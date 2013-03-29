@@ -10,6 +10,9 @@
 
 bin_PROGRAMS = calc
 
+EXTRA_DIST = system.h \
+	     version.h
+
 calc_SOURCES = calc.c \
 	       version.c
 
@@ -20,3 +23,11 @@ calc_CFLAGS = -I$(top_srcdir)/lib
 calc_LDFLAGS = -L$(top_builddir)/lib
 LIBS = -lgnu
 
+version.c: Makefile
+	rm -f $@
+	printf '#include <config.h>\n' > $@t
+	printf 'char const *Version = "$(PACKAGE_VERSION)";\n' >> $@t
+	chmod a-w $@t
+	mv $@t $@
+
+DISTCLEANFILES = version.c

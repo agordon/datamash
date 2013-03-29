@@ -8,7 +8,7 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-EXTRA_DIST = reconf configure \
+EXTRA_DIST = bootstrap configure \
 	$(top_srcdir)/.version
 
 SUBDIRS = m4 lib src scripts tests
