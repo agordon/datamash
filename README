@@ -1,0 +1,101 @@
+Calc
+====
+
+Command-line Calculations based on input fields.
+Copyright (C) 2013 Assaf Gordon (assafgordon@gmail.com)
+LICENCE: GPLv3 or later.
+
+
+Background
+==========
+
+`calc` can be used to summarize data from an input file using common operations
+(e.g. sum, count, mean, stdev, and many more).
+
+`calc` is modelled after Aaron Quinlan's `groupBy` tool
+(https://github.com/arq5x/bedtools) but uses slightly different semantics.
+
+
+Common Use-case
+===============
+
+Given the following input file, with two fields:
+
+    group      age
+    control    30
+    treatment  24
+    control    28
+    control    31
+    treatment  33
+    treatment  21
+
+What is the mean and standard-deviation of ages in each group?
+The expected output is:
+
+    group      mean   stdev
+    control    29.66  1.247
+    treatment  26     5.099
+
+Using `groupBy`:
+
+    $ cat input.txt | sort -k1,1 | groupBy -i stdin -g 1 -o mean,stdev -c 2,2
+    control    29.66  1.247
+    treatment  26     5.099
+
+Using `calc`:
+
+    $ cat input.txt | sort -k1,1 | calc -k1 mean 2 stdev 2
+    control    29.66  1.247
+    treatment  26     5.099
+
+
+Usage Examples
+==============
+
+Example 1:
+Calculate the sum of all values in column 3:
+    $ cat INPUT.txt | calc sum 3
+
+This is equivalent to:
+    $ cat INPUT.txt | awk '{sum += #4} END { print sum }'
+
+Example 2:
+Calculate the sum of values in colum 3, for each group of values in column 2
+    $ cat INPUT.txt | sort -k2,2 | calc -k2 sum 3
+
+This is equivalent to the following SQL statement:
+    SELECT *,sum(COLUMN3) FROM table GROUP BY COLUMN2
+
+Or the following unix command:
+    $ cat INPUT.txt | sort -k2,2 | \
+        awk 'last == $2 { sum += $3 }
+             last && last != $2 { print sum; sum = $3 }
+             END { print sum }'
+
+Or the following groupBy command:
+    $ cat INPUT.txt | sort -k2,2 | groupBy -g2 -o sum -c 3
+
+
+Installation Example
+====================
+
+From git repository:
+
+    git clone git://github.com/agordon/calc.git
+    cd calc
+    ./bootstrap
+    ./configure
+    make
+    make check
+    sudo make install
+
+From a tarball
+
+    tar -xzvf calc-X.Y.Z.tar.gz
+    cd calc-X.Y.Z
+    ./configure
+    make
+    make check
+    sudo make install
+
+
