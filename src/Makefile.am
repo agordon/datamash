@@ -10,11 +10,13 @@
 
 bin_PROGRAMS = calc
 
-calc_SOURCES = calc.c
+calc_SOURCES = calc.c \
+	       version.c
 
 # gnulib header files - is this the right way to find them?
 calc_CFLAGS = -I$(top_srcdir)/lib
 
 # gnulib static library
-calc_LDFLAGS = -L$(top_builddir)/lib -lgnu
+calc_LDFLAGS = -L$(top_builddir)/lib
+LIBS = -lgnu
 
