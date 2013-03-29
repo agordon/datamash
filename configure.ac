@@ -33,23 +33,6 @@ AX_C_LONG_LONG
 
 gl_INIT
 
-
-dnl --enable-wall
-EXTRA_CHECKS="-Wall -Wextra -Wformat-nonliteral -Wformat-security -Wswitch-default -Wswitch-enum -Wunused-parameter -Wfloat-equal -Werror"
-AC_ARG_ENABLE(wall,
- [  --enable-wall          Enable many common GCC warnings (-Wall,-Wextra, -Werror etc., default enabled)],
- [case "${enableval}" in
-   yes) wall=true ;;
-   no)  wall=false ;;
-   *) AC_MSG_ERROR(bad value ${enableval} for --enable-wall) ;;
-  esac],
-  [wall=true])
-if test "$wall" = "true"
-then
-  CFLAGS="${CFLAGS} ${EXTRA_CHECKS}"
-fi
-
-
 AC_CONFIG_FILES([
    Makefile
    m4/Makefile
