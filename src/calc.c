@@ -19,6 +19,12 @@
 /* Until someone better comes along */
 const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon" ;
 
+/* enable debugging */
+static bool debug = false;
+
+/* The character marking end of line. Default to \n. */
+static char eolchar = '\n';
+
 enum
 {
   DEBUG_OPTION = CHAR_MAX + 1,
@@ -28,9 +34,9 @@ static char const short_options[] = "zk:t:";
 
 static struct option const long_options[] =
 {
-  {"", no_argument, NULL, 'b'},
   {"zero-terminated", no_argument, NULL, 'z'},
   {"field-separator", required_argument, NULL, 't'},
+  {"debug", no_argument, NULL, DEBUG_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0},
@@ -66,6 +72,14 @@ int main(int argc, char* argv[])
     {
       switch (optc)
         {
+        case 'z':
+          eolchar = 0;
+          break;
+
+        case DEBUG_OPTION:
+          debug = true;
+          break;
+
         case_GETOPT_HELP_CHAR;
 
         case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
