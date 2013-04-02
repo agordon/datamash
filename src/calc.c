@@ -90,3 +90,8 @@ int main(int argc, char* argv[])
 
     }
 }
+
+/* vim: set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1: */
+/* vim: set shiftwidth=2: */
+/* vim: set tabstop=8: */
+/* vim: set expandtab: */
