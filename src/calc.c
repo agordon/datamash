@@ -9,6 +9,8 @@
 #include "quote.h"
 #include "version.h"
 #include "version-etc.h"
+#include "xalloc.h"
+#include "xstrtod.h"
 #include "xstrtol.h"
 
 /* The official name of this program (e.g., no 'g' prefix).  */
@@ -25,6 +27,8 @@ static bool debug = false;
 /* The character marking end of line. Default to \n. */
 static char eolchar = '\n';
 
+static size_t line_number = 0 ;
+
 enum operation_type
 {
   OP_COUNT = 0,
@@ -38,6 +42,11 @@ enum operation_type
 
   OP_LAST /* Must be last element */
 };
+
+typedef void* (*op_init) ();
+typedef bool  (*op_collect) (const char* str_value, const double *num_value);
+typedef void  (*op_calc) (void *);
+typedef void  (*op_free) (void *);
 
 struct operation_data
 {
@@ -71,6 +80,28 @@ struct fieldop
   enum operation_type op;
   struct fieldop *next;
 };
+
+struct fieldop *field_ops = NULL;
+
+static void
+add_field_op (enum operation_type op, size_t field)
+{
+  struct fieldop *newop = XZALLOC(struct fieldop);
+  newop->field = field;
+  newop->op = op;
+
+  if (field_ops == NULL)
+    {
+      field_ops = newop;
+    }
+  else
+    {
+      struct fieldop *p = field_ops;
+      while (p->next != NULL)
+        p = p->next;
+      p->next = newop;
+    }
+}
 
 enum
 {
@@ -154,8 +185,59 @@ parse_operations (int argc, int start, char **argv)
       field = get_field_number (op, argv[i]);
       i++;
 
-      printf ("%s(%zu)\n", get_operation_name(op), field);
+      add_field_op (op, field);
     }
+}
+
+static void
+print_ops ()
+{
+  struct fieldop *p = field_ops;
+  while (p)
+    {
+      printf ("%s(%zu)\n", get_operation_name(p->op),p->field);
+      p = p->next;
+    }
+}
+
+static void
+process_file ()
+{
+  struct linebuffer line;
+  long double val;
+  bool ok;
+  size_t buf_size = 1024 ;
+  char *buf = xzalloc (buf_size);
+
+  initbuffer (&line);
+  while (readlinebuffer_delim (&line, stdin, eolchar))
+    {
+      line_number++;
+
+      /* TODO: extract field, instead of whole line */
+      if (line.buffer[line.length-1]==eolchar)
+        line.length--; /* chomp */
+      if (line.length+1>buf_size)
+        {
+          buf_size = line.length+1;
+          xrealloc(buf, buf_size);
+        }
+      memcpy (buf, line.buffer, line.length);
+      buf[line.length]=0; /* NUL-terminate, as readlinebuffer doesn't */
+
+      /* TODO: convert to numeric only if any of the ops are numeric */
+      ok = xstrtold (buf, NULL, &val, strtold);
+
+      /* TODO: make invalid input error or warning or silent */
+      if (!ok)
+        error (EXIT_FAILURE, 0,
+               _("invalid numeric input in line %zu field %zu: '%s'"),
+                     line_number, 1, buf);
+    }
+  freebuffer (&line);
+
+  if (ferror (stdin))
+    error (EXIT_FAILURE, 0, _("error reading input"));
 }
 
 int main(int argc, char* argv[])
@@ -190,6 +272,7 @@ int main(int argc, char* argv[])
     error (0, 0, _("missing operations specifiers"));
 
   parse_operations (argc, optind, argv);
+  process_file ();
 }
 
 /* vim: set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1: */
