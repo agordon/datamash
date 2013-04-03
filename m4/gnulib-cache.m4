@@ -27,17 +27,19 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=config --no-conditional-dependencies --no-libtool --macro-prefix=gl git-version-gen linebuffer progname propername quote version-etc
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=config --no-conditional-dependencies --no-libtool --macro-prefix=gl getopt-gnu git-version-gen linebuffer progname propername quote version-etc xstrtol
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
 gl_MODULES([
+  getopt-gnu
   git-version-gen
   linebuffer
   progname
   propername
   quote
   version-etc
+  xstrtol
 ])
 gl_AVOID([])
 gl_SOURCE_BASE([lib])

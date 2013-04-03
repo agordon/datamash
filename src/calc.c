@@ -1,15 +1,15 @@
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "system.h"
 #include "config.h"
+#include <getopt.h>
 #include "linebuffer.h"
 #include "error.h"
 #include "quote.h"
 #include "version.h"
 #include "version-etc.h"
-
+#include "xstrtol.h"
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "calc"
@@ -50,7 +50,7 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION] op1 col1 [op2 col2]\n\
+Usage: %s [OPTION] op [op ...] col [...]\n\
 "),
               program_name);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -59,7 +59,54 @@ Usage: %s [OPTION] op1 col1 [op2 col2]\n\
   exit (status);
 }
 
+static bool
+valid_op (const char* op)
+{
+  const char* ops[] =
+    {
+      "sum", "mean", "median", "max", "min", "count",
+      NULL
+    };
 
+  const char** p = ops;
+  while ( (*p) != NULL )
+    {
+      if ( STREQ(*p, op) )
+        return true;
+      p++;
+    }
+  return false;
+}
+
+/* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
+static void
+parse_operations (int argc, int start, char **argv)
+{
+  int i = start;	/* Index into ARGV. */
+  size_t col;
+  const char *op;
+  strtol_error e;
+
+  while ( i < argc )
+    {
+      op = argv[i];
+      if (!valid_op(op))
+        error (EXIT_FAILURE, 0, _("invalid operation '%s'"), op);
+      i++;
+      if ( i >= argc )
+        error (EXIT_FAILURE, 0, _("missing field number after " \
+                                  "operation '%s'"), op );
+
+      e = xstrtoul (argv[i], NULL, 10, &col, NULL);
+      /* NOTE: can't use xstrtol_fatal - it's too tightly-coupled
+               with getopt command-line processing */
+      if (e != LONGINT_OK)
+        error (EXIT_FAILURE, 0, _("invalid column '%s'"), argv[i]);
+      i++;
+
+      printf ("%s(%zu)\n", op, col);
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -87,8 +134,12 @@ int main(int argc, char* argv[])
         default:
           usage (EXIT_FAILURE);
         }
-
     }
+
+  if (argc <= optind)
+    error (0, 0, _("missing operations specifiers"));
+
+  parse_operations (argc, optind, argv);
 }
 
 /* vim: set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1: */
