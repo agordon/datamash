@@ -71,3 +71,16 @@
 /malloc.m4
 /realloc.m4
 /xstrtod.m4
+/exponentd.m4
+/exponentf.m4
+/exponentl.m4
+/fabs.m4
+/fabsl.m4
+/float_h.m4
+/fpieee.m4
+/isnand.m4
+/isnanf.m4
+/isnanl.m4
+/math_h.m4
+/mathfunc.m4
+/signbit.m4
