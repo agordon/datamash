@@ -25,6 +25,53 @@ static bool debug = false;
 /* The character marking end of line. Default to \n. */
 static char eolchar = '\n';
 
+enum operation_type
+{
+  OP_COUNT = 0,
+  OP_SUM,
+  OP_MEAN,
+  OP_MEDIAN,
+  OP_MODE,
+  OP_STDEV,
+  OP_MIN,
+  OP_MAX,
+
+  OP_LAST /* Must be last element */
+};
+
+struct operation_data
+{
+  const char* name; /* operation name, e.g. "sum" */
+  bool  numeric;    /* if true, expect only numeric input.
+                       non-numeric input will trigger error/warning. */
+};
+
+enum
+{
+  NUMERIC = true,
+  NON_NUMERIC = false
+};
+
+struct operation_data operations[] =
+{
+    /* OP_COUNT */ {"count", NON_NUMERIC },
+    /* OP_SUM   */ {"sum",   NUMERIC },
+    /* OP_MEAN  */ {"mean",  NUMERIC },
+    /* OP_MEDIAN*/ {"median",NUMERIC },
+    /* OP_MODE  */ {"mode",  NUMERIC },
+    /* OP_STDEV */ {"stdev", NUMERIC },
+    /* OP_MIN   */ {"min",   NUMERIC },
+    /* OP_MAX   */ {"max",   NUMERIC }
+};
+
+/* Operation on a field */
+struct fieldop
+{
+  size_t field; /* field number.  1 = first field in input file. */
+  enum operation_type op;
+  struct fieldop *next;
+};
+
 enum
 {
   DEBUG_OPTION = CHAR_MAX + 1,
@@ -59,23 +106,34 @@ Usage: %s [OPTION] op [op ...] col [...]\n\
   exit (status);
 }
 
-static bool
-valid_op (const char* op)
+static const char*
+get_operation_name (enum operation_type op)
 {
-  const char* ops[] =
-    {
-      "sum", "mean", "median", "max", "min", "count",
-      NULL
-    };
+  return operations[op].name;
+}
 
-  const char** p = ops;
-  while ( (*p) != NULL )
-    {
-      if ( STREQ(*p, op) )
-        return true;
-      p++;
-    }
-  return false;
+static enum operation_type
+get_operation_type (const char* op)
+{
+  size_t i;
+  for (i = 0; i < OP_LAST; ++i)
+      if ( STREQ(operations[i].name, op) )
+        return (enum operation_type)i;
+  error (EXIT_FAILURE, 0, _("invalid operation '%s'"), op);
+}
+
+static size_t
+get_field_number(enum operation_type op, const char* field_str)
+{
+  size_t val;
+  strtol_error e = xstrtoul (field_str, NULL, 10, &val, NULL);
+  /* NOTE: can't use xstrtol_fatal - it's too tightly-coupled
+     with getopt command-line processing */
+  if (e != LONGINT_OK)
+    error (EXIT_FAILURE, 0, _("invalid column '%s' for operation " \
+                               "'%s'"), field_str,
+                               get_operation_name(op));
+  return val;
 }
 
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
@@ -83,28 +141,20 @@ static void
 parse_operations (int argc, int start, char **argv)
 {
   int i = start;	/* Index into ARGV. */
-  size_t col;
-  const char *op;
-  strtol_error e;
+  size_t field;
+  enum operation_type op;
 
   while ( i < argc )
     {
-      op = argv[i];
-      if (!valid_op(op))
-        error (EXIT_FAILURE, 0, _("invalid operation '%s'"), op);
+      op = get_operation_type (argv[i]);
       i++;
       if ( i >= argc )
         error (EXIT_FAILURE, 0, _("missing field number after " \
                                   "operation '%s'"), op );
-
-      e = xstrtoul (argv[i], NULL, 10, &col, NULL);
-      /* NOTE: can't use xstrtol_fatal - it's too tightly-coupled
-               with getopt command-line processing */
-      if (e != LONGINT_OK)
-        error (EXIT_FAILURE, 0, _("invalid column '%s'"), argv[i]);
+      field = get_field_number (op, argv[i]);
       i++;
 
-      printf ("%s(%zu)\n", op, col);
+      printf ("%s(%zu)\n", get_operation_name(op), field);
     }
 }
 
