@@ -84,3 +84,9 @@
 /math_h.m4
 /mathfunc.m4
 /signbit.m4
+/frexp.m4
+/frexpl.m4
+/ldexp.m4
+/ldexpl.m4
+/sqrt.m4
+/sqrtl.m4

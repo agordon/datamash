@@ -17,11 +17,24 @@ calc_SOURCES = calc.c \
 	       version.c
 
 # gnulib header files - is this the right way to find them?
-calc_CFLAGS = -I$(top_srcdir)/lib
+#
+# TODO: set -Werror only for GCC
+EXTRA_CFLAGS=-Wall -Wextra -Wformat-nonliteral -Wformat-security -Wswitch-default -Wswitch-enum -Wunused-parameter -Wfloat-equal -Werror
+
+calc_CFLAGS = -I$(top_srcdir)/lib $(EXTRA_CFLAGS)
 
 # gnulib static library
 calc_LDFLAGS = -L$(top_builddir)/lib
-LIBS = -lgnu
+LIBS = -lgnu \
+       $(FABSL_LIBM) \
+       $(FABS_LIBM) \
+       $(FREXPL_LIBM) \
+       $(FREXP_LIBM) \
+       $(ISNANL_LIBM) \
+       $(LDEXPL_LIBM) \
+       $(LDEXP_LIBM) \
+       $(SQRTL_LIBM) \
+       $(SQRT_LIBM)
 
 version.c: Makefile
 	rm -f $@

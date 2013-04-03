@@ -30,7 +30,7 @@ static char eolchar = '\n';
 
 static size_t line_number = 0 ;
 
-enum operation_type
+enum operation
 {
   OP_COUNT = 0,
   OP_SUM,
@@ -43,33 +43,49 @@ enum operation_type
   OP_MODE,
   OP_STDEV,
 
-  OP_LAST /* Must be last element */
+  OP_LAST = OP_STDEV /* Must be last element */
 };
 
-static const char* operation_names[] =
+enum operation_type__
 {
-  "count", "sum", "min", "max", "absmin", "absmax", "mean", "median", "mode",
-  "stdev", NULL
+  SINGLE_NUMERIC = 0,
+  MULTI_NUMERIC,
+  MULTI_STRING
 };
 
-static bool operation_numerics[] =
+enum operation_first_value
 {
-  true, true, true, true, true, true, /* count, sum, min, max, absmin, absmax */
-  true, true, true, true /* mean, median, mode, stdev */
+  AUTO_SET_FIRST = true,
+  IGNORE_FIRST = false
 };
 
-static bool operation_auto_firsts[] =
+struct operation_data
 {
-  false, false,  /* count, sum */
-  true, true, true, true, /* min, max, absmin, absmax */
-  false, false, false, false /* mean, median, mode, stdev */
+  const char* name;
+  enum operation_type__ type;
+  enum operation_first_value auto_first;
+};
+
+struct operation_data operations[] =
+{
+  {"count",   SINGLE_NUMERIC, IGNORE_FIRST },  /* OP_COUNT */
+  {"sum",     SINGLE_NUMERIC, IGNORE_FIRST },  /* OP_SUM */
+  {"min",     SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_MIN */
+  {"max",     SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_MAX */
+  {"absmin",  SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_ABSMIN */
+  {"absmax",  SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_ABSMAX */
+  {"mean",    SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_MEAN */
+  {"median",  MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_MEDIAN */
+  {"mode",    MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_MODE */
+  {"stdev",   MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_STDEV */
 };
 
 /* Operation on a field */
 struct fieldop
 {
   /* operation 'class' information */
-  enum operation_type type;
+  enum operation op;
+  enum operation_type__ type;
   const char* name;
   bool numeric;
   bool auto_first; /* if true, automatically set 'value' if 'first' */
@@ -83,26 +99,62 @@ struct fieldop
   long double value; /* for single-value operations (sum, min, max, absmin,
                         absmax, mean) - this is the accumulated value */
 
+  long double *values;     /* array for multi-valued ops (median,mode,stdev) */
+  size_t      num_values;  /* number of used values */
+  size_t      alloc_values;/* number of allocated values */
+
   struct fieldop *next;
 };
 
 
 static struct fieldop* field_ops = NULL;
 
+enum { VALUES_BATCH_INCREMENT = 1024 };
+
+/* Re-Allocate the 'op->values' buffer, by VALUES_BATCH_INCREMENT elements.
+   If 'op->values' is NULL, allocate the first batch */
 static void
-new_field_op (enum operation_type type, size_t field)
+field_op_reserve_values (struct fieldop *op)
+{
+  op->alloc_values += VALUES_BATCH_INCREMENT;
+  op->values = xnrealloc (op->values, op->alloc_values, sizeof (long double));
+}
+
+/* see:
+  http://www.gnu.org/software/libc/manual/html_node/Comparison-Functions.html */
+static int
+cmp_long_double (const void *p1, const void *p2)
+{
+  const long double *a = (const long double *)p1;
+  const long double *b = (const long double *)p2;
+
+  return ( *a > *b ) - (*a < *b);
+
+}
+
+static void
+field_op_sort_values (struct fieldop *op)
+{
+  qsort (op->values, op->num_values, sizeof (long double), cmp_long_double);
+}
+
+static void
+new_field_op (enum operation oper, size_t field)
 {
   struct fieldop *op = XZALLOC(struct fieldop);
 
-  op->type = type;
-  op->name = operation_names[type];
-  op->numeric = operation_numerics[type];
-  op->auto_first = operation_auto_firsts[type];
+  op->op = oper;
+  op->type = operations[oper].type;
+  op->name = operations[oper].name;
+  op->numeric = (op->type == SINGLE_NUMERIC || op->type == MULTI_NUMERIC);
+  op->auto_first = operations[oper].auto_first;
 
   op->field = field;
   op->first = true;
   op->value = 0;
   op->count = 0;
+  if (op->type == MULTI_NUMERIC)
+    field_op_reserve_values (op);
 
   op->next = NULL;
 
@@ -123,13 +175,16 @@ field_op_collect (struct fieldop *op,
 {
   bool keep_line = false;
 
+  if (debug)
+    fprintf (stderr, "-- collect for %s(%zu) val=%s\n",
+        op->name, op->field, str_value);
 
   op->count++;
 
   if (op->first && op->auto_first)
       op->value = num_value;
 
-  switch (op->type)
+  switch (op->op)
     {
     case OP_SUM:
     case OP_MEAN:
@@ -178,9 +233,14 @@ field_op_collect (struct fieldop *op,
     case OP_MEDIAN:
     case OP_MODE:
     case OP_STDEV:
-      error (EXIT_FAILURE, 0, _("not implemented yet"));
+      if (op->num_values >= op->alloc_values)
+        field_op_reserve_values(op);
+      op->values[op->num_values] = num_value;
+      op->num_values++;
       break;
 
+    default:
+      break;
     }
 
   if (op->first)
@@ -192,7 +252,10 @@ field_op_collect (struct fieldop *op,
 static void
 field_op_summarize (struct fieldop *op)
 {
-  switch (op->type)
+  if (debug)
+    fprintf (stderr, "-- summarize for %s(%zu)\n", op->name, op->field);
+
+  switch (op->op)
     {
     case OP_MEAN:
       /* Calculate mean, then fall-through */
@@ -211,9 +274,14 @@ field_op_summarize (struct fieldop *op)
     case OP_MEDIAN:
     case OP_MODE:
     case OP_STDEV:
-      error (EXIT_FAILURE, 0, _("not implemented yet"));
+      field_op_sort_values (op);
+      for (size_t i=0; i<op->num_values; i++)
+        fprintf (stderr, "value[%zu] = %Lg\n", i, op->values[i]);
       break;
 
+    default:
+      error (EXIT_FAILURE, 0, _("internal error 2"));
+      break;
     }
 
 
@@ -240,7 +308,12 @@ free_field_op (struct fieldop *op)
 
   next = op->next;
 
-  switch (op->type)
+  if (op->values)
+      free (op->values);
+  op->num_values = 0 ;
+  op->alloc_values = 0;
+
+  switch (op->op)
     {
     case OP_MEAN:
     case OP_SUM:
@@ -255,7 +328,9 @@ free_field_op (struct fieldop *op)
     case OP_MEDIAN:
     case OP_MODE:
     case OP_STDEV:
-      error (EXIT_FAILURE, 0, _("not implemented yet"));
+      break;
+
+    default:
       break;
     }
 
@@ -306,18 +381,20 @@ Usage: %s [OPTION] op [op ...] col [...]\n\
   exit (status);
 }
 
-static enum operation_type
-get_operation_type (const char* op)
+static enum operation
+get_operation (const char* op)
 {
   size_t i;
   for (i = 0; i < OP_LAST; ++i)
-      if ( STREQ(operation_names[i], op) )
-        return (enum operation_type)i;
+      if ( STREQ(operations[i].name, op) )
+        return (enum operation)i;
+
   error (EXIT_FAILURE, 0, _("invalid operation '%s'"), op);
+  return 0; /* never reached */
 }
 
 static size_t
-get_field_number(enum operation_type op, const char* field_str)
+get_field_number(enum operation op, const char* field_str)
 {
   size_t val;
   strtol_error e = xstrtoul (field_str, NULL, 10, &val, NULL);
@@ -326,7 +403,7 @@ get_field_number(enum operation_type op, const char* field_str)
   if (e != LONGINT_OK)
     error (EXIT_FAILURE, 0, _("invalid column '%s' for operation " \
                                "'%s'"), field_str,
-                               operation_names[op]);
+                               operations[op].name);
   return val;
 }
 
@@ -336,15 +413,15 @@ parse_operations (int argc, int start, char **argv)
 {
   int i = start;	/* Index into ARGV. */
   size_t field;
-  enum operation_type op;
+  enum operation op;
 
   while ( i < argc )
     {
-      op = get_operation_type (argv[i]);
+      op = get_operation (argv[i]);
       i++;
       if ( i >= argc )
         error (EXIT_FAILURE, 0, _("missing field number after " \
-                                  "operation '%s'"), op );
+                                  "operation '%s'"), argv[i] );
       field = get_field_number (op, argv[i]);
       i++;
 
@@ -352,6 +429,7 @@ parse_operations (int argc, int start, char **argv)
     }
 }
 
+#if 0
 static void
 print_ops ()
 {
@@ -362,12 +440,15 @@ print_ops ()
       p = p->next;
     }
 }
+#endif
 
 static void
 extract_field (const struct linebuffer *line, size_t field,
                char /*OUTPUT*/ **buf, size_t *buf_size)
 {
   size_t len = line->length;
+
+  (void)field;
 
   /* TODO: extract field, instead of whole line */
   if (line->buffer[len-1]==eolchar)
@@ -401,7 +482,7 @@ process_line (const struct linebuffer *line)
           if (!ok)
             error (EXIT_FAILURE, 0,
                 _("invalid numeric input in line %zu field %zu: '%s'"),
-                line_number, 1, buf);
+                line_number, op->field, buf);
 
           //fprintf (stderr, "buf=%s val = %Lg\n", buf, val);
         }
