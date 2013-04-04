@@ -560,7 +560,7 @@ field_op_summarize (struct fieldop *op)
   op->first = true;
   op->count = 0 ;
   op->value = 0;
-
+  op->num_values = 0 ;
   op->str_ptr_used = 0;
   op->str_buf_used = 0;
 }
