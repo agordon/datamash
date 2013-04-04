@@ -155,9 +155,9 @@ field_op_reserve_values (struct fieldop *op)
 /* Re-Allocate the 'op->collapsed_buf' buffer,
    by MAX(size+1,VALUES_BATCH_INCREMENT) bytes. */
 static void
-field_op_add_string (struct fieldop *op, const char* str)
+field_op_add_string (struct fieldop *op, const char* str, size_t slen)
 {
-  size_t len = strlen(str)+1;
+  size_t len = slen+1;
   if (op->str_buf_used + len >= op->str_buf_alloc)
     {
       op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,len);
@@ -174,7 +174,7 @@ field_op_add_string (struct fieldop *op, const char* str)
   op->str_ptr_used++;
 
   /* Copy the string to the buffer */
-  strcpy (op->str_buf + op->str_buf_used, str);
+  memcpy (op->str_buf + op->str_buf_used, str, len);
   op->str_buf_used += len;
 }
 
@@ -229,13 +229,17 @@ new_field_op (enum operation oper, size_t field)
 
 static bool
 field_op_collect (struct fieldop *op,
-                  const char* str_value, const long double num_value)
+                  const char* str, size_t slen,
+                  const long double num_value)
 {
   bool keep_line = false;
 
   if (debug)
-    fprintf (stderr, "-- collect for %s(%zu) val=%s\n",
-        op->name, op->field, str_value);
+    {
+      fprintf (stderr, "-- collect for %s(%zu) val='", op->name, op->field);
+      fwrite (str, sizeof(char), slen, stderr);
+      fprintf (stderr, "'\n");
+    }
 
   op->count++;
 
@@ -304,7 +308,7 @@ field_op_collect (struct fieldop *op,
     case OP_UNIQUE:
     case OP_UNIQUE_NOCASE:
     case OP_COLLAPSE:
-      field_op_add_string (op, str_value);
+      field_op_add_string (op, str, slen);
       break;
 
 
@@ -708,60 +712,64 @@ inline static void
 linebuffer_chomp (struct linebuffer *line)
 {
   if (line->buffer[line->length-1]==eolchar)
-    line->length--;
+    {
+      line->buffer[line->length-1] = 0; /* make it NUL terminated */
+      line->length--;
+    }
+  else
+    {
+      /* TODO: verify this is safe, and the allocated buffer is large enough */
+      line->buffer[line->length] = 0;
+    }
 }
 
 static void
-extract_field (const struct linebuffer *line, size_t field,
-               char /*OUTPUT*/ **buf, size_t *buf_size)
+skip_to_field (const struct linebuffer *line, size_t field,
+               char** /* OUT*/ ptr, size_t /*OUT*/ *len)
 {
-  size_t len = line->length;
-
   (void)field;
+  *ptr = line->buffer;
+  *len = line->length;
+}
 
-  /* TODO: extract field, instead of whole line */
-  if (len+1>*buf_size)
+inline static long double
+safe_strtold ( const char *str, size_t len, size_t field )
+{
+  char *endptr=NULL;
+
+  errno = 0;
+  long double val = strtold (str, &endptr);
+  if (errno==ERANGE || endptr==str)
     {
-      *buf_size = len+1;
-      xrealloc(*buf, *buf_size);
+      char *tmp = strdup(str);
+      tmp[len] = 0 ;
+      /* TODO: make invalid input error or warning or silent */
+      error (EXIT_FAILURE, 0,
+          _("invalid numeric input in line %zu field %zu: '%s'"),
+          line_number, field, tmp);
     }
-  memcpy (*buf, line->buffer, len);
-  (*buf)[len]=0; /* NUL-terminate, as readlinebuffer doesn't */
+  return val;
 }
 
 static void
 process_line (const struct linebuffer *line)
 {
-  size_t buf_size = 1024 ;
-  char *buf = xzalloc (buf_size);
-  long double val;
-  bool ok;
+  long double val=0;
+  char *str;
+  size_t len;
 
   struct fieldop *op = field_ops;
   while (op)
     {
-      extract_field (line, op->field, &buf, &buf_size);
+      skip_to_field (line, op->field, &str, &len);
 
       if (op->numeric)
-        {
-          ok = xstrtold (buf, NULL, &val, strtold);
-          /* TODO: make invalid input error or warning or silent */
-          if (!ok)
-            error (EXIT_FAILURE, 0,
-                _("invalid numeric input in line %zu field %zu: '%s'"),
-                line_number, op->field, buf);
+        val = safe_strtold ( str, len, op->field );
 
-          //fprintf (stderr, "buf=%s val = %Lg\n", buf, val);
-        }
-      else
-        val = 0;
-
-      field_op_collect (op, buf, val);
+      field_op_collect (op, str, len, val);
 
       op = op->next;
     }
-
-  free(buf);
 }
 
 static void

@@ -64,13 +64,10 @@
 /stdarg.m4
 /version-etc.m4
 /getopt.m4
-/inttypes.m4
 /nocrash.m4
-/xstrtol.m4
 /calloc.m4
 /malloc.m4
 /realloc.m4
-/xstrtod.m4
 /exponentd.m4
 /exponentf.m4
 /exponentl.m4
