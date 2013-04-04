@@ -41,9 +41,10 @@ enum operation
   OP_MEAN,
   OP_MEDIAN,
   OP_MODE,
-  OP_STDEV,
-
-  OP_LAST = OP_STDEV /* Must be last element */
+  OP_PSTDEV, /* Population Standard Deviation */
+  OP_SSTDEV, /* Sample Standard Deviation */
+  OP_PVARIANCE, /* Population Variance */
+  OP_SVARIANCE /* Sample Variance */
 };
 
 enum operation_type__
@@ -74,16 +75,20 @@ struct operation_data operations[] =
   {"max",     SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_MAX */
   {"absmin",  SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_ABSMIN */
   {"absmax",  SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_ABSMAX */
-  {"mean",    SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_MEAN */
+  {"mean",    SINGLE_NUMERIC, IGNORE_FIRST},   /* OP_MEAN */
   {"median",  MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_MEDIAN */
   {"mode",    MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_MODE */
-  {"stdev",   MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_STDEV */
+  {"pstdev",  MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_PSTDEV */
+  {"sstdev",  MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_SSTDEV */
+  {"pvar",    MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_PVARIANCE */
+  {"svar",    MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_SVARIANCE */
+  {NULL}
 };
 
 /* Operation on a field */
 struct fieldop
 {
-  /* operation 'class' information */
+    /* operation 'class' information */
   enum operation op;
   enum operation_type__ type;
   const char* name;
@@ -232,7 +237,10 @@ field_op_collect (struct fieldop *op,
 
     case OP_MEDIAN:
     case OP_MODE:
-    case OP_STDEV:
+    case OP_PSTDEV:
+    case OP_SSTDEV:
+    case OP_PVARIANCE:
+    case OP_SVARIANCE:
       if (op->num_values >= op->alloc_values)
         field_op_reserve_values(op);
       op->values[op->num_values] = num_value;
@@ -249,18 +257,61 @@ field_op_collect (struct fieldop *op,
   return keep_line;
 }
 
+inline static long double
+median_value ( const long double * const values, size_t n )
+{
+  return (n&0x01)
+    ?values[n/2]
+    :( (values[n/2-1] + values[n/2]) / 2.0 );
+}
+
+enum degrees_of_freedom
+{
+  DF_POPULATION = 0,
+  DF_SAMPLE = 1
+};
+
+inline static long double
+variance_value ( const long double * const values, size_t n, int df )
+{
+  long double sum=0;
+  long double mean;
+  long double variance;
+
+  for (size_t i = 0; i < n; i++)
+    sum += values[i];
+  mean = sum / n ;
+
+  sum = 0 ;
+  for (size_t i = 0; i < n; i++)
+    sum += (values[i] - mean) * (values[i] - mean);
+
+  variance = sum / ( n - df );
+
+  return variance;
+}
+
+inline static long double
+stdev_value ( const long double * const values, size_t n, int df )
+{
+  return sqrtl ( variance_value ( values, n, df ) );
+}
+
 static void
 field_op_summarize (struct fieldop *op)
 {
+  long double numeric_result = 0 ;
+
   if (debug)
     fprintf (stderr, "-- summarize for %s(%zu)\n", op->name, op->field);
 
   switch (op->op)
     {
     case OP_MEAN:
-      /* Calculate mean, then fall-through */
+      /* Calculate mean */
       /* TODO: check for division-by-zero */
-      op->value /= op->count;
+      numeric_result = op->value / op->count;
+      break;
 
     case OP_SUM:
     case OP_COUNT:
@@ -268,15 +319,35 @@ field_op_summarize (struct fieldop *op)
     case OP_MAX:
     case OP_ABSMIN:
     case OP_ABSMAX:
-      fprintf (stderr, "%s(%zu) = %Lg\n", op->name, op->field, op->value);
+      /* no summarization for these operations, just print the value */
+      numeric_result = op->value;
       break;
 
     case OP_MEDIAN:
-    case OP_MODE:
-    case OP_STDEV:
+      /* TODO: check for no values at all */
       field_op_sort_values (op);
-      for (size_t i=0; i<op->num_values; i++)
-        fprintf (stderr, "value[%zu] = %Lg\n", i, op->values[i]);
+      numeric_result = median_value ( op->values, op->num_values );
+      break;
+
+    case OP_PSTDEV:
+      numeric_result = stdev_value ( op->values, op->num_values, DF_POPULATION);
+      break;
+
+    case OP_SSTDEV:
+      numeric_result = stdev_value ( op->values, op->num_values, DF_SAMPLE);
+      break;
+
+    case OP_PVARIANCE:
+      numeric_result = variance_value ( op->values, op->num_values,
+                                        DF_POPULATION);
+      break;
+
+    case OP_SVARIANCE:
+      numeric_result = variance_value ( op->values, op->num_values,
+                                        DF_SAMPLE);
+      break;
+
+    case OP_MODE:
       break;
 
     default:
@@ -284,6 +355,9 @@ field_op_summarize (struct fieldop *op)
       break;
     }
 
+
+  if (op->numeric)
+    fprintf (stderr, "%s(%zu) = %Lg\n", op->name, op->field, numeric_result);
 
   /* reset values for next group */
   op->first = true;
@@ -312,27 +386,6 @@ free_field_op (struct fieldop *op)
       free (op->values);
   op->num_values = 0 ;
   op->alloc_values = 0;
-
-  switch (op->op)
-    {
-    case OP_MEAN:
-    case OP_SUM:
-    case OP_COUNT:
-    case OP_MIN:
-    case OP_MAX:
-    case OP_ABSMIN:
-    case OP_ABSMAX:
-      /* nothing to free for these types */
-      break;
-
-    case OP_MEDIAN:
-    case OP_MODE:
-    case OP_STDEV:
-      break;
-
-    default:
-      break;
-    }
 
   free(op);
 
@@ -384,8 +437,7 @@ Usage: %s [OPTION] op [op ...] col [...]\n\
 static enum operation
 get_operation (const char* op)
 {
-  size_t i;
-  for (i = 0; i < OP_LAST; ++i)
+  for (size_t i = 0; operations[i].name ; i++)
       if ( STREQ(operations[i].name, op) )
         return (enum operation)i;
 
