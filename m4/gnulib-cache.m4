@@ -27,19 +27,17 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=config --no-conditional-dependencies --no-libtool --macro-prefix=gl array-list avltree-list avltree-oset calloc-gnu fabsl getopt-gnu git-version-gen linebuffer progname propername quote realloc-gnu sqrtl version-etc xalloc xlist xoset xstrtod xstrtol xstrtold
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=config --no-conditional-dependencies --no-libtool --macro-prefix=gl calloc-gnu fabsl getopt-gnu git-version-gen linebuffer minmax progname propername quote realloc-gnu sqrtl version-etc xalloc xstrtod xstrtol xstrtold
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
 gl_MODULES([
-  array-list
-  avltree-list
-  avltree-oset
   calloc-gnu
   fabsl
   getopt-gnu
   git-version-gen
   linebuffer
+  minmax
   progname
   propername
   quote
@@ -47,8 +45,6 @@ gl_MODULES([
   sqrtl
   version-etc
   xalloc
-  xlist
-  xoset
   xstrtod
   xstrtol
   xstrtold

@@ -5,10 +5,8 @@
 #include <getopt.h>
 #include <math.h>
 #include <stdlib.h>
-#include "gl_avltree_oset.h"
-#include "gl_xlist.h"
-#include "gl_xoset.h"
 #include "linebuffer.h"
+#include "minmax.h"
 #include "error.h"
 #include "quote.h"
 #include "version.h"
@@ -31,6 +29,9 @@ static bool debug = false;
 /* The character marking end of line. Default to \n. */
 static char eolchar = '\n';
 
+/* The character used to separate collapsed/uniqued strings */
+static char collapse_separator = ',';
+
 static size_t line_number = 0 ;
 
 enum operation
@@ -50,14 +51,15 @@ enum operation
   OP_MODE,
   OP_ANTIMODE,
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */
-  OP_UNIQUE_NOCASE  /* Collapse Unique strings, ignoring-case */
+  OP_UNIQUE_NOCASE, /* Collapse Unique strings, ignoring-case */
+  OP_COLLAPSE       /* Collapse strings into comma separated values */
 };
 
 enum operation_type__
 {
   NUMERIC_SCALAR = 0,
   NUMERIC_VECTOR,
-  STRING_CUSTOM
+  STRING_VECTOR
 };
 
 enum operation_first_value
@@ -89,8 +91,9 @@ struct operation_data operations[] =
   {"svar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SVARIANCE */
   {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
   {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
-  {"unique",  STRING_CUSTOM,   IGNORE_FIRST},   /* OP_UNIQUE */
-  {"uniquenc",STRING_CUSTOM,   IGNORE_FIRST},   /* OP_UNIQUE_NOCASE */
+  {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
+  {"uniquenc",STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE_NOCASE */
+  {"collapse",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COLLAPSE */
 
   {NULL}
 };
@@ -121,8 +124,13 @@ struct fieldop
   size_t      num_values;  /* number of used values */
   size_t      alloc_values;/* number of allocated values */
 
-  /* String container for OP_UNIQE / OP_UNIQUE_NOCASE*/
-  gl_oset_t   str_oset;
+  /* String buffer for STRING_VECTOR operations */
+  char *str_buf;   /* points to the beginning of the buffer */
+  size_t str_buf_used; /* number of bytes used in the buffer */
+  size_t str_buf_alloc; /* number of bytes allocated in the buffer */
+  char **str_ptr;  /* array of string pointers, into 'str_buf' */
+  size_t str_ptr_used; /* number of strings pointers */
+  size_t str_ptr_alloc; /* number of string pointers allocated */
 
   struct fieldop *next;
 };
@@ -138,6 +146,32 @@ field_op_reserve_values (struct fieldop *op)
 {
   op->alloc_values += VALUES_BATCH_INCREMENT;
   op->values = xnrealloc (op->values, op->alloc_values, sizeof (long double));
+}
+
+/* Re-Allocate the 'op->collapsed_buf' buffer,
+   by MAX(size+1,VALUES_BATCH_INCREMENT) bytes. */
+static void
+field_op_add_string (struct fieldop *op, const char* str)
+{
+  size_t len = strlen(str)+1;
+  if (op->str_buf_used + len >= op->str_buf_alloc)
+    {
+      op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,len);
+      op->str_buf = xrealloc (op->str_buf, op->str_buf_alloc);
+    }
+  if (op->str_ptr_used + 1 >= op->str_ptr_alloc)
+    {
+      op->str_ptr_alloc += VALUES_BATCH_INCREMENT;
+      op->str_ptr = xrealloc (op->str_ptr, op->str_ptr_alloc);
+    }
+
+  /* Set the string pointer */
+  op->str_ptr[op->str_ptr_used] = op->str_buf + op->str_buf_used;
+  op->str_ptr_used++;
+
+  /* Copy the string to the buffer */
+  strcpy (op->str_buf + op->str_buf_used, str);
+  op->str_buf_used += len;
 }
 
 /* see:
@@ -175,15 +209,6 @@ new_field_op (enum operation oper, size_t field)
   op->count = 0;
   if (op->type == NUMERIC_VECTOR)
     field_op_reserve_values (op);
-
-  if (op->op == OP_UNIQUE)
-    op->str_oset = gl_oset_create_empty (GL_AVLTREE_OSET,
-                                         (gl_setelement_compar_fn)strcmp,
-                                         (gl_setelement_dispose_fn)free);
-  if (op->op == OP_UNIQUE_NOCASE)
-    op->str_oset = gl_oset_create_empty (GL_AVLTREE_OSET,
-                                         (gl_setelement_compar_fn)strcasecmp,
-                                         (gl_setelement_dispose_fn)free);
 
   op->next = NULL;
 
@@ -274,8 +299,10 @@ field_op_collect (struct fieldop *op,
 
     case OP_UNIQUE:
     case OP_UNIQUE_NOCASE:
-      gl_oset_add (op->str_oset, strdup(str_value));
+    case OP_COLLAPSE:
+      field_op_add_string (op, str_value);
       break;
+
 
     default:
       break;
@@ -369,28 +396,77 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
   return best_value;
 }
 
-static char *
-unique_value ( gl_oset_t str_oset )
+static int
+cmpstringp(const void *p1, const void *p2)
 {
-  size_t buf_size = 0;
-  const char* str;
+  /* The actual arguments to this function are "pointers to
+   *               pointers to char", but strcmp(3) arguments are "pointers
+   *                             to char", hence the following cast plus dereference */
+
+  return strcmp(* (char * const *) p1, * (char * const *) p2);
+}
+
+static int
+cmpstringp_nocase(const void *p1, const void *p2)
+{
+  /* The actual arguments to this function are "pointers to
+   *               pointers to char", but strcmp(3) arguments are "pointers
+   *                             to char", hence the following cast plus dereference */
+
+  return strcasecmp(* (char * const *) p1, * (char * const *) p2);
+}
+
+
+
+static char *
+unique_value ( struct fieldop *op, bool case_sensitive )
+{
+  const char *last_str;
   char *buf, *pos;
 
-  gl_oset_iterator_t it = gl_oset_iterator (str_oset);
-  while (gl_oset_iterator_next (&it, (const void**)&str))
-    buf_size += strlen(str)+1;
+  /* Sort the string pointers */
+  qsort ( op->str_ptr, op->str_ptr_used, sizeof(char*), case_sensitive
+                                                          ?cmpstringp
+                                                          :cmpstringp_nocase);
 
-  pos = buf = xzalloc (buf_size);
+  /* Uniquify them */
+  pos = buf = xzalloc ( op->str_buf_used );
 
-  it = gl_oset_iterator (str_oset);
-  while (gl_oset_iterator_next (&it, (const void**)&str))
+  /* Copy the first string */
+  last_str = op->str_ptr[0];
+  strcpy (buf, op->str_ptr[0]);
+  pos += strlen(op->str_ptr[0]);
+
+  /* Copy the following strings, if they are different from the previous one */
+  for (size_t i = 1; i < op->str_ptr_used ; ++i)
     {
-      if (pos != buf)
-          *pos++ = ',';
-      size_t len = strlen(str);
-      strcpy (pos, str);
-      pos += len;
+      const char *newstr = op->str_ptr[i];
+
+      if ((case_sensitive && (strcmp(newstr, last_str)!=0))
+          ||
+          (!case_sensitive && (strcasecmp(newstr, last_str)!=0)))
+        {
+          *pos++ = collapse_separator ;
+          strcpy (pos, newstr);
+          pos += strlen(newstr);
+        }
+      last_str = newstr;
     }
+
+  return buf;
+}
+
+static char *
+collapse_value ( struct fieldop *op )
+{
+  /* Copy the string buffer as-is */
+  char *buf = xzalloc ( op->str_buf_used );
+  memcpy (buf, op->str_buf, op->str_buf_used);
+
+  /* convert every NUL to comma, except for the last one */
+  for (size_t i=0; i < op->str_buf_used-1 ; i++)
+      if (buf[i] == 0)
+        buf[i] = collapse_separator ;
 
   return buf;
 }
@@ -399,6 +475,7 @@ static void
 field_op_summarize (struct fieldop *op)
 {
   long double numeric_result = 0 ;
+  char *string_result = NULL;
 
   if (debug)
     fprintf (stderr, "-- summarize for %s(%zu)\n", op->name, op->field);
@@ -454,7 +531,11 @@ field_op_summarize (struct fieldop *op)
 
     case OP_UNIQUE:
     case OP_UNIQUE_NOCASE:
-      fprintf(stderr, "foo = %s\n", unique_value (op->str_oset));
+      string_result = unique_value (op, (op->op==OP_UNIQUE));
+      break;
+
+    case OP_COLLAPSE:
+      string_result = collapse_value (op);
       break;
 
 
@@ -466,11 +547,18 @@ field_op_summarize (struct fieldop *op)
 
   if (op->numeric)
     fprintf (stderr, "%s(%zu) = %Lg\n", op->name, op->field, numeric_result);
+  else
+    fprintf (stderr, "%s(%zu) = '%s'\n", op->name, op->field, string_result);
+
+  free (string_result);
 
   /* reset values for next group */
   op->first = true;
   op->count = 0 ;
   op->value = 0;
+
+  op->str_ptr_used = 0;
+  op->str_buf_used = 0;
 }
 
 static void
@@ -494,6 +582,16 @@ free_field_op (struct fieldop *op)
       free (op->values);
   op->num_values = 0 ;
   op->alloc_values = 0;
+
+  free(op->str_buf);
+  op->str_buf = NULL;
+  op->str_buf_alloc = 0;
+  op->str_buf_used = 0;
+
+  free (op->str_ptr);
+  op->str_ptr = NULL;
+  op->str_ptr_used = 0;
+  op->str_ptr_alloc = 0;
 
   free(op);
 
@@ -653,6 +751,8 @@ process_line (const struct linebuffer *line)
 
       op = op->next;
     }
+
+  free(buf);
 }
 
 static void
