@@ -40,17 +40,18 @@ enum operation
   OP_ABSMAX,
   OP_MEAN,
   OP_MEDIAN,
-  OP_MODE,
-  OP_PSTDEV, /* Population Standard Deviation */
-  OP_SSTDEV, /* Sample Standard Deviation */
+  OP_PSTDEV,    /* Population Standard Deviation */
+  OP_SSTDEV,    /* Sample Standard Deviation */
   OP_PVARIANCE, /* Population Variance */
-  OP_SVARIANCE /* Sample Variance */
+  OP_SVARIANCE, /* Sample Variance */
+  OP_MODE,
+  OP_ANTIMODE
 };
 
 enum operation_type__
 {
-  SINGLE_NUMERIC = 0,
-  MULTI_NUMERIC,
+  NUMERIC_SCALAR = 0,
+  NUMERIC_VECTOR,
   MULTI_STRING
 };
 
@@ -69,19 +70,20 @@ struct operation_data
 
 struct operation_data operations[] =
 {
-  {"count",   SINGLE_NUMERIC, IGNORE_FIRST },  /* OP_COUNT */
-  {"sum",     SINGLE_NUMERIC, IGNORE_FIRST },  /* OP_SUM */
-  {"min",     SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_MIN */
-  {"max",     SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_MAX */
-  {"absmin",  SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_ABSMIN */
-  {"absmax",  SINGLE_NUMERIC, AUTO_SET_FIRST}, /* OP_ABSMAX */
-  {"mean",    SINGLE_NUMERIC, IGNORE_FIRST},   /* OP_MEAN */
-  {"median",  MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_MEDIAN */
-  {"mode",    MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_MODE */
-  {"pstdev",  MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_PSTDEV */
-  {"sstdev",  MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_SSTDEV */
-  {"pvar",    MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_PVARIANCE */
-  {"svar",    MULTI_NUMERIC,  IGNORE_FIRST},   /* OP_SVARIANCE */
+  {"count",   NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_COUNT */
+  {"sum",     NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_SUM */
+  {"min",     NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_MIN */
+  {"max",     NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_MAX */
+  {"absmin",  NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_ABSMIN */
+  {"absmax",  NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_ABSMAX */
+  {"mean",    NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_MEAN */
+  {"median",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MEDIAN */
+  {"pstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PSTDEV */
+  {"sstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SSTDEV */
+  {"pvar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PVARIANCE */
+  {"svar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SVARIANCE */
+  {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
+  {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
   {NULL}
 };
 
@@ -100,10 +102,13 @@ struct fieldop
 
   /* Collected Data */
   bool first;   /* true if this is the first item in a new group */
+
+  /* NUMERIC_SCALAR operations */
   size_t count; /* number of items collected so far in a group */
   long double value; /* for single-value operations (sum, min, max, absmin,
                         absmax, mean) - this is the accumulated value */
 
+  /* NUMERIC_VECTOR operations */
   long double *values;     /* array for multi-valued ops (median,mode,stdev) */
   size_t      num_values;  /* number of used values */
   size_t      alloc_values;/* number of allocated values */
@@ -151,14 +156,14 @@ new_field_op (enum operation oper, size_t field)
   op->op = oper;
   op->type = operations[oper].type;
   op->name = operations[oper].name;
-  op->numeric = (op->type == SINGLE_NUMERIC || op->type == MULTI_NUMERIC);
+  op->numeric = (op->type == NUMERIC_SCALAR || op->type == NUMERIC_VECTOR);
   op->auto_first = operations[oper].auto_first;
 
   op->field = field;
   op->first = true;
   op->value = 0;
   op->count = 0;
-  if (op->type == MULTI_NUMERIC)
+  if (op->type == NUMERIC_VECTOR)
     field_op_reserve_values (op);
 
   op->next = NULL;
@@ -236,11 +241,12 @@ field_op_collect (struct fieldop *op,
 
 
     case OP_MEDIAN:
-    case OP_MODE:
     case OP_PSTDEV:
     case OP_SSTDEV:
     case OP_PVARIANCE:
     case OP_SVARIANCE:
+    case OP_MODE:
+    case OP_ANTIMODE:
       if (op->num_values >= op->alloc_values)
         field_op_reserve_values(op);
       op->values[op->num_values] = num_value;
@@ -297,6 +303,48 @@ stdev_value ( const long double * const values, size_t n, int df )
   return sqrtl ( variance_value ( values, n, df ) );
 }
 
+
+enum MODETYPE
+{
+  MODE=1,
+  ANTIMODE
+};
+
+inline static long double
+mode_value ( const long double * const values, size_t n, enum MODETYPE type)
+{
+  /* not ideal implementation but simple enough */
+  /* Assumes 'values' are already sorted, find the longest sequence */
+  /* TODO: handle n==0 */
+
+  long double last_value = values[0];
+  size_t seq_size=1;
+  size_t best_seq_size= (type==MODE)?1:SIZE_MAX;
+  size_t best_value = values[0];
+
+  for (size_t i=1; i<n; i++)
+    {
+      bool eq = (cmp_long_double(&values[i],&last_value)==0);
+
+      if (eq)
+        seq_size++;
+
+      if ( ((type==MODE) && (seq_size > best_seq_size))
+           ||
+           ((type==ANTIMODE) && (seq_size < best_seq_size)))
+        {
+          best_seq_size = seq_size;
+          best_value = last_value;
+        }
+
+      if (!eq)
+          seq_size = 1;
+
+      last_value = values[i];
+    }
+  return best_value;
+}
+
 static void
 field_op_summarize (struct fieldop *op)
 {
@@ -348,7 +396,12 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_MODE:
+    case OP_ANTIMODE:
+      field_op_sort_values (op);
+      numeric_result = mode_value ( op->values, op->num_values,
+                                    (op->op==OP_MODE)?MODE:ANTIMODE);
       break;
+
 
     default:
       error (EXIT_FAILURE, 0, _("internal error 2"));
