@@ -32,7 +32,11 @@ static char eolchar = '\n';
 /* The character used to separate collapsed/uniqued strings */
 static char collapse_separator = ',';
 
+/* Line number in the input file */
 static size_t line_number = 0 ;
+
+/* Lines in the current group */
+static size_t lines_in_group = 0 ;
 
 enum operation
 {
@@ -700,6 +704,13 @@ print_ops ()
 }
 #endif
 
+inline static void
+linebuffer_chomp (struct linebuffer *line)
+{
+  if (line->buffer[line->length-1]==eolchar)
+    line->length--;
+}
+
 static void
 extract_field (const struct linebuffer *line, size_t field,
                char /*OUTPUT*/ **buf, size_t *buf_size)
@@ -709,8 +720,6 @@ extract_field (const struct linebuffer *line, size_t field,
   (void)field;
 
   /* TODO: extract field, instead of whole line */
-  if (line->buffer[len-1]==eolchar)
-    len--; /* chomp */
   if (len+1>*buf_size)
     {
       *buf_size = len+1;
@@ -764,11 +773,25 @@ process_file ()
   while (readlinebuffer_delim (&line, stdin, eolchar))
     {
       line_number++;
+      linebuffer_chomp (&line);
+
+      if (line.length==0)
+        {
+          /* new group marker */
+          if (lines_in_group>0)
+            summarize_field_ops ();
+
+          lines_in_group = 0;
+          continue;
+        }
+
+      lines_in_group++;
       process_line (&line);
     }
   freebuffer (&line);
 
-  summarize_field_ops ();
+  if (lines_in_group>0)
+    summarize_field_ops ();
 
   if (ferror (stdin))
     error (EXIT_FAILURE, 0, _("error reading input"));
