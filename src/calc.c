@@ -5,6 +5,9 @@
 #include <getopt.h>
 #include <math.h>
 #include <stdlib.h>
+#include "gl_avltree_oset.h"
+#include "gl_xlist.h"
+#include "gl_xoset.h"
 #include "linebuffer.h"
 #include "error.h"
 #include "quote.h"
@@ -45,14 +48,16 @@ enum operation
   OP_PVARIANCE, /* Population Variance */
   OP_SVARIANCE, /* Sample Variance */
   OP_MODE,
-  OP_ANTIMODE
+  OP_ANTIMODE,
+  OP_UNIQUE,        /* Collapse Unique string into comma separated values */
+  OP_UNIQUE_NOCASE  /* Collapse Unique strings, ignoring-case */
 };
 
 enum operation_type__
 {
   NUMERIC_SCALAR = 0,
   NUMERIC_VECTOR,
-  MULTI_STRING
+  STRING_CUSTOM
 };
 
 enum operation_first_value
@@ -84,6 +89,9 @@ struct operation_data operations[] =
   {"svar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SVARIANCE */
   {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
   {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
+  {"unique",  STRING_CUSTOM,   IGNORE_FIRST},   /* OP_UNIQUE */
+  {"uniquenc",STRING_CUSTOM,   IGNORE_FIRST},   /* OP_UNIQUE_NOCASE */
+
   {NULL}
 };
 
@@ -113,9 +121,11 @@ struct fieldop
   size_t      num_values;  /* number of used values */
   size_t      alloc_values;/* number of allocated values */
 
+  /* String container for OP_UNIQE / OP_UNIQUE_NOCASE*/
+  gl_oset_t   str_oset;
+
   struct fieldop *next;
 };
-
 
 static struct fieldop* field_ops = NULL;
 
@@ -165,6 +175,15 @@ new_field_op (enum operation oper, size_t field)
   op->count = 0;
   if (op->type == NUMERIC_VECTOR)
     field_op_reserve_values (op);
+
+  if (op->op == OP_UNIQUE)
+    op->str_oset = gl_oset_create_empty (GL_AVLTREE_OSET,
+                                         (gl_setelement_compar_fn)strcmp,
+                                         (gl_setelement_dispose_fn)free);
+  if (op->op == OP_UNIQUE_NOCASE)
+    op->str_oset = gl_oset_create_empty (GL_AVLTREE_OSET,
+                                         (gl_setelement_compar_fn)strcasecmp,
+                                         (gl_setelement_dispose_fn)free);
 
   op->next = NULL;
 
@@ -251,6 +270,11 @@ field_op_collect (struct fieldop *op,
         field_op_reserve_values(op);
       op->values[op->num_values] = num_value;
       op->num_values++;
+      break;
+
+    case OP_UNIQUE:
+    case OP_UNIQUE_NOCASE:
+      gl_oset_add (op->str_oset, strdup(str_value));
       break;
 
     default:
@@ -345,6 +369,32 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
   return best_value;
 }
 
+static char *
+unique_value ( gl_oset_t str_oset )
+{
+  size_t buf_size = 0;
+  const char* str;
+  char *buf, *pos;
+
+  gl_oset_iterator_t it = gl_oset_iterator (str_oset);
+  while (gl_oset_iterator_next (&it, (const void**)&str))
+    buf_size += strlen(str)+1;
+
+  pos = buf = xzalloc (buf_size);
+
+  it = gl_oset_iterator (str_oset);
+  while (gl_oset_iterator_next (&it, (const void**)&str))
+    {
+      if (pos != buf)
+          *pos++ = ',';
+      size_t len = strlen(str);
+      strcpy (pos, str);
+      pos += len;
+    }
+
+  return buf;
+}
+
 static void
 field_op_summarize (struct fieldop *op)
 {
@@ -400,6 +450,11 @@ field_op_summarize (struct fieldop *op)
       field_op_sort_values (op);
       numeric_result = mode_value ( op->values, op->num_values,
                                     (op->op==OP_MODE)?MODE:ANTIMODE);
+      break;
+
+    case OP_UNIQUE:
+    case OP_UNIQUE_NOCASE:
+      fprintf(stderr, "foo = %s\n", unique_value (op->str_oset));
       break;
 
 
@@ -526,7 +581,7 @@ parse_operations (int argc, int start, char **argv)
       i++;
       if ( i >= argc )
         error (EXIT_FAILURE, 0, _("missing field number after " \
-                                  "operation '%s'"), argv[i] );
+                                  "operation '%s'"), argv[i-1] );
       field = get_field_number (op, argv[i]);
       i++;
 
