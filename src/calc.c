@@ -2,6 +2,8 @@
 
 #include "system.h"
 #include "config.h"
+#include <assert.h>
+#include <ctype.h>
 #include <getopt.h>
 #include <math.h>
 #include <stdlib.h>
@@ -10,10 +12,9 @@
 #include "error.h"
 #include "quote.h"
 #include "version.h"
+#include "size_max.h"
 #include "version-etc.h"
 #include "xalloc.h"
-#include "xstrtod.h"
-#include "xstrtol.h"
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "calc"
@@ -37,6 +38,10 @@ static size_t line_number = 0 ;
 
 /* Lines in the current group */
 static size_t lines_in_group = 0 ;
+
+/* If delimiter has this value, blanks separate fields.  */
+enum { DELIMITER_DEFAULT = CHAR_MAX + 1 };
+static int delimiter = DELIMITER_DEFAULT; /* field separator */
 
 enum operation
 {
@@ -157,10 +162,9 @@ field_op_reserve_values (struct fieldop *op)
 static void
 field_op_add_string (struct fieldop *op, const char* str, size_t slen)
 {
-  size_t len = slen+1;
-  if (op->str_buf_used + len >= op->str_buf_alloc)
+  if (op->str_buf_used + slen+1 >= op->str_buf_alloc)
     {
-      op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,len);
+      op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,slen+1);
       op->str_buf = xrealloc (op->str_buf, op->str_buf_alloc);
     }
   if (op->str_ptr_used + 1 >= op->str_ptr_alloc)
@@ -174,8 +178,10 @@ field_op_add_string (struct fieldop *op, const char* str, size_t slen)
   op->str_ptr_used++;
 
   /* Copy the string to the buffer */
-  memcpy (op->str_buf + op->str_buf_used, str, len);
-  op->str_buf_used += len;
+  memcpy (op->str_buf + op->str_buf_used, str, slen);
+  op->str_buf_used += slen;
+  *(op->str_buf + op->str_buf_used) = 0;
+  op->str_buf_used++;
 }
 
 /* see:
@@ -663,10 +669,12 @@ static size_t
 get_field_number(enum operation op, const char* field_str)
 {
   size_t val;
-  strtol_error e = xstrtoul (field_str, NULL, 10, &val, NULL);
+  char *endptr;
+  errno = 0 ;
+  val = strtoul (field_str, &endptr, 10);
   /* NOTE: can't use xstrtol_fatal - it's too tightly-coupled
      with getopt command-line processing */
-  if (e != LONGINT_OK)
+  if (errno != 0 || endptr == field_str)
     error (EXIT_FAILURE, 0, _("invalid column '%s' for operation " \
                                "'%s'"), field_str,
                                operations[op].name);
@@ -724,13 +732,106 @@ linebuffer_chomp (struct linebuffer *line)
 }
 
 static void
-skip_to_field (const struct linebuffer *line, size_t field,
-               char** /* OUT*/ ptr, size_t /*OUT*/ *len)
+get_field (const struct linebuffer *line, size_t field,
+               const char** /* OUT*/ _ptr, size_t /*OUT*/ *_len)
 {
-  (void)field;
-  *ptr = line->buffer;
-  *len = line->length;
+  size_t pos = 0;
+  size_t flen = 0;
+  const size_t buflen = line->length;
+  char* fptr = line->buffer;
+  /* Move 'fptr' to point to the beginning of 'field' */
+  if (delimiter != DELIMITER_DEFAULT)
+    {
+      /* delimiter is explicit character */
+      while ((pos<buflen) && --field)
+        {
+          while ( (pos<buflen) && (*fptr != delimiter))
+            {
+              ++fptr;
+              ++pos;
+            }
+          if ( (pos<buflen) && (*fptr == delimiter))
+            {
+              ++fptr;
+              ++pos;
+            }
+        }
+    }
+  else
+    {
+      /* delimiter is white-space transition
+         (multiple whitespaces are one delimiter) */
+      while ((pos<buflen) && --field)
+        {
+          while ( (pos<buflen) && !isblank (*fptr))
+            {
+              ++fptr;
+              ++pos;
+            }
+          while ( (pos<buflen) && isblank (*fptr))
+            {
+              ++fptr;
+              ++pos;
+            }
+        }
+    }
+
+  /* Find the length of the field (until the next delimiter/eol) */
+  if (delimiter != DELIMITER_DEFAULT)
+    {
+      while ( (pos+flen<buflen) && (*(fptr+flen) != delimiter) )
+        flen++;
+    }
+  else
+    {
+      while ( (pos+flen<buflen) && !isblank (*(fptr+flen)) )
+        flen++;
+    }
+
+  *_len = flen;
+  *_ptr = fptr;
 }
+
+#if 0
+static bool
+test_get_field_eq ( const char *str, size_t field, const char *expected )
+{
+  const char *ptr;
+  size_t len;
+  struct linebuffer l;
+
+  l.buffer = (char*)str;
+  l.length = strlen(l.buffer);
+
+  get_field (&l, field, &ptr, &len);
+
+  if (len != strlen(expected))
+      return false;
+
+  return (strncmp(ptr,expected,len)==0);
+}
+
+static void
+test_get_field()
+{
+  /* white space delimiter */
+  delimiter = DELIMITER_DEFAULT ;
+  const char *s1 = "hello world   a\tb c";
+  assert(test_get_field_eq(s1,1,"hello"));
+  assert(test_get_field_eq(s1,2,"world"));
+  assert(test_get_field_eq(s1,3,"a"));
+  assert(test_get_field_eq(s1,4,"b"));
+  assert(test_get_field_eq(s1,5,"c"));
+
+  /* Explicit TAB delimiter */
+  delimiter = '\t';
+  const char *s2 = "hello\t\tworld   a\tb c";
+  assert(test_get_field_eq(s2,1,"hello"));
+  assert(test_get_field_eq(s2,2,""));
+  assert(test_get_field_eq(s2,3,"world   a"));
+  assert(test_get_field_eq(s2,4,"b c"));
+}
+#endif
 
 inline static long double
 safe_strtold ( const char *str, size_t len, size_t field )
@@ -755,13 +856,13 @@ static void
 process_line (const struct linebuffer *line)
 {
   long double val=0;
-  char *str;
+  const char *str;
   size_t len;
 
   struct fieldop *op = field_ops;
   while (op)
     {
-      skip_to_field (line, op->field, &str, &len);
+      get_field (line, op->field, &str, &len);
 
       if (op->numeric)
         val = safe_strtold ( str, len, op->field );
@@ -824,6 +925,14 @@ int main(int argc, char* argv[])
           debug = true;
           break;
 
+        case 't':
+          /* Interpret -t '' to mean 'use the NUL byte as the delimiter.'  */
+          if (optarg[0] != '\0' && optarg[1] != '\0')
+            error (EXIT_FAILURE, 0,
+                   _("the delimiter must be a single character"));
+          delimiter = optarg[0];
+          break;
+
         case_GETOPT_HELP_CHAR;
 
         case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -834,7 +943,7 @@ int main(int argc, char* argv[])
     }
 
   if (argc <= optind)
-    error (0, 0, _("missing operations specifiers"));
+    error (EXIT_FAILURE, 0, _("missing operations specifiers"));
 
   parse_operations (argc, optind, argv);
   process_file ();
