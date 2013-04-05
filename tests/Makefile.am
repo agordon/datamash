@@ -7,11 +7,22 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
 
-EXTRA_DIST = test.sh
+PERL_TESTS = calc-tests.pl
+
+EXTRA_DIST = Coreutils.pm CuSkip.pm CuTmpdir.pm \
+             $(PERL_TESTS)
+
 noinst_DATA = $(EXTRA_DIST)
 
 check_PROGRAMS =
 
+# (Copied from coreutils' tests/local.mk)
+# Use automake's TESTS_ENVIRONMENT to add ./src/ to the search path.
+TESTS_ENVIRONMENT =				\
+  PATH='$(abs_top_builddir)/src$(PATH_SEPARATOR)'"$$PATH" \
+  ;
+
 TESTS = $(check_PROGRAMS) \
-	test.sh
+	$(PERL_TESTS)
