@@ -21,6 +21,8 @@ check_PROGRAMS =
 # (Copied from coreutils' tests/local.mk)
 # Use automake's TESTS_ENVIRONMENT to add ./src/ to the search path.
 TESTS_ENVIRONMENT =				\
+  export \
+  PERL5LIB='$(top_srcdir)/tests$(PATH_SEPARATOR)'"$$PERL5LIB" \
   PATH='$(abs_top_builddir)/src$(PATH_SEPARATOR)'"$$PATH" \
   ;
 
