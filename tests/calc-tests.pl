@@ -17,11 +17,12 @@ my $prog = 'calc';
 @ENV{qw(LANGUAGE LANG LC_ALL)} = ('C') x 3;
 
 # note: '5' appears twice
-my $in1 = "1\n2\n3\n4\n5\n6\n7\n5\n8\n9\n10\n";
+my $in1 = join("\n", qw/1 2 3 4 5 6 7 5 8 9 10/) . "\n";
 
 # Mix of whitespace and tabs
 my $in2 = "1  2\t  3\n" .
           "4\t5 6\n";
+my $in_minmax = join("\n", qw/5 90 -7e2 3 200 0.1e-3 42/) . "\n";
 
 my @Tests =
 (
@@ -74,6 +75,12 @@ my @Tests =
   ['f3', 'sum 3', {IN_PIPE=>$in2}, {OUT=>"9\n"}],
   ['f4', 'sum 3 sum 1', {IN_PIPE=>$in2}, {OUT=>"9 5\n"}],
   ['f5', '-t: sum 4', {IN_PIPE=>"11:12::13:14"}, {OUT=>"13\n"}],
+
+  # Test Absolute min/max
+  ['mm1', 'min 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
+  ['mm2', 'max 1', {IN_PIPE=>$in_minmax}, {OUT=>"200\n"}],
+  ['mm3', 'absmin 1', {IN_PIPE=>$in_minmax}, {OUT=>"0.0001\n"}],
+  ['mm4', 'absmax 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
 
 );
 
