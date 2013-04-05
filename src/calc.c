@@ -662,11 +662,57 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION] op [op ...] col [...]\n\
+Usage: %s [OPTION] op col [op col ...]\n\
 "),
               program_name);
+      fputs (_("\
+Performs numeric/string operations on input from stdin.\n\
+\n\
+"), stdout);
+      fputs("\
+\n\
+'op' is the operation to perform on field 'col'.\n\
+\n\
+Numeric operations:\n\
+  count      count number of elements in the input group\n\
+  sum        print the sum the of values\n\
+  min        print the minimum value\n\
+  max        print the maximum value\n\
+  absmin     print the minimum of abs(values)\n\
+  absmax     print the maximum of abs(values)\n\
+  mean       print the mean of the values\n\
+  median     print the median value\n\
+  mode       print the mode value (most common value)\n\
+  antimode   print the anti-mode value (least common value)\n\
+  pstdev     print the population standard deviation\n\
+  sstdev     print the sample standard deviation\n\
+  pvar       print the population variance\n\
+  svar       print the sample variance\n\
+\n\
+String operations:\n\
+  unique     print comma-separated sorted list of unique values\n\
+  uniquenc   Same as above, while ignoring upper/lower case letters.\n\
+  collapse   print comma-separed list of all input values\n\
+\n\
+",stdout);
+      fputs (_("\
+\n\
+General options:\n\
+  -t, --field-separator=X    use X instead of whitespace for field delimiter\n\
+  -z, --zero-terminated     end lines with 0 byte, not newline\n\
+"), stdout);
+
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+
+      printf (_("\
+\n\
+Examples:\n\
+  Print the mean and the median of values from column 1\n\
+  $ seq 10 | %s mean 1 median 1\n\
+\n\
+"), program_name);
+
     }
   exit (status);
 }
