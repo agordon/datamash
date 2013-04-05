@@ -24,6 +24,14 @@ my $in2 = "1  2\t  3\n" .
           "4\t5 6\n";
 my $in_minmax = join("\n", qw/5 90 -7e2 3 200 0.1e-3 42/) . "\n";
 
+# Input with three groups, separated by empty lines
+# (as if from 'uniq --group')
+my $in_g1 = join("\n", 10 .. 20) . "\n" .
+            "\n" .
+            join("\n", 1 .. 13) . "\n" .
+            "\n" .
+            join("\n", 66 .. 99) . "\n" ;
+
 my @Tests =
 (
   # Basic tests, single field, single group, default everything
@@ -68,6 +76,10 @@ my @Tests =
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
   ['nl2', 'sum 1', {IN_PIPE=>"1\n99"}, {OUT=>"100\n"}],
 
+  # empty input = empty output
+  [ 'emp1', 'count 1', {IN_PIPE=>""}, {OUT=>""}],
+  [ 'emp2', 'count 1', {IN_PIPE=>"\n"}, {OUT=>""}],
+  [ 'emp3', 'count 1', {IN_PIPE=>"\n\n"}, {OUT=>""}],
 
   ## Field extraction
   ['f1', 'sum 1', {IN_PIPE=>$in2}, {OUT=>"5\n"}],
@@ -81,6 +93,42 @@ my @Tests =
   ['mm2', 'max 1', {IN_PIPE=>$in_minmax}, {OUT=>"200\n"}],
   ['mm3', 'absmin 1', {IN_PIPE=>$in_minmax}, {OUT=>"0.0001\n"}],
   ['mm4', 'absmax 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
+
+  # Test Groups
+  ['g1', 'count 1' ,    {IN_PIPE=>$in_g1},  {OUT => "11\n13\n34\n"}],
+  ['g2', 'sum 1',       {IN_PIPE=>$in_g1},  {OUT => "165\n91\n2805\n"}],
+  ['g3', 'min 1',       {IN_PIPE=>$in_g1},  {OUT => "10\n1\n66\n"}],
+  ['g4', 'max 1',       {IN_PIPE=>$in_g1},  {OUT => "20\n13\n99\n"}],
+  ['g5', 'absmin 1',    {IN_PIPE=>$in_g1},  {OUT => "10\n1\n66\n"}],
+  ['g6', 'absmax 1',    {IN_PIPE=>$in_g1},  {OUT => "20\n13\n99\n"}],
+  ['g8', 'median 1',    {IN_PIPE=>$in_g1},  {OUT => "15\n7\n82.5\n"}],
+  ['g9', 'mode 1',      {IN_PIPE=>$in_g1},  {OUT => "10\n1\n66\n"}],
+  ['g10', 'antimode 1', {IN_PIPE=>$in_g1},  {OUT => "10\n1\n66\n"}],
+  ['g11', 'unique 1',   {IN_PIPE=>$in_g1},
+	  {OUT => join(',',10..20) . "\n" .
+		  "1,10,11,12,13,2,3,4,5,6,7,8,9\n" . #not yet natural-order
+		  join(',',66..99) . "\n" }],
+  ['g12', 'uniquenc 1',   {IN_PIPE=>$in_g1},
+	  {OUT => join(',',10..20) . "\n" .
+		  "1,10,11,12,13,2,3,4,5,6,7,8,9\n" . #not yet natural-order
+		  join(',',66..99) . "\n" }],
+  ['g13', 'collapse 1',   {IN_PIPE=>$in_g1},
+	  {OUT => join(',',10..20) . "\n" .
+		  join(',',1..13) . "\n" .
+		  join(',',66..99) . "\n" }],
+  # on a different architecture, would printf(%Lg) print something else?
+  # Use OUT_SUBST to trim output to 1.3 digits
+  ['g14', 'mean 1',     {IN_PIPE=>$in_g1},  {OUT => "15\n7\n82.5\n"},
+	  {OUT_SUBST=>'s/^(\d+\.\d{3}).*/\1/'}],
+  ['g15', 'pstdev 1',   {IN_PIPE=>$in_g1},  {OUT => "3.162\n3.741\n9.810\n"},
+	  {OUT_SUBST=>'s/^(\d+\.\d{3}).*/\1/'}],
+  ['g16', 'sstdev 1',   {IN_PIPE=>$in_g1},  {OUT => "3.316\n3.894\n9.958\n"},
+	  {OUT_SUBST=>'s/^(\d+\.\d{3}).*/\1/'}],
+  ['g17', 'pvar 1',     {IN_PIPE=>$in_g1},  {OUT => "10\n14\n96.25\n"},
+	  {OUT_SUBST=>'s/^(\d+\.\d{3}).*/\1/'}],
+  ['g18', 'svar 1',     {IN_PIPE=>$in_g1},  {OUT => "11\n15.166\n99.166\n"},
+	  {OUT_SUBST=>'s/^(\d+\.\d{3}).*/\1/'}],
+
 
 );
 
