@@ -19,6 +19,10 @@ my $prog = 'calc';
 # note: '5' appears twice
 my $in1 = "1\n2\n3\n4\n5\n6\n7\n5\n8\n9\n10\n";
 
+# Mix of whitespace and tabs
+my $in2 = "1  2\t  3\n" .
+          "4\t5 6\n";
+
 my @Tests =
 (
   # Basic tests, single field, single group, default everything
@@ -47,6 +51,29 @@ my @Tests =
 	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b18', 'svar 1',     {IN_PIPE=>$in1},  {OUT => "8.272\n"},
 	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+
+
+  ## Some error checkings
+  ['e1',  'sum',  {IN_PIPE=>""}, {EXIT=>1},
+	  {ERR=>"$prog: missing field number after operation 'sum'\n"}],
+  ['e2',  'foobar',  {IN_PIPE=>""}, {EXIT=>1},
+	  {ERR=>"$prog: invalid operation 'foobar'\n"}],
+  ['e3',  '',  {IN_PIPE=>""}, {EXIT=>1},
+	  {ERR=>"$prog: missing operations specifiers\n"}],
+  ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid numeric input in line 1 field 1: 'a'\n"}],
+
+  # No newline at the end of the lines
+  ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
+  ['nl2', 'sum 1', {IN_PIPE=>"1\n99"}, {OUT=>"100\n"}],
+
+
+  ## Field extraction
+  ['f1', 'sum 1', {IN_PIPE=>$in2}, {OUT=>"5\n"}],
+  ['f2', 'sum 2', {IN_PIPE=>$in2}, {OUT=>"7\n"}],
+  ['f3', 'sum 3', {IN_PIPE=>$in2}, {OUT=>"9\n"}],
+  ['f4', 'sum 3 sum 1', {IN_PIPE=>$in2}, {OUT=>"9 5\n"}],
+  ['f5', '-t: sum 4', {IN_PIPE=>"11:12::13:14"}, {OUT=>"13\n"}],
 
 );
 
