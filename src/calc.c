@@ -559,10 +559,18 @@ field_op_summarize (struct fieldop *op)
     }
 
 
+  if (debug)
+    {
+      if (op->numeric)
+        fprintf (stderr, "%s(%zu) = %Lg\n", op->name, op->field, numeric_result);
+      else
+        fprintf (stderr, "%s(%zu) = '%s'\n", op->name, op->field, string_result);
+    }
+
   if (op->numeric)
-    fprintf (stderr, "%s(%zu) = %Lg\n", op->name, op->field, numeric_result);
+    printf ("%Lg", numeric_result);
   else
-    fprintf (stderr, "%s(%zu) = '%s'\n", op->name, op->field, string_result);
+    printf ("%s", string_result);
 
   free (string_result);
 
@@ -579,7 +587,16 @@ static void
 summarize_field_ops ()
 {
   for (struct fieldop *p = field_ops; p ; p=p->next)
-    field_op_summarize (p);
+    {
+      field_op_summarize (p);
+
+      /* print field separator */
+      if (p->next)
+        putchar( (delimiter==DELIMITER_DEFAULT)?' ':delimiter );
+    }
+
+    /* print end-of-line */
+    putchar(eolchar);
 }
 
 static struct fieldop *
