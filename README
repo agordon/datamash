@@ -16,8 +16,59 @@ Background
 (https://github.com/arq5x/bedtools) but uses slightly different semantics.
 
 
+Simpe Use-case (single group)
+=============================
+
+Given an input :
+
+    $ seq 10
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+    9
+    10
+
+What's the sum of the values in field 1 ?
+
+    $ seq 10 | calc sum 1
+    55
+
+What's the median value in field 1 ?
+
+    $ seq 10 | calc median 1
+    5.5
+
+Print the number of items, mean, sample-standard-deviation:
+
+    $ seq 10 | calc count 1 mean 1 sstdev 1
+    10 5.5 3.02765
+
+Given an input with multiple fields:
+
+    $ seq 10 | paste - -
+    1	2
+    3	4
+    5	6
+    7	8
+    9	10
+
+
+What's the sum of the values in field 1, and the mean of the values in field 2?
+
+   $ seq 10 | paste - - | calc sum 1 mean 2
+   25 6
+
+
+
 Common Use-case
 ===============
+
+(not fully implemented yet)
 
 Given the following input file, with two fields:
 
