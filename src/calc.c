@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <getopt.h>
+#include <locale.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdnoreturn.h>
@@ -651,6 +652,7 @@ static struct option const long_options[] =
 {
   {"zero-terminated", no_argument, NULL, 'z'},
   {"field-separator", required_argument, NULL, 't'},
+  {"key", required_argument, NULL, 'k'},
   {"debug", no_argument, NULL, DEBUG_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
@@ -918,6 +920,44 @@ safe_strtold ( const char *str, size_t len, size_t field )
   return val;
 }
 
+/* Given a "struct linebuffer", initializes a sort-compatible "struct line"
+ * (and finds the first key field) */
+/* copied from coreutils's src/uniq.c (in the key-spec branch) */
+static void
+prepare_line (const struct linebuffer *linebuf, struct line* /*output*/ line,
+              char eol_delimiter)
+{
+  size_t len = linebuf->length;
+
+  line->text = linebuf->buffer;
+  line->length = linebuf->length;
+  line->keybeg = NULL; /* TODO: are these the right initializers? */
+  line->keylim = NULL;
+
+  if (line->text[line->length-1] == eol_delimiter)
+    len--;
+
+  line->keybeg = begfield (line, keylist);
+  line->keylim = limfield (line, keylist);
+
+  if (line->keybeg >= line->keylim)
+    {
+      /* TODO: is this the correct way to detect 'no limit' ?
+       * (ie compare keys until the end of the line)*/
+      line->keylim = line->keybeg + len - (line->keybeg - line->text);
+    }
+}
+
+/* returns TRUE if the lines are different, false if identical.
+ * comparison is based on the specified keys */
+/* copied from coreutils's src/uniq.c (in the key-spec branch) */
+static bool
+different (const struct line* l1, const struct line* l2)
+{
+  int diff = keycompare (l1,l2);
+  return (diff != 0);
+}
+
 static void
 process_line (const struct linebuffer *line)
 {
@@ -975,14 +1015,76 @@ process_file ()
 int main(int argc, char* argv[])
 {
   int optc;
+  struct keyfield *key;
+  struct keyfield key_buf;
+  char const *s;
 
   set_program_name (argv[0]);
+
+  setlocale (LC_ALL, "");
+
+  init_key_spec ();
 
   while ((optc = getopt_long (argc, argv, short_options, long_options, NULL))
          != -1)
     {
       switch (optc)
         {
+        case 'k':
+          key = key_init (&key_buf);
+
+          /* Get POS1. */
+          s = parse_field_count (optarg, &key->sword,
+                                 N_("invalid number at field start"));
+          if (! key->sword--)
+            {
+              /* Provoke with 'sort -k0' */
+              badfieldspec (optarg, N_("field number is zero"));
+            }
+          if (*s == '.')
+            {
+              s = parse_field_count (s + 1, &key->schar,
+                                     N_("invalid number after '.'"));
+              if (! key->schar--)
+                {
+                  /* Provoke with 'sort -k1.0' */
+                  badfieldspec (optarg, N_("character offset is zero"));
+                }
+            }
+          if (! (key->sword || key->schar))
+            key->sword = SIZE_MAX;
+          s = set_ordering (s, key, bl_start);
+          if (*s != ',')
+            {
+              key->eword = SIZE_MAX;
+              key->echar = 0;
+            }
+          else
+            {
+              /* Get POS2. */
+              s = parse_field_count (s + 1, &key->eword,
+                                     N_("invalid number after ','"));
+              if (! key->eword--)
+                {
+                  /* Provoke with 'sort -k1,0' */
+                  badfieldspec (optarg, N_("field number is zero"));
+                }
+              if (*s == '.')
+                {
+                  s = parse_field_count (s + 1, &key->echar,
+                                         N_("invalid number after '.'"));
+                }
+              s = set_ordering (s, key, bl_end);
+            }
+          if (*s)
+            badfieldspec (optarg, N_("stray character in field spec"));
+          /* TODO: strange, sort's original code sets sword=SIZE_MAX for "-k1".
+           * force override??? */
+          if (key->sword==SIZE_MAX)
+            key->sword=0;
+          insertkey (key);
+          break;
+
         case 'z':
           eolchar = 0;
           break;
