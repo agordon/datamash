@@ -28,6 +28,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include <stdint.h>
+
 #include <limits.h>
 
 /* TODO: add GNU GetText support */
@@ -84,4 +86,48 @@ static inline void
 emit_try_help (void)
 {
   fprintf (stderr, _("Try '%s --help' for more information.\n"), program_name);
+}
+
+#ifndef ATTRIBUTE_NORETURN
+# define ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
+#endif
+
+/* Convert a possibly-signed character to an unsigned character.  This is
+   a bit safer than casting to unsigned char, since it catches some type
+   errors that the cast doesn't.  */
+static inline unsigned char to_uchar (char ch) { return ch; }
+
+#ifndef MAX
+# define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef MIN
+# define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
+/* Use this to suppress gcc's '...may be used before initialized' warnings. */
+#ifdef lint
+# define IF_LINT(Code) Code
+#else
+# define IF_LINT(Code) /* empty */
+#endif
+
+/* ISDIGIT differs from isdigit, as follows:
+   - Its arg may be any int or unsigned int; it need not be an unsigned char
+     or EOF.
+   - It's typically faster.
+   POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
+   isdigit unless it's important to use the locale's definition
+   of 'digit' even when the host does not conform to POSIX.  */
+#define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
+
+/* Return a value that pluralizes the same way that N does, in all
+   languages we know of.  */
+static inline unsigned long int
+select_plural (uintmax_t n)
+{
+  /* Reduce by a power of ten, but keep it away from zero.  The
+     gettext manual says 1000000 should be safe.  */
+  enum { PLURAL_REDUCER = 1000000 };
+  return (n <= ULONG_MAX ? n : n % PLURAL_REDUCER + PLURAL_REDUCER);
 }

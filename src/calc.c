@@ -7,6 +7,7 @@
 #include <getopt.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdnoreturn.h>
 #include "linebuffer.h"
 #include "minmax.h"
 #include "error.h"
@@ -15,6 +16,8 @@
 #include "size_max.h"
 #include "version-etc.h"
 #include "xalloc.h"
+
+#include "key-compare.h"
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "calc"

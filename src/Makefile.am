@@ -11,15 +11,20 @@
 bin_PROGRAMS = calc
 
 EXTRA_DIST = system.h \
+	     strnumcmp.h strnumcmp-in.h \
 	     version.h
 
 calc_SOURCES = calc.c \
+	       key-compare.h key-compare.c \
+	       strnumcmp.c \
 	       version.c
 
 # gnulib header files - is this the right way to find them?
 #
 # TODO: set -Werror only for GCC
-EXTRA_CFLAGS=-Wall -Wextra -Wformat-nonliteral -Wformat-security -Wswitch-default -Wswitch-enum -Wunused-parameter -Wfloat-equal -Werror
+EXTRA_CFLAGS=-Wall -Wextra -Wformat-security -Wswitch-enum
+calc_o_CFLAGS=-Wswitch-default -Wformat-nonliteral -Wunused-parameter -Werror
+
 
 calc_CFLAGS = -I$(top_srcdir)/lib $(EXTRA_CFLAGS)
 
