@@ -91,7 +91,8 @@ my @Tests =
   ['e2',  'foobar',  {IN_PIPE=>""}, {EXIT=>1},
 	  {ERR=>"$prog: invalid operation 'foobar'\n"}],
   ['e3',  '',  {IN_PIPE=>""}, {EXIT=>1},
-	  {ERR=>"$prog: missing operations specifiers\n"}],
+	  {ERR=>"$prog: missing operation specifiers\n" .
+		  "Try '$prog --help' for more information.\n"}],
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
 	  {ERR=>"$prog: invalid numeric input in line 1 field 1: 'a'\n"}],
 

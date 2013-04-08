@@ -88,7 +88,7 @@ enum operation
   OP_COLLAPSE       /* Collapse strings into comma separated values */
 };
 
-enum operation_type__
+enum operation_type
 {
   NUMERIC_SCALAR = 0,
   NUMERIC_VECTOR,
@@ -104,7 +104,7 @@ enum operation_first_value
 struct operation_data
 {
   const char* name;
-  enum operation_type__ type;
+  enum operation_type type;
   enum operation_first_value auto_first;
 };
 
@@ -127,8 +127,7 @@ struct operation_data operations[] =
   {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
   {"uniquenc",STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE_NOCASE */
   {"collapse",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COLLAPSE */
-
-  {NULL}
+  {NULL, 0, 0}
 };
 
 /* Operation on a field */
@@ -136,7 +135,7 @@ struct fieldop
 {
     /* operation 'class' information */
   enum operation op;
-  enum operation_type__ type;
+  enum operation_type type;
   const char* name;
   bool numeric;
   bool auto_first; /* if true, automatically set 'value' if 'first' */
@@ -175,10 +174,15 @@ enum { VALUES_BATCH_INCREMENT = 1024 };
 /* Re-Allocate the 'op->values' buffer, by VALUES_BATCH_INCREMENT elements.
    If 'op->values' is NULL, allocate the first batch */
 static void
-field_op_reserve_values (struct fieldop *op)
+field_op_add_value (struct fieldop *op, long double val)
 {
-  op->alloc_values += VALUES_BATCH_INCREMENT;
-  op->values = xnrealloc (op->values, op->alloc_values, sizeof (long double));
+  if (op->num_values >= op->alloc_values)
+    {
+      op->alloc_values += VALUES_BATCH_INCREMENT;
+      op->values = xnrealloc (op->values, op->alloc_values, sizeof (long double));
+    }
+  op->values[op->num_values] = val;
+  op->num_values++;
 }
 
 /* Re-Allocate the 'op->collapsed_buf' buffer,
@@ -217,7 +221,6 @@ cmp_long_double (const void *p1, const void *p2)
   const long double *b = (const long double *)p2;
 
   return ( *a > *b ) - (*a < *b);
-
 }
 
 static void
@@ -241,8 +244,6 @@ new_field_op (enum operation oper, size_t field)
   op->first = true;
   op->value = 0;
   op->count = 0;
-  if (op->type == NUMERIC_VECTOR)
-    field_op_reserve_values (op);
 
   op->next = NULL;
 
@@ -321,7 +322,6 @@ field_op_collect (struct fieldop *op,
         }
       break;
 
-
     case OP_MEDIAN:
     case OP_PSTDEV:
     case OP_SSTDEV:
@@ -329,10 +329,7 @@ field_op_collect (struct fieldop *op,
     case OP_SVARIANCE:
     case OP_MODE:
     case OP_ANTIMODE:
-      if (op->num_values >= op->alloc_values)
-        field_op_reserve_values(op);
-      op->values[op->num_values] = num_value;
-      op->num_values++;
+      field_op_add_value (op, num_value);
       break;
 
     case OP_UNIQUE:
@@ -340,7 +337,6 @@ field_op_collect (struct fieldop *op,
     case OP_COLLAPSE:
       field_op_add_string (op, str, slen);
       break;
-
 
     default:
       break;
@@ -438,9 +434,8 @@ static int
 cmpstringp(const void *p1, const void *p2)
 {
   /* The actual arguments to this function are "pointers to
-   *               pointers to char", but strcmp(3) arguments are "pointers
-   *                             to char", hence the following cast plus dereference */
-
+   * pointers to char", but strcmp(3) arguments are "pointers
+   * to char", hence the following cast plus dereference */
   return strcmp(* (char * const *) p1, * (char * const *) p2);
 }
 
@@ -448,9 +443,8 @@ static int
 cmpstringp_nocase(const void *p1, const void *p2)
 {
   /* The actual arguments to this function are "pointers to
-   *               pointers to char", but strcmp(3) arguments are "pointers
-   *                             to char", hence the following cast plus dereference */
-
+   * pointers to char", but strcmp(3) arguments are "pointers
+   * to char", hence the following cast plus dereference */
   return strcasecmp(* (char * const *) p1, * (char * const *) p2);
 }
 
@@ -576,7 +570,6 @@ field_op_summarize (struct fieldop *op)
       string_result = collapse_value (op);
       break;
 
-
     default:
       error (EXIT_FAILURE, 0, _("internal error 2"));
       break;
@@ -694,7 +687,6 @@ Usage: %s [OPTION] op col [op col ...]\n\
               program_name);
       fputs (_("\
 Performs numeric/string operations on input from stdin.\n\
-\n\
 "), stdout);
       fputs("\
 \n\
@@ -744,7 +736,13 @@ Examples:\n\
   Print the mean and the median of values from column 1\n\
   $ seq 10 | %s mean 1 median 1\n\
 \n\
-"), program_name);
+  Group input based on field 1, and sum values (per group) on field 2:\n\
+  $ printf '%%s %%d\n' A 10 A 5 B 9 | %s -g1 sum 2\n\
+\n\
+  Unsorted input must be sorted:\n\
+  $ cat INPUT.TXT | sort -k1,1 | %s -k1,1 mean 2\n\
+\n\
+"), program_name, program_name, program_name);
 
     }
   exit (status);
@@ -890,47 +888,6 @@ get_field (const struct linebuffer *line, size_t field,
   *_len = flen;
   *_ptr = fptr;
 }
-
-#if 0
-static bool
-test_get_field_eq ( const char *str, size_t field, const char *expected )
-{
-  const char *ptr;
-  size_t len;
-  struct linebuffer l;
-
-  l.buffer = (char*)str;
-  l.length = strlen(l.buffer);
-
-  get_field (&l, field, &ptr, &len);
-
-  if (len != strlen(expected))
-      return false;
-
-  return (strncmp(ptr,expected,len)==0);
-}
-
-static void
-test_get_field()
-{
-  /* white space delimiter */
-  delimiter = DELIMITER_DEFAULT ;
-  const char *s1 = "hello world   a\tb c";
-  assert(test_get_field_eq(s1,1,"hello"));
-  assert(test_get_field_eq(s1,2,"world"));
-  assert(test_get_field_eq(s1,3,"a"));
-  assert(test_get_field_eq(s1,4,"b"));
-  assert(test_get_field_eq(s1,5,"c"));
-
-  /* Explicit TAB delimiter */
-  delimiter = '\t';
-  const char *s2 = "hello\t\tworld   a\tb c";
-  assert(test_get_field_eq(s2,1,"hello"));
-  assert(test_get_field_eq(s2,2,""));
-  assert(test_get_field_eq(s2,3,"world   a"));
-  assert(test_get_field_eq(s2,4,"b c"));
-}
-#endif
 
 inline static long double
 safe_strtold ( const char *str, size_t len, size_t field )
@@ -1286,7 +1243,10 @@ int main(int argc, char* argv[])
     }
 
   if (argc <= optind)
-      error (EXIT_FAILURE, 0, _("missing operations specifiers"));
+    {
+      error (0, 0, _("missing operation specifiers"));
+      usage (EXIT_FAILURE);
+    }
 
   parse_operations (argc, optind, argv);
   process_file ();
