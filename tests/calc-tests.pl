@@ -41,6 +41,18 @@ B 77
 B 55
 EOF
 
+my $in_g3=<<'EOF';
+A 3  W
+A 5  W
+A 7  W
+A 11 X
+A 13 X
+B 17 Y
+B 19 Z
+C 23 Z
+EOF
+
+
 
 my @Tests =
 (
@@ -72,6 +84,7 @@ my @Tests =
 	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
 
 
+
   ## Some error checkings
   ['e1',  'sum',  {IN_PIPE=>""}, {EXIT=>1},
 	  {ERR=>"$prog: missing field number after operation 'sum'\n"}],
@@ -95,6 +108,8 @@ my @Tests =
   ['f3', 'sum 3', {IN_PIPE=>$in2}, {OUT=>"9\n"}],
   ['f4', 'sum 3 sum 1', {IN_PIPE=>$in2}, {OUT=>"9 5\n"}],
   ['f5', '-t: sum 4', {IN_PIPE=>"11:12::13:14"}, {OUT=>"13\n"}],
+  # collase non-last field (followed by whitespace, not new-line)
+  ['f6', 'unique 1', {IN_PIPE=>$in_g2}, {OUT=>"A,B\n"}],
 
   # Test Absolute min/max
   ['mm1', 'min 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
@@ -110,6 +125,10 @@ my @Tests =
   ['g1', '-k1,1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"195\n"}],
   ['g2', '-k1,1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"42.5\n"}],
   ['g3', '-k1,1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"100,10,50,35\n"}],
+  # Same as above, with "-g"
+  ['g1.1', '-g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"195\n"}],
+  ['g2.1', '-g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"42.5\n"}],
+  ['g3.1', '-g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"100,10,50,35\n"}],
 
   # Two groups (key in column 1)
   ['g4', '-k1,1 min 2',    {IN_PIPE=>$in_g2}, {OUT=>"10\n55\n"}],
@@ -119,6 +138,12 @@ my @Tests =
 
   # 3 groups, single line per group, custom delimiter
   ['g7', '-k2,2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"}, {OUT=>"1\n2\n3\n"}],
+  ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"}, {OUT=>"1\n2\n3\n"}],
+
+  # Multiple keys (from different columns)
+  ['g8', '-k1,1 -k3,3 sum 2', {IN_PIPE=>$in_g3}, {OUT=>"15\n24\n17\n19\n23\n"}],
+  ['g8.1',     '-g1,3 sum 2', {IN_PIPE=>$in_g3}, {OUT=>"15\n24\n17\n19\n23\n"}],
+
 
 
 );

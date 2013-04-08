@@ -664,12 +664,13 @@ enum
   DEBUG_OPTION = CHAR_MAX + 1,
 };
 
-static char const short_options[] = "zk:t:";
+static char const short_options[] = "zg:k:t:";
 
 static struct option const long_options[] =
 {
   {"zero-terminated", no_argument, NULL, 'z'},
   {"field-separator", required_argument, NULL, 't'},
+  {"groups", required_argument, NULL, 'g'},
   {"key", required_argument, NULL, 'k'},
   {"debug", no_argument, NULL, DEBUG_OPTION},
   {GETOPT_HELP_OPTION_DECL},
@@ -721,6 +722,10 @@ String operations:\n\
       fputs (_("\
 \n\
 General options:\n\
+  -g, --groups=X[,Y,Z,]     Group via fields X,[Y,X]\n\
+                            This is a short-cut for --key:\n\
+                            '-g5,6' is equivalent to '-k5,5 -k6,6'\n\
+  -k, --key=KEYDEF          Group via a key; KEYDEF gives location and type\n\
   -t, --field-separator=X    use X instead of whitespace for field delimiter\n\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
 "), stdout);
@@ -803,12 +808,11 @@ print_ops ()
 #endif
 
 inline static void
-linebuffer_chomp (struct linebuffer *line)
+linebuffer_nullify (struct linebuffer *line)
 {
   if (line->buffer[line->length-1]==eolchar)
     {
       line->buffer[line->length-1] = 0; /* make it NUL terminated */
-      line->length--;
     }
   else
     {
@@ -873,6 +877,10 @@ get_field (const struct linebuffer *line, size_t field,
       while ( (pos+flen<buflen) && !isblank (*(fptr+flen)) )
         flen++;
     }
+
+  /* Chomp field if needed */
+  if ( flen>1 && *(fptr + flen -1) == 0 || *(fptr+flen-1)==eolchar )
+    flen--;
 
   *_len = flen;
   *_ptr = fptr;
@@ -987,6 +995,12 @@ process_line (const struct linebuffer *line)
   while (op)
     {
       get_field (line, op->field, &str, &len);
+      if (debug)
+        {
+          fprintf(stderr,"getfield(%zu) = len %zu: '", op->field,len);
+          fwrite(str,sizeof(char),len,stderr);
+          fprintf(stderr,"'\n");
+        }
 
       if (op->numeric)
         val = safe_strtold ( str, len, op->field );
@@ -1028,7 +1042,7 @@ process_file ()
 
       if (readlinebuffer_delim (thisline, stdin, eolchar) == 0)
         break;
-      linebuffer_chomp (thisline);
+      linebuffer_nullify (thisline);
       line_number++;
 
       /* If no keys are given, the entire input is considered one group */
@@ -1037,6 +1051,17 @@ process_file ()
           prepare_line (thisline, thislinesort, eolchar);
           new_group = (prevline->length == 0
                        || different (thislinesort, prevlinesort));
+
+          if (debug)
+            {
+              fprintf(stderr,"thisline = '");
+              fwrite(thisline->buffer,sizeof(char),thisline->length,stderr);
+              fprintf(stderr,"'\n");
+              fprintf(stderr,"prevline = '");
+              fwrite(prevline->buffer,sizeof(char),prevline->length,stderr);
+              fprintf(stderr,"'\n'");
+              fprintf(stderr, "newgroup = %d\n", new_group);
+            }
 
           if (new_group && lines_in_group>0)
             {
@@ -1068,12 +1093,104 @@ process_file ()
   free (lb2.buffer);
 }
 
-int main(int argc, char* argv[])
+static void
+parse_group_spec ( const char* spec )
 {
-  int optc;
+  size_t val;
+  char *endptr;
+  struct keyfield *key;
+  struct keyfield key_buf;
+
+
+  errno = 0 ;
+  while (1)
+    {
+      val = strtoul (spec, &endptr, 10);
+      if (errno != 0 || endptr == spec)
+        error (EXIT_FAILURE, 0, _("invalid field value for grouping '%s'"),
+                                        spec);
+      if (val==0)
+        error (EXIT_FAILURE, 0, _("invalid field value (zero) for grouping"));
+
+      /* Emulate a '-key X,X' parameter */
+      key = key_init (&key_buf);
+      key->sword = val-1;
+      key->eword = val-1;
+      insertkey (key);
+
+      if (endptr==NULL || *endptr==0)
+        break;
+      if (*endptr != ',')
+        error (EXIT_FAILURE, 0, _("invalid grouping parameter '%s'"), endptr);
+      endptr++;
+      spec = endptr;
+    }
+}
+
+static void
+parse_key_spec ( const char *spec )
+{
   struct keyfield *key;
   struct keyfield key_buf;
   char const *s;
+
+  key = key_init (&key_buf);
+
+  /* Get POS1. */
+  s = parse_field_count (spec, &key->sword,
+                         N_("invalid number at field start"));
+  if (! key->sword--)
+    {
+      /* Provoke with 'sort -k0' */
+      badfieldspec (spec, N_("field number is zero"));
+    }
+  if (*s == '.')
+    {
+      s = parse_field_count (s + 1, &key->schar,
+                             N_("invalid number after '.'"));
+      if (! key->schar--)
+        {
+          /* Provoke with 'sort -k1.0' */
+          badfieldspec (spec, N_("character offset is zero"));
+        }
+    }
+  if (! (key->sword || key->schar))
+    key->sword = SIZE_MAX;
+  s = set_ordering (s, key, bl_start);
+  if (*s != ',')
+    {
+      key->eword = SIZE_MAX;
+      key->echar = 0;
+    }
+  else
+    {
+      /* Get POS2. */
+      s = parse_field_count (s + 1, &key->eword,
+                             N_("invalid number after ','"));
+      if (! key->eword--)
+        {
+          /* Provoke with 'sort -k1,0' */
+          badfieldspec (spec, N_("field number is zero"));
+        }
+      if (*s == '.')
+        {
+          s = parse_field_count (s + 1, &key->echar,
+                                 N_("invalid number after '.'"));
+        }
+      s = set_ordering (s, key, bl_end);
+    }
+  if (*s)
+    badfieldspec (spec, N_("stray character in field spec"));
+  /* TODO: strange, sort's original code sets sword=SIZE_MAX for "-k1".
+   * force override??? */
+  if (key->sword==SIZE_MAX)
+    key->sword=0;
+  insertkey (key);
+}
+
+int main(int argc, char* argv[])
+{
+  int optc;
 
   set_program_name (argv[0]);
 
@@ -1086,59 +1203,12 @@ int main(int argc, char* argv[])
     {
       switch (optc)
         {
-        case 'k':
-          key = key_init (&key_buf);
+        case 'g':
+          parse_group_spec (optarg);
+          break;
 
-          /* Get POS1. */
-          s = parse_field_count (optarg, &key->sword,
-                                 N_("invalid number at field start"));
-          if (! key->sword--)
-            {
-              /* Provoke with 'sort -k0' */
-              badfieldspec (optarg, N_("field number is zero"));
-            }
-          if (*s == '.')
-            {
-              s = parse_field_count (s + 1, &key->schar,
-                                     N_("invalid number after '.'"));
-              if (! key->schar--)
-                {
-                  /* Provoke with 'sort -k1.0' */
-                  badfieldspec (optarg, N_("character offset is zero"));
-                }
-            }
-          if (! (key->sword || key->schar))
-            key->sword = SIZE_MAX;
-          s = set_ordering (s, key, bl_start);
-          if (*s != ',')
-            {
-              key->eword = SIZE_MAX;
-              key->echar = 0;
-            }
-          else
-            {
-              /* Get POS2. */
-              s = parse_field_count (s + 1, &key->eword,
-                                     N_("invalid number after ','"));
-              if (! key->eword--)
-                {
-                  /* Provoke with 'sort -k1,0' */
-                  badfieldspec (optarg, N_("field number is zero"));
-                }
-              if (*s == '.')
-                {
-                  s = parse_field_count (s + 1, &key->echar,
-                                         N_("invalid number after '.'"));
-                }
-              s = set_ordering (s, key, bl_end);
-            }
-          if (*s)
-            badfieldspec (optarg, N_("stray character in field spec"));
-          /* TODO: strange, sort's original code sets sword=SIZE_MAX for "-k1".
-           * force override??? */
-          if (key->sword==SIZE_MAX)
-            key->sword=0;
-          insertkey (key);
+        case 'k':
+          parse_key_spec (optarg);
           break;
 
         case 'z':
