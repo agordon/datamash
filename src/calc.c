@@ -45,27 +45,8 @@ static size_t line_number = 0 ;
 /* Lines in the current group */
 static size_t lines_in_group = 0 ;
 
+/* If true, print the entire input line. Otherwise, print only the key fields */
 static bool print_full_line = false;
-
-#define SWAP_LINES(A, B)			\
-  do						\
-    {						\
-      struct linebuffer *_tmp;			\
-      _tmp = (A);				\
-      (A) = (B);				\
-      (B) = _tmp;				\
-    }						\
-  while (0)
-
-#define SWAP_SORT_LINES(A, B)			\
-  do						\
-    {						\
-      struct line *_tmp;			\
-      _tmp = (A);				\
-      (A) = (B);				\
-      (B) = _tmp;				\
-    }						\
-  while (0)
 
 enum operation
 {
@@ -400,7 +381,6 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
 {
   /* not ideal implementation but simple enough */
   /* Assumes 'values' are already sorted, find the longest sequence */
-  /* TODO: handle n==0 */
 
   long double last_value = values[0];
   size_t seq_size=1;
@@ -515,8 +495,6 @@ field_op_summarize (struct fieldop *op)
   switch (op->op)
     {
     case OP_MEAN:
-      /* Calculate mean */
-      /* TODO: check for division-by-zero */
       numeric_result = op->value / op->count;
       break;
 
@@ -531,7 +509,6 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_MEDIAN:
-      /* TODO: check for no values at all */
       field_op_sort_values (op);
       numeric_result = median_value ( op->values, op->num_values );
       break;
@@ -797,19 +774,6 @@ parse_operations (int argc, int start, char **argv)
     }
 }
 
-#if 0
-static void
-print_ops ()
-{
-  struct fieldop *p = field_ops;
-  while (p)
-    {
-      printf ("%s(%zu)\n", p->name, p->field);
-      p = p->next;
-    }
-}
-#endif
-
 inline static void
 linebuffer_nullify (struct linebuffer *line)
 {
@@ -1008,6 +972,27 @@ print_input_line (const struct linebuffer* lb)
         }
     }
 }
+
+#define SWAP_LINES(A, B)			\
+  do						\
+    {						\
+      struct linebuffer *_tmp;			\
+      _tmp = (A);				\
+      (A) = (B);				\
+      (B) = _tmp;				\
+    }						\
+  while (0)
+
+#define SWAP_SORT_LINES(A, B)			\
+  do						\
+    {						\
+      struct line *_tmp;			\
+      _tmp = (A);				\
+      (A) = (B);				\
+      (B) = _tmp;				\
+    }						\
+  while (0)
+
 
 /*
     Process each line in the input.
