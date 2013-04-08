@@ -43,9 +43,25 @@ static size_t line_number = 0 ;
 /* Lines in the current group */
 static size_t lines_in_group = 0 ;
 
-/* If delimiter has this value, blanks separate fields.  */
-enum { DELIMITER_DEFAULT = CHAR_MAX + 1 };
-static int delimiter = DELIMITER_DEFAULT; /* field separator */
+#define SWAP_LINES(A, B)			\
+  do						\
+    {						\
+      struct linebuffer *_tmp;			\
+      _tmp = (A);				\
+      (A) = (B);				\
+      (B) = _tmp;				\
+    }						\
+  while (0)
+
+#define SWAP_SORT_LINES(A, B)			\
+  do						\
+    {						\
+      struct line *_tmp;			\
+      _tmp = (A);				\
+      (A) = (B);				\
+      (B) = _tmp;				\
+    }						\
+  while (0)
 
 enum operation
 {
@@ -596,7 +612,7 @@ summarize_field_ops ()
 
       /* print field separator */
       if (p->next)
-        putchar( (delimiter==DELIMITER_DEFAULT)?' ':delimiter );
+        putchar( (tab==TAB_DEFAULT)?' ':tab );
     }
 
     /* print end-of-line */
@@ -808,17 +824,17 @@ get_field (const struct linebuffer *line, size_t field,
   const size_t buflen = line->length;
   char* fptr = line->buffer;
   /* Move 'fptr' to point to the beginning of 'field' */
-  if (delimiter != DELIMITER_DEFAULT)
+  if (tab != TAB_DEFAULT)
     {
       /* delimiter is explicit character */
       while ((pos<buflen) && --field)
         {
-          while ( (pos<buflen) && (*fptr != delimiter))
+          while ( (pos<buflen) && (*fptr != tab))
             {
               ++fptr;
               ++pos;
             }
-          if ( (pos<buflen) && (*fptr == delimiter))
+          if ( (pos<buflen) && (*fptr == tab))
             {
               ++fptr;
               ++pos;
@@ -845,9 +861,9 @@ get_field (const struct linebuffer *line, size_t field,
     }
 
   /* Find the length of the field (until the next delimiter/eol) */
-  if (delimiter != DELIMITER_DEFAULT)
+  if (tab != TAB_DEFAULT)
     {
-      while ( (pos+flen<buflen) && (*(fptr+flen) != delimiter) )
+      while ( (pos+flen<buflen) && (*(fptr+flen) != tab) )
         flen++;
     }
   else
@@ -979,37 +995,75 @@ process_line (const struct linebuffer *line)
     }
 }
 
+/*
+    Process each line in the input.
+
+    If the key fo the current line is different from the prevopis one,
+    summarize the previous group and start a new one
+ */
 static void
 process_file ()
 {
-  struct linebuffer line;
+  struct linebuffer lb1, lb2;
+  struct linebuffer *thisline, *prevline;
 
-  initbuffer (&line);
-  while (readlinebuffer_delim (&line, stdin, eolchar))
+   /* line structure used for sort's key comparison*/
+  struct line sortlb1, sortlb2;
+  struct line *thislinesort, *prevlinesort;
+
+  thisline = &lb1;
+  prevline = &lb2;
+
+  thislinesort = &sortlb1;
+  prevlinesort = &sortlb2;
+
+  initbuffer (thisline);
+  initbuffer (prevline);
+
+  while (!feof (stdin))
     {
+      bool new_group = false;
+
+      if (readlinebuffer_delim (thisline, stdin, eolchar) == 0)
+        break;
+      linebuffer_chomp (thisline);
       line_number++;
-      linebuffer_chomp (&line);
 
-      if (line.length==0)
+      /* If no keys are given, the entire input is considered one group */
+      if (keylist)
         {
-          /* new group marker */
-          if (lines_in_group>0)
-            summarize_field_ops ();
+          prepare_line (thisline, thislinesort, eolchar);
+          new_group = (prevline->length == 0
+                       || different (thislinesort, prevlinesort));
 
-          lines_in_group = 0;
-          continue;
+          if (new_group && lines_in_group>0)
+            {
+              summarize_field_ops ();
+              lines_in_group = 0 ;
+            }
         }
 
       lines_in_group++;
-      process_line (&line);
-    }
-  freebuffer (&line);
+      process_line (thisline);
 
-  if (lines_in_group>0)
+      if (new_group)
+        {
+          SWAP_LINES (prevline, thisline);
+          SWAP_SORT_LINES (prevlinesort, thislinesort);
+        }
+    }
+
+  /* summarize last group */
+  if (lines_in_group)
     summarize_field_ops ();
 
-  if (ferror (stdin))
-    error (EXIT_FAILURE, 0, _("error reading input"));
+  if (ferror (stdin) || fclose (stdin) != 0)
+    error (EXIT_FAILURE, 0, _("read error"));
+
+  /* stdout is handled via the atexit-invoked close_stdout function.  */
+
+  free (lb1.buffer);
+  free (lb2.buffer);
 }
 
 int main(int argc, char* argv[])
@@ -1098,7 +1152,7 @@ int main(int argc, char* argv[])
           if (optarg[0] != '\0' && optarg[1] != '\0')
             error (EXIT_FAILURE, 0,
                    _("the delimiter must be a single character"));
-          delimiter = optarg[0];
+          tab = optarg[0];
           break;
 
         case_GETOPT_HELP_CHAR;
