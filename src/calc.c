@@ -152,8 +152,7 @@ static struct fieldop* field_ops = NULL;
 
 enum { VALUES_BATCH_INCREMENT = 1024 };
 
-/* Re-Allocate the 'op->values' buffer, by VALUES_BATCH_INCREMENT elements.
-   If 'op->values' is NULL, allocate the first batch */
+/* Add a numeric value to the values vector, allocating memory as needed */
 static void
 field_op_add_value (struct fieldop *op, long double val)
 {
@@ -166,8 +165,7 @@ field_op_add_value (struct fieldop *op, long double val)
   op->num_values++;
 }
 
-/* Re-Allocate the 'op->collapsed_buf' buffer,
-   by MAX(size+1,VALUES_BATCH_INCREMENT) bytes. */
+/* Add a string to the strings vector, allocating memory as needed */
 static void
 field_op_add_string (struct fieldop *op, const char* str, size_t slen)
 {
@@ -193,23 +191,26 @@ field_op_add_string (struct fieldop *op, const char* str, size_t slen)
   op->str_buf_used++;
 }
 
-/* see:
-  http://www.gnu.org/software/libc/manual/html_node/Comparison-Functions.html */
+/* Compare two flowting-point variables, while avoiding '==' .
+see:
+http://www.gnu.org/software/libc/manual/html_node/Comparison-Functions.html */
 static int
 cmp_long_double (const void *p1, const void *p2)
 {
   const long double *a = (const long double *)p1;
   const long double *b = (const long double *)p2;
-
   return ( *a > *b ) - (*a < *b);
 }
 
+/* Sort the numeric values vector in a fieldop structure */
 static void
 field_op_sort_values (struct fieldop *op)
 {
   qsort (op->values, op->num_values, sizeof (long double), cmp_long_double);
 }
 
+/* Allocate a new fieldop, initialize it based on 'oper',
+   and add it to the linked-list of operations */
 static void
 new_field_op (enum operation oper, size_t field)
 {
