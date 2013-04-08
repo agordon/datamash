@@ -1,21 +1,23 @@
-#include <stdio.h>
+#include <config.h>
 
-#include "system.h"
-#include "config.h"
 #include <assert.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <locale.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdnoreturn.h>
+
+#include "system.h"
+
+#include "error.h"
 #include "linebuffer.h"
 #include "minmax.h"
-#include "error.h"
 #include "quote.h"
-#include "version.h"
 #include "size_max.h"
 #include "version-etc.h"
+#include "version.h"
 #include "xalloc.h"
 
 #include "key-compare.h"
