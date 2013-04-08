@@ -45,6 +45,8 @@ static size_t line_number = 0 ;
 /* Lines in the current group */
 static size_t lines_in_group = 0 ;
 
+static bool print_full_line = false;
+
 #define SWAP_LINES(A, B)			\
   do						\
     {						\
@@ -664,7 +666,7 @@ enum
   DEBUG_OPTION = CHAR_MAX + 1,
 };
 
-static char const short_options[] = "zg:k:t:";
+static char const short_options[] = "fzg:k:t:";
 
 static struct option const long_options[] =
 {
@@ -672,6 +674,7 @@ static struct option const long_options[] =
   {"field-separator", required_argument, NULL, 't'},
   {"groups", required_argument, NULL, 'g'},
   {"key", required_argument, NULL, 'k'},
+  {"full", no_argument, NULL, 'f'},
   {"debug", no_argument, NULL, DEBUG_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
@@ -722,6 +725,8 @@ String operations:\n\
       fputs (_("\
 \n\
 General options:\n\
+  -f, --full                Print entire input line before op results\n\
+                            (default: print only the groupped keys)\n\
   -g, --groups=X[,Y,Z,]     Group via fields X,[Y,X]\n\
                             This is a short-cut for --key:\n\
                             '-g5,6' is equivalent to '-k5,5 -k6,6'\n\
@@ -879,7 +884,7 @@ get_field (const struct linebuffer *line, size_t field,
     }
 
   /* Chomp field if needed */
-  if ( flen>1 && *(fptr + flen -1) == 0 || *(fptr+flen-1)==eolchar )
+  if ( (flen>1) && ((*(fptr + flen -1) == 0) || (*(fptr+flen-1)==eolchar)) )
     flen--;
 
   *_len = flen;
@@ -1011,6 +1016,42 @@ process_line (const struct linebuffer *line)
     }
 }
 
+/* Print the input line representing the summarized group.
+   if '--full' - print the entire line.
+   if not full, print only the keys used for grouping.
+ */
+static void
+print_input_line (const struct linebuffer* lb)
+{
+  if (print_full_line)
+    {
+      size_t len = lb->length;
+      const char *buf = lb->buffer;
+      if (buf[len-1]==eolchar || buf[len-1]==0)
+        len--;
+      fwrite (buf, sizeof(char), len, stdout);
+      putchar( (tab==TAB_DEFAULT)?' ':tab );
+    }
+  else
+    {
+      struct keyfield *key = keylist;
+      struct line li ;
+      li.text = lb->buffer;
+      li.length = lb->length;
+      while (key)
+        {
+          const char *keybeg = begfield (&li, key);
+          const char *keylim = limfield (&li, key);
+          while (isblank(*keybeg))
+            keybeg++;
+          size_t len = keylim - keybeg;
+          fwrite (keybeg, sizeof(char), len, stdout);
+          putchar( (tab==TAB_DEFAULT)?' ':tab );
+          key = key->next;
+        }
+    }
+}
+
 /*
     Process each line in the input.
 
@@ -1059,12 +1100,13 @@ process_file ()
               fprintf(stderr,"'\n");
               fprintf(stderr,"prevline = '");
               fwrite(prevline->buffer,sizeof(char),prevline->length,stderr);
-              fprintf(stderr,"'\n'");
+              fprintf(stderr,"'\n");
               fprintf(stderr, "newgroup = %d\n", new_group);
             }
 
           if (new_group && lines_in_group>0)
             {
+              print_input_line (prevline);
               summarize_field_ops ();
               lines_in_group = 0 ;
             }
@@ -1082,7 +1124,10 @@ process_file ()
 
   /* summarize last group */
   if (lines_in_group)
-    summarize_field_ops ();
+    {
+      print_input_line (print_full_line ? thisline : prevline);
+      summarize_field_ops ();
+    }
 
   if (ferror (stdin) || fclose (stdin) != 0)
     error (EXIT_FAILURE, 0, _("read error"));
@@ -1112,7 +1157,7 @@ parse_group_spec ( const char* spec )
       if (val==0)
         error (EXIT_FAILURE, 0, _("invalid field value (zero) for grouping"));
 
-      /* Emulate a '-key X,X' parameter */
+      /* Emulate a '-key Xb,X' parameter */
       key = key_init (&key_buf);
       key->sword = val-1;
       key->eword = val-1;
@@ -1203,6 +1248,10 @@ int main(int argc, char* argv[])
     {
       switch (optc)
         {
+        case 'f':
+          print_full_line = true;
+          break;
+
         case 'g':
           parse_group_spec (optarg);
           break;
@@ -1237,7 +1286,7 @@ int main(int argc, char* argv[])
     }
 
   if (argc <= optind)
-    error (EXIT_FAILURE, 0, _("missing operations specifiers"));
+      error (EXIT_FAILURE, 0, _("missing operations specifiers"));
 
   parse_operations (argc, optind, argv);
   process_file ();

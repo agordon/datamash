@@ -122,27 +122,39 @@ my @Tests =
   #
 
   # Single group (key in column 1)
-  ['g1', '-k1,1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"195\n"}],
-  ['g2', '-k1,1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"42.5\n"}],
-  ['g3', '-k1,1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"100,10,50,35\n"}],
+  ['g1', '-k1,1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
+  ['g2', '-k1,1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
+  ['g3', '-k1,1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
   # Same as above, with "-g"
-  ['g1.1', '-g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"195\n"}],
-  ['g2.1', '-g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"42.5\n"}],
-  ['g3.1', '-g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"100,10,50,35\n"}],
+  ['g1.1', '-g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
+  ['g2.1', '-g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
+  ['g3.1', '-g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
 
   # Two groups (key in column 1)
-  ['g4', '-k1,1 min 2',    {IN_PIPE=>$in_g2}, {OUT=>"10\n55\n"}],
-  ['g5', '-k1,1 median 2', {IN_PIPE=>$in_g2}, {OUT=>"42.5\n66\n"}],
+  ['g4', '-k1,1 min 2',    {IN_PIPE=>$in_g2}, {OUT=>"A 10\nB 55\n"}],
+  ['g5', '-k1,1 median 2', {IN_PIPE=>$in_g2}, {OUT=>"A 42.5\nB 66\n"}],
   ['g6', '-k1,1 collapse 2', {IN_PIPE=>$in_g2},
-     {OUT=>"100,10,50,35\n66,77,55\n"}],
+     {OUT=>"A 100,10,50,35\nB 66,77,55\n"}],
 
   # 3 groups, single line per group, custom delimiter
-  ['g7', '-k2,2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"}, {OUT=>"1\n2\n3\n"}],
-  ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"}, {OUT=>"1\n2\n3\n"}],
+  ['g7', '-k2,2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
+     {OUT=>"A=1\nB=2\nC=3\n"}],
+  ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
+     {OUT=>"A=1\nB=2\nC=3\n"}],
 
   # Multiple keys (from different columns)
-  ['g8', '-k1,1 -k3,3 sum 2', {IN_PIPE=>$in_g3}, {OUT=>"15\n24\n17\n19\n23\n"}],
-  ['g8.1',     '-g1,3 sum 2', {IN_PIPE=>$in_g3}, {OUT=>"15\n24\n17\n19\n23\n"}],
+  ['g8', '-k1,1 -k3,3 sum 2', {IN_PIPE=>$in_g3},
+     {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
+  ['g8.1',     '-g1,3 sum 2', {IN_PIPE=>$in_g3},
+     {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
+
+
+  # --full option - without grouping, returns the last line
+  ['fl1', '--full sum 2', {IN_PIPE=>$in_g3},
+     {OUT=>"C 23 Z 98\n"}],
+  # --full with grouping - print entire line of each group
+  ['fl2', '--full -g3 sum 2', {IN_PIPE=>$in_g3},
+     {OUT=>"A 3  W 15\nA 11 X 24\nB 17 Y 17\nC 23 Z 42\n"}],
 
 
 
