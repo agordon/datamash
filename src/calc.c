@@ -28,6 +28,7 @@
 
 #include "system.h"
 
+#include "closeout.h"
 #include "error.h"
 #include "linebuffer.h"
 #include "minmax.h"
@@ -1244,6 +1245,8 @@ int main(int argc, char* argv[])
   setlocale (LC_ALL, "");
 
   init_key_spec ();
+
+  atexit (close_stdout);
 
   while ((optc = getopt_long (argc, argv, short_options, long_options, NULL))
          != -1)
