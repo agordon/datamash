@@ -257,6 +257,12 @@ new_field_op (enum operation oper, size_t field)
     field_ops = op;
 }
 
+/* Add a value (from input) to the current field operation.
+   If the operation is numeric, num_value should be used.
+   If the operation is textual, str +slen should be used
+     (str is not guarenteed to be null terminated).
+
+   Return value (boolean, keep_line) isn't used at the moment. */
 static bool
 field_op_collect (struct fieldop *op,
                   const char* str, size_t slen,
@@ -350,6 +356,7 @@ field_op_collect (struct fieldop *op,
 inline static long double
 median_value ( const long double * const values, size_t n )
 {
+  /* Assumes 'values' are already sorted, returns the median value */
   return (n&0x01)
     ?values[n/2]
     :( (values[n/2-1] + values[n/2]) / 2.0 );
@@ -399,7 +406,6 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
 {
   /* not ideal implementation but simple enough */
   /* Assumes 'values' are already sorted, find the longest sequence */
-
   long double last_value = values[0];
   size_t seq_size=1;
   size_t best_seq_size= (type==MODE)?1:SIZE_MAX;
@@ -448,6 +454,8 @@ cmpstringp_nocase(const void *p1, const void *p2)
 
 
 
+/* Returns a nul-terimated string, composed of the unique values
+   of the input strings. The return string must be free()'d. */
 static char *
 unique_value ( struct fieldop *op, bool case_sensitive )
 {
@@ -486,6 +494,8 @@ unique_value ( struct fieldop *op, bool case_sensitive )
   return buf;
 }
 
+/* Returns a nul-terimated string, composed of all the values
+   of the input strings. The return string must be free()'d. */
 static char *
 collapse_value ( struct fieldop *op )
 {
@@ -501,6 +511,8 @@ collapse_value ( struct fieldop *op )
   return buf;
 }
 
+/* Prints to stdout the result of the field operation,
+   based on collected values */
 static void
 field_op_summarize (struct fieldop *op)
 {
@@ -585,14 +597,6 @@ field_op_summarize (struct fieldop *op)
     printf ("%s", string_result);
 
   free (string_result);
-
-  /* reset values for next group */
-  op->first = true;
-  op->count = 0 ;
-  op->value = 0;
-  op->num_values = 0 ;
-  op->str_ptr_used = 0;
-  op->str_buf_used = 0;
 }
 
 static void
@@ -611,6 +615,28 @@ summarize_field_ops ()
     putchar(eolchar);
 }
 
+/* reset operation values for next group */
+static void
+reset_field_op (struct fieldop *op)
+{
+  op->first = true;
+  op->count = 0 ;
+  op->value = 0;
+  op->num_values = 0 ;
+  op->str_ptr_used = 0;
+  op->str_buf_used = 0;
+}
+
+/* reset all field operations, for next group */
+static void
+reset_field_ops ()
+{
+  for (struct fieldop *p = field_ops; p ; p = p->next)
+    reset_field_op (p);
+}
+
+/* Frees all memory associated with a field operation struct.
+   returns the 'next' field operation, or NULL */
 static struct fieldop *
 free_field_op (struct fieldop *op)
 {
@@ -743,6 +769,8 @@ Examples:\n\
   exit (status);
 }
 
+/* Given a string with operation name, returns the operation enum.
+   exits with an error message if the string is not a valid/known operation. */
 static enum operation
 get_operation (const char* op)
 {
@@ -754,6 +782,8 @@ get_operation (const char* op)
   return 0; /* never reached */
 }
 
+/* Converts a string to number (field number).
+   Exits with an error message (using 'op') on invalid field number. */
 static size_t
 get_field_number(enum operation op, const char* field_str)
 {
@@ -792,6 +822,13 @@ parse_operations (int argc, int start, char **argv)
     }
 }
 
+/* Force NUL-termination of the string in the linebuffer struct.
+   NOTE 1: The buffer is assumed to contain NUL later on in the program,
+           and is used in 'strtoul()'.
+   NOTE 2: The buffer can not be simply chomp'd (by derementing length),
+           because sort's "keycompare()" function assume the last valid index
+           is one PAST the last character of the line (i.e. there is an EOL
+           charcter in the buffer). */
 inline static void
 linebuffer_nullify (struct linebuffer *line)
 {
@@ -928,6 +965,8 @@ different (const struct line* l1, const struct line* l2)
   return (diff != 0);
 }
 
+/* For a given line, extract all requested fields and process the associated
+   operations on them */
 static void
 process_line (const struct linebuffer *line)
 {
@@ -1016,7 +1055,7 @@ print_input_line (const struct linebuffer* lb)
     Process each line in the input.
 
     If the key fo the current line is different from the prevopis one,
-    summarize the previous group and start a new one
+    summarize the previous group and start a new one.
  */
 static void
 process_file ()
@@ -1068,6 +1107,7 @@ process_file ()
             {
               print_input_line (prevline);
               summarize_field_ops ();
+              reset_field_ops ();
               lines_in_group = 0 ;
             }
         }
@@ -1087,17 +1127,17 @@ process_file ()
     {
       print_input_line (print_full_line ? thisline : prevline);
       summarize_field_ops ();
+      reset_field_ops ();
     }
 
   if (ferror (stdin) || fclose (stdin) != 0)
     error (EXIT_FAILURE, 0, _("read error"));
 
-  /* stdout is handled via the atexit-invoked close_stdout function.  */
-
   free (lb1.buffer);
   free (lb2.buffer);
 }
 
+/* Parse the "--group=X[,Y,Z]" parameter, populating 'keylist' */
 static void
 parse_group_spec ( const char* spec )
 {
@@ -1132,6 +1172,8 @@ parse_group_spec ( const char* spec )
     }
 }
 
+/* Parse the "--key POS1,POS2" parameter, adding the key to 'keylist'.
+   This code is copied from coreutils' "sort". */
 static void
 parse_key_spec ( const char *spec )
 {
@@ -1254,6 +1296,8 @@ int main(int argc, char* argv[])
   parse_operations (argc, optind, argv);
   process_file ();
   free_field_ops ();
+
+  return EXIT_SUCCESS;
 }
 
 /* vim: set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1: */
