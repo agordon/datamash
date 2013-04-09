@@ -8,10 +8,10 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-EXTRA_DIST = bootstrap configure \
+EXTRA_DIST = \
 	$(top_srcdir)/.version
 
-SUBDIRS = m4 lib src scripts tests
+SUBDIRS = lib src tests
 ACLOCAL_AMFLAGS = -I m4
 
 BUILT_SOURCES = $(top_srcdir)/.version
