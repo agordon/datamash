@@ -1,0 +1,14 @@
+Additional contributors to calc.
+
+  Copyright (C) 2013 Assaf Gordon.
+
+  Copying and distribution of this file, with or without modification,
+  are permitted in any medium without royalty provided the copyright
+  notice and this notice are preserved.
+
+Thanks to:
+
+    Aaron Quinlan ( http://quinlanlab.org/ ) whose 'groupBy' program
+    (https://github.com/arq5x/bedtools) was the inspiration for calc.
+
+See also the AUTHORS and ChangeLog files.

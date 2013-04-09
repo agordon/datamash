@@ -1,4 +1,4 @@
-# Makefile for calc/tests.
+# Makefile.am for calc/man.
 #
 # Copyright 2013 Assaf Gordon.
 #
@@ -15,16 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-TESTS = calc-tests.pl
+man_MANS = calc.1
+EXTRA_DIST = $(man_MANS)
+MAINTAINERCLEANFILES = $(man_MANS)
 
-EXTRA_DIST = Coreutils.pm CuSkip.pm CuTmpdir.pm \
-             $(TESTS)
+# The man pages depend on the --help strings and the version number.
+common_mandeps = $(top_srcdir)/configure.ac
 
-# (Copied from coreutils' tests/local.mk)
-# Use automake's TESTS_ENVIRONMENT to add ./src/ to the search path.
-TESTS_ENVIRONMENT =				\
-  export \
-  PERL5LIB='$(top_srcdir)/tests$(PATH_SEPARATOR)'"$$PERL5LIB" \
-  PATH='$(abs_top_builddir)/src$(PATH_SEPARATOR)'"$$PATH" \
-  ;
-
+# Depend on the source, not the binary; we don't need to regenerate the
+# binary when any source file changes, only the main one.
+# Use -o so that the `missing' program can infer the output file.
+calc.1: $(top_srcdir)/src/calc.c $(common_mandeps)
+	$(HELP2MAN) --name="Simple Calculations on input data" ../src/calc -o $@

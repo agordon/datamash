@@ -1,32 +1,35 @@
-# Copyright (C) 2013 Assaf Gordon <assafgordon@gmail.com>
+# Makefile.am for calc/src.
 #
-# This file is free software; as a special exception the author gives
-# unlimited permission to copy and/or distribute it, with or without
-# modifications, as long as this notice is preserved.
+# Copyright (C) 2013 Assaf Gordon.
 #
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 bin_PROGRAMS = calc
 
-EXTRA_DIST = system.h \
-	     strnumcmp.h strnumcmp-in.h \
-	     version.h
-
 calc_SOURCES = calc.c \
 	       key-compare.h key-compare.c \
-	       strnumcmp.c \
-	       version.c
+           system.h \
+	       strnumcmp.c strnumcmp.h strnumcmp-in.h \
+	       version.c version.h
+
+# TODO: set -Werror only if using GCC
+calc_o_CFLAGS=-Wall -Wextra -Wformat-security -Wswitch-enum \
+              -Wswitch-default -Wformat-nonliteral -Wunused-parameter -Werror
+
 
 # gnulib header files - is this the right way to find them?
-#
-# TODO: set -Werror only for GCC
-EXTRA_CFLAGS=-Wall -Wextra -Wformat-security -Wswitch-enum
-calc_o_CFLAGS=-Wswitch-default -Wformat-nonliteral -Wunused-parameter -Werror
-
-
-calc_CFLAGS = -I$(top_srcdir)/lib $(EXTRA_CFLAGS)
+calc_CFLAGS = -I$(top_srcdir)/lib
 
 # gnulib static library
 calc_LDFLAGS = -L$(top_builddir)/lib
