@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # Copyright (C) 2013 Assaf Gordon <assafgordon@gmail.com>
 #
 # This file is free software; as a special exception the author gives
@@ -8,7 +10,6 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-#!/bin/sh
 rm -rf config.cache autom4te.cache aclocal.m4 .version .tarball_version
 
 echo "- gnulib."
