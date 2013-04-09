@@ -1,22 +1,24 @@
-# Copyright (C) 2013 Assaf Gordon <assafgordon@gmail.com>
+# Makefile for calc/tests.
 #
-# This file is free software; as a special exception the author gives
-# unlimited permission to copy and/or distribute it, with or without
-# modifications, as long as this notice is preserved.
+# Copyright 2013 Assaf Gordon.
 #
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
 #
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-PERL_TESTS = calc-tests.pl
+TESTS = calc-tests.pl
 
 EXTRA_DIST = Coreutils.pm CuSkip.pm CuTmpdir.pm \
-             $(PERL_TESTS)
-
-noinst_DATA = $(EXTRA_DIST)
-
-check_PROGRAMS =
+             $(TESTS)
 
 # (Copied from coreutils' tests/local.mk)
 # Use automake's TESTS_ENVIRONMENT to add ./src/ to the search path.
@@ -26,5 +28,3 @@ TESTS_ENVIRONMENT =				\
   PATH='$(abs_top_builddir)/src$(PATH_SEPARATOR)'"$$PATH" \
   ;
 
-TESTS = $(check_PROGRAMS) \
-	$(PERL_TESTS)
