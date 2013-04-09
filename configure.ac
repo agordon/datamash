@@ -50,6 +50,7 @@ fi
 AC_CONFIG_FILES([
    Makefile
    lib/Makefile
+   man/Makefile
    src/Makefile
    tests/Makefile
 ])

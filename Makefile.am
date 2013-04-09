@@ -11,7 +11,7 @@
 EXTRA_DIST = \
 	$(top_srcdir)/.version
 
-SUBDIRS = lib src tests
+SUBDIRS = lib src man tests
 ACLOCAL_AMFLAGS = -I m4
 
 BUILT_SOURCES = $(top_srcdir)/.version
