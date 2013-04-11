@@ -1,0 +1,4 @@
+# List of source files which contain translatable strings.
+src/calc.c
+src/key-compare.c
+src/system.h

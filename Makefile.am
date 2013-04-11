@@ -11,7 +11,7 @@
 EXTRA_DIST = \
 	$(top_srcdir)/.version
 
-SUBDIRS = lib src man tests
+SUBDIRS = po lib src man tests
 ACLOCAL_AMFLAGS = -I m4
 
 BUILT_SOURCES = $(top_srcdir)/.version
@@ -21,5 +21,31 @@ $(top_srcdir)/.version:
 
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
+
+# Verify that all source files using _() are listed in po/POTFILES.in.
+# The idea is to run this before making pretests, as well as official
+# releases, so that translators will be sure to have all the messages.
+# (From coreutils.)
+po-check:
+	if test -f po/POTFILES.in; then					\
+	  grep -E -v '^(#|$$)' po/POTFILES.in				\
+	    | grep -v '^src/false\.c$$' | sort > $@-1;			\
+	  files=;							\
+	  for file in $$($(CVS_LIST_EXCEPT)) `find * -name '*.[ch]'`; do \
+	    case $$file in						\
+	    djgpp/* | man/*) continue;;					\
+	    esac;							\
+	    case $$file in						\
+	    *.[ch])							\
+	      base=`expr " $$file" : ' \(.*\)\..'`;			\
+	      { test -f $$base.l || test -f $$base.y; } && continue;;	\
+	    esac;							\
+	    files="$$files $$file";					\
+	  done;								\
+	  grep -E -l '\b(N?_|gettext *)\([^)"]*("|$$)' $$files		\
+	    | sort -u > $@-2;						\
+	  diff -u $@-1 $@-2 || exit 1;					\
+	  rm -f $@-1 $@-2;						\
+	fi
 
 

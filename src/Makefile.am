@@ -31,6 +31,10 @@ calc_o_CFLAGS=-Wall -Wextra -Wformat-security -Wswitch-enum \
 # gnulib header files - is this the right way to find them?
 calc_CFLAGS = -I$(top_srcdir)/lib
 
+# Add LOCALDIR for gettext
+localedir = $(datadir)/locale
+DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
+
 # gnulib static library
 calc_LDFLAGS = -L$(top_builddir)/lib
 LIBS = -lgnu \

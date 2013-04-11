@@ -47,7 +47,11 @@ else
   HELP2MAN=:
 fi
 
-AC_CONFIG_FILES([
+# i18n support from GNU gettext.
+AM_GNU_GETTEXT_VERSION([0.18.1])
+AM_GNU_GETTEXT([external])
+
+AC_CONFIG_FILES([ po/Makefile.in
    Makefile
    lib/Makefile
    man/Makefile

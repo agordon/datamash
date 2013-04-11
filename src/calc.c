@@ -1243,6 +1243,8 @@ int main(int argc, char* argv[])
   set_program_name (argv[0]);
 
   setlocale (LC_ALL, "");
+  bindtextdomain (PACKAGE, LOCALEDIR);
+  textdomain (PACKAGE);
 
   init_key_spec ();
 

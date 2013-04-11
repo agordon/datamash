@@ -39,10 +39,18 @@
 #include <stdint.h>
 #include <limits.h>
 
-/* TODO: add GNU GetText support */
-#define _(x) (x)
-#define N_(x) (x)
+/* Take care of NLS matters.  */
 
+#include "gettext.h"
+#if ! ENABLE_NLS
+# undef textdomain
+# define textdomain(Domainname) /* empty */
+# undef bindtextdomain
+# define bindtextdomain(Domainname, Dirname) /* empty */
+#endif
+
+#define _(msgid) gettext (msgid)
+#define N_(msgid) msgid
 
 #define STREQ(a, b) (strcmp (a, b) == 0)
 #define STREQ_LEN(a, b, n) (strncmp (a, b, n) == 0)
