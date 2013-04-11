@@ -755,13 +755,17 @@ General options:\n\
       printf (_("\
 \n\
 Examples:\n\
-  Print the mean and the median of values from column 1\n\
+\n\
+Print the mean and the median of values from column 1:\n\
+\n\
   $ seq 10 | %s mean 1 median 1\n\
 \n\
-  Group input based on field 1, and sum values (per group) on field 2:\n\
-  $ printf '%%s %%d\n' A 10 A 5 B 9 | %s -g1 sum 2\n\
+Group input based on field 1, and sum values (per group) on field 2:\n\
 \n\
-  Unsorted input must be sorted:\n\
+  $ printf \"%%s %%d\\n\" A 10 A 5 B 9 | %s -g1 sum 2\n\
+\n\
+Unsorted input must be sorted:\n\
+\n\
   $ cat INPUT.TXT | sort -k1,1 | %s -k1,1 mean 2\n\
 \n\
 "), program_name, program_name, program_name);
