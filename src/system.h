@@ -1,10 +1,9 @@
-/*
-   Common definitions, copied from coreutils' src/system.h .
-   This will help keep this properly compartmalized, without duplicated code.
+/* system.h: system-dependent declarations.
 
+   Common definitions, copied from coreutils' src/system.h .
    The original Copyright is below:
-*/
-/* system-dependent definitions for coreutils
+
+   system-dependent definitions for coreutils
    Copyright (C) 1989-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -20,21 +19,28 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Include this file _after_ system headers if possible.  */
+#ifndef CALC_SYSTEM_H
+#define CALC_SYSTEM_H
 
+/* Assume ANSI C89 headers are available.  */
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
+/* Use POSIX headers.  If they are not available, we use the substitute
+   provided by gnulib.  */
+#include <getopt.h>
+#include <unistd.h>
+
+#include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
 #include <stdint.h>
-
 #include <limits.h>
 
 /* TODO: add GNU GetText support */
 #define _(x) (x)
-
 #define N_(x) (x)
 
 
@@ -133,3 +139,5 @@ select_plural (uintmax_t n)
   enum { PLURAL_REDUCER = 1000000 };
   return (n <= ULONG_MAX ? n : n % PLURAL_REDUCER + PLURAL_REDUCER);
 }
+
+#endif /* CALC_SYSTEM_H */
