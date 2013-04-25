@@ -19,8 +19,16 @@ BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
 	echo $(VERSION) > $@-t && mv $@-t $@
 
-dist-hook:
+dist-hook: gen-ChangeLog
 	echo $(VERSION) > $(distdir)/.tarball-version
+
+.PHONY: gen-ChangeLog
+gen-ChangeLog:
+	$(AM_V_GEN)if test -d .git; then				\
+	  $(top_srcdir)/build-aux/gitlog-to-changelog > $(distdir)/cl-t;\
+	  rm -f $(distdir)/ChangeLog;					\
+	  mv $(distdir)/cl-t $(distdir)/ChangeLog;			\
+	fi
 
 # Verify that all source files using _() are listed in po/POTFILES.in.
 # The idea is to run this before making pretests, as well as official
