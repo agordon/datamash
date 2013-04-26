@@ -193,8 +193,7 @@ default_key_compare (struct keyfield const *key);
 /* Output data independent key warnings to stderr.  */
 
 void
-key_warnings (struct keyfield const *gkey, bool gkey_only,
-              const bool unique, const bool stable);
+key_warnings (struct keyfield const *gkey, bool gkey_only);
 
 /* Return true if KEY is a numeric key.  */
 

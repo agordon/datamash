@@ -1036,6 +1036,9 @@ parse_field_count (char const *string, size_t *val, char const *msgid)
         error (SORT_FAILURE, 0, _("%s: invalid count at start of %s"),
                _(msgid), quote (string));
       return NULL;
+
+    default:
+      abort(); /* Should never happen */
     }
 
   return suffix;
@@ -1276,8 +1279,7 @@ default_key_compare (struct keyfield const *key)
 /* Output data independent key warnings to stderr.  */
 
 void
-key_warnings (struct keyfield const *gkey, bool gkey_only,
-              const bool unique, const bool stable)
+key_warnings (struct keyfield const *gkey, bool gkey_only)
 {
   struct keyfield const *key;
   struct keyfield ugkey = *gkey;
