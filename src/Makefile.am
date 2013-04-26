@@ -19,24 +19,23 @@ bin_PROGRAMS = calc
 
 calc_SOURCES = calc.c \
 	       key-compare.h key-compare.c \
-           system.h \
+	       system.h \
 	       strnumcmp.c strnumcmp.h strnumcmp-in.h \
 	       version.c version.h
 
-# TODO: set -Werror only if using GCC
-calc_o_CFLAGS=-Wall -Wextra -Wformat-security -Wswitch-enum \
-              -Wswitch-default -Wformat-nonliteral -Wunused-parameter -Werror
-
+# Extra compile flags for these source files.
+# Can't use them when compiling gnulib, so not adding them globally.
+AM_CFLAGS = $(WARN_CFLAGS)
 
 # gnulib header files - is this the right way to find them?
-calc_CFLAGS = -I$(top_srcdir)/lib
+AM_CPPFLAGS = -I$(top_srcdir)/lib
 
 # Add LOCALDIR for gettext
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
 # gnulib static library
-calc_LDFLAGS = -L$(top_builddir)/lib
+AM_LDFLAGS = -L$(top_builddir)/lib
 LIBS = -lgnu \
        $(FABSL_LIBM) \
        $(FABS_LIBM) \

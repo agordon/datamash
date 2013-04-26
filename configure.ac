@@ -47,6 +47,18 @@ else
   HELP2MAN=:
 fi
 
+# Add extra compilation warnings. These will only apply to calc.c not to any
+# gnulib modules). See $(WARN_CFLAGS) in src/Makefile.am .
+gl_WARN_ADD([-Wall])
+gl_WARN_ADD([-Wextra])
+gl_WARN_ADD([-Wformat-security])
+gl_WARN_ADD([-Wswitch-enum])
+gl_WARN_ADD([-Wswitch-default])
+gl_WARN_ADD([-Wformat-nonliteral])
+gl_WARN_ADD([-Wunused-parameter])
+gl_WARN_ADD([-Werror])
+
+
 # i18n support from GNU gettext.
 AM_GNU_GETTEXT_VERSION([0.18.1])
 AM_GNU_GETTEXT([external])
