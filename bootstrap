@@ -16,6 +16,12 @@ echo "- gnulib."
 git submodule update --init gnulib #pull gnulib to a specific git version.
 ./gnulib/gnulib-tool --update #update used gnulib modules
 
+# Create stub files, required for building
+# (ABOUT-NLS should be updated by gettext, and ChangeLog is auto-generated
+#  with `make dist`)
+test -e ChangeLog || touch ChangeLog
+test -e ABOUT-NLS || touch ABOUT-NLS
+
 mkdir -p config
 echo "- aclocal."
 aclocal -I m4
