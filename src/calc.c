@@ -1179,16 +1179,20 @@ static void
 print_column_headers()
 {
   if (print_full_line)
-    for (size_t n=1; n<=num_input_column_headers; ++n)
-      {
-        fputs(get_input_field_name(n), stdout);
-        putchar( (tab==TAB_DEFAULT)?' ':tab );
-      }
-
-  for (struct keyfield *key = keylist; key; key = key->next)
     {
-      printf("GroupBy(%s)",get_input_field_name(key->sword+1));
-      putchar( (tab==TAB_DEFAULT)?' ':tab );
+      for (size_t n=1; n<=num_input_column_headers; ++n)
+        {
+          fputs(get_input_field_name(n), stdout);
+          putchar( (tab==TAB_DEFAULT)?' ':tab );
+        }
+    }
+  else
+    {
+      for (struct keyfield *key = keylist; key; key = key->next)
+        {
+          printf("GroupBy(%s)",get_input_field_name(key->sword+1));
+          putchar( (tab==TAB_DEFAULT)?' ':tab );
+        }
     }
 
   for (struct fieldop *op = field_ops; op ; op=op->next)
