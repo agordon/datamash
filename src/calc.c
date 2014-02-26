@@ -1217,20 +1217,20 @@ static void
 process_file ()
 {
   struct linebuffer lb1, lb2;
-  struct linebuffer *thisline, *prevline;
+  struct linebuffer *thisline, *group_first_line;
 
    /* line structure used for sort's key comparison*/
   struct line sortlb1, sortlb2;
-  struct line *thislinesort, *prevlinesort;
+  struct line *thislinesort, *group_first_linesort;
 
   thisline = &lb1;
-  prevline = &lb2;
+  group_first_line = &lb2;
 
   thislinesort = &sortlb1;
-  prevlinesort = &sortlb2;
+  group_first_linesort = &sortlb2;
 
   initbuffer (thisline);
-  initbuffer (prevline);
+  initbuffer (group_first_line);
 
   while (!feof (stdin))
     {
@@ -1258,27 +1258,33 @@ process_file ()
       if (keylist)
         {
           prepare_line (thisline, thislinesort, eolchar);
-          new_group = (prevline->length == 0
-                       || different (thislinesort, prevlinesort));
+          new_group = (group_first_line->length == 0
+                       || different (thislinesort, group_first_linesort));
 
           if (debug)
             {
+              fprintf(stderr,"group_first_line = '");
+              fwrite(group_first_line->buffer,sizeof(char),group_first_line->length,stderr);
+              fprintf(stderr,"'\n");
               fprintf(stderr,"thisline = '");
               fwrite(thisline->buffer,sizeof(char),thisline->length,stderr);
-              fprintf(stderr,"'\n");
-              fprintf(stderr,"prevline = '");
-              fwrite(prevline->buffer,sizeof(char),prevline->length,stderr);
               fprintf(stderr,"'\n");
               fprintf(stderr, "newgroup = %d\n", new_group);
             }
 
           if (new_group && lines_in_group>0)
             {
-              print_input_line (prevline);
+              print_input_line (group_first_line);
               summarize_field_ops ();
               reset_field_ops ();
               lines_in_group = 0 ;
+              group_first_line->length = 0;
             }
+        }
+      else
+        {
+          /* The entire line is a "group", if it's the first line, keep it */
+          new_group = (group_first_line->length==0);
         }
 
       lines_in_group++;
@@ -1286,15 +1292,15 @@ process_file ()
 
       if (new_group)
         {
-          SWAP_LINES (prevline, thisline);
-          SWAP_SORT_LINES (prevlinesort, thislinesort);
+          SWAP_LINES (group_first_line, thisline);
+          SWAP_SORT_LINES (group_first_linesort, thislinesort);
         }
     }
 
   /* summarize last group */
   if (lines_in_group)
     {
-      print_input_line (print_full_line ? thisline : prevline);
+      print_input_line (group_first_line);
       summarize_field_ops ();
       reset_field_ops ();
     }

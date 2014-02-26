@@ -183,12 +183,12 @@ my @Tests =
      {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
 
 
-  # --full option - without grouping, returns the last line
+  # --full option - without grouping, returns the first line
   ['fl1', '--full sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"C 23 Z 98\n"}],
+     {OUT=>"A 3  W 98\n"}],
   # --full with grouping - print entire line of each group
   ['fl2', '--full -g3 sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"A 3  W 15\nA 11 X 24\nB 17 Y 17\nC 23 Z 42\n"}],
+     {OUT=>"A 3  W 15\nA 11 X 24\nB 17 Y 17\nB 19 Z 42\n"}],
 
   # count on non-numeric fields
   ['cnt1', '-g 1 count 1', {IN_PIPE=>$in_g2},
@@ -204,7 +204,15 @@ my @Tests =
 
   # Input and output header, with full line
   ['hdr3', '-g 1 --full --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
-     {OUT=>"x y z count(y)\nA 1 10 5\nB 5 10 3\nC 2 44 4\n"}],
+     {OUT=>"x y z count(y)\nA 1 10 5\nB 5 10 3\nC 8 11 4\n"}],
+
+  # Output Header
+  ['hdr4', '-g 1 --header-out count 2', {IN_PIPE=>$in_g3},
+     {OUT=>"GroupBy(field-1) count(field-2)\nA 5\nB 2\nC 1\n"}],
+
+  # Output Header with --full
+  ['hdr5', '-g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
+     {OUT=>"field-1 field-2 field-3 count(field-2)\nA 3  W 5\nB 17 Y 2\nC 23 Z 1\n"}],
 
 );
 
