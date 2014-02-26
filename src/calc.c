@@ -228,25 +228,6 @@ const char const * get_input_field_name(size_t field_num)
     }
 }
 
-void print_operator_column_header(struct fieldop *op)
-{
-/*
-  struct columnheader *h = XZALLOC(struct columnheader);
-
-  //opname + "(field-" + NNNN + ")" + NULL
-  const size_t len = strlen(op->name) + 1+6+1+ INT_BUFSIZE_BOUND(size_t)+1+1 ;
-  h->name = xmalloc(len);
-  snprintf(h->name,len,"%s(field-%zu)", op->name,op->field);
-  output_column_headers = add_column_header(output_column_headers, h);
-*/
-  printf("%s(%s)",op->name, get_input_field_name(op->field));
-}
-
-void print_group_column_header(struct keyfield *key)
-{
-  printf("GroupBy(%s)",get_input_field_name(key->sword+1));
-}
-
 enum { VALUES_BATCH_INCREMENT = 1024 };
 
 /* Add a numeric value to the values vector, allocating memory as needed */
