@@ -174,6 +174,9 @@ my @Tests =
   ['fl2', '--full -g3 sum 2', {IN_PIPE=>$in_g3},
      {OUT=>"A 3  W 15\nA 11 X 24\nB 17 Y 17\nC 23 Z 42\n"}],
 
+  # count on non-numeric fields
+  ['cnt1', '-g 1 count 1', {IN_PIPE=>$in_g2},
+     {OUT=>"A 4\nB 3\n"}],
 
 
 );
