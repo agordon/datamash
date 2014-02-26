@@ -63,6 +63,12 @@ static size_t line_number = 0 ;
 /* Lines in the current group */
 static size_t lines_in_group = 0 ;
 
+/* Print Output Header */
+static bool output_header = false;
+
+/* Input file has a header line */
+static bool input_header = false;
+
 /* If true, print the entire input line. Otherwise, print only the key fields */
 static bool print_full_line = false;
 
@@ -679,15 +685,20 @@ free_field_ops ()
 enum
 {
   DEBUG_OPTION = CHAR_MAX + 1,
+  INPUT_HEADER_OPTION,
+  OUTPUT_HEADER_OPTION
 };
 
-static char const short_options[] = "fzg:k:t:";
+static char const short_options[] = "fzg:k:t:H";
 
 static struct option const long_options[] =
 {
   {"zero-terminated", no_argument, NULL, 'z'},
   {"field-separator", required_argument, NULL, 't'},
   {"groups", required_argument, NULL, 'g'},
+  {"header-in", no_argument, NULL, INPUT_HEADER_OPTION},
+  {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
+  {"headers", no_argument, NULL, 'H'},
   {"key", required_argument, NULL, 'k'},
   {"full", no_argument, NULL, 'f'},
   {"debug", no_argument, NULL, DEBUG_OPTION},
@@ -744,6 +755,9 @@ General options:\n\
   -g, --groups=X[,Y,Z,]     Group via fields X,[Y,X]\n\
                             This is a short-cut for --key:\n\
                             '-g5,6' is equivalent to '-k5,5 -k6,6'\n\
+  --header-in               First input line is column headers\n\
+  --header-out              Print column headers as first line\n\
+  -H, --headers             Same as '--header-in --header-out'\n\
   -k, --key=KEYDEF          Group via a key; KEYDEF gives location and type\n\
   -t, --field-separator=X    use X instead of whitespace for field delimiter\n\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
@@ -1277,6 +1291,18 @@ int main(int argc, char* argv[])
 
         case DEBUG_OPTION:
           debug = true;
+          break;
+
+        case INPUT_HEADER_OPTION:
+          input_header = true;
+          break;
+
+        case OUTPUT_HEADER_OPTION:
+          output_header = true;
+          break;
+
+        case 'H':
+          input_header = output_header = true;
           break;
 
         case 't':
