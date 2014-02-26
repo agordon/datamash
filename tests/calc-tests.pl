@@ -69,6 +69,22 @@ B 19 Z
 C 23 Z
 EOF
 
+my $in_hdr1=<<'EOF';
+x y z
+A 1 10
+A 2 10
+A 3 10
+A 4 10
+A 4 10
+B 5 10
+B 6 20
+B 7 30
+C 8 11
+C 9 22
+C 1 33
+C 2 44
+EOF
+
 
 
 my @Tests =
@@ -178,6 +194,17 @@ my @Tests =
   ['cnt1', '-g 1 count 1', {IN_PIPE=>$in_g2},
      {OUT=>"A 4\nB 3\n"}],
 
+  # Input Header
+  ['hdr1', '-g 1 --header-in count 2',{IN_PIPE=>$in_hdr1},
+     {OUT=>"A 5\nB 3\nC 4\n"}],
+
+  # Input and output header
+  ['hdr2', '-g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
+     {OUT=>"GroupBy(x) count(y)\nA 5\nB 3\nC 4\n"}],
+
+  # Input and output header, with full line
+  ['hdr3', '-g 1 --full --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
+     {OUT=>"x y z count(y)\nA 1 10 5\nB 5 10 3\nC 2 44 4\n"}],
 
 );
 
