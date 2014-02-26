@@ -81,7 +81,8 @@ struct columnheader
         struct columnheader *next;
 };
 
-static struct columnheader* column_headers = NULL;
+static size_t num_input_column_headers = 0 ;
+static struct columnheader* input_column_headers = NULL;
 
 enum operation
 {
@@ -185,58 +186,64 @@ struct fieldop
 
 static struct fieldop* field_ops = NULL;
 
-void add_column_header(struct columnheader *h)
+void add_named_input_column_header(const char* buffer, size_t len)
 {
-  if (column_headers != NULL)
+  struct columnheader *h = XZALLOC(struct columnheader);
+  h->name = xmalloc(len+1);
+  bcopy(buffer,h->name,len);
+  h->name[len]=0;
+
+  if (input_column_headers != NULL)
     {
-      struct columnheader *p = column_headers;
+      struct columnheader *p = input_column_headers;
       while (p->next != NULL)
         p = p->next;
       p->next = h;
     }
   else
-    column_headers = h;
+    input_column_headers = h;
 }
 
-void add_named_column_header(const char* name)
+/* Returns a pointer to the name of the field.
+ * DO NOT FREE or reuse the returned buffer.
+ * Might return a pointer to a static buffer - not thread safe.*/
+const char const * get_input_field_name(size_t field_num)
 {
-  struct columnheader *h = XZALLOC(struct columnheader);
-  h->name = xstrdup(name);
-  add_column_header(h);
+  static char tmp[6+INT_BUFSIZE_BOUND(size_t)+1];
+  if (input_column_headers==NULL)
+    {
+       ignore_value(snprintf(tmp,sizeof(tmp),"field-%zu",field_num));
+       return tmp;
+    }
+  else
+    {
+       const struct columnheader *h = input_column_headers;
+       if (field_num > num_input_column_headers)
+         error(EXIT_FAILURE,0,_("Not enough input fields (field %zu requested, input has only %zu"), field_num, num_input_column_headers);
+
+       while (--field_num)
+         h = h->next;
+       return h->name;
+    }
 }
 
-void add_numeric_column_header(size_t n)
+void print_operator_column_header(struct fieldop *op)
 {
-  // "field-" + max-digits + 1 null.
-  #define MAX_COLUMN_NAME_SIZE (6+INT_BUFSIZE_BOUND(size_t)+1)
-
-  struct columnheader *h = XZALLOC(struct columnheader);
-  h->name = xmalloc(MAX_COLUMN_NAME_SIZE);
-  strcpy(h->name,"field-");
-  ignore_value(inttostr((int)n, h->name+6));
-  add_column_header(h);
-}
-
-void add_operator_column_header(struct fieldop *op)
-{
+/*
   struct columnheader *h = XZALLOC(struct columnheader);
 
   //opname + "(field-" + NNNN + ")" + NULL
   const size_t len = strlen(op->name) + 1+6+1+ INT_BUFSIZE_BOUND(size_t)+1+1 ;
   h->name = xmalloc(len);
   snprintf(h->name,len,"%s(field-%zu)", op->name,op->field);
-  add_column_header(h);
+  output_column_headers = add_column_header(output_column_headers, h);
+*/
+  printf("%s(%s)",op->name, get_input_field_name(op->field));
 }
 
-void add_group_column_header(struct keyfield *key)
+void print_group_column_header(struct keyfield *key)
 {
-  struct columnheader *h = XZALLOC(struct columnheader);
-
-  //"group(field-" + NNNN + ")" + NULL
-  const size_t len = 11+ INT_BUFSIZE_BOUND(size_t)+1+1 ;
-  h->name = xmalloc(len);
-  snprintf(h->name,len,"group(field-%zu)", key->sword+1);
-  add_column_header(h);
+  printf("GroupBy(%s)",get_input_field_name(key->sword+1));
 }
 
 enum { VALUES_BATCH_INCREMENT = 1024 };
@@ -1136,32 +1143,79 @@ print_input_line (const struct linebuffer* lb)
 
 
 static void
-build_operators_column_headers()
+build_input_line_headers(struct linebuffer *lb, bool store_names)
 {
-  for (struct fieldop *p = field_ops; p ; p=p->next)
-    add_operator_column_header(p);
-}
+  const char* ptr = lb->buffer;
+  const char* lim = lb->buffer + lb->length;
 
-static void
-build_group_column_headers()
-{
-  for (struct keyfield *key = keylist; key; key = key->next)
-    add_group_column_header(key);
+  while (ptr<lim)
+   {
+     const char *end = ptr;
+
+     /* Find the end of the input field, starting at 'ptr' */
+     if (tab != TAB_DEFAULT)
+       {
+         while (end < lim && *end != tab)
+           ++end;
+       }
+     else
+       {
+         while (end < lim && !blanks[to_uchar (*end)])
+           ++end;
+       }
+
+     if (store_names)
+       add_named_input_column_header(ptr, end-ptr);
+     ++num_input_column_headers;
+
+     if (debug)
+       {
+         fprintf(stderr,"input line header = ");
+         fwrite(ptr,sizeof(char),end-ptr,stderr);
+         fputc(eolchar,stderr);
+       }
+
+     /* Find the begining of the next field */
+     ptr = end ;
+     if (tab != TAB_DEFAULT)
+       {
+         if (ptr < lim)
+           ++ptr;
+       }
+     else
+       {
+         while (ptr < lim && blanks[to_uchar (*ptr)])
+           ++ptr;
+       }
+    }
 }
 
 static void
 print_column_headers()
 {
-  for (struct columnheader *h = column_headers; h ; h=h->next)
+  if (print_full_line)
+    for (size_t n=1; n<=num_input_column_headers; ++n)
+      {
+        fputs(get_input_field_name(n), stdout);
+        putchar( (tab==TAB_DEFAULT)?' ':tab );
+      }
+
+  for (struct keyfield *key = keylist; key; key = key->next)
     {
-      fputs(h->name, stdout);
-      /* print field separator */
-      if (h->next)
+      printf("GroupBy(%s)",get_input_field_name(key->sword+1));
+      putchar( (tab==TAB_DEFAULT)?' ':tab );
+    }
+
+  for (struct fieldop *op = field_ops; op ; op=op->next)
+    {
+      printf("%s(%s)",op->name, get_input_field_name(op->field));
+
+      if (op->next)
         putchar( (tab==TAB_DEFAULT)?' ':tab );
     }
 
-    /* print end-of-line */
-    putchar(eolchar);
+  /* print end-of-line */
+  putchar(eolchar);
 }
 
 /*
@@ -1189,17 +1243,6 @@ process_file ()
   initbuffer (thisline);
   initbuffer (prevline);
 
-  if (input_header || output_header)
-  {
-    if (print_full_line)
-      error(EXIT_FAILURE,0,_("--full with --headr-out is not implemented yet"));
-    build_group_column_headers();
-    build_operators_column_headers();
-
-    if (output_header)
-      print_column_headers();
-  }
-
   while (!feof (stdin))
     {
       bool new_group = false;
@@ -1208,6 +1251,19 @@ process_file ()
         break;
       linebuffer_nullify (thisline);
       line_number++;
+
+      /* Process header, only after reading the first line,
+         in case we need to know either the column names or
+         the number of columns in the input. */
+      if ((input_header || output_header) && line_number==1)
+        {
+          build_input_line_headers(thisline,input_header);
+
+          if (output_header)
+            print_column_headers();
+          if (input_header)
+            continue; //this line does not contain numeric values, only headers.
+        }
 
       /* If no keys are given, the entire input is considered one group */
       if (keylist)
