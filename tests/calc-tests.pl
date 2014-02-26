@@ -133,8 +133,17 @@ my @Tests =
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
   ['nl2', 'sum 1', {IN_PIPE=>"1\n99"}, {OUT=>"100\n"}],
 
-  # empty input = empty output
+  # empty input = empty output, regardless of options
   [ 'emp1', 'count 1', {IN_PIPE=>""}, {OUT=>""}],
+  [ 'emp2', '--full count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp3', '--header-in count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp4', '--header-out count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp5', '--full --header-in count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp6', '--full --header-out count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp7', '--full --header-in --header-out count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp8', '-g3,4 --full --header-in --header-out count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp9', '-g3 count 2', {IN_PIPE=>""},{OUT=>""}],
+
 
   ## Field extraction
   ['f1', 'sum 1', {IN_PIPE=>$in2}, {OUT=>"5\n"}],
