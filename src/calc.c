@@ -31,9 +31,12 @@
 #include "closeout.h"
 #include "error.h"
 #include "linebuffer.h"
+#include "ignore-value.h"
 #include "minmax.h"
+#include "intprops.h"
 #include "quote.h"
 #include "size_max.h"
+#include "inttostr.h"
 #include "version-etc.h"
 #include "version.h"
 #include "xalloc.h"
@@ -71,6 +74,14 @@ static bool input_header = false;
 
 /* If true, print the entire input line. Otherwise, print only the key fields */
 static bool print_full_line = false;
+
+struct columnheader
+{
+        char *name;
+        struct columnheader *next;
+};
+
+static struct columnheader* column_headers = NULL;
 
 enum operation
 {
@@ -173,6 +184,60 @@ struct fieldop
 };
 
 static struct fieldop* field_ops = NULL;
+
+void add_column_header(struct columnheader *h)
+{
+  if (column_headers != NULL)
+    {
+      struct columnheader *p = column_headers;
+      while (p->next != NULL)
+        p = p->next;
+      p->next = h;
+    }
+  else
+    column_headers = h;
+}
+
+void add_named_column_header(const char* name)
+{
+  struct columnheader *h = XZALLOC(struct columnheader);
+  h->name = xstrdup(name);
+  add_column_header(h);
+}
+
+void add_numeric_column_header(size_t n)
+{
+  // "field-" + max-digits + 1 null.
+  #define MAX_COLUMN_NAME_SIZE (6+INT_BUFSIZE_BOUND(size_t)+1)
+
+  struct columnheader *h = XZALLOC(struct columnheader);
+  h->name = xmalloc(MAX_COLUMN_NAME_SIZE);
+  strcpy(h->name,"field-");
+  ignore_value(inttostr((int)n, h->name+6));
+  add_column_header(h);
+}
+
+void add_operator_column_header(struct fieldop *op)
+{
+  struct columnheader *h = XZALLOC(struct columnheader);
+
+  //opname + "(field-" + NNNN + ")" + NULL
+  const size_t len = strlen(op->name) + 1+6+1+ INT_BUFSIZE_BOUND(size_t)+1+1 ;
+  h->name = xmalloc(len);
+  snprintf(h->name,len,"%s(field-%zu)", op->name,op->field);
+  add_column_header(h);
+}
+
+void add_group_column_header(struct keyfield *key)
+{
+  struct columnheader *h = XZALLOC(struct columnheader);
+
+  //"group(field-" + NNNN + ")" + NULL
+  const size_t len = 11+ INT_BUFSIZE_BOUND(size_t)+1+1 ;
+  h->name = xmalloc(len);
+  snprintf(h->name,len,"group(field-%zu)", key->sword+1);
+  add_column_header(h);
+}
 
 enum { VALUES_BATCH_INCREMENT = 1024 };
 
@@ -1070,6 +1135,35 @@ print_input_line (const struct linebuffer* lb)
   while (0)
 
 
+static void
+build_operators_column_headers()
+{
+  for (struct fieldop *p = field_ops; p ; p=p->next)
+    add_operator_column_header(p);
+}
+
+static void
+build_group_column_headers()
+{
+  for (struct keyfield *key = keylist; key; key = key->next)
+    add_group_column_header(key);
+}
+
+static void
+print_column_headers()
+{
+  for (struct columnheader *h = column_headers; h ; h=h->next)
+    {
+      fputs(h->name, stdout);
+      /* print field separator */
+      if (h->next)
+        putchar( (tab==TAB_DEFAULT)?' ':tab );
+    }
+
+    /* print end-of-line */
+    putchar(eolchar);
+}
+
 /*
     Process each line in the input.
 
@@ -1094,6 +1188,17 @@ process_file ()
 
   initbuffer (thisline);
   initbuffer (prevline);
+
+  if (input_header || output_header)
+  {
+    if (print_full_line)
+      error(EXIT_FAILURE,0,_("--full with --headr-out is not implemented yet"));
+    build_group_column_headers();
+    build_operators_column_headers();
+
+    if (output_header)
+      print_column_headers();
+  }
 
   while (!feof (stdin))
     {
