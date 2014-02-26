@@ -53,6 +53,8 @@ extern bool hard_LC_COLLATE;
 extern bool hard_LC_TIME;
 #endif
 
+extern bool blanks[UCHAR_LIM];
+
 #define NONZERO(x) ((x) != 0)
 
 /* The kind of blanks for '-b' to skip in various options. */

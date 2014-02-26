@@ -85,7 +85,7 @@ bool hard_LC_TIME = 0;
    tricky.  */
 
 /* Table of blanks.  */
-static bool blanks[UCHAR_LIM];
+bool blanks[UCHAR_LIM];
 
 #ifdef KEY_SPEC_NONPRINTING
 /* Table of non-printing characters. */
