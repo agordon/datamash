@@ -109,6 +109,7 @@ enum operation_type
 {
   NUMERIC_SCALAR = 0,
   NUMERIC_VECTOR,
+  STRING_SCALAR,
   STRING_VECTOR
 };
 
@@ -127,7 +128,7 @@ struct operation_data
 
 struct operation_data operations[] =
 {
-  {"count",   NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_COUNT */
+  {"count",   STRING_SCALAR,  IGNORE_FIRST},   /* OP_COUNT */
   {"sum",     NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_SUM */
   {"min",     NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_MIN */
   {"max",     NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_MAX */
@@ -595,6 +596,7 @@ collapse_value ( struct fieldop *op )
 static void
 field_op_summarize (struct fieldop *op)
 {
+  bool print_numeric_result = true;
   long double numeric_result = 0 ;
   char *string_result = NULL;
 
@@ -649,10 +651,12 @@ field_op_summarize (struct fieldop *op)
 
     case OP_UNIQUE:
     case OP_UNIQUE_NOCASE:
+      print_numeric_result = false;
       string_result = unique_value (op, (op->op==OP_UNIQUE));
       break;
 
     case OP_COLLAPSE:
+      print_numeric_result = false;
       string_result = collapse_value (op);
       break;
 
@@ -664,13 +668,13 @@ field_op_summarize (struct fieldop *op)
 
   if (debug)
     {
-      if (op->numeric)
+      if (print_numeric_result)
         fprintf (stderr, "%s(%zu) = %Lg\n", op->name, op->field, numeric_result);
       else
         fprintf (stderr, "%s(%zu) = '%s'\n", op->name, op->field, string_result);
     }
 
-  if (op->numeric)
+  if (print_numeric_result)
     printf ("%Lg", numeric_result);
   else
     printf ("%s", string_result);
