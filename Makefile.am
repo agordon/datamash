@@ -11,7 +11,7 @@
 EXTRA_DIST = \
 	$(top_srcdir)/.version
 
-SUBDIRS = po lib src man tests
+SUBDIRS = po lib src man tests examples
 ACLOCAL_AMFLAGS = -I m4
 
 BUILT_SOURCES = $(top_srcdir)/.version
