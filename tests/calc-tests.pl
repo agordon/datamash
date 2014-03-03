@@ -69,6 +69,12 @@ B 19 Z
 C 23 Z
 EOF
 
+my $in_g4=<<'EOF';
+A 5
+K 6
+P 2
+EOF
+
 my $in_hdr1=<<'EOF';
 x y z
 A 1 10
@@ -222,6 +228,12 @@ my @Tests =
   # Output Header with --full
   ['hdr5', '-g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
      {OUT=>"field-1 field-2 field-3 count(field-2)\nA 3  W 5\nB 17 Y 2\nC 23 Z 1\n"}],
+
+  # Test single line per group
+  ['sl1', '-g 1 mean 2', {IN_PIPE=>$in_g4},
+     {OUT=>"A 5\nK 6\nP 2\n"}],
+  ['sl2', '--full -g 1 mean 2', {IN_PIPE=>$in_g4},
+     {OUT=>"A 5 5\nK 6 6\nP 2 2\n"}],
 
 );
 
