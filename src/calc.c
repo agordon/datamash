@@ -102,7 +102,8 @@ enum operation
   OP_ANTIMODE,
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */
   OP_UNIQUE_NOCASE, /* Collapse Unique strings, ignoring-case */
-  OP_COLLAPSE       /* Collapse strings into comma separated values */
+  OP_COLLAPSE,      /* Collapse strings into comma separated values */
+  OP_COUNT_UNIQUE   /* count number of unique values */
 };
 
 enum operation_type
@@ -145,6 +146,7 @@ struct operation_data operations[] =
   {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
   {"uniquenc",STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE_NOCASE */
   {"collapse",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COLLAPSE */
+  {"countunique",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COUNT_UNIQUE */
   {NULL, 0, 0}
 };
 
@@ -401,6 +403,7 @@ field_op_collect (struct fieldop *op,
     case OP_UNIQUE:
     case OP_UNIQUE_NOCASE:
     case OP_COLLAPSE:
+    case OP_COUNT_UNIQUE:
       field_op_add_string (op, str, slen);
       break;
 
@@ -555,6 +558,38 @@ unique_value ( struct fieldop *op, bool case_sensitive )
   return buf;
 }
 
+/* Returns the number of unique string values in the given field operation */
+size_t
+count_unique_values ( struct fieldop *op, bool case_sensitive )
+{
+  const char *last_str;
+  size_t count = 1 ;
+
+  /* Sort the string pointers */
+  qsort ( op->str_ptr, op->str_ptr_used, sizeof(char*), case_sensitive
+                                                          ?cmpstringp
+                                                          :cmpstringp_nocase);
+
+  /* Copy the first string */
+  last_str = op->str_ptr[0];
+
+  /* Copy the following strings, if they are different from the previous one */
+  for (size_t i = 1; i < op->str_ptr_used ; ++i)
+    {
+      const char *newstr = op->str_ptr[i];
+
+      if ((case_sensitive && (strcmp(newstr, last_str)!=0))
+          ||
+          (!case_sensitive && (strcasecmp(newstr, last_str)!=0)))
+        {
+                ++count;
+        }
+      last_str = newstr;
+    }
+
+  return count;
+}
+
 /* Returns a nul-terimated string, composed of all the values
    of the input strings. The return string must be free()'d. */
 static char *
@@ -639,6 +674,10 @@ field_op_summarize (struct fieldop *op)
     case OP_COLLAPSE:
       print_numeric_result = false;
       string_result = collapse_value (op);
+      break;
+
+   case OP_COUNT_UNIQUE:
+      numeric_result = count_unique_values(op,true); //true: for now - always case sensitive
       break;
 
     default:
