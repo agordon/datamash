@@ -91,6 +91,22 @@ C 1 33
 C 2 44
 EOF
 
+my $in_cnt_uniq1=<<'EOF';
+x y
+A 1
+A 2
+A 1
+A 2
+A 1
+A 2
+B 1
+B 2
+B 1
+B 2
+B 1
+B 2
+EOF
+
 
 
 my @Tests =
@@ -121,6 +137,7 @@ my @Tests =
 	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b18', 'svar 1',     {IN_PIPE=>$in1},  {OUT => "8.272\n"},
 	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+  ['b19', 'countunique 1', {IN_PIPE=>$in1}, {OUT => "10\n"}],
 
 
 
@@ -234,6 +251,14 @@ my @Tests =
      {OUT=>"A 5\nK 6\nP 2\n"}],
   ['sl2', '--full -g 1 mean 2', {IN_PIPE=>$in_g4},
      {OUT=>"A 5 5\nK 6 6\nP 2 2\n"}],
+
+  # Test countunique operation
+  ['cuq1', '-g 1 countunique 3', {IN_PIPE=>$in_g3},
+     {OUT=>"A 2\nB 2\nC 1\n"}],
+  ['cuq2', '-g 1 countunique 2', {IN_PIPE=>$in_g4},
+     {OUT=>"A 1\nK 1\nP 1\n"}],
+  ['cuq3', '--header-in -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq1},
+     {OUT=>"A 2\nB 2\n"}],
 
 );
 
