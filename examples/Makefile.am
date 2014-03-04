@@ -15,10 +15,9 @@
 ##
 examplesdir = $(pkgdatadir)/examples
 
-dist_examples_DATA = readme.txt \
-		     experiment.txt experiment_h.txt \
-		     genes.txt genes_h.txt \
-		     samples.txt samples_h.txt
+dist_examples_DATA = readme.md \
+		     scores.txt scores_h.txt \
+		     genes.txt genes_h.txt
 
 EXTRA_DIST = $(dist_examples_DATA)
 
