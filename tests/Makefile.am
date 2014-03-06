@@ -15,9 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-TESTS = calc-tests.pl
+TESTS = calc-tests.pl \
+        calc-valgrind.sh
 
-EXTRA_DIST = Coreutils.pm CuSkip.pm CuTmpdir.pm \
+EXTRA_DIST = Coreutils.pm CuSkip.pm CuTmpdir.pm init.sh \
              $(TESTS)
 
 # (Copied from coreutils' tests/local.mk)
