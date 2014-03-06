@@ -115,6 +115,18 @@ B 2\t20
 C 3\t30
 EOF
 
+# When using whitespace, this input has fours columns.
+# When using Tab, this input has three columns.
+# The lines are unsorted. When sorted by the second column,
+# The output will depend on whether using whitespace or TAB.
+my $in_sort1=<<"EOF";
+! A\tx\t1
+@ B\tk\t2
+# D\tj\t3
+@ B\tx\t5
+# C\tj\t4
+^ C\tg\t6
+EOF
 
 
 my @Tests =
@@ -258,6 +270,18 @@ my @Tests =
   ['tab1', 'sum 2',         {IN_PIPE=>$in_tab1}, {OUT=>"6\n"}],
   ['tab2', "-t '\t' sum 2", {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
   ['tab3', '-T sum 2',      {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
+
+  # Test Auto-Sorting
+  # With default separator (White-space), the second column is A,B,C,D
+  ['sort1', '-s -g 2 unique 3', {IN_PIPE=>$in_sort1},
+     {OUT=>"A x\nB k,x\nC g,j\nD j\n"}],
+  # With TAB separator, the second column is g,j,k,x
+  ['sort2', '-s -T -g 2 unique 3', {IN_PIPE=>$in_sort1},
+     {OUT=>"g\t6\nj\t3,4\nk\t2\nx\t1,5\n"}],
+  # Control check: if we do not sort, the some groups will appear twice
+  # because the input is not sorted.
+  ['sort3', '-T -g 2 unique 3', {IN_PIPE=>$in_sort1},
+     {OUT=>"x\t1\nk\t2\nj\t3\nx\t5\nj\t4\ng\t6\n"}],
 
 );
 

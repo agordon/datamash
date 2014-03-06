@@ -1373,9 +1373,32 @@ process_file ()
 static void
 open_input()
 {
-  if (pipe_through_sort)
+  if (pipe_through_sort && group_columns)
     {
-      pipe_input = popen("cat","r");
+      char tmp[INT_BUFSIZE_BOUND(size_t)*2+5];
+      char cmd[1024];
+      bzero(cmd,sizeof(cmd));
+
+      if (input_header)
+        strcat(cmd,"sed -u 1q|");
+      strcat(cmd,"LC_ALL=C sort ");
+      if (tab != TAB_DEFAULT)
+        {
+          snprintf(tmp,sizeof(tmp),"-t '%c' ",tab);
+          strcat(cmd,tmp);
+        }
+      for (size_t *key = group_columns; key && *key; ++key)
+        {
+          snprintf(tmp,sizeof(tmp),"-k%zu,%zu ",*key,*key);
+          if (strlen(tmp)+strlen(cmd)+1 >= sizeof(cmd))
+            error(EXIT_FAILURE, 0, _("sort command too-long (please report this bug)"));
+          strcat(cmd,tmp);
+        }
+
+      if (debug)
+        fprintf(stderr,"sort cmd = '%s'\n", cmd);
+
+      pipe_input = popen(cmd,"r");
       if (pipe_input == NULL)
         error (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
     }
