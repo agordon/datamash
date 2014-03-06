@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "./init.sh"; path_prepend_ ./src
+. "${test_dir=.}/init.sh"; path_prepend_ ./src
 
 ## Ensure valgrind is useable
 ## (copied from coreutils' init.cfg)

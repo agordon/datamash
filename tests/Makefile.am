@@ -27,5 +27,6 @@ TESTS_ENVIRONMENT =				\
   export \
   PERL5LIB='$(top_srcdir)/tests$(PATH_SEPARATOR)'"$$PERL5LIB" \
   PATH='$(abs_top_builddir)/src$(PATH_SEPARATOR)'"$$PATH" \
+  test_dir='$(top_srcdir)/tests' \
   ;
 
