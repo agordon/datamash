@@ -180,9 +180,6 @@ struct fieldop
   char *str_buf;   /* points to the beginning of the buffer */
   size_t str_buf_used; /* number of bytes used in the buffer */
   size_t str_buf_alloc; /* number of bytes allocated in the buffer */
-  char **str_ptr;  /* array of string pointers, into 'str_buf' */
-  size_t str_ptr_used; /* number of strings pointers */
-  size_t str_ptr_alloc; /* number of string pointers allocated */
 
   struct fieldop *next;
 };
@@ -254,21 +251,51 @@ field_op_add_string (struct fieldop *op, const char* str, size_t slen)
       op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,slen+1);
       op->str_buf = xrealloc (op->str_buf, op->str_buf_alloc);
     }
-  if (op->str_ptr_used + 1 >= op->str_ptr_alloc)
-    {
-      op->str_ptr_alloc += VALUES_BATCH_INCREMENT;
-      op->str_ptr = xrealloc (op->str_ptr, op->str_ptr_alloc);
-    }
-
-  /* Set the string pointer */
-  op->str_ptr[op->str_ptr_used] = op->str_buf + op->str_buf_used;
-  op->str_ptr_used++;
 
   /* Copy the string to the buffer */
   memcpy (op->str_buf + op->str_buf_used, str, slen);
-  op->str_buf_used += slen;
-  *(op->str_buf + op->str_buf_used) = 0;
-  op->str_buf_used++;
+  *(op->str_buf + op->str_buf_used + slen ) = 0;
+  op->str_buf_used += slen + 1 ;
+}
+
+static int
+cmpstringp(const void *p1, const void *p2);
+
+static int
+cmpstringp_nocase(const void *p1, const void *p2);
+
+/* Returns an array of string-pointers (char*),
+   each pointing to a string in the string buffer (added by field_op_add_string() ).
+
+   The returned pointer must be free()'d.
+
+   The returned pointer will have 'op->count+1' elements,
+   pointing to 'op->count' strings + one last NULL.
+*/
+static const char **
+field_op_get_string_ptrs ( struct fieldop *op, bool sort, bool sort_case_sensitive )
+{
+  const char **ptrs = xnmalloc(op->count+1, sizeof(char*));
+  char *p = op->str_buf;
+  const char* pend = op->str_buf + op->str_buf_used;
+  size_t idx=0;
+  while (p < pend)
+    {
+      ptrs[idx++] = p;
+      while ( p<pend && *p != '\0' )
+        ++p;
+      ++p;
+    }
+  ptrs[idx] = 0;
+
+  if (sort)
+    {
+      /* Sort the string pointers */
+      qsort ( ptrs, op->count, sizeof(char*), sort_case_sensitive
+                                            ?cmpstringp
+                                            :cmpstringp_nocase);
+    }
+  return ptrs;
 }
 
 /* Compare two flowting-point variables, while avoiding '==' .
@@ -526,23 +553,20 @@ unique_value ( struct fieldop *op, bool case_sensitive )
   const char *last_str;
   char *buf, *pos;
 
-  /* Sort the string pointers */
-  qsort ( op->str_ptr, op->str_ptr_used, sizeof(char*), case_sensitive
-                                                          ?cmpstringp
-                                                          :cmpstringp_nocase);
+  const char **ptrs = field_op_get_string_ptrs (op, true, case_sensitive);
 
   /* Uniquify them */
   pos = buf = xzalloc ( op->str_buf_used );
 
   /* Copy the first string */
-  last_str = op->str_ptr[0];
-  strcpy (buf, op->str_ptr[0]);
-  pos += strlen(op->str_ptr[0]);
+  last_str = ptrs[0];
+  strcpy (buf, ptrs[0]);
+  pos += strlen(ptrs[0]);
 
   /* Copy the following strings, if they are different from the previous one */
-  for (size_t i = 1; i < op->str_ptr_used ; ++i)
+  for (size_t i = 1; i < op->count; ++i)
     {
-      const char *newstr = op->str_ptr[i];
+      const char *newstr = ptrs[i];
 
       if ((case_sensitive && (strcmp(newstr, last_str)!=0))
           ||
@@ -555,6 +579,8 @@ unique_value ( struct fieldop *op, bool case_sensitive )
       last_str = newstr;
     }
 
+  free(ptrs);
+
   return buf;
 }
 
@@ -562,30 +588,30 @@ unique_value ( struct fieldop *op, bool case_sensitive )
 size_t
 count_unique_values ( struct fieldop *op, bool case_sensitive )
 {
-  const char *last_str;
+  const char *last_str, **cur_str;
   size_t count = 1 ;
 
-  /* Sort the string pointers */
-  qsort ( op->str_ptr, op->str_ptr_used, sizeof(char*), case_sensitive
-                                                          ?cmpstringp
-                                                          :cmpstringp_nocase);
+  const char **ptrs = field_op_get_string_ptrs (op, true, case_sensitive);
 
   /* Copy the first string */
-  last_str = op->str_ptr[0];
+  cur_str = ptrs;
+  last_str = *cur_str;
+  ++cur_str;
 
   /* Copy the following strings, if they are different from the previous one */
-  for (size_t i = 1; i < op->str_ptr_used ; ++i)
+  while ( *cur_str != 0 )
     {
-      const char *newstr = op->str_ptr[i];
-
-      if ((case_sensitive && (strcmp(newstr, last_str)!=0))
+      if ((case_sensitive && (strcmp(*cur_str, last_str)!=0))
           ||
-          (!case_sensitive && (strcasecmp(newstr, last_str)!=0)))
+          (!case_sensitive && (strcasecmp(*cur_str, last_str)!=0)))
         {
                 ++count;
         }
-      last_str = newstr;
+      last_str = *cur_str;
+      ++cur_str;
     }
+
+  free(ptrs);
 
   return count;
 }
@@ -726,8 +752,8 @@ reset_field_op (struct fieldop *op)
   op->count = 0 ;
   op->value = 0;
   op->num_values = 0 ;
-  op->str_ptr_used = 0;
   op->str_buf_used = 0;
+  /* note: op->str_buf and op->str_alloc are not free'd, and reused */
 }
 
 /* reset all field operations, for next group */
@@ -759,11 +785,6 @@ free_field_op (struct fieldop *op)
   op->str_buf = NULL;
   op->str_buf_alloc = 0;
   op->str_buf_used = 0;
-
-  free (op->str_ptr);
-  op->str_ptr = NULL;
-  op->str_ptr_used = 0;
-  op->str_ptr_alloc = 0;
 
   free(op);
 
@@ -1351,6 +1372,20 @@ process_file ()
   free (lb2.buffer);
 }
 
+static void
+free_sort_keys ()
+{
+  struct keyfield *p = keylist, *next;
+
+  while (p)
+    {
+      next = p->next;
+      free(p);
+      p = next ;
+    }
+  keylist = NULL;
+}
+
 /* Parse the "--group=X[,Y,Z]" parameter, populating 'keylist' */
 static void
 parse_group_spec ( const char* spec )
@@ -1526,6 +1561,8 @@ int main(int argc, char* argv[])
   parse_operations (argc, optind, argv);
   process_file ();
   free_field_ops ();
+  free_sort_keys ();
+
 
   return EXIT_SUCCESS;
 }
