@@ -87,6 +87,9 @@ static bool blanks[UCHAR_LIM];
 static size_t *group_columns = NULL;
 static size_t num_group_colums = 0;
 
+static bool pipe_through_sort = false;
+static FILE* pipe_input = NULL;
+
 struct columnheader
 {
         char *name;
@@ -823,7 +826,7 @@ enum
   OUTPUT_HEADER_OPTION
 };
 
-static char const short_options[] = "fzg:t:TH";
+static char const short_options[] = "sfzg:t:TH";
 
 static struct option const long_options[] =
 {
@@ -834,6 +837,7 @@ static struct option const long_options[] =
   {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
   {"headers", no_argument, NULL, 'H'},
   {"full", no_argument, NULL, 'f'},
+  {"sort", no_argument, NULL, 's'},
   {"debug", no_argument, NULL, DEBUG_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
@@ -891,7 +895,9 @@ General options:\n\
   --header-in               First input line is column headers\n\
   --header-out              Print column headers as first line\n\
   -H, --headers             Same as '--header-in --header-out'\n\
-  -t, --field-separator=X    use X instead of whitespace for field delimiter\n\
+  -s, --sort                Sort the input before grouping\n\
+                            Removes the need to manually pipe the input through 'sort'\n\
+  -t, --field-separator=X   use X instead of whitespace for field delimiter\n\
   -T                        Use tab as field separator\n\
                             Same as -t $'\\t'\n\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
@@ -914,9 +920,13 @@ Group input based on field 1, and sum values (per group) on field 2:\n\
 \n\
 Unsorted input must be sorted:\n\
 \n\
+  $ cat INPUT.TXT | %s -s -g1 mean 2\n\
+\n\
+  Which is equivalent to:\n\
   $ cat INPUT.TXT | sort -k1,1 | %s -g1 mean 2\n\
 \n\
-"), program_name, program_name, program_name);
+\n\
+"), program_name, program_name, program_name, program_name);
 
     }
   exit (status);
@@ -1285,11 +1295,11 @@ process_file ()
   initbuffer (thisline);
   initbuffer (group_first_line);
 
-  while (!feof (stdin))
+  while (!feof (pipe_input))
     {
       bool new_group = false;
 
-      if (readlinebuffer_delim (thisline, stdin, eolchar) == 0)
+      if (readlinebuffer_delim (thisline, pipe_input, eolchar) == 0)
         break;
       linebuffer_nullify (thisline);
       line_number++;
@@ -1356,17 +1366,46 @@ process_file ()
       reset_field_ops ();
     }
 
-  if (ferror (stdin) || fclose (stdin) != 0)
-    error (EXIT_FAILURE, 0, _("read error"));
-
   free (lb1.buffer);
   free (lb2.buffer);
 }
 
 static void
+open_input()
+{
+  if (pipe_through_sort)
+    {
+      pipe_input = popen("cat","r");
+      if (pipe_input == NULL)
+        error (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
+    }
+  else
+    {
+      pipe_input = stdin;
+    }
+}
+
+static void
+close_input()
+{
+  int i;
+
+  if (ferror (pipe_input))
+    error (EXIT_FAILURE, 0, _("read error"));
+
+  if (pipe_through_sort)
+    i = pclose(pipe_input);
+  else
+    i = fclose(pipe_input);
+
+  if (i != 0)
+    error (EXIT_FAILURE, 0, _("read error (on close)"));
+}
+
+static void
 free_sort_keys ()
 {
-  //free(group_columns);
+  free(group_columns);
 }
 
 /* Parse the "--group=X[,Y,Z]" parameter, populating 'keylist' */
@@ -1473,6 +1512,10 @@ int main(int argc, char* argv[])
           input_header = output_header = true;
           break;
 
+        case 's':
+          pipe_through_sort = true;
+          break;
+
         case 't':
           /* Interpret -t '' to mean 'use the NUL byte as the delimiter.'  */
           if (optarg[0] != '\0' && optarg[1] != '\0')
@@ -1501,10 +1544,11 @@ int main(int argc, char* argv[])
     }
 
   parse_operations (argc, optind, argv);
+  open_input ();
   process_file ();
   free_field_ops ();
   free_sort_keys ();
-
+  close_input ();
 
   return EXIT_SUCCESS;
 }
