@@ -107,6 +107,14 @@ B 1
 B 2
 EOF
 
+# When using whitespace, the second column is 1,2,3.
+# When using Tab, the second column is 10,20,30.
+my $in_tab1=<<"EOF";
+A 1\t10
+B 2\t20
+C 3\t30
+EOF
+
 
 
 my @Tests =
@@ -259,6 +267,11 @@ my @Tests =
      {OUT=>"A 1\nK 1\nP 1\n"}],
   ['cuq3', '--header-in -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq1},
      {OUT=>"A 2\nB 2\n"}],
+
+  # Test Tab vs White-space field separator
+  ['tab1', 'sum 2',         {IN_PIPE=>$in_tab1}, {OUT=>"6\n"}],
+  ['tab2', "-t '\t' sum 2", {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
+  ['tab3', '-T sum 2',      {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
 
 );
 

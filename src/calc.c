@@ -806,7 +806,7 @@ enum
   OUTPUT_HEADER_OPTION
 };
 
-static char const short_options[] = "fzg:k:t:H";
+static char const short_options[] = "fzg:k:t:TH";
 
 static struct option const long_options[] =
 {
@@ -877,6 +877,8 @@ General options:\n\
   -H, --headers             Same as '--header-in --header-out'\n\
   -k, --key=KEYDEF          Group via a key; KEYDEF gives location and type\n\
   -t, --field-separator=X    use X instead of whitespace for field delimiter\n\
+  -T                        Use tab as field separator\n\
+                            Same as -t $'\\t'\n\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
 "), stdout);
 
@@ -1541,6 +1543,10 @@ int main(int argc, char* argv[])
             error (EXIT_FAILURE, 0,
                    _("the delimiter must be a single character"));
           tab = optarg[0];
+          break;
+
+        case 'T':
+          tab = '\t';
           break;
 
         case_GETOPT_HELP_CHAR;
