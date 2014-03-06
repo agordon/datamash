@@ -196,29 +196,15 @@ my @Tests =
   #
 
   # Single group (key in column 1)
-  ['g1', '-k1,1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
-  ['g2', '-k1,1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
-  ['g3', '-k1,1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
-  # Same as above, with "-g"
   ['g1.1', '-g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
   ['g2.1', '-g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
   ['g3.1', '-g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
 
-  # Two groups (key in column 1)
-  ['g4', '-k1,1 min 2',    {IN_PIPE=>$in_g2}, {OUT=>"A 10\nB 55\n"}],
-  ['g5', '-k1,1 median 2', {IN_PIPE=>$in_g2}, {OUT=>"A 42.5\nB 66\n"}],
-  ['g6', '-k1,1 collapse 2', {IN_PIPE=>$in_g2},
-     {OUT=>"A 100,10,50,35\nB 66,77,55\n"}],
-
   # 3 groups, single line per group, custom delimiter
-  ['g7', '-k2,2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
-     {OUT=>"A=1\nB=2\nC=3\n"}],
   ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
      {OUT=>"A=1\nB=2\nC=3\n"}],
 
   # Multiple keys (from different columns)
-  ['g8', '-k1,1 -k3,3 sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
   ['g8.1',     '-g1,3 sum 2', {IN_PIPE=>$in_g3},
      {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
 

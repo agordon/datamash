@@ -806,7 +806,7 @@ enum
   OUTPUT_HEADER_OPTION
 };
 
-static char const short_options[] = "fzg:k:t:TH";
+static char const short_options[] = "fzg:t:TH";
 
 static struct option const long_options[] =
 {
@@ -816,7 +816,6 @@ static struct option const long_options[] =
   {"header-in", no_argument, NULL, INPUT_HEADER_OPTION},
   {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
   {"headers", no_argument, NULL, 'H'},
-  {"key", required_argument, NULL, 'k'},
   {"full", no_argument, NULL, 'f'},
   {"debug", no_argument, NULL, DEBUG_OPTION},
   {GETOPT_HELP_OPTION_DECL},
@@ -875,7 +874,6 @@ General options:\n\
   --header-in               First input line is column headers\n\
   --header-out              Print column headers as first line\n\
   -H, --headers             Same as '--header-in --header-out'\n\
-  -k, --key=KEYDEF          Group via a key; KEYDEF gives location and type\n\
   -t, --field-separator=X    use X instead of whitespace for field delimiter\n\
   -T                        Use tab as field separator\n\
                             Same as -t $'\\t'\n\
@@ -899,7 +897,7 @@ Group input based on field 1, and sum values (per group) on field 2:\n\
 \n\
 Unsorted input must be sorted:\n\
 \n\
-  $ cat INPUT.TXT | sort -k1,1 | %s -k1,1 mean 2\n\
+  $ cat INPUT.TXT | sort -k1,1 | %s -g1 mean 2\n\
 \n\
 "), program_name, program_name, program_name);
 
@@ -1423,69 +1421,6 @@ parse_group_spec ( const char* spec )
     }
 }
 
-/* Parse the "--key POS1,POS2" parameter, adding the key to 'keylist'.
-   This code is copied from coreutils' "sort". */
-static void
-parse_key_spec ( const char *spec )
-{
-  struct keyfield *key;
-  struct keyfield key_buf;
-  char const *s;
-
-  key = key_init (&key_buf);
-
-  /* Get POS1. */
-  s = parse_field_count (spec, &key->sword,
-                         N_("invalid number at field start"));
-  if (! key->sword--)
-    {
-      /* Provoke with 'sort -k0' */
-      badfieldspec (spec, N_("field number is zero"));
-    }
-  if (*s == '.')
-    {
-      s = parse_field_count (s + 1, &key->schar,
-                             N_("invalid number after '.'"));
-      if (! key->schar--)
-        {
-          /* Provoke with 'sort -k1.0' */
-          badfieldspec (spec, N_("character offset is zero"));
-        }
-    }
-  if (! (key->sword || key->schar))
-    key->sword = SIZE_MAX;
-  s = set_ordering (s, key, bl_start);
-  if (*s != ',')
-    {
-      key->eword = SIZE_MAX;
-      key->echar = 0;
-    }
-  else
-    {
-      /* Get POS2. */
-      s = parse_field_count (s + 1, &key->eword,
-                             N_("invalid number after ','"));
-      if (! key->eword--)
-        {
-          /* Provoke with 'sort -k1,0' */
-          badfieldspec (spec, N_("field number is zero"));
-        }
-      if (*s == '.')
-        {
-          s = parse_field_count (s + 1, &key->echar,
-                                 N_("invalid number after '.'"));
-        }
-      s = set_ordering (s, key, bl_end);
-    }
-  if (*s)
-    badfieldspec (spec, N_("stray character in field spec"));
-  /* TODO: strange, sort's original code sets sword=SIZE_MAX for "-k1".
-   * force override??? */
-  if (key->sword==SIZE_MAX)
-    key->sword=0;
-  insertkey (key);
-}
-
 int main(int argc, char* argv[])
 {
   int optc;
@@ -1511,10 +1446,6 @@ int main(int argc, char* argv[])
 
         case 'g':
           parse_group_spec (optarg);
-          break;
-
-        case 'k':
-          parse_key_spec (optarg);
           break;
 
         case 'z':
