@@ -18,7 +18,6 @@
 bin_PROGRAMS = calc
 
 calc_SOURCES = calc.c \
-	       key-compare.h key-compare.c \
 	       system.h \
 	       strnumcmp.c strnumcmp.h strnumcmp-in.h \
 	       version.c version.h

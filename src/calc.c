@@ -41,8 +41,6 @@
 #include "version.h"
 #include "xalloc.h"
 
-#include "key-compare.h"
-
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "calc"
 
@@ -74,6 +72,20 @@ static bool input_header = false;
 
 /* If true, print the entire input line. Otherwise, print only the key fields */
 static bool print_full_line = false;
+
+/* If TAB has this value, blanks separate fields.  */
+enum { TAB_DEFAULT = CHAR_MAX + 1 };
+
+/* Tab character separating fields.  If TAB_DEFAULT, then fields are
+   separated by the empty string between a non-blank character and a blank
+   character. */
+static int tab = TAB_DEFAULT;
+
+#define UCHAR_LIM (UCHAR_MAX + 1)
+static bool blanks[UCHAR_LIM];
+
+static size_t *group_columns = NULL;
+static size_t num_group_colums = 0;
 
 struct columnheader
 {
@@ -126,6 +138,11 @@ struct operation_data
   enum operation_type type;
   enum operation_first_value auto_first;
 };
+
+static inline void print_field_separator()
+{
+  putchar( (tab==TAB_DEFAULT)?' ':tab );
+}
 
 struct operation_data operations[] =
 {
@@ -1011,12 +1028,12 @@ get_field (const struct linebuffer *line, size_t field,
          (multiple whitespaces are one delimiter) */
       while ((pos<buflen) && --field)
         {
-          while ( (pos<buflen) && !isblank (*fptr))
+          while ( (pos<buflen) && !blanks[to_uchar(*fptr)])
             {
               ++fptr;
               ++pos;
             }
-          while ( (pos<buflen) && isblank (*fptr))
+          while ( (pos<buflen) && blanks[to_uchar(*fptr)])
             {
               ++fptr;
               ++pos;
@@ -1032,7 +1049,7 @@ get_field (const struct linebuffer *line, size_t field,
     }
   else
     {
-      while ( (pos+flen<buflen) && !isblank (*(fptr+flen)) )
+      while ( (pos+flen<buflen) && !blanks[to_uchar(*(fptr+flen))] )
         flen++;
     }
 
@@ -1063,42 +1080,32 @@ safe_strtold ( const char *str, size_t len, size_t field )
   return val;
 }
 
-/* Given a "struct linebuffer", initializes a sort-compatible "struct line"
- * (and finds the first key field) */
-/* copied from coreutils's src/uniq.c (in the key-spec branch) */
-static void
-prepare_line (const struct linebuffer *linebuf, struct line* /*output*/ line,
-              char eol_delimiter)
-{
-  size_t len = linebuf->length;
-
-  line->text = linebuf->buffer;
-  line->length = linebuf->length;
-  line->keybeg = NULL; /* TODO: are these the right initializers? */
-  line->keylim = NULL;
-
-  if (line->text[line->length-1] == eol_delimiter)
-    len--;
-
-  line->keybeg = begfield (line, keylist);
-  line->keylim = limfield (line, keylist);
-
-  if (line->keybeg >= line->keylim)
-    {
-      /* TODO: is this the correct way to detect 'no limit' ?
-       * (ie compare keys until the end of the line)*/
-      line->keylim = line->keybeg + len - (line->keybeg - line->text);
-    }
-}
-
 /* returns TRUE if the lines are different, false if identical.
  * comparison is based on the specified keys */
 /* copied from coreutils's src/uniq.c (in the key-spec branch) */
 static bool
-different (const struct line* l1, const struct line* l2)
+different (const struct linebuffer* l1, const struct linebuffer* l2)
 {
-  int diff = keycompare (l1,l2);
-  return (diff != 0);
+  for (size_t *key = group_columns; key && *key ; ++key )
+    {
+      const char *str1,*str2;
+      size_t len1,len2;
+      get_field(l1,*key,&str1,&len1);
+      get_field(l2,*key,&str2,&len2);
+      if (debug)
+        {
+          fprintf(stderr,"diff, key column = %zu, str1='", *key);
+          fwrite(str1,sizeof(char),len1,stderr);
+          fprintf(stderr,"' str2='");
+          fwrite(str2,sizeof(char),len2,stderr);
+          fputs("\n",stderr);
+        }
+      if (len1 != len2)
+        return true;
+      if (memcmp(str1,str2,len1) != 0)
+        return true;
+    }
+  return false;
 }
 
 /* For a given line, extract all requested fields and process the associated
@@ -1144,24 +1151,17 @@ print_input_line (const struct linebuffer* lb)
       if (buf[len-1]==eolchar || buf[len-1]==0)
         len--;
       fwrite (buf, sizeof(char), len, stdout);
-      putchar( (tab==TAB_DEFAULT)?' ':tab );
+      print_field_separator();
     }
   else
     {
-      struct keyfield *key = keylist;
-      struct line li ;
-      li.text = lb->buffer;
-      li.length = lb->length;
-      while (key)
+      for (size_t *key = group_columns; key && *key != 0 ; ++key)
         {
-          const char *keybeg = begfield (&li, key);
-          const char *keylim = limfield (&li, key);
-          while (isblank(*keybeg))
-            keybeg++;
-          size_t len = keylim - keybeg;
-          fwrite (keybeg, sizeof(char), len, stdout);
-          putchar( (tab==TAB_DEFAULT)?' ':tab );
-          key = key->next;
+          const char *str;
+          size_t len;
+          get_field(lb,*key, &str, &len);
+          fwrite(str,sizeof(char),len,stdout);
+          print_field_separator();
         }
     }
 }
@@ -1176,16 +1176,16 @@ print_input_line (const struct linebuffer* lb)
     }						\
   while (0)
 
-#define SWAP_SORT_LINES(A, B)			\
-  do						\
-    {						\
-      struct line *_tmp;			\
-      _tmp = (A);				\
-      (A) = (B);				\
-      (B) = _tmp;				\
-    }						\
-  while (0)
+static void
+init_blank_table (void)
+{
+  size_t i;
 
+  for (i = 0; i < UCHAR_LIM; ++i)
+    {
+      blanks[i] = !! isblank (i);
+    }
+}
 
 static void
 build_input_line_headers(struct linebuffer *lb, bool store_names)
@@ -1243,15 +1243,15 @@ print_column_headers()
       for (size_t n=1; n<=num_input_column_headers; ++n)
         {
           fputs(get_input_field_name(n), stdout);
-          putchar( (tab==TAB_DEFAULT)?' ':tab );
+          print_field_separator();
         }
     }
   else
     {
-      for (struct keyfield *key = keylist; key; key = key->next)
+      for (size_t *key = group_columns; *key != 0; ++key)
         {
-          printf("GroupBy(%s)",get_input_field_name(key->sword+1));
-          putchar( (tab==TAB_DEFAULT)?' ':tab );
+          printf("GroupBy(%s)",get_input_field_name(*key));
+          print_field_separator();
         }
     }
 
@@ -1260,7 +1260,7 @@ print_column_headers()
       printf("%s(%s)",op->name, get_input_field_name(op->field));
 
       if (op->next)
-        putchar( (tab==TAB_DEFAULT)?' ':tab );
+        print_field_separator();
     }
 
   /* print end-of-line */
@@ -1279,15 +1279,8 @@ process_file ()
   struct linebuffer lb1, lb2;
   struct linebuffer *thisline, *group_first_line;
 
-   /* line structure used for sort's key comparison*/
-  struct line sortlb1, sortlb2;
-  struct line *thislinesort, *group_first_linesort;
-
   thisline = &lb1;
   group_first_line = &lb2;
-
-  thislinesort = &sortlb1;
-  group_first_linesort = &sortlb2;
 
   initbuffer (thisline);
   initbuffer (group_first_line);
@@ -1315,11 +1308,10 @@ process_file ()
         }
 
       /* If no keys are given, the entire input is considered one group */
-      if (keylist)
+      if (num_group_colums)
         {
-          prepare_line (thisline, thislinesort, eolchar);
           new_group = (group_first_line->length == 0
-                       || different (thislinesort, group_first_linesort));
+                       || different (thisline, group_first_line));
 
           if (debug)
             {
@@ -1353,7 +1345,6 @@ process_file ()
       if (new_group)
         {
           SWAP_LINES (group_first_line, thisline);
-          SWAP_SORT_LINES (group_first_linesort, thislinesort);
         }
     }
 
@@ -1375,28 +1366,34 @@ process_file ()
 static void
 free_sort_keys ()
 {
-  struct keyfield *p = keylist, *next;
-
-  while (p)
-    {
-      next = p->next;
-      free(p);
-      p = next ;
-    }
-  keylist = NULL;
+  //free(group_columns);
 }
 
 /* Parse the "--group=X[,Y,Z]" parameter, populating 'keylist' */
 static void
-parse_group_spec ( const char* spec )
+parse_group_spec ( char* spec )
 {
   size_t val;
+  size_t idx;
   char *endptr;
-  struct keyfield *key;
-  struct keyfield key_buf;
 
+  /* Count number of groups parameters, by number of commas */
+  num_group_colums = 1;
+  if (debug)
+    fprintf(stderr,"parse_group_spec (spec='%s')\n", spec);
+  endptr = spec;
+  while ( *endptr != '\0' )
+    {
+      if (*endptr == ',')
+        num_group_colums++;
+      ++endptr;
+    }
+
+  /* Allocate the group_columns */
+  group_columns = xnmalloc(num_group_colums+1, sizeof(size_t));
 
   errno = 0 ;
+  idx=0;
   while (1)
     {
       val = strtoul (spec, &endptr, 10);
@@ -1406,11 +1403,8 @@ parse_group_spec ( const char* spec )
       if (val==0)
         error (EXIT_FAILURE, 0, _("invalid field value (zero) for grouping"));
 
-      /* Emulate a '-key Xb,X' parameter */
-      key = key_init (&key_buf);
-      key->sword = val-1;
-      key->eword = val-1;
-      insertkey (key);
+      group_columns[idx] = val;
+      idx++;
 
       if (endptr==NULL || *endptr==0)
         break;
@@ -1418,6 +1412,17 @@ parse_group_spec ( const char* spec )
         error (EXIT_FAILURE, 0, _("invalid grouping parameter '%s'"), endptr);
       endptr++;
       spec = endptr;
+    }
+  group_columns[idx] = 0 ; /* marker for the last element */
+
+  if (debug)
+    {
+      fprintf(stderr,"group columns (%p) num=%zu = ", group_columns,num_group_colums);
+      for (size_t *key=group_columns;key && *key; ++key)
+        {
+          fprintf(stderr,"%zu ", *key);
+        }
+      fputs("\n",stderr);
     }
 }
 
@@ -1431,7 +1436,7 @@ int main(int argc, char* argv[])
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  init_key_spec ();
+  init_blank_table();
 
   atexit (close_stdout);
 
