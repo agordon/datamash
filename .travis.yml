@@ -13,4 +13,3 @@ script:
   - make
   - make check
   - make dist
-  - make distcheck
