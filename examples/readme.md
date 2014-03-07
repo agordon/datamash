@@ -30,64 +30,80 @@ Example: sum and count the number of even values between 0 and 100:
 
 ## Example: Test Scores
 
-The file `scores.txt` contains tests scores of pupils in three study groups:
-Classroom learning, Online learning and Self-Study Prep Book learning.
+The file `scores.txt` contains tests scores of college students of different majors
+(Arts, Business, Health and Medicine, Life Sciences, Engineering, Social Sciences).
 
-The files has three columns: Name, Study Group, Score:
+The files has three columns: Name, Major, Score:
 
-    $ head -n 5 scores.txt
-    Dominic     Classroom   510
-    William     Classroom   430
-    Nathaniel   Classroom   620
-    Carlos      Classroom   650
-    Ethan       Classroom   440
+    $ cat scores.txt
+    Shawn     Arts  65
+    Marques   Arts  58
+    Fernando  Arts  78
+    Paul      Arts  63
+    Walter    Arts  75
+    ...
 
-Using `calc`, find the lowest (min) and highest (max) score in each study group
-(Study group is in column 2, the score values are in column 3):
+Using `calc`, find the lowest (min) and highest (max) score for each College Major:
+(Major is in column 2, the score values are in column 3):
 
     $ calc -g 2 min 3 max 3 < scores.txt
-    Classroom   250   680
-    Online      280   760
-    PrepBook    310   700
+    Arts            46  88
+    Business        79  94
+    Health-Medicine 72  100
+    Social-Sciences 27  90
+    Life-Sciences   14  91
+    Engineering     39  99
 
-Similarly, find the number of students, mean score and  population-standard-deviation for each study group:
+Similarly, find the number of students, mean score and sample-standard-deviation for each College major:
 
-    $ calc -g 2 count 3 mean 3 pstdev 3 < scores.txt
-    Classroom   41   494.39     100.439
-    Online      41   540.244    117.4
-    PrepBook    47   516.383    85.5377
+    $ calc -g 2 count 3 mean 3 sstdev 3 < scores.txt
+    Arts             68.9474  10.4215
+    Business         87.3636  5.18214
+    Health-Medicine  90.6154  9.22441
+    Social-Sciences  60.2667  17.2273
+    Life-Sciences    55.3333  20.606
+    Engineering      66.5385  19.8814
+
 
 ## Example: Header Lines
 
 A *header line* is an optional first line in the input or output files, which labels each column.
 `calc` can generate header line in the output file, even if the input file doesn't have a header line (`scores.txt` does not have a header line, the first line in the file contains data).
 
-Use '--header-out' to add a header line:
+Use '--header-out' to add a header line to the output (when the input does not contain a header line):
 
     $ calc --header-out -g 2 count 3 mean 3 pstdev 3 < scores.txt
-    GroupBy(field-2)  count(field-3)  mean(field-3)  pstdev(field-3)
-    Classroom         41              494.39         100.439
-    Online            41              540.244        117.4
-    PrepBook          47              516.383        85.5377
+    GroupBy(field-2)    mean(field-3)  sstdev(field-3)
+    Arts                68.9474        10.4215
+    Business            87.3636        5.18214
+    Health-Medicine     90.6154        9.22441
+    Social-Sciences     60.2667        17.2273
+    Life-Sciences       55.3333        20.606
+    Engineering         66.5385        19.8814
 
 
 When the input file has a header line, `calc` can will use the labels from each column in the output header line. `scores_h.txt` contains the same information as `scores.txt`, with an additional header line:
 
-    $ head -n 5 scores_h.txt
-    Name        TeachingMethod   Score
-    Dominic     Classroom        510
-    William     Classroom        430
-    Nathaniel   Classroom        620
-    Carlos      Classroom        650
+    $ cat scores_h.txt
+    Name        Major   Score
+    Shawn       Arts    65
+    Marques     Arts    58
+    Fernando    Arts    78
+    Paul        Arts    63
+    Walter      Arts    75
+    ...
 
 
 Use `-H` (equivalent to `--header-in --header-out`) to use input headers and print output headers:
 
     $ calc -H -g 2 count 3 mean 3 pstdev 3 < scores_h.txt
-    GroupBy(TeachingMethod)  count(Score)   mean(Score)  pstdev(Score)
-    Classroom                41             494.39       100.439
-    Online                   41             540.244      117.4
-    PrepBook                 47             516.383      85.5377
+    GroupBy(Major)      mean(Score)    sstdev(Score)
+    Arts                68.9474        10.4215
+    Business            87.3636        5.18214
+    Health-Medicine     90.6154        9.22441
+    Social-Sciences     60.2667        17.2273
+    Life-Sciences       55.3333        20.606
+    Engineering         66.5385        19.8814
 
 
 ## Example: Human Genes
