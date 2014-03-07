@@ -1380,7 +1380,7 @@ open_input()
       bzero(cmd,sizeof(cmd));
 
       if (input_header)
-        strcat(cmd,"sed -u 1q|");
+        strcat(cmd,"sed -u 1q;");
       strcat(cmd,"LC_ALL=C sort ");
       if (tab != TAB_DEFAULT)
         {
