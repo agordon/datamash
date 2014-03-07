@@ -227,7 +227,7 @@ void add_named_input_column_header(const char* buffer, size_t len)
 /* Returns a pointer to the name of the field.
  * DO NOT FREE or reuse the returned buffer.
  * Might return a pointer to a static buffer - not thread safe.*/
-const char const * get_input_field_name(size_t field_num)
+const char* get_input_field_name(size_t field_num)
 {
   static char tmp[6+INT_BUFSIZE_BOUND(size_t)+1];
   if (input_column_headers==NULL)
