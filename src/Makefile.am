@@ -48,6 +48,8 @@ LIBS = -lgnu \
        $(ISNANL_LIBM) \
        $(LDEXPL_LIBM) \
        $(LDEXP_LIBM) \
+       $(LIBICONV) \
+       $(LIBINTL) \
        $(SQRTL_LIBM) \
        $(SQRT_LIBM)
 

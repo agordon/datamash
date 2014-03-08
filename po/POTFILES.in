@@ -1,3 +1,5 @@
 # List of source files which contain translatable strings.
 src/calc.c
+src/field-ops.c
+src/text-lines.c
 src/system.h
