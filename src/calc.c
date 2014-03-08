@@ -49,8 +49,10 @@
 /* Until someone better comes along */
 const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon" ;
 
+#ifdef ENABLE_DEBUG
 /* enable debugging */
 static bool debug = false;
+#endif
 
 /* The character marking end of line. Default to \n. */
 static char eolchar = '\n';
@@ -380,12 +382,14 @@ field_op_collect (struct fieldop *op,
 {
   bool keep_line = false;
 
+#ifdef ENABLE_DEBUG
   if (debug)
     {
       fprintf (stderr, "-- collect for %s(%zu) val='", op->name, op->field);
       fwrite (str, sizeof(char), slen, stderr);
       fprintf (stderr, "'\n");
     }
+#endif
 
   op->count++;
 
@@ -662,8 +666,10 @@ field_op_summarize (struct fieldop *op)
   long double numeric_result = 0 ;
   char *string_result = NULL;
 
+#ifdef ENABLE_DEBUG
   if (debug)
     fprintf (stderr, "-- summarize for %s(%zu)\n", op->name, op->field);
+#endif
 
   switch (op->op)
     {
@@ -732,6 +738,7 @@ field_op_summarize (struct fieldop *op)
     }
 
 
+#ifdef ENABLE_DEBUG
   if (debug)
     {
       if (print_numeric_result)
@@ -739,6 +746,7 @@ field_op_summarize (struct fieldop *op)
       else
         fprintf (stderr, "%s(%zu) = '%s'\n", op->name, op->field, string_result);
     }
+#endif
 
   if (print_numeric_result)
     printf ("%Lg", numeric_result);
@@ -821,9 +829,11 @@ free_field_ops ()
 
 enum
 {
-  DEBUG_OPTION = CHAR_MAX + 1,
-  INPUT_HEADER_OPTION,
-  OUTPUT_HEADER_OPTION
+  INPUT_HEADER_OPTION = CHAR_MAX + 1,
+  OUTPUT_HEADER_OPTION,
+#ifdef ENABLE_DEBUG
+  DEBUG_OPTION
+#endif
 };
 
 static char const short_options[] = "sfzg:t:TH";
@@ -838,7 +848,9 @@ static struct option const long_options[] =
   {"headers", no_argument, NULL, 'H'},
   {"full", no_argument, NULL, 'f'},
   {"sort", no_argument, NULL, 's'},
+#ifdef ENABLE_DEBUG
   {"debug", no_argument, NULL, DEBUG_OPTION},
+#endif
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0},
@@ -1122,6 +1134,7 @@ different (const struct linebuffer* l1, const struct linebuffer* l2)
       size_t len1,len2;
       get_field(l1,*key,&str1,&len1);
       get_field(l2,*key,&str2,&len2);
+#ifdef ENABLE_DEBUG
       if (debug)
         {
           fprintf(stderr,"diff, key column = %zu, str1='", *key);
@@ -1130,6 +1143,7 @@ different (const struct linebuffer* l1, const struct linebuffer* l2)
           fwrite(str2,sizeof(char),len2,stderr);
           fputs("\n",stderr);
         }
+#endif
       if (len1 != len2)
         return true;
       if (memcmp(str1,str2,len1) != 0)
@@ -1151,13 +1165,14 @@ process_line (const struct linebuffer *line)
   while (op)
     {
       get_field (line, op->field, &str, &len);
+#ifdef ENABLE_DEBUG
       if (debug)
         {
           fprintf(stderr,"getfield(%zu) = len %zu: '", op->field,len);
           fwrite(str,sizeof(char),len,stderr);
           fprintf(stderr,"'\n");
         }
-
+#endif
       if (op->numeric)
         val = safe_strtold ( str, len, op->field );
 
@@ -1243,12 +1258,14 @@ build_input_line_headers(struct linebuffer *lb, bool store_names)
        add_named_input_column_header(ptr, end-ptr);
      ++num_input_column_headers;
 
+#ifdef ENABLE_DEBUG
      if (debug)
        {
          fprintf(stderr,"input line header = ");
          fwrite(ptr,sizeof(char),end-ptr,stderr);
          fputc(eolchar,stderr);
        }
+#endif
 
      /* Find the begining of the next field */
      ptr = end ;
@@ -1343,6 +1360,7 @@ process_file ()
           new_group = (group_first_line->length == 0
                        || different (thisline, group_first_line));
 
+#ifdef ENABLE_DEBUG
           if (debug)
             {
               fprintf(stderr,"group_first_line = '");
@@ -1353,6 +1371,7 @@ process_file ()
               fprintf(stderr,"'\n");
               fprintf(stderr, "newgroup = %d\n", new_group);
             }
+#endif
 
           if (new_group && lines_in_group>0)
             {
@@ -1415,8 +1434,10 @@ open_input()
           strcat(cmd,tmp);
         }
 
+#ifdef ENABLE_DEBUG
       if (debug)
         fprintf(stderr,"sort cmd = '%s'\n", cmd);
+#endif
 
       pipe_input = popen(cmd,"r");
       if (pipe_input == NULL)
@@ -1461,8 +1482,11 @@ parse_group_spec ( char* spec )
 
   /* Count number of groups parameters, by number of commas */
   num_group_colums = 1;
+#ifdef ENABLE_DEBUG
   if (debug)
     fprintf(stderr,"parse_group_spec (spec='%s')\n", spec);
+#endif
+
   endptr = spec;
   while ( *endptr != '\0' )
     {
@@ -1497,6 +1521,7 @@ parse_group_spec ( char* spec )
     }
   group_columns[idx] = 0 ; /* marker for the last element */
 
+#ifdef ENABLE_DEBUG
   if (debug)
     {
       fprintf(stderr,"group columns (%p) num=%zu = ", group_columns,num_group_colums);
@@ -1506,6 +1531,7 @@ parse_group_spec ( char* spec )
         }
       fputs("\n",stderr);
     }
+#endif
 }
 
 int main(int argc, char* argv[])
@@ -1539,10 +1565,11 @@ int main(int argc, char* argv[])
           eolchar = 0;
           break;
 
+#ifdef ENABLE_DEBUG
         case DEBUG_OPTION:
           debug = true;
           break;
-
+#endif
         case INPUT_HEADER_OPTION:
           input_header = true;
           break;
