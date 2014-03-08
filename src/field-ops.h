@@ -39,7 +39,6 @@ enum operation
   OP_MODE,
   OP_ANTIMODE,
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */
-  OP_UNIQUE_NOCASE, /* Collapse Unique strings, ignoring-case */
   OP_COLLAPSE,      /* Collapse strings into comma separated values */
   OP_COUNT_UNIQUE   /* count number of unique values */
 };

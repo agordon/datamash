@@ -85,13 +85,14 @@ enum
 #endif
 };
 
-static char const short_options[] = "sfzg:t:TH";
+static char const short_options[] = "sfizg:t:TH";
 
 static struct option const long_options[] =
 {
   {"zero-terminated", no_argument, NULL, 'z'},
   {"field-separator", required_argument, NULL, 't'},
   {"group", required_argument, NULL, 'g'},
+  {"ignore-case", no_argument, NULL, 'i'},
   {"header-in", no_argument, NULL, INPUT_HEADER_OPTION},
   {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
   {"headers", no_argument, NULL, 'H'},
@@ -140,9 +141,9 @@ Numeric operations:\n\
   svar       print the sample variance\n\
 \n\
 String operations:\n\
-  unique     print comma-separated sorted list of unique values\n\
-  uniquenc   Same as above, while ignoring upper/lower case letters.\n\
-  collapse   print comma-separed list of all input values\n\
+  unique      print comma-separated sorted list of unique values\n\
+  collapse    print comma-separed list of all input values\n\
+  countunique print number of unique values\n\
 \n\
 ",stdout);
       fputs (_("\
@@ -154,6 +155,8 @@ General options:\n\
   --header-in               First input line is column headers\n\
   --header-out              Print column headers as first line\n\
   -H, --headers             Same as '--header-in --header-out'\n\
+  -i, --ignore-case         Ignore upper/lower case when comparing text\n\
+                            This affects grouping, and string operations\n\
   -s, --sort                Sort the input before grouping\n\
                             Removes the need to manually pipe the input through 'sort'\n\
   -t, --field-separator=X   use X instead of whitespace for field delimiter\n\
@@ -256,7 +259,9 @@ different (const struct linebuffer* l1, const struct linebuffer* l2)
 #endif
       if (len1 != len2)
         return true;
-      if (memcmp(str1,str2,len1) != 0)
+      if ((case_sensitive && (strncmp(str1,str2,len1)!=0))
+          ||
+          (!case_sensitive && (strncasecmp(str1,str2,len1)!=0)))
         return true;
     }
   return false;
@@ -471,6 +476,8 @@ open_input()
       if (input_header)
         strcat(cmd,"sed -u 1q;");
       strcat(cmd,"LC_ALL=C sort ");
+      if (!case_sensitive)
+        strcat(cmd,"-f ");
       if (tab != TAB_DEFAULT)
         {
           snprintf(tmp,sizeof(tmp),"-t '%c' ",tab);
@@ -609,6 +616,10 @@ int main(int argc, char* argv[])
 
         case 'g':
           parse_group_spec (optarg);
+          break;
+
+        case 'i':
+          case_sensitive = false;
           break;
 
         case 'z':

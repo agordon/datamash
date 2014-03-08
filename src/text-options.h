@@ -33,6 +33,9 @@ enum { TAB_DEFAULT = CHAR_MAX + 1 };
    character. */
 extern int tab ;
 
+/* Global case-sensitivity option. Defaults to 'true' . */
+extern bool case_sensitive ;
+
 #define UCHAR_LIM (UCHAR_MAX + 1)
 extern bool blanks[UCHAR_LIM];
 

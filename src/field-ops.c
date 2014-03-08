@@ -52,7 +52,6 @@ struct operation_data operations[] =
   {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
   {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
   {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
-  {"uniquenc",STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE_NOCASE */
   {"collapse",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COLLAPSE */
   {"countunique",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COUNT_UNIQUE */
   {NULL, 0, 0}
@@ -250,7 +249,6 @@ field_op_collect (struct fieldop *op,
       break;
 
     case OP_UNIQUE:
-    case OP_UNIQUE_NOCASE:
     case OP_COLLAPSE:
     case OP_COUNT_UNIQUE:
       field_op_add_string (op, str, slen);
@@ -415,9 +413,8 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_UNIQUE:
-    case OP_UNIQUE_NOCASE:
       print_numeric_result = false;
-      string_result = unique_value (op, (op->op==OP_UNIQUE));
+      string_result = unique_value (op, case_sensitive);
       break;
 
     case OP_COLLAPSE:
@@ -426,7 +423,7 @@ field_op_summarize (struct fieldop *op)
       break;
 
    case OP_COUNT_UNIQUE:
-      numeric_result = count_unique_values(op,true); //true: for now - always case sensitive
+      numeric_result = count_unique_values(op,case_sensitive);
       break;
 
     default:

@@ -32,6 +32,9 @@ char eolchar = '\n';
    character. */
 int tab = TAB_DEFAULT;
 
+/* Global case-sensitivity option. Defaults to 'true' . */
+bool case_sensitive = true;
+
 #define UCHAR_LIM (UCHAR_MAX + 1)
 bool blanks[UCHAR_LIM];
 

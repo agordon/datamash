@@ -128,6 +128,26 @@ my $in_sort1=<<"EOF";
 ^ C\tg\t6
 EOF
 
+# This (sorted) input will return different results based on case-sensitivity
+my $in_case_sorted=<<'EOF';
+a X 1
+a x 3
+A X 2
+A x 5
+b Y 4
+B Y 6
+EOF
+#
+# This (unsorted) input will return different results based on case-sensitivity
+my $in_case_unsorted=<<'EOF';
+a X 1
+A X 2
+a x 3
+b Y 4
+A x 5
+B Y 6
+EOF
+
 
 my @Tests =
 (
@@ -142,7 +162,6 @@ my @Tests =
   ['b9', 'mode 1',      {IN_PIPE=>$in1},  {OUT => "5\n"}],
   ['b10', 'antimode 1', {IN_PIPE=>$in1},  {OUT => "1\n"}],
   ['b11', 'unique 1',   {IN_PIPE=>$in1},  {OUT => "1,10,2,3,4,5,6,7,8,9\n"}],
-  ['b12', 'uniquenc 1', {IN_PIPE=>$in1},  {OUT => "1,10,2,3,4,5,6,7,8,9\n"}],
   ['b13', 'collapse 1', {IN_PIPE=>$in1},  {OUT => "1,2,3,4,5,6,7,5,8,9,10\n"}],
 
   # on a different architecture, would printf(%Lg) print something else?
@@ -282,6 +301,29 @@ my @Tests =
   # because the input is not sorted.
   ['sort3', '-T -g 2 unique 3', {IN_PIPE=>$in_sort1},
      {OUT=>"x\t1\nk\t2\nj\t3\nx\t5\nj\t4\ng\t6\n"}],
+
+
+  # Test Case-sensitivity, on sorted input (no 'sort' piping)
+  # on both grouping and string operations
+  ['case1', '-g 1 sum 3', {IN_PIPE=>$in_case_sorted},
+     {OUT=>"a 4\nA 7\nb 4\nB 6\n"}],
+  ['case2', '-i -g 1 sum 3', {IN_PIPE=>$in_case_sorted},
+     {OUT=>"a 11\nb 10\n"}],
+  ['case3', '-g 1 unique 2', {IN_PIPE=>$in_case_sorted},
+     {OUT=>"a X,x\nA X,x\nb Y\nB Y\n"}],
+  ['case4', '-i -g 1 unique 2', {IN_PIPE=>$in_case_sorted},
+     {OUT=>"a X\nb Y\n"}],
+
+  # Test Case-sensitivity, on non-sorted input (with 'sort' piping)
+  # on both grouping and string operations
+  ['case5', '-s -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
+     {OUT=>"A 7\nB 6\na 4\nb 4\n"}],
+  ['case6', '-s -i -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
+     {OUT=>"A 11\nB 10\n"}],
+  ['case7', '-s -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
+     {OUT=>"A X,x\nB Y\na X,x\nb Y\n"}],
+  ['case8', '-s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
+     {OUT=>"A X\nB Y\n"}],
 
 );
 
