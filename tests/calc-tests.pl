@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 =pod
   Unit Tests for calc - perform simple calculation on input data
-  Copyright (C) 2013 Assaf Gordon.
+  Copyright (C) 2013-2014 Assaf Gordon.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
