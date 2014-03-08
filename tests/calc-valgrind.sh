@@ -24,19 +24,32 @@
 valgrind --error-exitcode=1 true 2>/dev/null ||
     skip_ "requires a working valgrind"
 
+## Don't use valgrind on statically-compiled binary
+## (it gives some false-positives and the test fails).
+if which ldd >/dev/null ; then
+  ## Tricky implicit assumption:
+  ## If the system has "ldd" - we can test if this is a static binary.
+  ## If the system doesn't have "ldd", we can't test it, and we'll assume
+  ## we can valgrind without false-positives.
+  ## This is relevant for Mac OS X, where static binaries are discouraged and
+  ## difficult to create (https://developer.apple.com/library/mac/qa/qa1118/_index.html)
+  ldd $(which calc) >/dev/null 2>/dev/null ||
+    skip_ "skipping valgrind test for a non-dynamic-binary calc"
+fi
+
 fail=0
 
-seq 10000 | valgrind --leak-check=full --error-exitcode=1 \
+seq 10000 | valgrind --track-origins=yes --leak-check=full --error-exitcode=1 \
                  calc unique 1 > /dev/null || { warn_ "unique 1 - failed" ; fail=1 ; }
 
 seq 10000 | sed 's/^/group /' |
-     valgrind --leak-check=full --error-exitcode=1 \
+     valgrind --track-origins=yes --leak-check=full --error-exitcode=1 \
                  calc -g 1 unique 1 > /dev/null || { warn_ "-g 1 unique 1 - failed" ; fail=1 ; }
 
-seq 10000 | valgrind --leak-check=full --error-exitcode=1 \
+seq 10000 | valgrind --track-origins=yes --leak-check=full --error-exitcode=1 \
                  calc countunique 1 > /dev/null || { warn_ "countunique 1 - failed" ; fail=1 ; }
 
-seq 10000 | valgrind --leak-check=full --error-exitcode=1 \
+seq 10000 | valgrind --track-origins=yes --leak-check=full --error-exitcode=1 \
                  calc collapse 1 > /dev/null || { warn_ "collapse 1 - failed" ; fail=1 ; }
 
 Exit $fail
