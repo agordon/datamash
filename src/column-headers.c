@@ -37,6 +37,20 @@ struct columnheader
 static size_t num_input_column_headers = 0 ;
 static struct columnheader* input_column_headers = NULL;
 
+void free_column_headers()
+{
+  struct columnheader *p = input_column_headers;
+  while (p)
+    {
+      struct columnheader *n = p->next;
+      free(p->name);
+      free(p);
+      p = n;
+    }
+  input_column_headers = NULL ;
+  num_input_column_headers = 0;
+}
+
 size_t get_num_column_headers()
 {
   return num_input_column_headers;

@@ -52,4 +52,6 @@ size_t get_num_column_headers();
 */
 const char* get_input_field_name(size_t field_num);
 
+void free_column_headers();
+
 #endif

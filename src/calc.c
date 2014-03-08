@@ -679,6 +679,7 @@ int main(int argc, char* argv[])
   process_file ();
   free_field_ops ();
   free_sort_keys ();
+  free_column_headers ();
   close_input ();
 
   return EXIT_SUCCESS;
