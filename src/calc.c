@@ -832,7 +832,7 @@ static struct option const long_options[] =
 {
   {"zero-terminated", no_argument, NULL, 'z'},
   {"field-separator", required_argument, NULL, 't'},
-  {"groups", required_argument, NULL, 'g'},
+  {"group", required_argument, NULL, 'g'},
   {"header-in", no_argument, NULL, INPUT_HEADER_OPTION},
   {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
   {"headers", no_argument, NULL, 'H'},
@@ -889,9 +889,7 @@ String operations:\n\
 General options:\n\
   -f, --full                Print entire input line before op results\n\
                             (default: print only the groupped keys)\n\
-  -g, --groups=X[,Y,Z,]     Group via fields X,[Y,X]\n\
-                            This is a short-cut for --key:\n\
-                            '-g5,6' is equivalent to '-k5,5 -k6,6'\n\
+  -g, --group=X[,Y,Z]       Group via fields X,[Y,Z]\n\
   --header-in               First input line is column headers\n\
   --header-out              Print column headers as first line\n\
   -H, --headers             Same as '--header-in --header-out'\n\
@@ -910,23 +908,45 @@ General options:\n\
 \n\
 Examples:\n\
 \n\
-Print the mean and the median of values from column 1:\n\
+Print the sum and the mean of values from column 1:\n\
 \n\
-  $ seq 10 | %s mean 1 median 1\n\
-\n\
+  $ seq 10 | %s sum 1 mean 1\n\
+  55  5.5\n\
+\n"), program_name);
+
+      printf (_("\
 Group input based on field 1, and sum values (per group) on field 2:\n\
 \n\
-  $ printf \"%%s %%d\\n\" A 10 A 5 B 9 | %s -g1 sum 2\n\
+  $ cat example.txt\n\
+  A  10\n\
+  A  5\n\
+  B  9\n\
+  B  11\n\
+  $ %s -g 1 sum 2 < example.txt \n\
+  A  15\n\
+  B  20\n\
+\n"), program_name);
+
+      printf (_("\
+Unsorted input must be sorted (with '-s'):\n\
 \n\
-Unsorted input must be sorted:\n\
+  $ cat example.txt\n\
+  A  10\n\
+  C  4\n\
+  B  9\n\
+  C  1\n\
+  A  5\n\
+  B  11\n\
+  $ %s -s -g1 sum 2 < example.txt \n\
+  A 15\n\
+  B 20\n\
+  C 5\n\
 \n\
-  $ cat INPUT.TXT | %s -s -g1 mean 2\n\
-\n\
-  Which is equivalent to:\n\
-  $ cat INPUT.TXT | sort -k1,1 | %s -g1 mean 2\n\
+Which is equivalent to:\n\
+  $ cat example.txt | sort -k1,1 | %s -g 1 sum 2\n\
 \n\
 \n\
-"), program_name, program_name, program_name, program_name);
+"), program_name, program_name);
 
     }
   exit (status);
