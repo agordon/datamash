@@ -350,7 +350,7 @@ print_column_headers()
     }
   else
     {
-      for (size_t *key = group_columns; *key != 0; ++key)
+      for (size_t *key = group_columns; key && *key != 0; ++key)
         {
           printf("GroupBy(%s)",get_input_field_name(*key));
           print_field_separator();

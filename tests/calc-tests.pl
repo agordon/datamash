@@ -271,6 +271,10 @@ my @Tests =
   ['hdr5', '-g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
      {OUT=>"field-1 field-2 field-3 count(field-2)\nA 3  W 5\nB 17 Y 2\nC 23 Z 1\n"}],
 
+  # Header without grouping
+  ['hdr6', '--header-out count 2', {IN_PIPE=>$in_g3},
+     {OUT=>"count(field-2)\n8\n"}],
+
   # Test single line per group
   ['sl1', '-g 1 mean 2', {IN_PIPE=>$in_g4},
      {OUT=>"A 5\nK 6\nP 2\n"}],
