@@ -1,6 +1,6 @@
 # Makefile.am for calc/src.
 #
-# Copyright (C) 2013 Assaf Gordon.
+# Copyright (C) 2013-2014 Assaf Gordon.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +17,15 @@
 
 bin_PROGRAMS = calc
 
-calc_SOURCES = calc.c \
-	       system.h \
+calc_SOURCES = system.h \
+	       version.c version.h \
 	       strnumcmp.c strnumcmp.h strnumcmp-in.h \
-	       version.c version.h
+	       text-options.c text-options.h \
+	       utils.c utils.h \
+	       text-lines.c text-lines.h \
+	       column-headers.c column-headers.h \
+	       field-ops.c field-ops.h \
+	       calc.c
 
 # Extra compile flags for these source files.
 # Can't use them when compiling gnulib, so not adding them globally.
