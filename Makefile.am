@@ -9,6 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 EXTRA_DIST = \
+        make_bin_dist.sh \
 	$(top_srcdir)/.version
 
 SUBDIRS = po lib src man tests examples

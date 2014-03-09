@@ -34,7 +34,7 @@ SRC=./src/calc
 
 DATE=$(date -u +"%F-%H%M%S")
 
-mkdir bin || die "failed to create 'bin' directory"
+mkdir -p bin || die "failed to create 'bin' directory"
 
 DST=calc-${CALCVER}__${KERNEL}__${RELEASE}__${MACHINE}__${DATE}.bin
 cp "$SRC" "bin/$DST" || die "failed to create destination binary ($DST)"
