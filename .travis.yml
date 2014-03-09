@@ -3,13 +3,24 @@ compiler:
   - clang
   - gcc
 before_install:
-  - sudo apt-get install help2man valgrind gperf help2man
+  - sudo apt-get install help2man valgrind gperf
   - wget ftp://ftp.gnu.org/gnu/sed/sed-4.2.2.tar.bz2
   - tar -xjf sed-4.2.2.tar.bz2
   - "( cd sed-4.2.2 ; ./configure && make && sudo make install )"
 script:
-  - ./bootstrap
-  - ./configure
-  - make
-  - make check
-  - make dist
+- "( git fetch --unshallow ; true )"
+- ls -l
+- ./bootstrap
+- ls -l
+- git describe --always
+- ./build-aux/git-version-gen .tarball-version
+- ./configure
+- make
+- make check
+- make dist
+- ./build-aux/make_bin_dist.sh
+after_success:
+- ls -l ./bin/
+- md5sum ./bin/*
+- sha1sum ./bin/*
+- ( FILE=$(basename $(ls ./bin/calc-*.tar.gz)) ; echo "--BIN-DIST-START--:$FILE" ; cat ./bin/calc*.tar.gz | base64 -w 400 ; echo "--BIN-DIST-END--" )

@@ -11,11 +11,9 @@ die()
   exit 1
 }
 
-cd $(dirname "$0") || die "failed to set directory"
+cd $(dirname "$0")/.. || die "failed to set directory"
 
 CALCVER=$(./build-aux/git-version-gen .tarball-version) || die "can't get calc version"
-
-[ -e "Makfile" ] && make distclean
 
 KERNEL=$(uname -s)   # Linux,FreeBSD,Darwin
 RELEASE=$(uname -r)  # 2.6.30, 10-RELEASE, 10.2.8
@@ -27,6 +25,7 @@ STATICFLAG=
 [ "$KERNEL" = "Linux" -o "$KERNEL" = "FreeBSD" ] && STATICFLAG="LDFLAGS=-static"
 
 ./configure CFLAGS="-O2" $STATICFLAG || die "./configure failed"
+make clean
 make || die "make failed"
 
 SRC=./src/calc
@@ -34,8 +33,14 @@ SRC=./src/calc
 
 DATE=$(date -u +"%F-%H%M%S")
 
-mkdir -p bin || die "failed to create 'bin' directory"
+NAME="calc-${CALCVER}-bin__${KERNEL}__${RELEASE}__${MACHINE}"
+mkdir -p "bin/$NAME" || die "failed to create 'bin/$NAME' directory"
 
-DST=calc-${CALCVER}__${KERNEL}__${RELEASE}__${MACHINE}__${DATE}.bin
-cp "$SRC" "bin/$DST" || die "failed to create destination binary ($DST)"
+cp "$SRC" "bin/$NAME/calc" || die "failed to create destination binary (bin/$NAME/calc)"
 
+cd "bin" || die
+tar -czvf "$NAME.tar.gz" "$NAME" || die "failed to create TarBall for binary executable"
+cd ".."
+
+echo "Done. File ="
+echo "   ./bin/$NAME.tar.gz"
