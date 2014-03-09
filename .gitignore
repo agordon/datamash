@@ -44,6 +44,9 @@ Makefile.in
 stamp-h1
 *.o
 
+ChangeLog
+bin/
+
 # gnulib modules, auto-generated in "./reconf"
 lib/
 
@@ -55,6 +58,7 @@ po/*.pot
 po/Makefile.in
 po/stamp-po
 po/POTFILES
+po/remove-potcdate.sed
 
 src/calc
 
