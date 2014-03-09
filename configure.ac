@@ -73,3 +73,19 @@ AC_CONFIG_FILES([ po/Makefile.in
 ])
 
 AC_OUTPUT
+
+dnl
+dnl Report Configuration
+dnl
+AC_MSG_RESULT([])
+AC_MSG_RESULT([ Configuration summary for $PACKAGE])
+AC_MSG_RESULT([    version:  $VERSION])
+AC_MSG_RESULT([    CFLAGS:   $CFLAGS])
+AC_MSG_RESULT([    LDFLAGS:  $LDFLAGS])
+AC_MSG_RESULT([])
+AC_MSG_RESULT([ Default installtion directories:])
+AC_MSG_RESULT([    programs: ${prefix}/bin/ ])
+AC_MSG_RESULT([])
+AC_MSG_RESULT([ To change installtion path, use:])
+AC_MSG_RESULT([    ./configure --prefix NEW-PATH])
+AC_MSG_RESULT([])
