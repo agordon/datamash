@@ -472,16 +472,9 @@ reset_field_ops ()
 
 /* Frees all memory associated with a field operation struct.
    returns the 'next' field operation, or NULL */
-struct fieldop *
+static void
 free_field_op (struct fieldop *op)
 {
-  struct fieldop *next;
-
-  if (!op)
-    return NULL;
-
-  next = op->next;
-
   if (op->values)
       free (op->values);
   op->num_values = 0 ;
@@ -493,8 +486,6 @@ free_field_op (struct fieldop *op)
   op->str_buf_used = 0;
 
   free(op);
-
-  return next;
 }
 
 void
@@ -502,7 +493,11 @@ free_field_ops ()
 {
   struct fieldop *p = field_ops;
   while (p)
-    p = free_field_op(p);
+    {
+      struct fieldop *n = p->next;
+      free_field_op(p);
+      p = n;
+    }
 }
 
 /* Given a string with operation name, returns the operation enum.
