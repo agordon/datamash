@@ -17,6 +17,7 @@
 
 TESTS = calc-tests.pl \
         calc-sort-header.sh \
+        calc-sort-errors.sh \
         calc-valgrind.sh
 
 EXTRA_DIST = Coreutils.pm CuSkip.pm CuTmpdir.pm init.sh \
