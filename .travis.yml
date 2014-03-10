@@ -3,7 +3,7 @@ compiler:
   - clang
   - gcc
 before_install:
-  - sudo apt-get install help2man valgrind gperf
+  - sudo apt-get install help2man valgrind gperf lcov
   - wget ftp://ftp.gnu.org/gnu/sed/sed-4.2.2.tar.bz2
   - tar -xjf sed-4.2.2.tar.bz2
   - "( cd sed-4.2.2 ; ./configure && make && sudo make install )"
@@ -18,9 +18,10 @@ script:
 - make
 - make check
 - make dist
-- ./build-aux/make_bin_dist.sh
 after_success:
+- ./build-aux/make_bin_dist.sh
 - ls -l ./bin/
 - md5sum ./bin/*
 - sha1sum ./bin/*
 - ( FILE=$(basename $(ls ./bin/calc-*.tar.gz)) ; echo "--BIN-DIST-START--:$FILE" ; cat ./bin/calc*.tar.gz | base64 -w 400 ; echo "--BIN-DIST-END--" )
+- ./build-aux/rebuild-coverage.sh
