@@ -67,6 +67,8 @@ src/*.gcda
 src/*.gcno
 lib/*.gcda
 lib/*.gcno
+calc.lcov
+calc-cov/
 
 ## TODO: change this to the name of your package tarball
 calc-*.tar.gz
