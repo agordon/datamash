@@ -255,7 +255,8 @@ field_op_collect (struct fieldop *op,
       break;
 
     default:
-      break;
+      /* Should never happen */
+      error (EXIT_FAILURE, 0, _("internal error 3"));
     }
 
   if (op->first)
@@ -427,8 +428,8 @@ field_op_summarize (struct fieldop *op)
       break;
 
     default:
+      /* Should never happen */
       error (EXIT_FAILURE, 0, _("internal error 2"));
-      break;
     }
 
 
