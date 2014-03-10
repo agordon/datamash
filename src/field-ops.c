@@ -511,7 +511,7 @@ get_operation (const char* op)
         return (enum operation)i;
 
   error (EXIT_FAILURE, 0, _("invalid operation '%s'"), op);
-  return 0; /* never reached */
+  return 0; /* never reached LCOV_EXCL_LINE */
 }
 
 /* Converts a string to number (field number).
