@@ -11,6 +11,8 @@
 EXTRA_DIST = \
         build-aux/make_bin_dist.sh \
         build-aux/get_travis_dist.sh \
+        build-aux/rebuild-coverage.sh \
+        build-aux/gen-coverage-report.sh \
 	$(top_srcdir)/.version
 
 SUBDIRS = po lib src man tests examples

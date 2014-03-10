@@ -62,5 +62,11 @@ po/remove-potcdate.sed
 
 src/calc
 
+# Coverage files
+src/*.gcda
+src/*.gcno
+lib/*.gcda
+lib/*.gcno
+
 ## TODO: change this to the name of your package tarball
 calc-*.tar.gz
