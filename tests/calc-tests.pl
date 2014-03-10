@@ -91,6 +91,19 @@ C 1 33
 C 2 44
 EOF
 
+# Same data, different field separator
+my $in_hdr2=<<'EOF';
+x:y:z
+A:3:W
+A:5:W
+A:7:W
+A:11:X
+A:13:X
+B:17:Y
+B:19:Z
+C:23:Z
+EOF
+
 my $in_cnt_uniq1=<<'EOF';
 x y
 A 1
@@ -148,6 +161,9 @@ A x 5
 B Y 6
 EOF
 
+## NUL as end-of-line character
+my $in_nul1="A 1\x00A 2\x00B 3\x00B 4\x00";
+
 
 my @Tests =
 (
@@ -190,6 +206,29 @@ my @Tests =
 		  "Try '$prog --help' for more information.\n"}],
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
 	  {ERR=>"$prog: invalid numeric input in line 1 field 1: 'a'\n"}],
+  ['e5',  '-g 4, sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid field value for grouping ''\n"}],
+  ['e6',  '-g 4,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid field value for grouping 'x'\n"}],
+  ['e7',  '-g ,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid field value for grouping ',x'\n"}],
+  ['e8',  '-g 1,0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid field value (zero) for grouping\n"}],
+  ['e9',  '-g 1X0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid grouping parameter 'X0'\n"}],
+  ['e10',  '-g 1 -t XX sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: the delimiter must be a single character\n"}],
+  ['e11',  '--foobar' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+	  {ERR=>"$prog: unrecognized option '--foobar'\n" .
+                "Try '$prog --help' for more information.\n"}],
+  ['e12',  '-H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+	  {ERR=>"$prog: Not enough input fields (field 4 requested, input has only 3 fields)\n"}],
+  ['e13',  'sum 6' ,  {IN_PIPE=>$in_g3}, {EXIT=>1},
+	  {ERR=>"$prog: invalid numeric input in line 1 field 6: ''\n"}],
+  ['e14',  '--header-in -t: sum 6' ,  {IN_PIPE=>$in_hdr2}, {EXIT=>1},
+	  {ERR=>"$prog: invalid numeric input in line 2 field 6: ''\n"}],
+  ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
@@ -275,6 +314,19 @@ my @Tests =
   ['hdr6', '--header-out count 2', {IN_PIPE=>$in_g3},
      {OUT=>"count(field-2)\n8\n"}],
 
+  # Output Header, multiple ops
+  ['hdr7', '-g 1 --header-out count 2 unique 3', {IN_PIPE=>$in_g3},
+     {OUT=>"GroupBy(field-1) count(field-2) unique(field-3)\nA 5 W,X\nB 2 Y,Z\nC 1 Z\n"}],
+
+  # Headers, non white-space separator
+  ['hdr8', '-g 1 -H -t: count 2 unique 3', {IN_PIPE=>$in_hdr2},
+     {OUT=>"GroupBy(x):count(y):unique(z)\nA:5:W,X\nB:2:Y,Z\nC:1:Z\n"}],
+
+  # Headers, non white-space separator, 3 operations
+  ['hdr9', '-g 1 -H -t: count 2 unique 3 sum 2', {IN_PIPE=>$in_hdr2},
+     {OUT=>"GroupBy(x):count(y):unique(z):sum(y)\nA:5:W,X:39\nB:2:Y,Z:36\nC:1:Z:23\n"}],
+
+
   # Test single line per group
   ['sl1', '-g 1 mean 2', {IN_PIPE=>$in_g4},
      {OUT=>"A 5\nK 6\nP 2\n"}],
@@ -328,6 +380,19 @@ my @Tests =
      {OUT=>"A X,x\nB Y\na X,x\nb Y\n"}],
   ['case8', '-s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"A X\nB Y\n"}],
+
+  ## Test nul-terminated lines
+  ['nul1', '-z -g 1 sum 2', {IN_PIPE=>$in_nul1},
+     {OUT=>"A 3\x00B 7\x00"}],
+  ['nul2', '--zero-terminated -g 1 sum 2', {IN_PIPE=>$in_nul1},
+     {OUT=>"A 3\x00B 7\x00"}],
+
+  # Test --help (but don't verify the output)
+  ['help1', '--help',     {IN_PIPE=>""},  {OUT => ""},
+	  {OUT_SUBST=>'s/^.*//gms'}],
+  ['ver1', '--version',     {IN_PIPE=>""},  {OUT => ""},
+	  {OUT_SUBST=>'s/^.*//gms'}],
+
 
 );
 
