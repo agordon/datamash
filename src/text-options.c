@@ -48,3 +48,9 @@ init_blank_table (void)
       blanks[i] = !! isblank (i);
     }
 }
+
+/* Force generation of these inline'd symbols, needed to avoid
+   "undefined reference" when compiling with coverage instrumentation.
+   See: http://stackoverflow.com/questions/16245521/c99-inline-function-in-c-file/16245669#16245669 */
+void print_field_separator();
+void print_line_separator();
