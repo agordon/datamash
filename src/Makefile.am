@@ -19,7 +19,6 @@ bin_PROGRAMS = calc
 
 calc_SOURCES = system.h \
 	       version.c version.h \
-	       strnumcmp.c strnumcmp.h strnumcmp-in.h \
 	       text-options.c text-options.h \
 	       utils.c utils.h \
 	       text-lines.c text-lines.h \
