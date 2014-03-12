@@ -63,6 +63,39 @@ gl_WARN_ADD([-Wformat-nonliteral])
 gl_WARN_ADD([-Wunused-parameter])
 gl_WARN_ADD([-Werror])
 
+# Add Debian-specific Hardening flags
+# See:  https://wiki.debian.org/HardeningWalkthrough
+# Requires 'dpkg-buildflags' from the 'dpkg-dev' package
+#
+# To use:
+#    ./configure --enable-debian-hardening
+#
+AC_ARG_ENABLE(debian-hardening,
+	      AS_HELP_STRING([--enable-debian-hardening],
+			     [Build with Debian-specific hardening flags]),
+			     [
+			      if test "$enableval" = "yes" ; then
+				      :
+			      elif test "$enableval" != "no" ; then
+				      AC_MSG_ERROR([--enable-debian-hardening does not accept an argument])
+			      fi
+			      ])
+
+AC_CHECK_PROG([DPKG_BUILDFLAGS],[dpkg-buildflags],[yes],[no],[])
+
+if test "x$enable_debian_hardening" = "xyes" ; then
+	if test "x$DPKG_BUILDFLAGS" != "xyes" ; then
+		AC_MSG_ERROR([debian-hardening requires the program dpkg-buildflag, which was not found])
+	fi
+	DEBHARD_CFLAGS=`dpkg-buildflags --get CFLAGS`
+	DEBHARD_CPPFLAGS=`dpkg-buildflags --get CPPFLAGS`
+	DEBHARD_LDFLAGS=`dpkg-buildflags --get LDFLAGS`
+
+	CFLAGS="$CFLAGS $DEBHARD_CFLAGS"
+	CPPFLAGS="$CPPFLAGS $DEBHARD_CPPFLAGS"
+	LDFLAGS="$LDFLAGS $DEBHARD_LDFLAGS"
+fi
+
 
 # i18n support from GNU gettext.
 AM_GNU_GETTEXT_VERSION([0.17])
@@ -81,6 +114,7 @@ AC_MSG_RESULT([])
 AC_MSG_RESULT([ Configuration summary for $PACKAGE])
 AC_MSG_RESULT([    version:  $VERSION])
 AC_MSG_RESULT([    CFLAGS:   $CFLAGS])
+AC_MSG_RESULT([    CPPFLAGS: $CPPFLAGS])
 AC_MSG_RESULT([    LDFLAGS:  $LDFLAGS])
 AC_MSG_RESULT([])
 AC_MSG_RESULT([ Default installtion directories:])
