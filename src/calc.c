@@ -32,6 +32,7 @@
 #include "error.h"
 #include "linebuffer.h"
 #include "quote.h"
+#include "ignore-value.h"
 #include "inttostr.h"
 #define Version VERSION
 #include "version-etc.h"
@@ -310,7 +311,7 @@ print_input_line (const struct linebuffer* lb)
       const char *buf = lb->buffer;
       if (buf[len-1]==eolchar || buf[len-1]==0)
         len--;
-      fwrite (buf, sizeof(char), len, stdout);
+      ignore_value(fwrite (buf, sizeof(char), len, stdout));
       print_field_separator();
     }
   else
@@ -320,7 +321,7 @@ print_input_line (const struct linebuffer* lb)
           const char *str;
           size_t len;
           get_field(lb,*key, &str, &len);
-          fwrite(str,sizeof(char),len,stdout);
+          ignore_value(fwrite(str,sizeof(char),len,stdout));
           print_field_separator();
         }
     }
