@@ -3,7 +3,7 @@ compiler:
   - clang
   - gcc
 before_install:
-  - sudo apt-get install help2man valgrind gperf lcov gettext autopoint
+  - sudo apt-get install help2man valgrind gperf lcov gettext autopoint dpkg-dev
   - wget ftp://ftp.gnu.org/gnu/sed/sed-4.2.2.tar.bz2
   - tar -xjf sed-4.2.2.tar.bz2
   - "( cd sed-4.2.2 ; ./configure && make && sudo make install )"
@@ -24,7 +24,7 @@ script:
 - ls -l
 - git describe --always
 - ./build-aux/git-version-gen .tarball-version
-- ./configure
+- ./configure --enable-debian-hardening
 - make
 - make check VERBOSE=yes
 - cat tests/calc-show-env.sh.log ; true
@@ -33,7 +33,7 @@ script:
 after_success:
 - ./build-aux/make_bin_dist.sh
 - ls -l ./bin/
-- md5sum ./bin/*
-- sha1sum ./bin/*
+- md5sum ./bin/*.tar.gz
+- sha1sum ./bin/*.tar.gz
 - ( FILE=$(basename $(ls ./bin/calc-*.tar.gz)) ; echo "--BIN-DIST-START--:$FILE" ; cat ./bin/calc*.tar.gz | base64 -w 400 ; echo "--BIN-DIST-END--" )
 - ./build-aux/rebuild-coverage.sh
