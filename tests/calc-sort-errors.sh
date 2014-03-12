@@ -29,7 +29,7 @@ fail=0
 ## Test preparations
 ##
 ##
-GROUPPARAM=$(seq 1000 2000 | paste -d, -s) ||
+GROUPPARAM=$(seq 1000 2000 | paste -d "," -s -) ||
   framework_failure_ "failed to construct too-long group parameter"
 
 ## The expected error message when the group parameter is too long
