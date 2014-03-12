@@ -28,7 +28,7 @@ STATICFLAG=
 make clean
 make || die "make failed"
 
-SRC=./src/calc
+SRC=./calc
 [ -e "$SRC" ] || die "Expected program file '$SRC' not found"
 
 DATE=$(date -u +"%F-%H%M%S")

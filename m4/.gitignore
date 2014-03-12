@@ -58,7 +58,6 @@
 /stdint.m4
 /strnlen.m4
 /wcwidth.m4
-/quote.m4
 /quotearg.m4
 /stdarg.m4
 /version-etc.m4
@@ -93,10 +92,8 @@
 /assert.m4
 /stdnoreturn.m4
 /hard-locale.m4
-/memcoll.m4
 /inttypes.m4
 /xstrtol.m4
-/mbswidth.m4
 /inttostr.m4
 /gettext.m4
 /glibc2.m4
@@ -126,3 +123,9 @@
 /closeout.m4
 /fpending.m4
 /warnings.m4
+/dirname.m4
+/double-slash-root.m4
+/mbsrtowcs.m4
+/non-recursive-gnulib-prefix-hack.m4
+/strndup.m4
+/xstrndup.m4

@@ -3,10 +3,20 @@ compiler:
   - clang
   - gcc
 before_install:
-  - sudo apt-get install help2man valgrind gperf lcov
+  - sudo apt-get install help2man valgrind gperf lcov gettext autopoint
   - wget ftp://ftp.gnu.org/gnu/sed/sed-4.2.2.tar.bz2
   - tar -xjf sed-4.2.2.tar.bz2
   - "( cd sed-4.2.2 ; ./configure && make && sudo make install )"
+  - which automake
+  - automake --version
+  - which autoconf
+  - autoconf --version
+  - which autopoint
+  - autopoint --version
+  - which gettext
+  - gettext --version
+  - which autoreconf
+  - autoreconf --version
 script:
 - "( git fetch --unshallow ; true )"
 - ls -l
@@ -16,7 +26,9 @@ script:
 - ./build-aux/git-version-gen .tarball-version
 - ./configure
 - make
-- make check
+- make check VERBOSE=yes
+- cat tests/calc-show-env.sh.log ; true
+- cat ./test-suite.log ; true
 - make dist
 after_success:
 - ./build-aux/make_bin_dist.sh

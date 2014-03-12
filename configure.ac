@@ -9,15 +9,20 @@ dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_INIT([calc],
-        m4_esyscmd([build-aux/git-version-gen .tarball-version]),
-        [A. Gordon assafgordon@gmail.com])
+        [m4_esyscmd([build-aux/git-version-gen .tarball-version])],
+	[assafgordon@gmail.com], [],
+	[http://agordon.github.io/calc/])
 
 dnl Must come before AM_INIT_AUTOMAKE.
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([])
+AM_INIT_AUTOMAKE([
+	1.11.1
+	parallel-tests
+	subdir-objects
+])
 
 # Minimum Autoconf version required.
-AC_PREREQ(2.60)
+AC_PREREQ(2.62)
 
 # Where to generate output; srcdir location.
 AC_CONFIG_HEADERS([config.h:config.in])dnl Keep filename to 8.3 for MS-DOS.
@@ -60,16 +65,11 @@ gl_WARN_ADD([-Werror])
 
 
 # i18n support from GNU gettext.
-AM_GNU_GETTEXT_VERSION([0.18.1])
+AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT([external])
 
-AC_CONFIG_FILES([ po/Makefile.in
-   Makefile
-   lib/Makefile
-   man/Makefile
-   src/Makefile
-   tests/Makefile
-   examples/Makefile
+AC_CONFIG_FILES([Makefile
+	po/Makefile.in
 ])
 
 AC_OUTPUT

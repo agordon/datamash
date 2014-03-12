@@ -33,8 +33,8 @@
 #include "linebuffer.h"
 #include "quote.h"
 #include "inttostr.h"
+#define Version VERSION
 #include "version-etc.h"
-#include "version.h"
 #include "xalloc.h"
 
 #include "text-options.h"
