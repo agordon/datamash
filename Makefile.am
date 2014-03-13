@@ -21,7 +21,6 @@ EXTRA_DIST = \
 	man/calc.x
 
 EXTRA_DIST += \
-      debian/files \
       debian/compat \
       debian/calc.dirs \
       debian/source/format \
