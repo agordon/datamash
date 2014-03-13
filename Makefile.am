@@ -63,7 +63,9 @@ EXTRA_DIST += $(man_MANS)
 CLEANFILES = $(man_MANS)
 
 calc.1: calc
-	$(HELP2MAN) --include=$(top_srcdir)/man/calc.x $(top_builddir)/calc -o $@
+	$(HELP2MAN) --include=$(top_srcdir)/man/calc.x $(top_builddir)/calc -o $@-t
+	chmod a=r $@-t
+	mv -f $@-t $@
 
 ##
 ## Tests
