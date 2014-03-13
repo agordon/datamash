@@ -24,6 +24,9 @@ MACHINE=$(uname -m)  # x86_64, amd64, i386
 STATICFLAG=
 [ "$KERNEL" = "Linux" -o "$KERNEL" = "FreeBSD" ] && STATICFLAG="LDFLAGS=-static"
 
+# Technically incorrect, but much friendlier to users
+[ "$KERNEL" = "Darwin" ] && KERNEL="MacOSX"
+
 ./configure CFLAGS="-O2" $STATICFLAG || die "./configure failed"
 make clean
 make || die "make failed"
@@ -33,7 +36,7 @@ SRC=./calc
 
 DATE=$(date -u +"%F-%H%M%S")
 
-NAME="calc-${CALCVER}-bin__${KERNEL}__${RELEASE}__${MACHINE}"
+NAME="calc-${CALCVER}-bin__${KERNEL}__${MACHINE}"
 mkdir -p "bin/$NAME" || die "failed to create 'bin/$NAME' directory"
 
 cp "$SRC" "bin/$NAME/calc" || die "failed to create destination binary (bin/$NAME/calc)"

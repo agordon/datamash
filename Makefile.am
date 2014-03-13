@@ -17,6 +17,7 @@ EXTRA_DIST = \
         build-aux/get_travis_dist.sh \
         build-aux/rebuild-coverage.sh \
         build-aux/gen-coverage-report.sh \
+	build-aux/git-log-fix \
 	m4/gnulib-cache.m4 \
 	man/calc.x
 
@@ -73,7 +74,9 @@ EXTRA_DIST += $(man_MANS)
 CLEANFILES = $(man_MANS)
 
 calc.1: calc
-	$(HELP2MAN) --include=$(top_srcdir)/man/calc.x $(top_builddir)/calc -o $@
+	$(HELP2MAN) --include=$(top_srcdir)/man/calc.x $(top_builddir)/calc -o $@-t
+	chmod a=r $@-t
+	mv -f $@-t $@
 
 ##
 ## Tests
