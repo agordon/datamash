@@ -1,0 +1,12 @@
+Source: calc
+Maintainer: Assaf Gordon <assafgordon@gmail.com>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>=9)
+
+
+Package: calc
+Architecture: any
+Depends: ${shlibs:Depends} ${misc:Depends}
+Description: Command-line simple calculations
