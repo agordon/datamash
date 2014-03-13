@@ -1,5 +1,12 @@
 # List of source files which contain translatable strings.
+lib/closeout.c
+lib/error.c
+lib/getopt.c
+lib/quotearg.c
+lib/version-etc.c
+lib/xalloc-die.c
+lib/xstrtol-error.c
 src/calc.c
+src/column-headers.c
 src/field-ops.c
-src/text-lines.c
 src/system.h

@@ -39,4 +39,3 @@ cat "$LOGFILE" |
 echo "done!"
 echo "File = "
 echo "   $FILENAME"
-

@@ -238,4 +238,3 @@ Strand information is in column 4. How many transcripts are in each chromsomse A
 ## More Information
 
 For more information about `calc` usage, run `calc --help`, and the [Calc Website](https://github.com/agordon/calc) .
-

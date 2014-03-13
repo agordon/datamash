@@ -94,6 +94,14 @@ TESTS_ENVIRONMENT = \
   export top_srcdir PERL5LIB PATH CALC test_dir ;
 
 ##
+## For 'make syntax-check'
+##
+EXTRA_DIST += \
+	cfg.mk
+
+
+
+##
 ## Examples
 ##
 

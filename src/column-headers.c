@@ -89,7 +89,7 @@ const char* get_input_field_name(size_t field_num)
     {
        const struct columnheader *h = input_column_headers;
        if (field_num > num_input_column_headers)
-         error(EXIT_FAILURE,0,_("Not enough input fields (field %zu requested, input has only %zu fields)"), field_num, num_input_column_headers);
+         error(EXIT_FAILURE,0,_("not enough input fields (field %zu requested, input has only %zu fields)"), field_num, num_input_column_headers);
 
        while (--field_num)
          h = h->next;
@@ -146,4 +146,3 @@ build_input_line_headers(const char*line, size_t len, bool store_names)
        }
     }
 }
-

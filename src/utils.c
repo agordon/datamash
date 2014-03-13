@@ -16,7 +16,6 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
-#include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>

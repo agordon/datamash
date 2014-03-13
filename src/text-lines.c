@@ -30,7 +30,7 @@
 /* Force NUL-termination of the string in the linebuffer struct.
    NOTE 1: The buffer is assumed to contain NUL later on in the program,
            and is used in 'strtoul()'.
-   NOTE 2: The buffer can not be simply chomp'd (by derementing length),
+   NOTE 2: The buffer cannot be simply chomp'd (by derementing length),
            because sort's "keycompare()" function assume the last valid index
            is one PAST the last character of the line (i.e. there is an EOL
            charcter in the buffer). */
@@ -112,4 +112,3 @@ get_field (const struct linebuffer *line, size_t field,
   *_len = flen;
   *_ptr = fptr;
 }
-
