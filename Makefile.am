@@ -20,6 +20,17 @@ EXTRA_DIST = \
 	m4/gnulib-cache.m4 \
 	man/calc.x
 
+EXTRA_DIST += \
+      debian/files \
+      debian/compat \
+      debian/calc.dirs \
+      debian/source/format \
+      debian/copyright \
+      debian/control \
+      debian/rules \
+      debian/changelog
+
+
 SUBDIRS = po
 
 ##
