@@ -32,10 +32,11 @@ script:
 - cat tests/calc-show-env.sh.log ; true
 - cat ./test-suite.log ; true
 - make dist
+- make distcheck
 after_success:
 - ./build-aux/make_bin_dist.sh
 - ls -l ./bin/
 - md5sum ./bin/*.tar.gz
 - sha1sum ./bin/*.tar.gz
-- ( FILE=$(basename $(ls ./bin/calc-*.tar.gz)) ; echo "--BIN-DIST-START--:$FILE" ; cat ./bin/calc*.tar.gz | base64 -w 400 ; echo "--BIN-DIST-END--" )
+#- ( FILE=$(basename $(ls ./bin/calc-*.tar.gz)) ; echo "--BIN-DIST-START--:$FILE" ; cat ./bin/calc*.tar.gz | base64 -w 400 ; echo "--BIN-DIST-END--" )
 - ./build-aux/rebuild-coverage.sh
