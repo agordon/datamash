@@ -17,6 +17,7 @@ EXTRA_DIST = \
         build-aux/get_travis_dist.sh \
         build-aux/rebuild-coverage.sh \
         build-aux/gen-coverage-report.sh \
+	build-aux/git-log-fix \
 	m4/gnulib-cache.m4 \
 	man/calc.x
 
