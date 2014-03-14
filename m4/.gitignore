@@ -129,3 +129,5 @@
 /non-recursive-gnulib-prefix-hack.m4
 /strndup.m4
 /xstrndup.m4
+/absolute-header.m4
+/stdio_h.m4
