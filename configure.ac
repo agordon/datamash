@@ -117,9 +117,16 @@ AC_MSG_RESULT([    CFLAGS:   $CFLAGS])
 AC_MSG_RESULT([    CPPFLAGS: $CPPFLAGS])
 AC_MSG_RESULT([    LDFLAGS:  $LDFLAGS])
 AC_MSG_RESULT([])
-AC_MSG_RESULT([ Default installtion directories:])
-AC_MSG_RESULT([    programs: ${prefix}/bin/ ])
+AC_MSG_RESULT([ Default installation directories:])
+AC_MSG_RESULT([    program:  ${prefix}/bin/ ])
+dnl The default 'datarootdir' is unexpanded, still contains
+dnl '${prefix}/share' (not the single quotes)
+if test "x$datarootdir" = 'x${prefix}/share' ; then
+AC_MSG_RESULT([    examples: ${prefix}/share/${PACKAGE_NAME}/examples])
+else
+AC_MSG_RESULT([    examples: ${datarootdir}/${PACKAGE_NAME}/examples])
+fi
 AC_MSG_RESULT([])
-AC_MSG_RESULT([ To change installtion path, use:])
+AC_MSG_RESULT([ To change installation path, re-run:])
 AC_MSG_RESULT([    ./configure --prefix NEW-PATH])
 AC_MSG_RESULT([])

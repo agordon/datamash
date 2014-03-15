@@ -16,7 +16,6 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
-#include <assert.h>
 #include <ctype.h>
 #include <locale.h>
 #include <math.h>
@@ -27,7 +26,6 @@
 
 #include "error.h"
 #include "minmax.h"
-#include "quote.h"
 #include "system.h"
 #include "xalloc.h"
 
@@ -288,7 +286,7 @@ unique_value ( struct fieldop *op, bool case_sensitive )
     {
       const char *newstr = ptrs[i];
 
-      if ((case_sensitive && (strcmp(newstr, last_str)!=0))
+      if ((case_sensitive && (!STREQ(newstr, last_str)))
           ||
           (!case_sensitive && (strcasecmp(newstr, last_str)!=0)))
         {
@@ -321,7 +319,7 @@ count_unique_values ( struct fieldop *op, bool case_sensitive )
   /* Copy the following strings, if they are different from the previous one */
   while ( *cur_str != 0 )
     {
-      if ((case_sensitive && (strcmp(*cur_str, last_str)!=0))
+      if ((case_sensitive && (!STREQ(*cur_str, last_str)))
           ||
           (!case_sensitive && (strcasecmp(*cur_str, last_str)!=0)))
         {
@@ -476,8 +474,7 @@ reset_field_ops ()
 static void
 free_field_op (struct fieldop *op)
 {
-  if (op->values)
-      free (op->values);
+  free (op->values);
   op->num_values = 0 ;
   op->alloc_values = 0;
 
@@ -569,4 +566,3 @@ summarize_field_ops ()
   /* print end-of-line */
   print_line_separator ();
 }
-

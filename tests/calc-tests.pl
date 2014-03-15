@@ -222,7 +222,7 @@ my @Tests =
 	  {ERR=>"$prog: unrecognized option '--foobar'\n" .
                 "Try '$prog --help' for more information.\n"}],
   ['e12',  '-H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-	  {ERR=>"$prog: Not enough input fields (field 4 requested, input has only 3 fields)\n"}],
+	  {ERR=>"$prog: not enough input fields (field 4 requested, input has only 3 fields)\n"}],
   ['e13',  'sum 6' ,  {IN_PIPE=>$in_g3}, {EXIT=>1},
 	  {ERR=>"$prog: invalid numeric input in line 1 field 6: ''\n"}],
   ['e14',  '--header-in -t: sum 6' ,  {IN_PIPE=>$in_hdr2}, {EXIT=>1},

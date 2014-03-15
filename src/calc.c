@@ -17,7 +17,6 @@
 /* Written by Assaf Gordon */
 #include <config.h>
 
-#include <assert.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <locale.h>
@@ -30,10 +29,9 @@
 
 #include "closeout.h"
 #include "error.h"
+#include "lib/intprops.h"
 #include "linebuffer.h"
-#include "quote.h"
 #include "ignore-value.h"
-#include "inttostr.h"
 #define Version VERSION
 #include "version-etc.h"
 #include "xalloc.h"

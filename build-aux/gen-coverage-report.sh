@@ -35,4 +35,3 @@ echo ""
 echo "To accumulate more coverage information, run '$PROJECT' again,"
 echo "then, re-generate the coverage report by re-running $0"
 echo ""
-
