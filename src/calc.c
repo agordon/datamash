@@ -369,6 +369,24 @@ print_column_headers()
 }
 
 /*
+    Process the input header line
+*/
+static void
+process_input_header(FILE *stream)
+{
+  struct linebuffer lb;
+
+  initbuffer (&lb);
+  if (readlinebuffer_delim (&lb, stream, eolchar) != 0)
+    {
+      linebuffer_nullify (&lb);
+      build_input_line_headers(lb.buffer,lb.length,true);
+      line_number++;
+    }
+  freebuffer(&lb);
+}
+
+/*
     Process each line in the input.
 
     If the key fo the current line is different from the prevopis one,
@@ -386,6 +404,9 @@ process_file ()
   initbuffer (thisline);
   initbuffer (group_first_line);
 
+  if (input_header)
+    process_input_header(pipe_input);
+
   while (!feof (pipe_input))
     {
       bool new_group = false;
@@ -393,20 +414,19 @@ process_file ()
       if (readlinebuffer_delim (thisline, pipe_input, eolchar) == 0)
         break;
       linebuffer_nullify (thisline);
+
+      /* If asked to print the full-line, and the input doesn't have headers,
+         then count the number of fields in first input line.
+         NOTE: 'input_header' might be false if 'sort piping' was used with header,
+                 but in that case, line_number will be 1. */
+      if (line_number==0 && print_full_line && !input_header)
+        build_input_line_headers(thisline->buffer,thisline->length,false);
+
+      /* Print output header, only after reading the first line */
+      if (output_header && line_number==1)
+        print_column_headers();
+
       line_number++;
-
-      /* Process header, only after reading the first line,
-         in case we need to know either the column names or
-         the number of columns in the input. */
-      if ((input_header || output_header) && line_number==1)
-        {
-          build_input_line_headers(thisline->buffer,thisline->length,input_header);
-
-          if (output_header)
-            print_column_headers();
-          if (input_header)
-            continue; //this line does not contain numeric values, only headers.
-        }
 
       /* If no keys are given, the entire input is considered one group */
       if (num_group_colums)
@@ -473,7 +493,14 @@ open_input()
       bzero(cmd,sizeof(cmd));
 
       if (input_header)
-        strcat(cmd,"sed -u 1q;");
+        {
+          /* Set no-buffering, to ensure only the first line is consumed */
+          setbuf(stdin,NULL);
+          /* Read the header line from STDIN, and pass the rest of it to
+             the 'sort' child-process */
+          process_input_header(stdin);
+          input_header = false;
+        }
       strcat(cmd,"LC_ALL=C sort ");
       if (!case_sensitive)
         strcat(cmd,"-f ");
