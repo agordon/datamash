@@ -73,7 +73,7 @@ static size_t *group_columns = NULL;
 static size_t num_group_colums = 0;
 
 static bool pipe_through_sort = false;
-static FILE* pipe_input = NULL;
+static FILE* input_stream = NULL;
 
 enum
 {
@@ -405,13 +405,13 @@ process_file ()
   initbuffer (group_first_line);
 
   if (input_header)
-    process_input_header(pipe_input);
+    process_input_header(input_stream);
 
-  while (!feof (pipe_input))
+  while (!feof (input_stream))
     {
       bool new_group = false;
 
-      if (readlinebuffer_delim (thisline, pipe_input, eolchar) == 0)
+      if (readlinebuffer_delim (thisline, input_stream, eolchar) == 0)
         break;
       linebuffer_nullify (thisline);
 
@@ -522,13 +522,15 @@ open_input()
         fprintf(stderr,"sort cmd = '%s'\n", cmd);
 #endif
 
-      pipe_input = popen(cmd,"r");
-      if (pipe_input == NULL)
+      input_stream = popen(cmd,"r");
+      if (input_stream == NULL)
         error (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
     }
   else
     {
-      pipe_input = stdin;
+      /* without grouping, there's no need to sort */
+      input_stream = stdin;
+      pipe_through_sort = false;
     }
 }
 
@@ -537,13 +539,13 @@ close_input()
 {
   int i;
 
-  if (ferror (pipe_input))
+  if (ferror (input_stream))
     error (EXIT_FAILURE, 0, _("read error"));
 
   if (pipe_through_sort)
-    i = pclose(pipe_input);
+    i = pclose(input_stream);
   else
-    i = fclose(pipe_input);
+    i = fclose(input_stream);
 
   if (i != 0)
     error (EXIT_FAILURE, 0, _("read error (on close)"));
