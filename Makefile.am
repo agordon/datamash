@@ -25,6 +25,7 @@ EXTRA_DIST += \
       debian/compat \
       debian/calc.dirs \
       debian/source/format \
+      debian/watch \
       debian/copyright \
       debian/control \
       debian/rules \
