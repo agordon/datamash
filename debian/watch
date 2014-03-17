@@ -1,0 +1,3 @@
+version=3
+opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/calc-$1\.tar\.gz/ \
+  https://github.com/agordon/calc/tags .*/v?(\d\S*)\.tar\.gz
