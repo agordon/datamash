@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 =pod
-  Unit Tests for calc - perform simple calculation on input data
+  Unit Tests for compute - perform simple calculation on input data
   Copyright (C) 2013-2014 Assaf Gordon.
 
    This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,10 @@ use warnings;
 # as in the coreutils' autotools system.
 use Coreutils;
 use CuSkip;
-use CuTmpdir qw(calc);
+use CuTmpdir qw(compute);
 
 (my $program_name = $0) =~ s|.*/||;
-my $prog = 'calc';
+my $prog = 'compute';
 
 # TODO: add localization tests with "grouping"
 # Turn off localization of executable's output.

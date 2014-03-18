@@ -1,5 +1,5 @@
 #!/bin/sh
-#   Unit Tests for calc - perform simple calculation on input data
+#   Unit Tests for compute - perform simple calculation on input data
 #   Copyright (C) 2014 Assaf Gordon.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -69,51 +69,51 @@ A % 1 1,3
 B ( 2 2,4" > exp_sort_headers_full || framework_failure_ "failed to write exp_sort_headers_full"
 
 
-echo "$INFILE" | calc -g 1 unique 3 > out1 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -g 1 unique 3 > out1 || framework_failure_ "compute failed"
 compare_ out1 exp_no_sort_no_header || { warn_ "no-sort-no-header failed" ; fail=1 ; }
 
-echo "$INFILE" | calc -g 1 --header-in unique 3 > out2 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -g 1 --header-in unique 3 > out2 || framework_failure_ "compute failed"
 compare_ out2 exp_no_sort_in_header || { warn_ "no-sort-in-header failed" ; fail=1 ; }
 
-echo "$INFILE" | calc -g 1 --sort --header-in unique 3 > out3 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -g 1 --sort --header-in unique 3 > out3 || framework_failure_ "compute failed"
 compare_ out3 exp_sort_in_header || { warn_ "sort-in-header failed" ; fail=1 ; }
 
-echo "$INFILE" | calc -g 1 --headers unique 3 > out4 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -g 1 --headers unique 3 > out4 || framework_failure_ "compute failed"
 compare_ out4 exp_no_sort_headers || { warn_ "no-sort-headers failed" ; fail=1 ; }
 
-echo "$INFILE" | calc -g 1 --sort --headers unique 3 > out5 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -g 1 --sort --headers unique 3 > out5 || framework_failure_ "compute failed"
 compare_ out5 exp_sort_headers || { warn_ "sort-headers failed" ; fail=1 ; }
 
-echo "$INFILE" | calc -sH -g 1 unique 3 > out6 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -sH -g 1 unique 3 > out6 || framework_failure_ "compute failed"
 compare_ out5 out6 || { warn_ "sort-headers (short options) failed" ; fail=1 ; }
 
-echo "$INFILE" | sed 1d | calc --sort --header-out -g 1 unique 3 > out7 || framework_failure_ "calc failed"
+echo "$INFILE" | sed 1d | compute --sort --header-out -g 1 unique 3 > out7 || framework_failure_ "compute failed"
 compare_ out7 exp_sort_out_header || { warn_ "sort-header-out failed" ; fail=1 ; }
 
-echo "$INFILE" | sed 1d | calc --sort --full --header-out -g 1 unique 3 > out8 || framework_failure_ "calc failed"
+echo "$INFILE" | sed 1d | compute --sort --full --header-out -g 1 unique 3 > out8 || framework_failure_ "compute failed"
 compare_ out8 exp_sort_out_header_full || { warn_ "sort-header-out-full failed" ; fail=1 ; }
 
-echo "$INFILE" | calc -g 1 --sort --full --header-in unique 3 > out9 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -g 1 --sort --full --header-in unique 3 > out9 || framework_failure_ "compute failed"
 compare_ out9 exp_sort_in_header_full || { warn_ "sort-in-header-full failed" ; fail=1 ; }
 
-echo "$INFILE" | calc -g 1 --sort --full --headers unique 3 > out10 || framework_failure_ "calc failed"
+echo "$INFILE" | compute -g 1 --sort --full --headers unique 3 > out10 || framework_failure_ "compute failed"
 compare_ out10 exp_sort_headers_full || { warn_ "sort-headers-full failed" ; fail=1 ; }
 
 
 ## Check sort-piping with empty input - should always produce empty output
-printf "" | calc --sort unique 3 > emp1 || framework_failure_ "calc failed"
+printf "" | compute --sort unique 3 > emp1 || framework_failure_ "compute failed"
 test -s "emp1" && { warn_ "sort on empty file failed" ; fail=1; }
 
-printf "" | calc --sort --header-in unique 3 > emp2 || framework_failure_ "calc failed"
+printf "" | compute --sort --header-in unique 3 > emp2 || framework_failure_ "compute failed"
 test -s "emp2" && { warn_ "sort+header-in on empty file failed" ; fail=1; }
 
-printf "" | calc --sort --header-out unique 3 > emp3 || framework_failure_ "calc failed"
+printf "" | compute --sort --header-out unique 3 > emp3 || framework_failure_ "compute failed"
 test -s "emp3" && { warn_ "sort+header-out on empty file failed" ; fail=1; }
 
-printf "" | calc --sort --headers unique 3 > emp4 || framework_failure_ "calc failed"
+printf "" | compute --sort --headers unique 3 > emp4 || framework_failure_ "compute failed"
 test -s "emp4" && { warn_ "sort+headers on empty file failed" ; fail=1; }
 
-printf "" | calc --sort --full unique 3 > emp5 || framework_failure_ "calc failed"
+printf "" | compute --sort --full unique 3 > emp5 || framework_failure_ "compute failed"
 test -s "emp5" && { warn_ "sort+full on empty file failed" ; fail=1; }
 
 Exit $fail

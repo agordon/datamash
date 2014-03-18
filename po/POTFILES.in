@@ -6,7 +6,7 @@ lib/quotearg.c
 lib/version-etc.c
 lib/xalloc-die.c
 lib/xstrtol-error.c
-src/calc.c
+src/compute.c
 src/column-headers.c
 src/field-ops.c
 src/system.h

@@ -34,11 +34,11 @@ GROUPPARAM=$(seq 1000 2000 | paste -d "," -s -) ||
 
 ## The expected error message when the group parameter is too long
 ## to pass to the 'sort' pipe
-echo "calc: sort command too-long (please report this bug)" > exp_err1 ||
+echo "compute: sort command too-long (please report this bug)" > exp_err1 ||
 	framework_failure_ "failed to create exp_err1"
 
 ## The expected error message when 'sort' is not found
-printf 'sh: sort: not found\ncalc: read error (on close)' > exp_err2 ||
+printf 'sh: sort: not found\ncompute: read error (on close)' > exp_err2 ||
 	framework_failure_ "failed to create exp_err2"
 
 ##
@@ -50,9 +50,9 @@ printf "#!/foo/bar/bad/interpreter" > "$BADDIR1/sort" ||
 chmod a+x "$BADDIR1/sort" || framework_failure_ "failed to make bad-sort executable"
 ORIGPATH=$PATH
 
-## The directory where the "calc' executable is
-CALCDIR=$(dirname $(which calc))
-test -z "$CALCDIR" && framework_failure_ "failed to find calc's directory"
+## The directory where the "compute' executable is
+COMPUTEDIR=$(dirname $(which compute))
+test -z "$COMPUTEDIR" && framework_failure_ "failed to find compute's directory"
 
 ## Create a 'sort' which will crash
 BADDIR=$(mktemp -d badsort.XXXXX) || framework_failure_ "failed to create bad-sort-dir"
@@ -77,8 +77,8 @@ chmod a+x "$BADDIR/sort" || framework_failure_ "failed to make $BADDIR/sort exec
 ##
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-echo "" | calc --sort --group "$GROUPPARAM" sum 1 2>err1 &&
-	{ warn_ "calc --sort (group too-long) failed to detect error" ; fail=1 ; }
+echo "" | compute --sort --group "$GROUPPARAM" sum 1 2>err1 &&
+	{ warn_ "compute --sort (group too-long) failed to detect error" ; fail=1 ; }
 compare_ err1 exp_err1 || { warn_ "group-too-long error message is incorrect" ; fail=1 ; }
 
 ##
@@ -87,14 +87,14 @@ compare_ err1 exp_err1 || { warn_ "group-too-long error message is incorrect" ; 
 ##
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-seq 10 | PATH=$CALCDIR calc --sort -g 1 sum 1 &&
-	{ warn_ "calc --sort with non existing 'sort' did not fail (it should have failed)" ; fail=1 ; }
+seq 10 | PATH=$COMPUTEDIR compute --sort -g 1 sum 1 &&
+	{ warn_ "compute --sort with non existing 'sort' did not fail (it should have failed)" ; fail=1 ; }
 
 ##
 ## Test with a 'sort' that crashes
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-seq 10 | PATH=$BADDIR:$CALCDIR calc --sort -g 1 sum 1 &&
-	{ warn_ "calc --sort with crashing 'sort' did not fail (it should have failed)" ; fail=1 ; }
+seq 10 | PATH=$BADDIR:$COMPUTEDIR compute --sort -g 1 sum 1 &&
+	{ warn_ "compute --sort with crashing 'sort' did not fail (it should have failed)" ; fail=1 ; }
 
 Exit $fail

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#   Unit Tests for calc - perform simple calculation on input data
+#   Unit Tests for compute - perform simple calculation on input data
 #   Copyright (C) 2014 Assaf Gordon.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -33,35 +33,35 @@ if which ldd >/dev/null ; then
   ## we can valgrind without false-positives.
   ## This is relevant for Mac OS X, where static binaries are discouraged and
   ## difficult to create (https://developer.apple.com/library/mac/qa/qa1118/_index.html)
-  ldd $(which calc) >/dev/null 2>/dev/null ||
-    skip_ "skipping valgrind test for a non-dynamic-binary calc"
+  ldd $(which compute) >/dev/null 2>/dev/null ||
+    skip_ "skipping valgrind test for a non-dynamic-binary compute"
 fi
 
 fail=0
 
 seq 10000 | valgrind --track-origins=yes  --show-reachable=yes \
                      --leak-check=full  --error-exitcode=1 \
-                 calc unique 1 > /dev/null || { warn_ "unique 1 - failed" ; fail=1 ; }
+                 compute unique 1 > /dev/null || { warn_ "unique 1 - failed" ; fail=1 ; }
 
 seq 10000 | sed 's/^/group /' |
      valgrind --track-origins=yes  --leak-check=full \
               --show-reachable=yes  --error-exitcode=1 \
-                 calc -g 1 unique 1 > /dev/null || { warn_ "-g 1 unique 1 - failed" ; fail=1 ; }
+                 compute -g 1 unique 1 > /dev/null || { warn_ "-g 1 unique 1 - failed" ; fail=1 ; }
 
 seq 10000 | valgrind --track-origins=yes  --leak-check=full \
                      --show-reachable=yes  --error-exitcode=1 \
-                 calc countunique 1 > /dev/null || { warn_ "countunique 1 - failed" ; fail=1 ; }
+                 compute countunique 1 > /dev/null || { warn_ "countunique 1 - failed" ; fail=1 ; }
 
 seq 10000 | valgrind --track-origins=yes  --leak-check=full  \
                      --show-reachable=yes  --error-exitcode=1 \
-                 calc collapse 1 > /dev/null || { warn_ "collapse 1 - failed" ; fail=1 ; }
+                 compute collapse 1 > /dev/null || { warn_ "collapse 1 - failed" ; fail=1 ; }
 
 (echo "values" ; seq 10000 ) | valgrind --track-origins=yes  --leak-check=full \
                                         --show-reachable=yes  --error-exitcode=1 \
-                 calc -H countunique 1 > /dev/null || { warn_ "-H collapse 1 - failed" ; fail=1 ; }
+                 compute -H countunique 1 > /dev/null || { warn_ "-H collapse 1 - failed" ; fail=1 ; }
 
 (echo "values" ; seq 10000 ) | valgrind --track-origins=yes  --leak-check=full \
                                         --show-reachable=yes  --error-exitcode=1 \
-                 calc -g 1 -H countunique 1 > /dev/null || { warn_ "-g 1 -H collapse 1 - failed" ; fail=1 ; }
+                 compute -g 1 -H countunique 1 > /dev/null || { warn_ "-g 1 -H collapse 1 - failed" ; fail=1 ; }
 
 Exit $fail

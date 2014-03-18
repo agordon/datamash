@@ -11,7 +11,7 @@ fi
 
 (cat refGene.txt |
 		sort -k13,13 |
-		../src/calc -g 13 countunique 3 countunique 4 |
+		../compute -g 13 countunique 3 countunique 4 |
 		awk '$2>1 || $3>1' | sort -R | head -n 100 | cut -f1 -d " " ;
 	   cut -f13 refGene.txt | sort -R -u | head -n 1000 ) |
 		 sort -u > genelist.txt

@@ -1,8 +1,8 @@
-# Calc  [![Build Status](https://travis-ci.org/agordon/calc.png?branch=master)](https://travis-ci.org/agordon/calc)
+# Compute  [![Build Status](https://travis-ci.org/agordon/compute.png?branch=master)](https://travis-ci.org/agordon/compute)
 
 Command-line Calculations based on input fields.
 
-Website: <http://agordon.github.io/calc/>
+Website: <http://agordon.github.io/compute/>
 
 
 
@@ -10,7 +10,7 @@ Website: <http://agordon.github.io/calc/>
 
 What's the sum and mean of the values in field 1 ?
 
-    $ seq 10 | calc sum 1 mean 1
+    $ seq 10 | compute sum 1 mean 1
     55 5.5
 
 Given a file with three columns (Name, College Major, Score),
@@ -27,7 +27,7 @@ what is the average, grouped by college major?
 
     # Sort input and group by column 2, calculate average on column 3:
 
-    $ calc --sort --group 2  mean 3 < scores.txt
+    $ compute --sort --group 2  mean 3 < scores.txt
     Arts             68.9474
     Business         87.3636
     Health-Medicine  90.6154
@@ -35,18 +35,18 @@ what is the average, grouped by college major?
     Life-Sciences    55.3333
     Engineering      66.5385
 
-More Examples: <http://agordon.github.io/calc/examples.html>
+More Examples: <http://agordon.github.io/compute/examples.html>
 
 
 ## Usage Information
 
-See <http://agordon.github.io/calc/manual.html>
+See <http://agordon.github.io/compute/manual.html>
 
 
 ## Download and Installation
 
 Precompiled binaries and installation instructions:
-<http://agordon.github.io/calc/download.html>
+<http://agordon.github.io/compute/download.html>
 
 
 

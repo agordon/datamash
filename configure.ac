@@ -8,10 +8,10 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT([calc],
+AC_INIT([compute],
         [m4_esyscmd([build-aux/git-version-gen .tarball-version])],
 	[assafgordon@gmail.com], [],
-	[http://agordon.github.io/calc/])
+	[http://agordon.github.io/compute/])
 
 dnl Must come before AM_INIT_AUTOMAKE.
 AC_CONFIG_AUX_DIR([build-aux])
@@ -26,7 +26,7 @@ AC_PREREQ(2.62)
 
 # Where to generate output; srcdir location.
 AC_CONFIG_HEADERS([config.h:config.in])dnl Keep filename to 8.3 for MS-DOS.
-AC_CONFIG_SRCDIR([src/calc.c])
+AC_CONFIG_SRCDIR([src/compute.c])
 
 dnl Checks for programs.
 # We need a C compiler.
@@ -52,7 +52,7 @@ else
   HELP2MAN=:
 fi
 
-# Add extra compilation warnings. These will only apply to calc.c not to any
+# Add extra compilation warnings. These will only apply to compute.c not to any
 # gnulib modules). See $(WARN_CFLAGS) in src/Makefile.am .
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wextra])

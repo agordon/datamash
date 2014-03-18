@@ -19,24 +19,24 @@ EXTRA_DIST = \
         build-aux/gen-coverage-report.sh \
 	build-aux/git-log-fix \
 	m4/gnulib-cache.m4 \
-	man/calc.x
+	man/compute.x
 
 SUBDIRS = po
 
 ##
 ## Main Program
 ##
-bin_PROGRAMS = calc
+bin_PROGRAMS = compute
 
-calc_SOURCES = src/system.h \
+compute_SOURCES = src/system.h \
 	       src/text-options.c src/text-options.h \
 	       src/utils.c src/utils.h \
 	       src/text-lines.c src/text-lines.h \
 	       src/column-headers.c src/column-headers.h \
 	       src/field-ops.c src/field-ops.h \
-	       src/calc.c
+	       src/compute.c
 
-calc_LDADD = \
+compute_LDADD = \
        $(top_builddir)/lib/lib$(PACKAGE).a \
        $(FABSL_LIBM) \
        $(FABS_LIBM) \
@@ -59,12 +59,12 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 ## Man Page
 ##
 
-man_MANS = calc.1
+man_MANS = compute.1
 EXTRA_DIST += $(man_MANS)
 CLEANFILES = $(man_MANS)
 
-calc.1: calc
-	$(HELP2MAN) --include=$(top_srcdir)/man/calc.x $(top_builddir)/calc -o $@-t
+compute.1: compute
+	$(HELP2MAN) --include=$(top_srcdir)/man/compute.x $(top_builddir)/compute -o $@-t
 	chmod a=r $@-t
 	mv -f $@-t $@
 
@@ -72,11 +72,11 @@ calc.1: calc
 ## Tests
 ##
 TESTS = \
-	tests/calc-show-env.sh \
-	tests/calc-tests.pl \
-	tests/calc-sort-header.sh \
-	tests/calc-sort-errors.sh \
-	tests/calc-valgrind.sh
+	tests/compute-show-env.sh \
+	tests/compute-tests.pl \
+	tests/compute-sort-header.sh \
+	tests/compute-sort-errors.sh \
+	tests/compute-valgrind.sh
 
 EXTRA_DIST += \
 	tests/Coreutils.pm \
@@ -89,9 +89,9 @@ TESTS_ENVIRONMENT = \
   top_srcdir=$(abs_top_srcdir) \
   PERL5LIB='$(abs_top_srcdir)/tests$(PATH_SEPARATOR)'"$$PERL5LIB" \
   PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
-  CALC=`echo calc | sed '$(transform)'` \
+  COMPUTE=`echo compute | sed '$(transform)'` \
   test_dir='$(abs_top_srcdir)/tests' ; \
-  export top_srcdir PERL5LIB PATH CALC test_dir ;
+  export top_srcdir PERL5LIB PATH COMPUTE test_dir ;
 
 ##
 ## For 'make syntax-check'
@@ -106,7 +106,7 @@ EXTRA_DIST += \
 ##
 
 ## These example files will be installed in the "{prefix}/share/APPNAME/examples"
-## directory (default "/usr/local/share/calc/examples")
+## directory (default "/usr/local/share/compute/examples")
 examplesdir = $(pkgdatadir)/examples
 
 dist_examples_DATA = examples/readme.md \
