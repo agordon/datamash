@@ -13,7 +13,7 @@ die()
 
 cd $(dirname "$0")/.. || die "failed to set directory"
 
-CALCVER=$(./build-aux/git-version-gen .tarball-version) || die "can't get calc version"
+COMPUTEVER=$(./build-aux/git-version-gen .tarball-version) || die "can't get compute version"
 
 KERNEL=$(uname -s)   # Linux,FreeBSD,Darwin
 RELEASE=$(uname -r)  # 2.6.30, 10-RELEASE, 10.2.8
@@ -31,15 +31,15 @@ STATICFLAG=
 make clean
 make || die "make failed"
 
-SRC=./calc
+SRC=./compute
 [ -e "$SRC" ] || die "Expected program file '$SRC' not found"
 
 DATE=$(date -u +"%F-%H%M%S")
 
-NAME="calc-${CALCVER}-bin__${KERNEL}__${MACHINE}"
+NAME="compute-${COMPUTEVER}-bin__${KERNEL}__${MACHINE}"
 mkdir -p "bin/$NAME" || die "failed to create 'bin/$NAME' directory"
 
-cp "$SRC" "bin/$NAME/calc" || die "failed to create destination binary (bin/$NAME/calc)"
+cp "$SRC" "bin/$NAME/compute" || die "failed to create destination binary (bin/$NAME/compute)"
 
 cd "bin" || die
 tar -czvf "$NAME.tar.gz" "$NAME" || die "failed to create TarBall for binary executable"

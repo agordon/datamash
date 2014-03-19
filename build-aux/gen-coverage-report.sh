@@ -17,7 +17,7 @@ GCDAFILES=$(find -name "*.gcda") || die "failed to search for *.gcda files"
 GCNOFILES=$(find -name "*.gcno") || die "failed to search for *.gcno files"
 [ -z "$GCDAFILES" -o -z "$GCNOFILES" ] && die "No coverage files found (*.gcda/*.gcno) - did you rebuild with coverage instrumentation? try ./build-aux/rebuild-coverage.sh"
 
-PROJECT=calc
+PROJECT=compute
 LCOVFILE="$PROJECT.lcov"
 REPORTDIR="$PROJECT-cov"
 
