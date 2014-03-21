@@ -47,3 +47,6 @@ cd ".."
 
 echo "Done. File ="
 echo "   ./bin/$NAME.tar.gz"
+echo "Upload to AWS S3:"
+echo "   ./build-aux/aws-upload.sh ./bin/$NAME.tar.gz bin"
+echo
