@@ -171,6 +171,7 @@ include $(top_srcdir)/lib/local.mk
 ##
 
 dist-hook: gen-ChangeLog
+	$(AM_V_GEN)echo $(VERSION) > $(distdir)/.tarball-version
 
 gen_start_date = 2011-12-17
 .PHONY: gen-ChangeLog
