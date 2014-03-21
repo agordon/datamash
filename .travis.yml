@@ -5,7 +5,7 @@ compiler:
   - clang
   - gcc
 before_install:
-  - sudo apt-get install help2man valgrind gperf lcov gettext autopoint dpkg-dev
+  - sudo apt-get install valgrind gperf lcov gettext autopoint dpkg-dev
   - which automake
   - automake --version
   - which autoconf

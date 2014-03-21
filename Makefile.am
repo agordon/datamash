@@ -18,8 +18,7 @@ EXTRA_DIST = \
         build-aux/rebuild-coverage.sh \
         build-aux/gen-coverage-report.sh \
 	build-aux/git-log-fix \
-	m4/gnulib-cache.m4 \
-	man/compute.x
+	m4/gnulib-cache.m4
 
 SUBDIRS = po
 
@@ -60,12 +59,16 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 ##
 
 man_MANS = compute.1
-EXTRA_DIST += $(man_MANS)
+EXTRA_DIST += $(man_MANS) \
+		man/compute.x \
+		man/help2man
+
 CLEANFILES = $(man_MANS)
 
 compute.1: compute
-	$(HELP2MAN) --include=$(top_srcdir)/man/compute.x $(top_builddir)/compute -o $@-t
-	chmod a=r $@-t
+	PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
+	   $(abs_top_srcdir)/man/help2man --include=$(top_srcdir)/man/compute.x compute -o $@-t
+	chmod u=rw,go=r $@-t
 	mv -f $@-t $@
 
 ##
