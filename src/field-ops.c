@@ -169,7 +169,6 @@ bool
 field_op_collect (struct fieldop *op,
                   const char* str, size_t slen)
 {
-  bool keep_line = false;
   char *endptr=NULL;
   long double num_value = 0;
 
@@ -200,18 +199,15 @@ field_op_collect (struct fieldop *op,
     case OP_SUM:
     case OP_MEAN:
       op->value += num_value;
-      keep_line = op->first;
       break;
 
     case OP_COUNT:
       op->value++;
-      keep_line = op->first;
       break;
 
     case OP_MIN:
       if (num_value < op->value)
         {
-          keep_line = true;
           op->value = num_value;
         }
       break;
@@ -219,7 +215,6 @@ field_op_collect (struct fieldop *op,
     case OP_MAX:
       if (num_value > op->value)
         {
-          keep_line = true;
           op->value = num_value;
         }
       break;
@@ -227,7 +222,6 @@ field_op_collect (struct fieldop *op,
     case OP_ABSMIN:
       if (fabsl(num_value) < fabsl(op->value))
         {
-          keep_line = true;
           op->value = num_value;
         }
       break;
@@ -235,7 +229,6 @@ field_op_collect (struct fieldop *op,
     case OP_ABSMAX:
       if (fabsl(num_value) > fabsl(op->value))
         {
-          keep_line = true;
           op->value = num_value;
         }
       break;
