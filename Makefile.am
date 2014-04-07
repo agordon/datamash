@@ -37,6 +37,7 @@ compute_SOURCES = src/system.h \
 	       src/field-ops.c src/field-ops.h \
 	       src/compute.c
 
+compute_CFLAGS = $(WARN_CFLAGS)
 compute_LDADD = \
        $(top_builddir)/lib/lib$(PACKAGE).a \
        $(FABSL_LIBM) \

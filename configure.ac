@@ -42,7 +42,7 @@ gl_EARLY
 gl_INIT
 
 # Add extra compilation warnings. These will only apply to compute.c not to any
-# gnulib modules). See $(WARN_CFLAGS) in src/Makefile.am .
+# gnulib modules). See $(WARN_CFLAGS) in Makefile.am
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wextra])
 gl_WARN_ADD([-Wformat-security])
@@ -50,7 +50,7 @@ gl_WARN_ADD([-Wswitch-enum])
 gl_WARN_ADD([-Wswitch-default])
 gl_WARN_ADD([-Wformat-nonliteral])
 gl_WARN_ADD([-Wunused-parameter])
-gl_WARN_ADD([-Werror])
+gl_WARN_ADD([-Wfloat-equal])
 
 # Add Debian-specific Hardening flags
 # See:  https://wiki.debian.org/HardeningWalkthrough
@@ -102,7 +102,8 @@ dnl
 AC_MSG_RESULT([])
 AC_MSG_RESULT([ Configuration summary for $PACKAGE])
 AC_MSG_RESULT([    version:  $VERSION])
-AC_MSG_RESULT([    CFLAGS:   $CFLAGS])
+AC_MSG_RESULT([    COMPILER: $CC])
+AC_MSG_RESULT([    CFLAGS:   $CFLAGS $WARN_CFLAGS])
 AC_MSG_RESULT([    CPPFLAGS: $CPPFLAGS])
 AC_MSG_RESULT([    LDFLAGS:  $LDFLAGS])
 AC_MSG_RESULT([])
