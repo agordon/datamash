@@ -215,25 +215,6 @@ Which is equivalent to:\n\
   exit (status);
 }
 
-inline static long double
-safe_strtold ( const char *str, size_t len, size_t field )
-{
-  char *endptr=NULL;
-
-  errno = 0;
-  long double val = strtold (str, &endptr);
-  if (errno==ERANGE || endptr==str)
-    {
-      char *tmp = strdup(str);
-      tmp[len] = 0 ;
-      /* TODO: make invalid input error or warning or silent */
-      error (EXIT_FAILURE, 0,
-          _("invalid numeric input in line %zu field %zu: '%s'"),
-          line_number, field, tmp);
-    }
-  return val;
-}
-
 /* returns TRUE if the lines are different, false if identical.
  * comparison is based on the specified keys */
 /* copied from coreutils's src/uniq.c (in the key-spec branch) */
@@ -271,7 +252,6 @@ different (const struct linebuffer* l1, const struct linebuffer* l2)
 static void
 process_line (const struct linebuffer *line)
 {
-  long double val=0;
   const char *str;
   size_t len;
 
@@ -287,10 +267,15 @@ process_line (const struct linebuffer *line)
           fprintf(stderr,"'\n");
         }
 #endif
-      if (op->numeric)
-        val = safe_strtold ( str, len, op->field );
-
-      field_op_collect (op, str, len, val);
+      if (!field_op_collect (op, str, len))
+        {
+          char *tmp = xmalloc(len+1);
+          memcpy(tmp,str,len);
+          tmp[len] = 0 ;
+          error (EXIT_FAILURE, 0,
+              _("invalid numeric input in line %zu field %zu: '%s'"),
+              line_number, op->field, tmp);
+        }
 
       op = op->next;
     }

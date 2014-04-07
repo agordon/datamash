@@ -164,18 +164,14 @@ new_field_op (enum operation oper, size_t field)
     field_ops = op;
 }
 
-/* Add a value (from input) to the current field operation.
-   If the operation is numeric, num_value should be used.
-   If the operation is textual, str +slen should be used
-     (str is not guarenteed to be null terminated).
-
-   Return value (boolean, keep_line) isn't used at the moment. */
+/* Add a value (from input) to the current field operation. */
 bool
 field_op_collect (struct fieldop *op,
-                  const char* str, size_t slen,
-                  const long double num_value)
+                  const char* str, size_t slen)
 {
   bool keep_line = false;
+  char *endptr=NULL;
+  long double num_value = 0;
 
 #ifdef ENABLE_DEBUG
   if (debug)
@@ -188,7 +184,15 @@ field_op_collect (struct fieldop *op,
 
   op->count++;
 
-  if (op->first && op->auto_first)
+  if (op->numeric)
+    {
+      errno = 0;
+      num_value = strtold (str, &endptr);
+      if (errno==ERANGE || endptr==str)
+        return false;
+    }
+
+  if (op->first && op->auto_first && op->numeric)
       op->value = num_value;
 
   switch (op->op)
@@ -260,7 +264,7 @@ field_op_collect (struct fieldop *op,
   if (op->first)
     op->first = false;
 
-  return keep_line;
+  return true;
 }
 
 /* Returns a nul-terimated string, composed of the unique values

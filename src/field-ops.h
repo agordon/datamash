@@ -124,14 +124,14 @@ void field_op_sort_values (struct fieldop *op);
 void new_field_op (enum operation oper, size_t field);
 
 /* Add a value (from input) to the current field operation.
-   If the operation is numeric, num_value should be used.
-   If the operation is textual, str +slen should be used
-     (str is not guarenteed to be null terminated).
+   'str' does not need to be null-terminated.
 
-   Return value (boolean, keep_line) isn't used at the moment. */
+  Returns true if the operation was successful.
+  Returns false if the input was invalid numeric value.
+*/
 bool field_op_collect (struct fieldop *op,
-                  const char* str, size_t slen,
-                  const long double num_value);
+                  const char* str, size_t slen);
+
 
 /* Returns a nul-terimated string, composed of the unique values
    of the input strings. The return string must be free()'d. */
