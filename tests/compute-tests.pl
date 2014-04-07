@@ -172,6 +172,16 @@ B 3a
 B 4
 EOF
 
+my $in_precision1=<<'EOF';
+0.3
+3e10
+EOF
+
+my $in_precision2=<<'EOF';
+0.3
+3e14
+EOF
+
 
 my @Tests =
 (
@@ -403,6 +413,19 @@ my @Tests =
   ['ver1', '--version',     {IN_PIPE=>""},  {OUT => ""},
 	  {OUT_SUBST=>'s/^.*//gms'}],
 
+  # Test output precision (number of digits) for numerical operations.
+  # The current precision is 14 digits (hard-coded).
+  ['prcs1', 'sum 1', {IN_PIPE=>"1e1"},  {OUT => "10\n"}],
+  ['prcs2', 'sum 1', {IN_PIPE=>"1e7"},  {OUT => "10000000\n"}],
+  ['prcs3', 'sum 1', {IN_PIPE=>"1e9"},  {OUT => "1000000000\n"}],
+  ['prcs4', 'sum 1', {IN_PIPE=>"1.8e12"},  {OUT => "1800000000000\n"}],
+  ['prcs5', 'sum 1', {IN_PIPE=>"1.234e13"},  {OUT => "12340000000000\n"}],
+  ['prcs6', 'sum 1', {IN_PIPE=>"1.234e14"},  {OUT => "1.234e+14\n"}],
+  ['prcs7', 'sum 1', {IN_PIPE=>"-1.8e12"},  {OUT => "-1800000000000\n"}],
+  ['prcs8', 'sum 1', {IN_PIPE=>"-1.234e13"},  {OUT => "-12340000000000\n"}],
+  ['prcs9', 'sum 1', {IN_PIPE=>"-1.234e14"},  {OUT => "-1.234e+14\n"}],
+  ['prcs10', 'sum 1', {IN_PIPE=>$in_precision1},  {OUT => "30000000000.3\n"}],
+  ['prcs11', 'sum 1', {IN_PIPE=>$in_precision2},  {OUT => "3e+14\n"}],
 
 );
 

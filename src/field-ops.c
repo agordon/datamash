@@ -33,6 +33,9 @@
 #include "text-options.h"
 #include "field-ops.h"
 
+int field_op_output_precision = 14 ; /* In the future: allow users to
+					change this */
+
 struct operation_data operations[] =
 {
   {"count",   STRING_SCALAR,  IGNORE_FIRST},   /* OP_COUNT */
@@ -439,7 +442,7 @@ field_op_summarize (struct fieldop *op)
 #endif
 
   if (print_numeric_result)
-    printf ("%Lg", numeric_result);
+    printf ("%.*Lg", field_op_output_precision, numeric_result);
   else
     printf ("%s", string_result);
 

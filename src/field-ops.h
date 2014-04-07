@@ -152,4 +152,7 @@ enum operation get_operation (const char* op);
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
 void parse_operations (int argc, int start, char **argv);
 
+/* Output precision, to be used with "printf("%.*Lg",)" */
+extern int field_op_output_precision;
+
 #endif
