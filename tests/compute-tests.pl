@@ -164,6 +164,14 @@ EOF
 ## NUL as end-of-line character
 my $in_nul1="A 1\x00A 2\x00B 3\x00B 4\x00";
 
+## Invalid numeric input
+my $in_invalid_num1=<<'EOF';
+A 1
+A 2
+B 3a
+B 4
+EOF
+
 
 my @Tests =
 (
@@ -229,6 +237,8 @@ my @Tests =
 	  {ERR=>"$prog: invalid numeric input in line 2 field 6: ''\n"}],
   ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
 	  {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
+  ['e16',  'sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
+	  {ERR=>"$prog: invalid numeric input in line 3 field 2: '3a'\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],

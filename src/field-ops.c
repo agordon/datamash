@@ -187,7 +187,7 @@ field_op_collect (struct fieldop *op,
     {
       errno = 0;
       num_value = strtold (str, &endptr);
-      if (errno==ERANGE || endptr==str)
+      if (errno==ERANGE || endptr==str || endptr!=(str+slen))
         return false;
     }
 
