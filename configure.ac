@@ -110,7 +110,11 @@ AC_MSG_RESULT([])
 AC_MSG_RESULT([ Default installation directories:])
 AC_MSG_RESULT([    program:  ${prefix}/bin/ ])
 dnl The default 'datarootdir' is unexpanded, still contains
-dnl '${prefix}/share' (not the single quotes)
+dnl '${prefix}/share' (note the single quotes in the second parameter).
+dnl If it is unexpanded, it means "./configure" will put the default value
+dnl in the resulting 'Makefile'.
+dnl If it is expanded, it means the user called "./configure" with a custom
+dnl "--prefix" parameter.
 if test "x$datarootdir" = 'x${prefix}/share' ; then
 AC_MSG_RESULT([    examples: ${prefix}/share/${PACKAGE_NAME}/examples])
 else
