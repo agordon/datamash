@@ -145,9 +145,46 @@ long double skewness_value ( const long double * const values, size_t n, int df 
 
   skewness = moment3 / powl(moment2,3.0/2.0);
   if ( df == DF_SAMPLE )
+    {
       skewness = ( sqrt(n*(n-1)) / (n-2) ) * skewness;
+    }
 
   return skewness;
+}
+
+/*
+ Given an array of doubles, return the excess kurtosis
+ 'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
+ */
+long double excess_kurtosis_value ( const long double * const values, size_t n, int df )
+{
+  long double moment2=0;
+  long double moment4=0;
+  long double mean;
+  long double excess_kurtosis;
+
+  mean = arithmetic_mean_value(values, n);
+
+  for (size_t i = 0; i < n; i++)
+    {
+      const long double t = (values[i] - mean);
+      moment2 += t*t;
+      moment4 += t*t*t*t;
+    }
+  moment2 /= n;
+  moment4 /= n;
+
+  excess_kurtosis = moment4 / (moment2*moment2) - 3;
+
+  if ( df == DF_SAMPLE )
+    {
+      if (n<=3)
+        return nanl("");
+      excess_kurtosis = ( ((long double)n-1) / (((long double)n-2)*((long double)n-3)) ) *
+                        ( (n+1)*excess_kurtosis + 6 ) ;
+    }
+
+  return excess_kurtosis;
 }
 
 

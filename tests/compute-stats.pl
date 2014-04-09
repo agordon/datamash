@@ -158,6 +158,16 @@ The compute tests below should return the same results are thes R commands:
     skewness(seq21)
     smp.skewness(seq21)
 
+    pop.excess_kurtosis=function(x) { kurtosis(x)-3 }
+    smp.excess_kurtosis=function(x) {
+          n=length(x)
+          ( (n-1) / ( (n-2)*(n-3) ) ) *
+             ( (n+1) * pop.excess_kurtosis(x) + 6 )
+     }
+    test(pop.excess_kurtosis)
+    test(smp.excess_kurtosis)
+
+
 =cut
 
 
@@ -303,6 +313,24 @@ my @Tests =
   ['sskew_8', 'sskew 1' ,  {IN_PIPE=>$seq20},   {OUT => "-0.207\n"}],
   ['pskew_9', 'pskew 1' ,  {IN_PIPE=>$seq21},   {OUT => "1.193\n"}],
   ['sskew_9', 'sskew 1' ,  {IN_PIPE=>$seq21},   {OUT => "1.212\n"}],
+
+  # Test Popluation Excess Kurtosis
+  ['pkurt_1', 'pkurt 1' ,  {IN_PIPE=>$seq1},   {OUT => "-1.36\n"}],
+  ['pkurt_2', 'pkurt 1' ,  {IN_PIPE=>$seq2},   {OUT => "-1.5\n"}],
+  ['pkurt_3', 'pkurt 1' ,  {IN_PIPE=>$seq3},   {OUT => "-nan\n"}],
+  ['pkurt_4', 'pkurt 1' ,  {IN_PIPE=>$seq9},   {OUT => "-1.273\n"}],
+  ['pkurt_5', 'pkurt 1' ,  {IN_PIPE=>$seq10},  {OUT => "-0.987\n"}],
+  ['pkurt_6', 'pkurt 1' ,  {IN_PIPE=>$seq11},  {OUT => "-1.169\n"}],
+  ['pkurt_7', 'pkurt 1' ,  {IN_PIPE=>$seq12},  {OUT => "-1.098\n"}],
+
+  # Test Sample Excess Kurtosis
+  ['skurt_1', 'skurt 1' ,  {IN_PIPE=>$seq1},   {OUT => "-1.2\n"}],
+  ['skurt_2', 'skurt 1' ,  {IN_PIPE=>$seq2},   {OUT => "nan\n"}],
+  ['skurt_3', 'skurt 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['skurt_4', 'skurt 1' ,  {IN_PIPE=>$seq9},   {OUT => "-1.283\n"}],
+  ['skurt_5', 'skurt 1' ,  {IN_PIPE=>$seq10},  {OUT => "-0.781\n"}],
+  ['skurt_6', 'skurt 1' ,  {IN_PIPE=>$seq11},  {OUT => "-1.116\n"}],
+  ['skurt_7', 'skurt 1' ,  {IN_PIPE=>$seq12},  {OUT => "-1.012\n"}],
 
 );
 

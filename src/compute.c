@@ -149,6 +149,8 @@ Numeric operations:\n\
   madraw     print the MEdian Absolute Debiation, unscaled\n\
   sskew      print the skewness of the (sample) group\n\
   pskew      print the skewness of the (population) group\n\
+  skurt      print the Excess Kurtosis of the (sample) group\n\
+  pkurt      print the Excess Kurtosis of the (population) group\n\
 \n\
 String operations:\n\
   unique      print comma-separated sorted list of unique values\n\
