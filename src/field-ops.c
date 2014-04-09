@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "error.h"
 #include "minmax.h"
@@ -46,6 +47,7 @@ struct operation_data operations[] =
   {"absmax",  NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_ABSMAX */
   {"first",   STRING_SCALAR,   IGNORE_FIRST},   /* OP_FIRST */
   {"last",    STRING_SCALAR,   IGNORE_FIRST},   /* OP_LAST */
+  {"rand",    STRING_SCALAR,   IGNORE_FIRST},   /* OP_RAND */
   {"mean",    NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_MEAN */
   {"median",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MEDIAN */
   {"pstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PSTDEV */
@@ -265,6 +267,16 @@ field_op_collect (struct fieldop *op,
       field_op_replace_string(op, str, slen);
       break;
 
+    case OP_RAND:
+      {
+        /* Reservoir sampling,
+           With a simpler case were "k=1" */
+        unsigned long i = random()%op->count;
+        if (op->first || i==0)
+          field_op_replace_string(op, str, slen);
+      }
+      break;
+
     case OP_MEDIAN:
     case OP_PSTDEV:
     case OP_SSTDEV:
@@ -412,6 +424,7 @@ field_op_summarize (struct fieldop *op)
 
     case OP_FIRST:
     case OP_LAST:
+    case OP_RAND:
       /* Only one string is returned in the buffer, return it */
       print_numeric_result = false;
       string_result = xstrdup(op->str_buf);
@@ -601,4 +614,29 @@ summarize_field_ops ()
 
   /* print end-of-line */
   print_line_separator ();
+}
+
+/* long mix function, from:
+   Robert Jenkins' 96 bit Mix Function
+   http://burtleburtle.net/bob/hash/doobs.html */
+static unsigned long
+mix(unsigned long a, unsigned long b, unsigned long c)
+{
+    a=a-b;  a=a-c;  a=a^(c >> 13);
+    b=b-c;  b=b-a;  b=b^(a << 8);
+    c=c-a;  c=c-b;  c=c^(b >> 13);
+    a=a-b;  a=a-c;  a=a^(c >> 12);
+    b=b-c;  b=b-a;  b=b^(a << 16);
+    c=c-a;  c=c-b;  c=c^(b >> 5);
+    a=a-b;  a=a-c;  a=a^(c >> 3);
+    b=b-c;  b=b-a;  b=b^(a << 10);
+    c=c-a;  c=c-b;  c=c^(b >> 15);
+    return c;
+}
+
+void
+init_random()
+{
+  unsigned long seed = mix(clock(), time(NULL), getpid());
+  srandom(seed);
 }

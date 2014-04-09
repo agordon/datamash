@@ -32,6 +32,7 @@ enum operation
   OP_ABSMAX,
   OP_FIRST,
   OP_LAST,
+  OP_RAND,
   OP_MEAN,
   OP_MEDIAN,
   OP_PSTDEV,    /* Population Standard Deviation */
@@ -156,5 +157,8 @@ void parse_operations (int argc, int start, char **argv);
 
 /* Output precision, to be used with "printf("%.*Lg",)" */
 extern int field_op_output_precision;
+
+/* Initialize random number source */
+void init_random();
 
 #endif

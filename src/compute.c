@@ -132,6 +132,7 @@ Numeric operations:\n\
   absmax     print the maximum of abs(values)\n\
   first      print the first value of the group\n\
   last       print the last value of the group\n\
+  rand       print one random value from the group\n\
   mean       print the mean of the values\n\
   median     print the median value\n\
   mode       print the mode value (most common value)\n\
@@ -622,6 +623,7 @@ int main(int argc, char* argv[])
   textdomain (PACKAGE);
 
   init_blank_table();
+  init_random();
 
   atexit (close_stdout);
 

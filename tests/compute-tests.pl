@@ -237,6 +237,10 @@ my @Tests =
   ['b19', 'countunique 1', {IN_PIPE=>$in1}, {OUT => "10\n"}],
   ['b20', 'first 1',    {IN_PIPE=>$in1},  {OUT => "1\n"}],
   ['b21', 'last 1',     {IN_PIPE=>$in1},  {OUT => "10\n"}],
+  # This test just ensures the 'rand' operation is functioning.
+  # It does not verify randomness (see compute-rand.sh test for that).
+  ['b22', 'rand 1',     {IN_PIPE=>$in1},  {OUT => "\n"},
+	  {OUT_SUBST=>'s/[0-9]+//'}],
 
 
 
