@@ -121,6 +121,34 @@ stdev_value ( const long double * const values, size_t n, int df )
   return sqrtl ( variance_value ( values, n, df ) );
 }
 
+/*
+ Given an array of doubles, return the skewness
+ 'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
+ */
+long double skewness_value ( const long double * const values, size_t n, int df )
+{
+  long double moment2=0;
+  long double moment3=0;
+  long double mean;
+  long double skewness;
+
+  mean = arithmetic_mean_value(values, n);
+
+  for (size_t i = 0; i < n; i++)
+    {
+      const long double t = (values[i] - mean);
+      moment2 += t*t;
+      moment3 += t*t*t;
+    }
+  moment2 /= n;
+  moment3 /= n;
+
+  skewness = moment3 / powl(moment2,3.0/2.0);
+  if ( df == DF_SAMPLE )
+      skewness = ( sqrt(n*(n-1)) / (n-2) ) * skewness;
+
+  return skewness;
+}
 
 
 long double

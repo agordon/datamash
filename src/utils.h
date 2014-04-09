@@ -80,6 +80,13 @@ long double variance_value ( const long double * const values, size_t n, int df 
  */
 long double stdev_value ( const long double * const values, size_t n, int df );
 
+/*
+ Given an array of doubles, return the skewness
+ 'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
+ */
+long double skewness_value ( const long double * const values, size_t n, int df );
+
+
 enum MODETYPE
 {
   MODE=1,

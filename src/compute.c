@@ -147,6 +147,8 @@ Numeric operations:\n\
   mad        print the Median Absolute Deviation,\n\
              scaled by constant 1.4826 for normal distributions\n\
   madraw     print the MEdian Absolute Debiation, unscaled\n\
+  sskew      print the skewness of the (sample) group\n\
+  pskew      print the skewness of the (population) group\n\
 \n\
 String operations:\n\
   unique      print comma-separated sorted list of unique values\n\

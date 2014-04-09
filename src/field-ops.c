@@ -59,6 +59,8 @@ struct operation_data operations[] =
   {"svar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SVARIANCE */
   {"mad",     NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MAD */
   {"madraw",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MADRAW */
+  {"sskew",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_S_SKEWNESS */
+  {"pskew",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_P_SKEWNESS */
   {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
   {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
   {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
@@ -292,6 +294,8 @@ field_op_collect (struct fieldop *op,
     case OP_SVARIANCE:
     case OP_MAD:
     case OP_MADRAW:
+    case OP_S_SKEWNESS:
+    case OP_P_SKEWNESS:
     case OP_MODE:
     case OP_ANTIMODE:
       field_op_add_value (op, num_value);
@@ -487,6 +491,14 @@ field_op_summarize (struct fieldop *op)
     case OP_MADRAW:
       field_op_sort_values (op);
       numeric_result = mad_value ( op->values, op->num_values, 1.0 );
+      break;
+
+    case OP_S_SKEWNESS:
+      numeric_result = skewness_value ( op->values, op->num_values, DF_SAMPLE );
+      break;
+
+    case OP_P_SKEWNESS:
+      numeric_result = skewness_value ( op->values, op->num_values, DF_POPULATION );
       break;
 
     case OP_MODE:

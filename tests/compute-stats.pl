@@ -70,6 +70,22 @@ my $seq11   = c(@data11);
 my $seq12_unsorted = c(@data12_unsorted);
 my $seq12   = c(@data12);
 
+# The following random sequence was generated using R:
+#   floor(rnorm(100,sd=10,mean=100))
+# It is drawn from a normal distribution, and should have near-zero skewness.
+my $seq20 = c(117,89,86,101,90,110,97,91,106,99,118,110,82,91,105,90,108,96,
+              92,103,107,87,100,101,101,86,97,94,97,87,114,104,97,107,94,117,
+              100,111,111,113,93,113,107,108,95,117,106,105,105,105,105,99,
+              91,103,84,99,99,99,108,94,103,96,93,90,107,111,103,98,103,96,
+              113,111,84,109,96,110,90,78,111,85,102,91,107,99,120,109,107,
+              92,106,86,108,107,104,78,100,97,99,86,98,82);
+# A non-symetric values, skewness should be large
+my $seq21 = c(63,13,64,23,86,61,76,28,84,27,38,40,15,29,120,56,59,33,73,103,
+              15,22,36,45,40,35,3,114,66,55,16,17,29,30,42,32,34,110,16,33,
+              57,35,48,78,35,84,20,83,78,49,26,29,50,41,23,21,24,79,92,41,
+              77,64,12,31,6,32,22,8,19,27,14,12,64,51,29,33,24,58,1,56,47,
+              98,44,33,18,38,5,33,17,21,116,169,57,40,2,59,88,42,68,23);
+
 =pod
 The compute tests below should return the same results are thes R commands:
 
@@ -80,6 +96,17 @@ The compute tests below should return the same results are thes R commands:
     seq10 = c(2,3,5,7,11,13,17,19,23,29)
     seq11 = c(2,3,5,7,11,13,17,19,23,29,31)
     seq12 = c(2,3,5,7,11,13,17,19,23,29,31,37)
+    seq20 = c(117,89,86,101,90,110,97,91,106,99,118,110,82,91,105,90,108,96,
+              92,103,107,87,100,101,101,86,97,94,97,87,114,104,97,107,94,117,
+              100,111,111,113,93,113,107,108,95,117,106,105,105,105,105,99,
+              91,103,84,99,99,99,108,94,103,96,93,90,107,111,103,98,103,96,
+              113,111,84,109,96,110,90,78,111,85,102,91,107,99,120,109,107,
+              92,106,86,108,107,104,78,100,97,99,86,98,82)
+    seq22 = c(63,13,64,23,86,61,76,28,84,27,38,40,15,29,120,56,59,33,73,103,
+              15,22,36,45,40,35,3,114,66,55,16,17,29,30,42,32,34,110,16,33,
+              57,35,48,78,35,84,20,83,78,49,26,29,50,41,23,21,24,79,92,41,
+              77,64,12,31,6,32,22,8,19,27,14,12,64,51,29,33,24,58,1,56,47,
+              98,44,33,18,38,5,33,17,21,116,169,57,40,2,59,88,42,68,23)
 
     # define a population-flavor variance and sd functions
     # (R's default are sample-variance and sample-sd)
@@ -117,6 +144,19 @@ The compute tests below should return the same results are thes R commands:
     test(pop.var)
     test(mad)
     test(madraw)
+
+    library(moments)
+    # helper function for sample- skewness
+    smp.skewness=function(x) { skewness(x) * sqrt( length(x)*(length(x)-1) ) / (length(x)-2) }
+    test(skewness)
+    test(smp.skewness)
+
+    ## Test skewness on normally-distributed values
+    skewness(seq20)
+    smp.skewness(seq20)
+
+    skewness(seq21)
+    smp.skewness(seq21)
 
 =cut
 
@@ -240,6 +280,30 @@ my @Tests =
   ['madraw_6', 'madraw 1' ,  {IN_PIPE=>$seq11},  {OUT => "8\n"}],
   ['madraw_7', 'madraw 1' ,  {IN_PIPE=>$seq12},  {OUT => "9\n"}],
 
+  # Test Skewness for a population
+  ['pskew_1', 'pskew 1' ,  {IN_PIPE=>$seq1},   {OUT => "0\n"}],
+  ['pskew_2', 'pskew 1' ,  {IN_PIPE=>$seq2},   {OUT => "0\n"}],
+  ['pskew_3', 'pskew 1' ,  {IN_PIPE=>$seq3},   {OUT => "-nan\n"}],
+  ['pskew_4', 'pskew 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.254\n"}],
+  ['pskew_5', 'pskew 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.403\n"}],
+  ['pskew_6', 'pskew 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.332\n"}],
+  ['pskew_7', 'pskew 1' ,  {IN_PIPE=>$seq12},  {OUT => "0.371\n"}],
+
+  # Test Skewness for a sample
+  ['sskew_1', 'sskew 1' ,  {IN_PIPE=>$seq1},   {OUT => "0\n"}],
+  ['sskew_2', 'sskew 1' ,  {IN_PIPE=>$seq2},   {OUT => "0\n"}],
+  ['sskew_3', 'sskew 1' ,  {IN_PIPE=>$seq3},   {OUT => "-nan\n"}],
+  ['sskew_4', 'sskew 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.307\n"}],
+  ['sskew_5', 'sskew 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.477\n"}],
+  ['sskew_6', 'sskew 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.387\n"}],
+  ['sskew_7', 'sskew 1' ,  {IN_PIPE=>$seq12},  {OUT => "0.426\n"}],
+
+  ## Extra test of skewness for values drawn from normal distribution
+  ['pskew_8', 'pskew 1' ,  {IN_PIPE=>$seq20},   {OUT => "-0.204\n"}],
+  ['sskew_8', 'sskew 1' ,  {IN_PIPE=>$seq20},   {OUT => "-0.207\n"}],
+  ['pskew_9', 'pskew 1' ,  {IN_PIPE=>$seq21},   {OUT => "1.193\n"}],
+  ['sskew_9', 'sskew 1' ,  {IN_PIPE=>$seq21},   {OUT => "1.212\n"}],
+
 );
 
 ##
@@ -247,7 +311,7 @@ my @Tests =
 ## after the decimal point.
 ##
 for my $t (@Tests) {
- push @{$t}, {OUT_SUBST=>'s/^(\d+\.\d{1,3}).*/\1/'};
+ push @{$t}, {OUT_SUBST=>'s/^(-?\d+\.\d{1,3}).*/\1/'};
 }
 
 my $save_temps = $ENV{SAVE_TEMPS};

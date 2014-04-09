@@ -45,6 +45,8 @@ enum operation
   OP_MAD,       /* MAD - Median Absolute Deviation, with adjustment constant of
                    1.4826 for normal distribution */
   OP_MADRAW,    /* MAD (same as above), with constant=1 */
+  OP_S_SKEWNESS,/* Sample Skewness */
+  OP_P_SKEWNESS,/* Population Skewness */
   OP_MODE,
   OP_ANTIMODE,
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */
