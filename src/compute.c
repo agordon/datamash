@@ -130,6 +130,8 @@ Numeric operations:\n\
   max        print the maximum value\n\
   absmin     print the minimum of abs(values)\n\
   absmax     print the maximum of abs(values)\n\
+  first      print the first value of the group\n\
+  last       print the last value of the group\n\
   mean       print the mean of the values\n\
   median     print the median value\n\
   mode       print the mode value (most common value)\n\
@@ -489,6 +491,11 @@ open_input()
       strcat(cmd,"LC_ALL=C sort ");
       if (!case_sensitive)
         strcat(cmd,"-f ");
+      /* stable sort (-s) is needed to support first/last operations
+         (prevent sort from re-ordering lines which are not part of the group.
+         '-s' is not standard POSIX, but very commonly supported, including
+         on GNU coreutils, Busybox, FreeBSD, MacOSX */
+      strcat(cmd,"-s ");
       if (tab != TAB_DEFAULT)
         {
           snprintf(tmp,sizeof(tmp),"-t '%c' ",tab);

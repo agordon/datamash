@@ -37,6 +37,20 @@ if which ldd >/dev/null ; then
     skip_ "skipping valgrind test for a non-dynamic-binary compute"
 fi
 
+
+## Prepare file with long fields - for first/last operations.
+( printf "A " ; seq 100 | paste -s -d "" ;
+  printf "A " ; seq 1000 | paste -s -d "" ;
+  printf "A " ; seq 2000 | paste -s -d "" ;
+  printf "A " ; seq 3000 | paste -s -d "" ;
+  printf "A 1\n" ;
+  printf "B " ; seq 1000 | paste -s -d "" ;
+  printf "B " ; seq 2000 | paste -s -d "" ;
+  printf "B " ; seq 3000 | paste -s -d "" ;
+  printf "B " ; seq 100 | paste -s -d "" ;
+) > in_first || framework_failure "failed to prepare 'in_first' file"
+
+
 fail=0
 
 seq 10000 | valgrind --track-origins=yes  --show-reachable=yes \
@@ -63,5 +77,18 @@ seq 10000 | valgrind --track-origins=yes  --leak-check=full  \
 (echo "values" ; seq 10000 ) | valgrind --track-origins=yes  --leak-check=full \
                                         --show-reachable=yes  --error-exitcode=1 \
                  compute -g 1 -H countunique 1 > /dev/null || { warn_ "-g 1 -H collapse 1 - failed" ; fail=1 ; }
+
+cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
+                          --show-reachable=yes  --error-exitcode=1 \
+                 compute first 2 > /dev/null || { warn_ "first 2" ; fail=1 ; }
+
+cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
+                          --show-reachable=yes  --error-exitcode=1 \
+                 compute -g 1 first 2 > /dev/null || { warn_ "-g 1 first 2" ; fail=1 ; }
+
+cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
+                          --show-reachable=yes  --error-exitcode=1 \
+                 compute -g 1 last 2 > /dev/null || { warn_ "-g 1 last 2" ; fail=1 ; }
+
 
 Exit $fail

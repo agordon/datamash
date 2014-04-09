@@ -182,6 +182,30 @@ my $in_precision2=<<'EOF';
 3e14
 EOF
 
+my $in_large_buffer1 =
+"A 1\n" .
+"A " . "FooBar" x 512 . "\n" .
+"A " . "FooBar" x 1024 . "\n" .
+"A 2\n" .
+"B 3\n" .
+"B " . "FooBar" x 1024 . "\n" .
+"B " . "FooBar" x 512 . "\n" .
+"B 4\n";
+
+my $in_large_buffer2 =
+"A " . "FooBar" x 100 . "\n" .
+"A " . "FooBar" x 200 . "\n" .
+"B " . "FooBar" x 300 . "\n" .
+"B " . "FooBar" x 400 . "\n" ;
+
+my $out_large_buffer_first =
+"A " . "FooBar" x 100 . "\n" .
+"B " . "FooBar" x 300 . "\n" ;
+
+my $out_large_buffer_last =
+"A " . "FooBar" x 200 . "\n" .
+"B " . "FooBar" x 400 . "\n" ;
+
 
 my @Tests =
 (
@@ -211,6 +235,8 @@ my @Tests =
   ['b18', 'svar 1',     {IN_PIPE=>$in1},  {OUT => "8.272\n"},
 	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b19', 'countunique 1', {IN_PIPE=>$in1}, {OUT => "10\n"}],
+  ['b20', 'first 1',    {IN_PIPE=>$in1},  {OUT => "1\n"}],
+  ['b21', 'last 1',     {IN_PIPE=>$in1},  {OUT => "10\n"}],
 
 
 
@@ -391,15 +417,18 @@ my @Tests =
      {OUT=>"a X\nb Y\n"}],
 
   # Test Case-sensitivity, on non-sorted input (with 'sort' piping)
-  # on both grouping and string operations
+  # on both grouping and string operations.
+  # NOTE: 'sort' is used with '-s' (stable sort),
+  #       so with case-insensitive sort, the first appearing letter is
+  #       reported (the lowercase a/b in case6 & case8).
   ['case5', '-s -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"A 7\nB 6\na 4\nb 4\n"}],
   ['case6', '-s -i -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
-     {OUT=>"A 11\nB 10\n"}],
+     {OUT=>"a 11\nb 10\n"}],
   ['case7', '-s -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"A X,x\nB Y\na X,x\nb Y\n"}],
   ['case8', '-s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
-     {OUT=>"A X\nB Y\n"}],
+     {OUT=>"a X\nb Y\n"}],
 
   ## Test nul-terminated lines
   ['nul1', '-z -g 1 sum 2', {IN_PIPE=>$in_nul1},
@@ -427,6 +456,34 @@ my @Tests =
   ['prcs10', 'sum 1', {IN_PIPE=>$in_precision1},  {OUT => "30000000000.3\n"}],
   ['prcs11', 'sum 1', {IN_PIPE=>$in_precision2},  {OUT => "3e+14\n"}],
 
+  # Test first,last operations (and 'field_op_replace_string()')
+  ['fst1',   'first 2', {IN_PIPE=>$in_g1}, {OUT=>"100\n"}],
+  ['fst2',   '-g 1 first 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100\n"}],
+  ['fst3',   '-g 1 first 2', {IN_PIPE=>$in_g2}, {OUT=>"A 100\nB 66\n"}],
+  ['fst4',   '-g 1 first 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
+  ['fst5',   '-g 1 first 2', {IN_PIPE=>$in_large_buffer1},
+            {OUT=>"A 1\nB 3\n"}],
+  ['fst6',   '-g 1 first 2', {IN_PIPE=>$in_large_buffer2},
+            {OUT=>$out_large_buffer_first}],
+  # First with sort, test the 'stable' sort
+  ['fst7',   '--sort -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
+            {OUT=>"A 2\nB 6\na 1\nb 4\n"}],
+  ['fst8',   '--sort -i -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
+            {OUT=>"a 1\nb 4\n"}],
+
+  ['lst1',   'last 2', {IN_PIPE=>$in_g1}, {OUT=>"35\n"}],
+  ['lst2',   '-g 1 last 2', {IN_PIPE=>$in_g1}, {OUT=>"A 35\n"}],
+  ['lst3',   '-g 1 last 2', {IN_PIPE=>$in_g2}, {OUT=>"A 35\nB 55\n"}],
+  ['lst4',   '-g 1 last 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
+  ['lst5',   '-g 1 last 2', {IN_PIPE=>$in_large_buffer1},
+            {OUT=>"A 2\nB 4\n"}],
+  ['lst6',   '-g 1 last 2', {IN_PIPE=>$in_large_buffer2},
+            {OUT=>$out_large_buffer_last}],
+  # last with sort, test the 'stable' sort
+  ['lst7',   '--sort -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
+            {OUT=>"A 5\nB 6\na 3\nb 4\n"}],
+  ['lst8',   '--sort -i -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
+            {OUT=>"a 5\nb 6\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

@@ -44,6 +44,8 @@ struct operation_data operations[] =
   {"max",     NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_MAX */
   {"absmin",  NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_ABSMIN */
   {"absmax",  NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_ABSMAX */
+  {"first",   STRING_SCALAR,   IGNORE_FIRST},   /* OP_FIRST */
+  {"last",    STRING_SCALAR,   IGNORE_FIRST},   /* OP_LAST */
   {"mean",    NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_MEAN */
   {"median",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MEDIAN */
   {"pstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PSTDEV */
@@ -93,6 +95,23 @@ field_op_add_string (struct fieldop *op, const char* str, size_t slen)
   memcpy (op->str_buf + op->str_buf_used, str, slen);
   *(op->str_buf + op->str_buf_used + slen ) = 0;
   op->str_buf_used += slen + 1 ;
+}
+
+/* Replace the current string in the string buffer.
+   This function assumes only one string is stored in the buffer. */
+void
+field_op_replace_string (struct fieldop *op, const char* str, size_t slen)
+{
+  if (slen+1 >= op->str_buf_alloc)
+    {
+      op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,slen+1);
+      op->str_buf = xrealloc (op->str_buf, op->str_buf_alloc);
+    }
+
+  /* Copy the string to the buffer */
+  memcpy (op->str_buf, str, slen);
+  *(op->str_buf + slen ) = 0;
+  op->str_buf_used = slen + 1 ;
 }
 
 /* Returns an array of string-pointers (char*),
@@ -234,6 +253,16 @@ field_op_collect (struct fieldop *op,
         {
           op->value = num_value;
         }
+      break;
+
+    case OP_FIRST:
+      if (op->first)
+        field_op_replace_string(op, str, slen);
+      break;
+
+    case OP_LAST:
+      /* Replace the 'current' string with the latest one */
+      field_op_replace_string(op, str, slen);
       break;
 
     case OP_MEDIAN:
@@ -379,6 +408,13 @@ field_op_summarize (struct fieldop *op)
     case OP_ABSMAX:
       /* no summarization for these operations, just print the value */
       numeric_result = op->value;
+      break;
+
+    case OP_FIRST:
+    case OP_LAST:
+      /* Only one string is returned in the buffer, return it */
+      print_numeric_result = false;
+      string_result = xstrdup(op->str_buf);
       break;
 
     case OP_MEDIAN:

@@ -30,6 +30,8 @@ enum operation
   OP_MAX,
   OP_ABSMIN,
   OP_ABSMAX,
+  OP_FIRST,
+  OP_LAST,
   OP_MEAN,
   OP_MEDIAN,
   OP_PSTDEV,    /* Population Standard Deviation */
