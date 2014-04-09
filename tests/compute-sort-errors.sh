@@ -1,5 +1,5 @@
 #!/bin/sh
-#   Unit Tests for calc - perform simple calculation on input data
+#   Unit Tests for compute - perform simple calculation on input data
 #   Copyright (C) 2014 Assaf Gordon.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 #    Written by Assaf Gordon
 
 ##
-## This scripts tests the sort piping code for errors
+## This script tests the sort piping code for errors
 ##
 
 . "${test_dir=.}/init.sh"; path_prepend_ ./src
