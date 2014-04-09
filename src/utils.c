@@ -86,6 +86,16 @@ long double mad_value ( const long double * const values, size_t n, double scale
   return mad * scale;
 }
 
+long double
+arithmetic_mean_value ( const long double * const values, const size_t n)
+{
+  long double sum=0;
+  long double mean;
+  for (size_t i = 0; i < n; i++)
+    sum += values[i];
+  mean = sum / n ;
+  return mean;
+}
 
 long double
 variance_value ( const long double * const values, size_t n, int df )
@@ -94,9 +104,7 @@ variance_value ( const long double * const values, size_t n, int df )
   long double mean;
   long double variance;
 
-  for (size_t i = 0; i < n; i++)
-    sum += values[i];
-  mean = sum / n ;
+  mean = arithmetic_mean_value(values, n);
 
   sum = 0 ;
   for (size_t i = 0; i < n; i++)

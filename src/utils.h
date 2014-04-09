@@ -23,6 +23,9 @@
  */
 
 
+/* Given an array of doubles, return the arithmetic mean value */
+long double arithmetic_mean_value ( const long double * const values, const size_t n);
+
 /*
  Given a sorted array of doubles, return the value of 'percentile'.
  Example of valid 'percentile':
