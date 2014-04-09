@@ -51,6 +51,7 @@ gl_WARN_ADD([-Wswitch-default])
 gl_WARN_ADD([-Wformat-nonliteral])
 gl_WARN_ADD([-Wunused-parameter])
 gl_WARN_ADD([-Wfloat-equal])
+gl_WARN_ADD([-Werror])
 
 # Add Debian-specific Hardening flags
 # See:  https://wiki.debian.org/HardeningWalkthrough
