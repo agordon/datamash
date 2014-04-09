@@ -134,7 +134,41 @@ my @Tests =
   ['iqr_6', 'iqr 1' ,  {IN_PIPE=>$seq10},  {OUT => "13\n"}],
   ['iqr_7', 'iqr 1' ,  {IN_PIPE=>$seq9},   {OUT => "12\n"}],
 
+  # Test sample standard deviation
+  ['sstdev_1', 'sstdev 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.290\n"}],
+  ['sstdev_2', 'sstdev 1' ,  {IN_PIPE=>$seq2},   {OUT => "1\n"}],
+  ['sstdev_3', 'sstdev 1' ,  {IN_PIPE=>$seq3},   {OUT => "-nan\n"}],
+  ['sstdev_4', 'sstdev 1' ,  {IN_PIPE=>$seq12},  {OUT => "11.649\n"}],
+  ['sstdev_5', 'sstdev 1' ,  {IN_PIPE=>$seq11},  {OUT => "10.152\n"}],
+  ['sstdev_6', 'sstdev 1' ,  {IN_PIPE=>$seq10},  {OUT => "9.024\n"}],
+  ['sstdev_7', 'sstdev 1' ,  {IN_PIPE=>$seq9},   {OUT => "7.457\n"}],
 
+  # Test population standard deviation
+  ['pstdev_1', 'pstdev 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.118\n"}],
+  ['pstdev_2', 'pstdev 1' ,  {IN_PIPE=>$seq2},   {OUT => "0.816\n"}],
+  ['pstdev_3', 'pstdev 1' ,  {IN_PIPE=>$seq3},   {OUT => "0\n"}],
+  ['pstdev_4', 'pstdev 1' ,  {IN_PIPE=>$seq12},  {OUT => "11.153\n"}],
+  ['pstdev_5', 'pstdev 1' ,  {IN_PIPE=>$seq11},  {OUT => "9.680\n"}],
+  ['pstdev_6', 'pstdev 1' ,  {IN_PIPE=>$seq10},  {OUT => "8.560\n"}],
+  ['pstdev_7', 'pstdev 1' ,  {IN_PIPE=>$seq9},   {OUT => "7.030\n"}],
+
+  # Test sample variance
+  ['svar_1', 'svar 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.666\n"}],
+  ['svar_2', 'svar 1' ,  {IN_PIPE=>$seq2},   {OUT => "1\n"}],
+  ['svar_3', 'svar 1' ,  {IN_PIPE=>$seq3},   {OUT => "-nan\n"}],
+  ['svar_4', 'svar 1' ,  {IN_PIPE=>$seq12},  {OUT => "135.719\n"}],
+  ['svar_5', 'svar 1' ,  {IN_PIPE=>$seq11},  {OUT => "103.072\n"}],
+  ['svar_6', 'svar 1' ,  {IN_PIPE=>$seq10},  {OUT => "81.433\n"}],
+  ['svar_7', 'svar 1' ,  {IN_PIPE=>$seq9},   {OUT => "55.611\n"}],
+
+  # Test population variance
+  ['pvar_1', 'pvar 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.25\n"}],
+  ['pvar_2', 'pvar 1' ,  {IN_PIPE=>$seq2},   {OUT => "0.666\n"}],
+  ['pvar_3', 'pvar 1' ,  {IN_PIPE=>$seq3},   {OUT => "0\n"}],
+  ['pvar_4', 'pvar 1' ,  {IN_PIPE=>$seq12},  {OUT => "124.409\n"}],
+  ['pvar_5', 'pvar 1' ,  {IN_PIPE=>$seq11},  {OUT => "93.702\n"}],
+  ['pvar_6', 'pvar 1' ,  {IN_PIPE=>$seq10},  {OUT => "73.29\n"}],
+  ['pvar_7', 'pvar 1' ,  {IN_PIPE=>$seq9},   {OUT => "49.432\n"}],
 );
 
 ##
