@@ -50,6 +50,9 @@ struct operation_data operations[] =
   {"rand",    STRING_SCALAR,   IGNORE_FIRST},   /* OP_RAND */
   {"mean",    NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_MEAN */
   {"median",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MEDIAN */
+  {"q1",      NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_QUARTILE_1 */
+  {"q3",      NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_QUARTILE_3 */
+  {"iqr",     NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_IQR */
   {"pstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PSTDEV */
   {"sstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SSTDEV */
   {"pvar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PVARIANCE */
@@ -278,6 +281,9 @@ field_op_collect (struct fieldop *op,
       break;
 
     case OP_MEDIAN:
+    case OP_QUARTILE_1:
+    case OP_QUARTILE_3:
+    case OP_IQR:
     case OP_PSTDEV:
     case OP_SSTDEV:
     case OP_PVARIANCE:
@@ -433,6 +439,22 @@ field_op_summarize (struct fieldop *op)
     case OP_MEDIAN:
       field_op_sort_values (op);
       numeric_result = median_value ( op->values, op->num_values );
+      break;
+
+    case OP_QUARTILE_1:
+      field_op_sort_values (op);
+      numeric_result = quartile1_value ( op->values, op->num_values );
+      break;
+
+    case OP_QUARTILE_3:
+      field_op_sort_values (op);
+      numeric_result = quartile3_value ( op->values, op->num_values );
+      break;
+
+    case OP_IQR:
+      field_op_sort_values (op);
+      numeric_result = quartile3_value ( op->values, op->num_values ) -
+                       quartile1_value ( op->values, op->num_values );
       break;
 
     case OP_PSTDEV:

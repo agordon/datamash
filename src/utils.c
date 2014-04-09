@@ -41,10 +41,32 @@ cmp_long_double (const void *p1, const void *p2)
 long double
 median_value ( const long double * const values, size_t n )
 {
-  /* Assumes 'values' are already sorted, returns the median value */
+#if 0
+  return percentile_value(values, n, 2.0/4.0);
+#else
+  /* Equivalent to the above, but slightly faster */
   return (n&0x01)
     ?values[n/2]
     :( (values[n/2-1] + values[n/2]) / 2.0 );
+#endif
+}
+
+/* This implementation follows R's summary() and quantile(type=7) functions.
+   See discussion here:
+   http://tolstoy.newcastle.edu.au/R/e17/help/att-1067/Quartiles_in_R.pdf */
+long double percentile_value ( const long double * const values,
+                               const size_t n, const double percentile )
+{
+  const double h = ( (n-1) * percentile ) ;
+  const size_t fh = floor(h);
+
+  if (n==0 || percentile<0.0 || percentile>100.0)
+    return 0;
+
+  if (n==1)
+    return values[0];
+
+  return values[fh] + (h-fh) * ( values[fh+1] - values[fh] ) ;
 }
 
 long double

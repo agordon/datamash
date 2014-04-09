@@ -22,10 +22,34 @@
  Generate Utility Functions module.
  */
 
+
 /*
- Given an array of doubles, return the median value
- */
+ Given a sorted array of doubles, return the value of 'percentile'.
+ Example of valid 'percentile':
+    0.10 = First decile
+    0.25 = First quartile
+    0.50 = median
+    0.75 = third quartile
+    0.99 = 99nt percentile
+*/
+long double percentile_value ( const long double * const values,
+                               const size_t n, const double percentile );
+
+/* Given a sorted array of doubles, return the value of the median */
 long double median_value ( const long double * const values, size_t n );
+
+/* Given a sorted array of doubles, return the value of 1st quartile */
+static inline long double quartile1_value ( const long double * const values, size_t n )
+{
+  return percentile_value(values, n, 1.0/4.0);
+}
+
+/* Given a sorted array of doubles, return the value of 3rd quartile */
+static inline long double quartile3_value ( const long double * const values, size_t n )
+{
+  return percentile_value(values, n, 3.0/4.0);
+}
+
 
 enum degrees_of_freedom
 {

@@ -135,6 +135,9 @@ Numeric operations:\n\
   rand       print one random value from the group\n\
   mean       print the mean of the values\n\
   median     print the median value\n\
+  q1         prints the 1st quartile value\n\
+  q3         prints the 3rd quartile value\n\
+  iqr        prints the inter-quartile range value\n\
   mode       print the mode value (most common value)\n\
   antimode   print the anti-mode value (least common value)\n\
   pstdev     print the population standard deviation\n\

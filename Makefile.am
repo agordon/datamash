@@ -81,6 +81,7 @@ TESTS = \
 	tests/compute-show-env.sh \
 	tests/compute-tests.pl \
 	tests/compute-rand.sh \
+	tests/compute-stats.pl \
 	tests/compute-sort-header.sh \
 	tests/compute-sort-errors.sh \
 	tests/compute-valgrind.sh
