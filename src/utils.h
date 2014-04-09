@@ -50,6 +50,14 @@ static inline long double quartile3_value ( const long double * const values, si
   return percentile_value(values, n, 3.0/4.0);
 }
 
+/* Given a sorted array of doubles, return the MAD value
+   (median absolute deviation), with scale constant 'scale' */
+long double mad_value ( const long double * const values, size_t n, double scale );
+
+
+/* Sorts (in-place) an array of long-doubles */
+void qsortfl(long double *values, size_t n);
+
 
 enum degrees_of_freedom
 {

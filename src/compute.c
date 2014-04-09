@@ -144,6 +144,9 @@ Numeric operations:\n\
   sstdev     print the sample standard deviation\n\
   pvar       print the population variance\n\
   svar       print the sample variance\n\
+  mad        print the Median Absolute Deviation,\n\
+             scaled by constant 1.4826 for normal distributions\n\
+  madraw     print the MEdian Absolute Debiation, unscaled\n\
 \n\
 String operations:\n\
   unique      print comma-separated sorted list of unique values\n\

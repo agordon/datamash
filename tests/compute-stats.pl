@@ -169,6 +169,26 @@ my @Tests =
   ['pvar_5', 'pvar 1' ,  {IN_PIPE=>$seq11},  {OUT => "93.702\n"}],
   ['pvar_6', 'pvar 1' ,  {IN_PIPE=>$seq10},  {OUT => "73.29\n"}],
   ['pvar_7', 'pvar 1' ,  {IN_PIPE=>$seq9},   {OUT => "49.432\n"}],
+
+  # Test MAD (Median Absolute Deviation), with default
+  # scaling factor of 1.486 for normal distributions
+  ['mad_1', 'mad 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.482\n"}],
+  ['mad_2', 'mad 1' ,  {IN_PIPE=>$seq2},   {OUT => "1.482\n"}],
+  ['mad_3', 'mad 1' ,  {IN_PIPE=>$seq3},   {OUT => "0\n"}],
+  ['mad_4', 'mad 1' ,  {IN_PIPE=>$seq12},  {OUT => "13.343\n"}],
+  ['mad_5', 'mad 1' ,  {IN_PIPE=>$seq11},  {OUT => "11.860\n"}],
+  ['mad_6', 'mad 1' ,  {IN_PIPE=>$seq10},  {OUT => "10.378\n"}],
+  ['mad_7', 'mad 1' ,  {IN_PIPE=>$seq9},   {OUT => "8.895\n"}],
+
+  # Test MAD-Raw (Median Absolute Deviation), with scaling factor of 1
+  ['madraw_1', 'madraw 1' ,  {IN_PIPE=>$seq1},   {OUT => "1\n"}],
+  ['madraw_2', 'madraw 1' ,  {IN_PIPE=>$seq2},   {OUT => "1\n"}],
+  ['madraw_3', 'madraw 1' ,  {IN_PIPE=>$seq3},   {OUT => "0\n"}],
+  ['madraw_4', 'madraw 1' ,  {IN_PIPE=>$seq12},  {OUT => "9\n"}],
+  ['madraw_5', 'madraw 1' ,  {IN_PIPE=>$seq11},  {OUT => "8\n"}],
+  ['madraw_6', 'madraw 1' ,  {IN_PIPE=>$seq10},  {OUT => "7\n"}],
+  ['madraw_7', 'madraw 1' ,  {IN_PIPE=>$seq9},   {OUT => "6\n"}],
+
 );
 
 ##

@@ -57,6 +57,8 @@ struct operation_data operations[] =
   {"sstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SSTDEV */
   {"pvar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PVARIANCE */
   {"svar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SVARIANCE */
+  {"mad",     NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MAD */
+  {"madraw",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MADRAW */
   {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
   {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
   {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
@@ -157,7 +159,7 @@ field_op_get_string_ptrs ( struct fieldop *op, bool sort, bool sort_case_sensiti
 void
 field_op_sort_values (struct fieldop *op)
 {
-  qsort (op->values, op->num_values, sizeof (long double), cmp_long_double);
+  qsortfl(op->values, op->num_values);
 }
 
 /* Allocate a new fieldop, initialize it based on 'oper',
@@ -288,6 +290,8 @@ field_op_collect (struct fieldop *op,
     case OP_SSTDEV:
     case OP_PVARIANCE:
     case OP_SVARIANCE:
+    case OP_MAD:
+    case OP_MADRAW:
     case OP_MODE:
     case OP_ANTIMODE:
       field_op_add_value (op, num_value);
@@ -473,6 +477,16 @@ field_op_summarize (struct fieldop *op)
     case OP_SVARIANCE:
       numeric_result = variance_value ( op->values, op->num_values,
                                         DF_SAMPLE);
+      break;
+
+    case OP_MAD:
+      field_op_sort_values (op);
+      numeric_result = mad_value ( op->values, op->num_values, 1.4826 );
+      break;
+
+    case OP_MADRAW:
+      field_op_sort_values (op);
+      numeric_result = mad_value ( op->values, op->num_values, 1.0 );
       break;
 
     case OP_MODE:

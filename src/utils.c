@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "xalloc.h"
 #include "size_max.h"
 
 #include "utils.h"
@@ -68,6 +69,23 @@ long double percentile_value ( const long double * const values,
 
   return values[fh] + (h-fh) * ( values[fh+1] - values[fh] ) ;
 }
+
+
+/* Given a sorted array of doubles, return the MAD value
+   (median absolute deviation), with scale constant 'scale' */
+long double mad_value ( const long double * const values, size_t n, double scale )
+{
+  const long double median = median_value(values,n);
+  long double *mads = xnmalloc(n,sizeof(long double));
+  long double mad = 0 ;
+  for (size_t i=0; i<n; ++i)
+    mads[i] = fabsl(median - values[i]);
+  qsortfl(mads,n);
+  mad = median_value(mads,n);
+  free(mads);
+  return mad * scale;
+}
+
 
 long double
 variance_value ( const long double * const values, size_t n, int df )
@@ -146,4 +164,10 @@ cmpstringp_nocase(const void *p1, const void *p2)
    * pointers to char", but strcmp(3) arguments are "pointers
    * to char", hence the following cast plus dereference */
   return strcasecmp(* (char * const *) p1, * (char * const *) p2);
+}
+
+/* Sorts (in-place) an array of long-doubles */
+void qsortfl(long double *values, size_t n)
+{
+  qsort (values, n, sizeof (long double), cmp_long_double);
 }

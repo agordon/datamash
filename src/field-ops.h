@@ -42,6 +42,9 @@ enum operation
   OP_SSTDEV,    /* Sample Standard Deviation */
   OP_PVARIANCE, /* Population Variance */
   OP_SVARIANCE, /* Sample Variance */
+  OP_MAD,       /* MAD - Median Absolute Deviation, with adjustment constant of
+                   1.4826 for normal distribution */
+  OP_MADRAW,    /* MAD (same as above), with constant=1 */
   OP_MODE,
   OP_ANTIMODE,
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */
