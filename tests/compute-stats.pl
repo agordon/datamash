@@ -149,6 +149,9 @@ The compute tests below should return the same results are thes R commands:
              ( (n+1) * pop.excess_kurtosis(x) + 6 )
      }
 
+    # Helper function for Jarque-Bera pValue
+    jarque.beta.pvalue=function(x) { t=jarque.test(x) ; t$p.value }
+
     # Helper function to execute function 'f' on all input sequences
     test=function(f) {
          f_name =  deparse(substitute(f))
@@ -180,6 +183,7 @@ The compute tests below should return the same results are thes R commands:
     test(smp.skewness)
     test(pop.excess_kurtosis)
     test(smp.excess_kurtosis)
+    test(jarque.beta.pvalue)
 
 =cut
 
@@ -392,6 +396,18 @@ my @Tests =
   ['skurt_9', 'skurt 1' ,  {IN_PIPE=>$seq21},  {OUT => "1.958\n"},],
   ['skurt_10','skurt 1' ,  {IN_PIPE=>$seq22},  {OUT => "-0.209\n"},],
 
+  # Test Jarque-Bera normality pVale
+  ['jarque_1', 'jarque 1' ,  {IN_PIPE=>$seq1},   {OUT => "0.857\n"}],
+  ['jarque_2', 'jarque 1' ,  {IN_PIPE=>$seq2},   {OUT => "0.868\n"}],
+  ['jarque_3', 'jarque 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['jarque_4', 'jarque 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.702\n"}],
+  ['jarque_5', 'jarque 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.712\n"}],
+  ['jarque_6', 'jarque 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.660\n"}],
+  ['jarque_7', 'jarque 1' ,  {IN_PIPE=>$seq12},  {OUT => "0.644\n"}],
+  ['jarque_8', 'jarque 1' ,  {IN_PIPE=>$seq20},  {OUT => "0.327\n"},],
+  ['jarque_9', 'jarque 1' ,  {IN_PIPE=>$seq21},  {OUT => "8.011e-09\n"},],
+  ['jarque_10','jarque 1' ,  {IN_PIPE=>$seq22},  {OUT => "0.789\n"},],
+
 );
 
 ##
@@ -399,7 +415,7 @@ my @Tests =
 ## after the decimal point.
 ##
 for my $t (@Tests) {
- push @{$t}, {OUT_SUBST=>'s/^(-?\d+\.\d{1,3}).*/\1/'};
+ push @{$t}, {OUT_SUBST=>'s/^(-?\d+\.\d{1,3})\d*/\1/'};
 }
 
 my $save_temps = $ENV{SAVE_TEMPS};

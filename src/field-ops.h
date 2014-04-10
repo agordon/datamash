@@ -49,6 +49,7 @@ enum operation
   OP_P_SKEWNESS,/* Population Skewness */
   OP_S_EXCESS_KURTOSIS, /* Sample Excess Kurtosis */
   OP_P_EXCESS_KURTOSIS, /* Population Excess Kurtosis */
+  OP_JARQUE_BERA,   /* Jarque-Bera test of normality */
   OP_MODE,
   OP_ANTIMODE,
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */

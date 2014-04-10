@@ -187,6 +187,31 @@ long double excess_kurtosis_value ( const long double * const values, size_t n, 
   return excess_kurtosis;
 }
 
+/*
+ Chi-Squared - Cumulative distribution function,
+ for the special case of DF=2.
+ Equivalent to the R function 'pchisq(x,df=2)'.
+*/
+long double pchisq_df2(long double x)
+{
+  return 1.0 - expl(-x/2);
+}
+
+/*
+ Given an array of doubles, return the p-Value
+ Of the Jarque-Bera Test for normality
+   http://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test
+ Equivalent to R's "jarque.test()" function in the "moments" library.
+ */
+long double jarque_bera_pvalue ( const long double * const values, size_t n )
+{
+  const long double k = excess_kurtosis_value(values,n,DF_POPULATION);
+  const long double s = skewness_value(values,n,DF_POPULATION);
+  const long double jb = (n*(s*s + k*k/4))/6.0 ;
+  const long double pval = 1 - pchisq_df2(jb);
+  return pval;
+}
+
 
 long double
 mode_value ( const long double * const values, size_t n, enum MODETYPE type)
