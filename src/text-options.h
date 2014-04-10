@@ -42,12 +42,12 @@ extern bool blanks[UCHAR_LIM];
 /* Initializes the 'blanks' table. */
 void init_blank_table (void);
 
-inline void print_field_separator()
+static inline void print_field_separator()
 {
   putchar( (tab==TAB_DEFAULT)?' ':tab );
 }
 
-inline void print_line_separator()
+static inline void print_line_separator()
 {
   putchar( eolchar );
 }
