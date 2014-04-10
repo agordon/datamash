@@ -104,6 +104,9 @@ variance_value ( const long double * const values, size_t n, int df )
   long double mean;
   long double variance;
 
+  if ( df<0 || (size_t)df == n )
+    return nanl("");
+
   mean = arithmetic_mean_value(values, n);
 
   sum = 0 ;
@@ -132,6 +135,9 @@ long double skewness_value ( const long double * const values, size_t n, int df 
   long double mean;
   long double skewness;
 
+  if (n<=1)
+    return nanl("");
+
   mean = arithmetic_mean_value(values, n);
 
   for (size_t i = 0; i < n; i++)
@@ -143,10 +149,13 @@ long double skewness_value ( const long double * const values, size_t n, int df 
   moment2 /= n;
   moment3 /= n;
 
-  skewness = moment3 / powl(moment2,3.0/2.0);
+  /* can't use 'powl(moment2,3.0/2.0)' - not all systems have powl */
+  skewness = moment3 / sqrtl(moment2*moment2*moment2);
   if ( df == DF_SAMPLE )
     {
-      skewness = ( sqrt(n*(n-1)) / (n-2) ) * skewness;
+      if (n<=2)
+        return nanl("");
+      skewness = ( sqrtl(n*(n-1)) / (n-2) ) * skewness;
     }
 
   return skewness;
@@ -162,6 +171,9 @@ long double excess_kurtosis_value ( const long double * const values, size_t n, 
   long double moment4=0;
   long double mean;
   long double excess_kurtosis;
+
+  if (n<=1)
+    return nanl("");
 
   mean = arithmetic_mean_value(values, n);
 
@@ -209,6 +221,8 @@ long double jarque_bera_pvalue ( const long double * const values, size_t n )
   const long double s = skewness_value(values,n,DF_POPULATION);
   const long double jb = (n*(s*s + k*k/4))/6.0 ;
   const long double pval = 1 - pchisq_df2(jb);
+  if (n<=1 || isnan(k) || isnan(s))
+    return nanl("");
   return pval;
 }
 
