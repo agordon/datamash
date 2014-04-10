@@ -119,48 +119,71 @@ Usage: %s [OPTION] op col [op col ...]\n\
       fputs (_("\
 Performs numeric/string operations on input from stdin.\n\
 "), stdout);
-      fputs("\
+      fputs(_("\
 \n\
 'op' is the operation to perform on field 'col'.\n\
 \n\
+"), stdout);
+
+      fputs (_("\
 Numeric operations:\n\
-  count      count number of elements in the input group\n\
-  sum        print the sum the of values\n\
-  min        print the minimum value\n\
-  max        print the maximum value\n\
-  absmin     print the minimum of abs(values)\n\
-  absmax     print the maximum of abs(values)\n\
-  first      print the first value of the group\n\
-  last       print the last value of the group\n\
-  rand       print one random value from the group\n\
-  mean       print the mean of the values\n\
-  median     print the median value\n\
-  q1         prints the 1st quartile value\n\
-  q3         prints the 3rd quartile value\n\
-  iqr        prints the inter-quartile range value\n\
-  mode       print the mode value (most common value)\n\
-  antimode   print the anti-mode value (least common value)\n\
-  pstdev     print the population standard deviation\n\
-  sstdev     print the sample standard deviation\n\
-  pvar       print the population variance\n\
-  svar       print the sample variance\n\
-  mad        print the Median Absolute Deviation,\n\
+  sum        sum the of values\n\
+  min        minimum value\n\
+  max        maximum value\n\
+  absmin     minimum of the absolute values\n\
+  absmax     maximum of the absolute values\n\
+\n\
+"), stdout);
+      fputs (_("\
+Textual/Numeric operations:\n\
+  count       count number of elements in the group\n\
+  first       the first value of the group\n\
+  last        the last value of the group\n\
+  rand        one random value from the group\n\
+  unique      comma-separated sorted list of unique values\n\
+  collapse    comma-separed list of all input values\n\
+  countunique number of unique/distinct values\n\
+\n\
+"),stdout);
+
+      fputs (_("\
+Statistical opeations:\n\
+  mean       mean of the values\n\
+  median     median value\n\
+  q1         1st quartile value\n\
+  q3         3rd quartile value\n\
+  iqr        inter-quartile range\n\
+  mode       mode value (most common value)\n\
+  antimode   anti-mode value (least common value)\n\
+  pstdev     population standard deviation\n\
+  sstdev     sample standard deviation\n\
+  pvar       population variance\n\
+  svar       sample variance\n\
+  mad        Median Absolute Deviation,\n\
              scaled by constant 1.4826 for normal distributions\n\
-  madraw     print the MEdian Absolute Debiation, unscaled\n\
-  sskew      print the skewness of the (sample) group\n\
-  pskew      print the skewness of the (population) group\n\
-  skurt      print the Excess Kurtosis of the (sample) group\n\
-  pkurt      print the Excess Kurtosis of the (population) group\n\
-  jarque     print the p-value of the Jarque-Beta test for normality\n\
-  dpo        print the p-value of the D'Agostino-Pearson Omnibus\n\
-             test for normality.\n\
+  madraw     Median Absolute Debiation, unscaled\n\
+"), stdout);
+      fputs (_("\
+  sskew      skewness of the (sample) group\n\
+  pskew      skewness of the (population) group\n\
+             For values x reported by 'sskew' and 'pskew' operations:\n\
+                     x > 0       -  positively skewed / skewed right\n\
+                 0 > x           -  negatively skewed / skewed left\n\
+                     x > 1       -  highly skewed right \n\
+                 1 > x >  0.5    -  moderately skewed right\n\
+               0.5 > x > -0.5    -  approximately symmetric\n\
+              -0.5 > x > -1      -  moderately skewed left\n\
+                -1 > x           -  highly skewed left\n\
+  skurt      Excess Kurtosis of the (sample) group\n\
+  pkurt      Excess Kurtosis of the (population) group\n\
+  jarque     p-value of the Jarque-Beta test for normality\n\
+  dpo        p-value of the D'Agostino-Pearson Omnibus test for normality.\n\
+             For 'jarque' and 'dpo' operations:\n\
+               Null hypothesis is normality.\n\
+               Low p-Values indicate non-normal data.\n\
+               Hihg p-Values indicate null-hypothesis cannot be rejected.\n\
 \n\
-String operations:\n\
-  unique      print comma-separated sorted list of unique values\n\
-  collapse    print comma-separed list of all input values\n\
-  countunique print number of unique values\n\
-\n\
-",stdout);
+"), stdout);
       fputs (_("\
 \n\
 General options:\n\
@@ -227,6 +250,11 @@ Which is equivalent to:\n\
 \n\
 "), program_name, program_name);
 
+      fputs (_("\
+More detailed manual and examples, please visit\n  " PACKAGE_URL "\
+\n\
+\n\
+"), stdout);
     }
   exit (status);
 }
