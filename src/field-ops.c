@@ -64,6 +64,7 @@ struct operation_data operations[] =
   {"skurt",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_S_EXCESS_KURTOSIS */
   {"pkurt",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_P_EXCESS_KURTOSIS */
   {"jarque",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_JARQUE_BETA */
+  {"dpo",     NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_DP_OMNIBUS */
   {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
   {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
   {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
@@ -302,6 +303,7 @@ field_op_collect (struct fieldop *op,
     case OP_S_EXCESS_KURTOSIS:
     case OP_P_EXCESS_KURTOSIS:
     case OP_JARQUE_BERA:
+    case OP_DP_OMNIBUS:
     case OP_MODE:
     case OP_ANTIMODE:
       field_op_add_value (op, num_value);
@@ -517,6 +519,10 @@ field_op_summarize (struct fieldop *op)
 
     case OP_JARQUE_BERA:
       numeric_result = jarque_bera_pvalue ( op->values, op->num_values );
+      break;
+
+    case OP_DP_OMNIBUS:
+      numeric_result = dagostino_pearson_omnibus_pvalue ( op->values, op->num_values );
       break;
 
     case OP_MODE:

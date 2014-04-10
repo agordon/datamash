@@ -152,6 +152,8 @@ Numeric operations:\n\
   skurt      print the Excess Kurtosis of the (sample) group\n\
   pkurt      print the Excess Kurtosis of the (population) group\n\
   jarque     print the p-value of the Jarque-Beta test for normality\n\
+  dpo        print the p-value of the D'Agostino-Pearson Omnibus\n\
+             test for normality.\n\
 \n\
 String operations:\n\
   unique      print comma-separated sorted list of unique values\n\

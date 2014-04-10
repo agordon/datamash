@@ -161,6 +161,26 @@ long double skewness_value ( const long double * const values, size_t n, int df 
   return skewness;
 }
 
+/* Standard error of skewness (SES), given the sample size 'n' */
+long double SES_value ( size_t n )
+{
+  if (n<=2)
+    return nanl("");
+  return sqrtl( (long double)(6.0*n*(n-1)) /
+                  ((long double)(n-2)*(n+1)*(n+3)) );
+}
+
+/* Skewness Test statistics Z = ( sample skewness / SES ) */
+long double skewnessZ_value ( const long double * const values, size_t n)
+{
+  const long double skew = skewness_value (values,n,DF_SAMPLE);
+  const long double SES = SES_value (n);
+  if (isnan(skew) || isnan(SES) )
+    return nanl("");
+  return skew/SES;
+}
+
+
 /*
  Given an array of doubles, return the excess kurtosis
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
@@ -199,6 +219,28 @@ long double excess_kurtosis_value ( const long double * const values, size_t n, 
   return excess_kurtosis;
 }
 
+/* Standard error of kurtisos (SEK), given the sample size 'n' */
+long double SEK_value ( size_t n )
+{
+  const long double ses = SES_value(n);
+
+  if (n<=3)
+    return nanl("");
+
+   return 2 * ses * sqrtl( (long double)(n*n-1) /
+                            ((long double)((n-3)*(n+5)))  );
+}
+
+/* Kurtosis Test statistics Z = ( sample kurtosis / SEK ) */
+long double kurtosisZ_value ( const long double * const values, size_t n)
+{
+  const long double kurt = excess_kurtosis_value (values,n,DF_SAMPLE);
+  const long double SEK = SEK_value (n);
+  if (isnan(kurt) || isnan(SEK) )
+    return nanl("");
+  return kurt/SEK;
+}
+
 /*
  Chi-Squared - Cumulative distribution function,
  for the special case of DF=2.
@@ -219,9 +261,26 @@ long double jarque_bera_pvalue ( const long double * const values, size_t n )
 {
   const long double k = excess_kurtosis_value(values,n,DF_POPULATION);
   const long double s = skewness_value(values,n,DF_POPULATION);
-  const long double jb = (n*(s*s + k*k/4))/6.0 ;
-  const long double pval = 1 - pchisq_df2(jb);
+  const long double jb = (long double)(n*(s*s + k*k/4))/6.0 ;
+  const long double pval = 1.0 - pchisq_df2(jb);
   if (n<=1 || isnan(k) || isnan(s))
+    return nanl("");
+  return pval;
+}
+
+/*
+ D'Agostino-Perason omnibus test for normality.
+ returns the p-value,
+ where the null-hypothesis is normal distribution.
+*/
+long double dagostino_pearson_omnibus_pvalue( const long double * const values, size_t n)
+{
+  const long double z_skew = skewnessZ_value (values, n);
+  const long double z_kurt = kurtosisZ_value (values, n);
+  const long double DP = z_skew*z_skew + z_kurt*z_kurt;
+  const long double pval = 1.0 - pchisq_df2( DP );
+
+  if (isnan(z_skew) || isnan(z_kurt))
     return nanl("");
   return pval;
 }

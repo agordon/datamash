@@ -51,6 +51,20 @@ sub c
   return join "", map { "$_\n" } @_ ;
 }
 
+=pod
+ rep(value,count) = returns a list of 'values' repeated 'count' times.
+ Akin to R's "rep()" function.
+
+ my @a = rep(65,4)
+ @a == ( 65, 65, 65, 65 )
+=cut
+sub rep
+{
+  my ($value,$count) = @_;
+  my @result = map { $value } ( 1 .. $count ) ;
+  return @result ;
+}
+
 my $seq1 = c( 1,2,3,4 );
 my $seq2 = c( 1,2,3 );
 my $seq3 = c( 2 );
@@ -92,6 +106,11 @@ my $seq22 = c(61,61,61,61,61,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,
               67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,
               67,67,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,
               70,70,70,70,70,70,70,70,73,73,73,73,73,73,73,73);
+# Sequence from worked example:
+#   http://www.tc3.edu/instruct/sbrown/stat/shape.htm
+# "Example 2: Size of Rat Litters"
+my $seq23 =  c(rep(1,7),rep(2,33),rep(3,58),rep(4,116),rep(5,125),rep(6,126),
+               rep(7,121),rep(8,107),rep(9,56),rep(10,37),rep(11,25),rep(12,4));
 
 =pod
 The compute tests below should return the same results are thes R commands:
@@ -119,6 +138,8 @@ The compute tests below should return the same results are thes R commands:
               67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,
               67,67,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,
               70,70,70,70,70,70,70,70,73,73,73,73,73,73,73,73)
+    seq23 =  c(rep(1,7),rep(2,33),rep(3,58),rep(4,116),rep(5,125),rep(6,126),
+               rep(7,121),rep(8,107),rep(9,56),rep(10,37),rep(11,25),rep(12,4))
 
     # define a population-flavor variance and sd functions
     # (R's default are sample-variance and sample-sd)
@@ -149,8 +170,24 @@ The compute tests below should return the same results are thes R commands:
              ( (n+1) * pop.excess_kurtosis(x) + 6 )
      }
 
+    # Helper function for SES - Standard Error of Skewness
+    SES = function(n) { sqrt( (6*n*(n-1)) / ( (n-2)*(n+1)*(n+3) ) ) }
+    # Helper function for SEK - Standard ERror of Kurtosis
+    SEK = function(n) { 2*SES(n) * sqrt ( (n*n-1) / ( (n-3)*(n+5)  ) ) }
+
+    # Helper function for Skewness Test Statistics
+    skewnessZ = function(x) { smp.skewness(x)/SES(length(x)) }
+    # Helper function for Kurtosis  Test Statistics
+    kurtosisZ = function(x) { smp.excess_kurtosis(x)/SEK(length(x)) }
+
     # Helper function for Jarque-Bera pValue
-    jarque.beta.pvalue=function(x) { t=jarque.test(x) ; t$p.value }
+    jarque.bera.pvalue=function(x) { t=jarque.test(x) ; t$p.value }
+
+    # Helper function for D'Agostino-Pearson Omnibus Test for normality
+    dpo=function(x) {
+         DP = skewnessZ(x)^2 + kurtosisZ(x)^2
+         pval = 1.0 - pchisq(DP,df=2)
+       }
 
     # Helper function to execute function 'f' on all input sequences
     test=function(f) {
@@ -165,6 +202,7 @@ The compute tests below should return the same results are thes R commands:
          cat(f_name,"(seq20)=", f(seq20),"\n")
          cat(f_name,"(seq21)=", f(seq21),"\n")
          cat(f_name,"(seq22)=", f(seq22),"\n")
+         cat(f_name,"(seq23)=", f(seq23),"\n")
     }
 
     # Run tests
@@ -183,7 +221,7 @@ The compute tests below should return the same results are thes R commands:
     test(smp.skewness)
     test(pop.excess_kurtosis)
     test(smp.excess_kurtosis)
-    test(jarque.beta.pvalue)
+    test(jarque.bera.pvalue)
 
 =cut
 
@@ -209,6 +247,7 @@ my @Tests =
   ['mean10','mean 1' ,  {IN_PIPE=>$seq20}, {OUT => "100.06\n"},],
   ['mean11','mean 1' ,  {IN_PIPE=>$seq21}, {OUT => "45.32\n"},],
   ['mean12','mean 1' ,  {IN_PIPE=>$seq22}, {OUT => "67.45\n"},],
+  ['mean13','mean 1' ,  {IN_PIPE=>$seq23}, {OUT => "6.125\n"},],
 
   # Test median
   ['med1', 'median 1' ,  {IN_PIPE=>$seq1},  {OUT => "2.5\n"}],
@@ -224,6 +263,7 @@ my @Tests =
   ['med10','median 1' ,  {IN_PIPE=>$seq20}, {OUT => "100\n"},],
   ['med11','median 1' ,  {IN_PIPE=>$seq21}, {OUT => "37\n"},],
   ['med12','median 1' ,  {IN_PIPE=>$seq22}, {OUT => "67\n"},],
+  ['med13','median 1' ,  {IN_PIPE=>$seq23}, {OUT => "6\n"},],
 
   # Test Q1
   ['q1_1', 'q1 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.75\n"}],
@@ -239,6 +279,7 @@ my @Tests =
   ['q1_10','q1 1' ,  {IN_PIPE=>$seq20},  {OUT => "93\n"},],
   ['q1_11','q1 1' ,  {IN_PIPE=>$seq21},  {OUT => "23\n"},],
   ['q1_12','q1 1' ,  {IN_PIPE=>$seq22},  {OUT => "67\n"},],
+  ['q1_13','q1 1' ,  {IN_PIPE=>$seq23},  {OUT => "4\n"},],
 
   # Test Q3
   ['q3_1', 'q3 1' ,  {IN_PIPE=>$seq1},   {OUT => "3.25\n"}],
@@ -254,6 +295,7 @@ my @Tests =
   ['q3_10','q3 1' ,  {IN_PIPE=>$seq20},  {OUT => "107\n"},],
   ['q3_11','q3 1' ,  {IN_PIPE=>$seq21},  {OUT => "61.5\n"},],
   ['q3_12','q3 1' ,  {IN_PIPE=>$seq22},  {OUT => "70\n"},],
+  ['q3_13','q3 1' ,  {IN_PIPE=>$seq23},  {OUT => "8\n"},],
 
   # Test IQR
   ['iqr_1', 'iqr 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.5\n"}],
@@ -266,6 +308,7 @@ my @Tests =
   ['iqr_8', 'iqr 1' ,  {IN_PIPE=>$seq20},  {OUT => "14\n"},],
   ['iqr_9', 'iqr 1' ,  {IN_PIPE=>$seq21},  {OUT => "38.5\n"},],
   ['iqr_10','iqr 1' ,  {IN_PIPE=>$seq22},  {OUT => "3\n"},],
+  ['iqr_11','iqr 1' ,  {IN_PIPE=>$seq23},  {OUT => "4\n"},],
 
   # Test sample standard deviation
   ['sstdev_1', 'sstdev 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.290\n"}],
@@ -278,6 +321,7 @@ my @Tests =
   ['sstdev_8', 'sstdev 1' ,  {IN_PIPE=>$seq20},  {OUT => "9.576\n"},],
   ['sstdev_9', 'sstdev 1' ,  {IN_PIPE=>$seq21},  {OUT => "30.448\n"},],
   ['sstdev_10','sstdev 1' ,  {IN_PIPE=>$seq22},  {OUT => "2.934\n"},],
+  ['sstdev_11','sstdev 1' ,  {IN_PIPE=>$seq23},  {OUT => "2.275\n"},],
 
   # Test population standard deviation
   ['pstdev_1', 'pstdev 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.118\n"}],
@@ -290,6 +334,7 @@ my @Tests =
   ['pstdev_8', 'pstdev 1' ,  {IN_PIPE=>$seq20},  {OUT => "9.528\n"},],
   ['pstdev_9', 'pstdev 1' ,  {IN_PIPE=>$seq21},  {OUT => "30.296\n"},],
   ['pstdev_10','pstdev 1' ,  {IN_PIPE=>$seq22},  {OUT => "2.920\n"},],
+  ['pstdev_11','pstdev 1' ,  {IN_PIPE=>$seq23},  {OUT => "2.274\n"},],
 
   # Test sample variance
   ['svar_1', 'svar 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.666\n"}],
@@ -302,6 +347,7 @@ my @Tests =
   ['svar_8', 'svar 1' ,  {IN_PIPE=>$seq20},  {OUT => "91.713\n"},],
   ['svar_9', 'svar 1' ,  {IN_PIPE=>$seq21},  {OUT => "927.128\n"},],
   ['svar_10','svar 1' ,  {IN_PIPE=>$seq22},  {OUT => "8.613\n"},],
+  ['svar_11','svar 1' ,  {IN_PIPE=>$seq23},  {OUT => "5.178\n"},],
 
   # Test population variance
   ['pvar_1', 'pvar 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.25\n"}],
@@ -314,6 +360,7 @@ my @Tests =
   ['pvar_8', 'pvar 1' ,  {IN_PIPE=>$seq20},  {OUT => "90.796\n"},],
   ['pvar_9', 'pvar 1' ,  {IN_PIPE=>$seq21},  {OUT => "917.857\n"},],
   ['pvar_10','pvar 1' ,  {IN_PIPE=>$seq22},  {OUT => "8.527\n"},],
+  ['pvar_11','pvar 1' ,  {IN_PIPE=>$seq23},  {OUT => "5.172\n"},],
 
   # Test MAD (Median Absolute Deviation), with default
   # scaling factor of 1.486 for normal distributions
@@ -331,6 +378,7 @@ my @Tests =
   ['mad_8', 'mad 1' ,  {IN_PIPE=>$seq20},  {OUT => "10.378\n"},],
   ['mad_9', 'mad 1' ,  {IN_PIPE=>$seq21},  {OUT => "27.428\n"},],
   ['mad_10','mad 1' ,  {IN_PIPE=>$seq22},  {OUT => "4.447\n"},],
+  ['mad_11','mad 1' ,  {IN_PIPE=>$seq23},  {OUT => "2.965\n"},],
 
   # Test MAD-Raw (Median Absolute Deviation), with scaling factor of 1
   ['madraw_1', 'madraw 1' ,  {IN_PIPE=>$seq1},   {OUT => "1\n"}],
@@ -347,6 +395,7 @@ my @Tests =
   ['madraw_8', 'madraw 1' ,  {IN_PIPE=>$seq20},  {OUT => "7\n"},],
   ['madraw_9', 'madraw 1' ,  {IN_PIPE=>$seq21},  {OUT => "18.5\n"},],
   ['madraw_10','madraw 1' ,  {IN_PIPE=>$seq22},  {OUT => "3\n"},],
+  ['madraw_11','madraw 1' ,  {IN_PIPE=>$seq23},  {OUT => "2\n"},],
 
   # Test Skewness for a population
   ['pskew_1', 'pskew 1' ,  {IN_PIPE=>$seq1},   {OUT => "0\n"}],
@@ -359,6 +408,7 @@ my @Tests =
   ['pskew_8', 'pskew 1' ,  {IN_PIPE=>$seq20},  {OUT => "-0.204\n"},],
   ['pskew_9', 'pskew 1' ,  {IN_PIPE=>$seq21},  {OUT => "1.193\n"},],
   ['pskew_10','pskew 1' ,  {IN_PIPE=>$seq22},  {OUT => "-0.108\n"},],
+  ['pskew_11','pskew 1' ,  {IN_PIPE=>$seq23},  {OUT => "0.172\n"},],
 
   # Test Skewness for a sample
   ['sskew_1', 'sskew 1' ,  {IN_PIPE=>$seq1},   {OUT => "0\n"}],
@@ -371,6 +421,7 @@ my @Tests =
   ['sskew_8', 'sskew 1' ,  {IN_PIPE=>$seq20},  {OUT => "-0.207\n"},],
   ['sskew_9', 'sskew 1' ,  {IN_PIPE=>$seq21},  {OUT => "1.212\n"},],
   ['sskew_10','sskew 1' ,  {IN_PIPE=>$seq22},  {OUT => "-0.109\n"},],
+  ['sskew_11','sskew 1' ,  {IN_PIPE=>$seq23},  {OUT => "0.173\n"},],
 
   # Test Popluation Excess Kurtosis
   ['pkurt_1', 'pkurt 1' ,  {IN_PIPE=>$seq1},   {OUT => "-1.36\n"}],
@@ -383,6 +434,7 @@ my @Tests =
   ['pkurt_8', 'pkurt 1' ,  {IN_PIPE=>$seq20},  {OUT => "-0.608\n"},],
   ['pkurt_9', 'pkurt 1' ,  {IN_PIPE=>$seq21},  {OUT => "1.802\n"},],
   ['pkurt_10','pkurt 1' ,  {IN_PIPE=>$seq22},  {OUT => "-0.258\n"},],
+  ['pkurt_11','pkurt 1' ,  {IN_PIPE=>$seq23},  {OUT => "-0.480\n"},],
 
   # Test Sample Excess Kurtosis
   ['skurt_1', 'skurt 1' ,  {IN_PIPE=>$seq1},   {OUT => "-1.2\n"}],
@@ -395,6 +447,7 @@ my @Tests =
   ['skurt_8', 'skurt 1' ,  {IN_PIPE=>$seq20},  {OUT => "-0.577\n"},],
   ['skurt_9', 'skurt 1' ,  {IN_PIPE=>$seq21},  {OUT => "1.958\n"},],
   ['skurt_10','skurt 1' ,  {IN_PIPE=>$seq22},  {OUT => "-0.209\n"},],
+  ['skurt_11','skurt 1' ,  {IN_PIPE=>$seq23},  {OUT => "-0.476\n"},],
 
   # Test Jarque-Bera normality pVale
   ['jarque_1', 'jarque 1' ,  {IN_PIPE=>$seq1},   {OUT => "0.857\n"}],
@@ -407,6 +460,20 @@ my @Tests =
   ['jarque_8', 'jarque 1' ,  {IN_PIPE=>$seq20},  {OUT => "0.327\n"},],
   ['jarque_9', 'jarque 1' ,  {IN_PIPE=>$seq21},  {OUT => "8.011e-09\n"},],
   ['jarque_10','jarque 1' ,  {IN_PIPE=>$seq22},  {OUT => "0.789\n"},],
+  ['jarque_11','jarque 1' ,  {IN_PIPE=>$seq23},  {OUT => "0.002\n"},],
+
+  # Test D'Agostino-Pearson omnibus test for normality
+  ['dpo_1', 'dpo 1' ,  {IN_PIPE=>$seq1},   {OUT => "0.900\n"}],
+  ['dpo_2', 'dpo 1' ,  {IN_PIPE=>$seq2},   {OUT => "nan\n"}],
+  ['dpo_3', 'dpo 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['dpo_4', 'dpo 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.599\n"}],
+  ['dpo_5', 'dpo 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.661\n"}],
+  ['dpo_6', 'dpo 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.575\n"}],
+  ['dpo_7', 'dpo 1' ,  {IN_PIPE=>$seq12},  {OUT => "0.570\n"}],
+  ['dpo_8', 'dpo 1' ,  {IN_PIPE=>$seq20},  {OUT => "0.334\n"},],
+  ['dpo_9', 'dpo 1' ,  {IN_PIPE=>$seq21},  {OUT => "7.689e-10\n"},],
+  ['dpo_10','dpo 1' ,  {IN_PIPE=>$seq22},  {OUT => "0.819\n"},],
+  ['dpo_11','dpo 1' ,  {IN_PIPE=>$seq23},  {OUT => "0.002\n"},],
 
 );
 

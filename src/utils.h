@@ -86,11 +86,23 @@ long double stdev_value ( const long double * const values, size_t n, int df );
  */
 long double skewness_value ( const long double * const values, size_t n, int df );
 
+/* Standard error of skewness (SES), given the sample size 'n' */
+long double SES_value ( size_t n );
+
+/* Skewness Test statistics Z = ( sample skewness / SES ) */
+long double skewnessZ_value ( const long double * const values, size_t n);
+
 /*
  Given an array of doubles, return the excess kurtosis
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
 long double excess_kurtosis_value ( const long double * const values, size_t n, int df );
+
+/* Standard error of kurtisos (SEK), given the sample size 'n' */
+long double SEK_value ( size_t n );
+
+/* Kurtosis Test statistics Z = ( sample kurtosis / SEK ) */
+long double kurtosisZ_value ( const long double * const values, size_t n);
 
 /*
  Chi-Squared - Cumulative distribution function,
@@ -98,6 +110,14 @@ long double excess_kurtosis_value ( const long double * const values, size_t n, 
  Equivalent to the R function 'pchisq(x,df=2)'.
 */
 long double pchisq_df2(long double x);
+
+/*
+ D'Agostino-Perason omnibus test for normality.
+ returns the p-value,
+ where the null-hypothesis is normal distribution.
+*/
+long double dagostino_pearson_omnibus_pvalue( const long double * const values, size_t n);
+
 
 
 /*
