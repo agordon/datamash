@@ -267,8 +267,11 @@ my @Tests =
   ['e10',  '-g 1 -t XX sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
 	  {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e11',  '--foobar' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: unrecognized option '--foobar'\n" .
-                "Try '$prog --help' for more information.\n"}],
+	  {ERR=>"$prog: unrecognized option foobar\n" .
+                "Try '$prog --help' for more information.\n"},
+          # This ERR_SUBST is needed because on some systems (e.g. OpenBSD),
+          # The error message from 'getopt_long' is slightly different then Linux's.
+          {ERR_SUBST=>'s/(unknown|unrecognized) option.*(foobar).*/unrecognized option $2/'}],
   ['e12',  '-H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
 	  {ERR=>"$prog: not enough input fields (field 4 requested, input has only 3 fields)\n"}],
   ['e13',  'sum 6' ,  {IN_PIPE=>$in_g3}, {EXIT=>1},
