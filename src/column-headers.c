@@ -108,9 +108,9 @@ build_input_line_headers(const char*line, size_t len, bool store_names)
      const char *end = ptr;
 
      /* Find the end of the input field, starting at 'ptr' */
-     if (tab != TAB_DEFAULT)
+     if (in_tab != TAB_WHITESPACE)
        {
-         while (end < lim && *end != tab)
+         while (end < lim && *end != in_tab)
            ++end;
        }
      else
@@ -134,7 +134,7 @@ build_input_line_headers(const char*line, size_t len, bool store_names)
 
      /* Find the begining of the next field */
      ptr = end ;
-     if (tab != TAB_DEFAULT)
+     if (in_tab != TAB_WHITESPACE)
        {
          if (ptr < lim)
            ++ptr;

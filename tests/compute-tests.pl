@@ -36,10 +36,14 @@ my $prog = 'compute';
 # note: '5' appears twice
 my $in1 = join("\n", qw/1 2 3 4 5 6 7 5 8 9 10/) . "\n";
 
-# Mix of whitespace and tabs
-my $in2 = "1  2\t  3\n" .
+# Mix of spaces and tabs
+my $in2 = "1 2\t 3\n" .
           "4\t5 6\n";
 my $in_minmax = join("\n", qw/5 90 -7e2 3 200 0.1e-3 42/) . "\n";
+
+# Lots of whitespace
+my $in3 = "1 \t  2\t\t\t3\t\t\n" .
+          "4\t\t\t5   6\n";
 
 my $in_g1=<<'EOF';
 A 100
@@ -57,11 +61,13 @@ B 66
 B 77
 B 55
 EOF
+my $in_g2_tab = $in_g2;
+$in_g2_tab =~ s/ /\t/gms;
 
 my $in_g3=<<'EOF';
-A 3  W
-A 5  W
-A 7  W
+A 3 W
+A 5 W
+A 7 W
 A 11 X
 A 13 X
 B 17 Y
@@ -272,7 +278,7 @@ my @Tests =
           # This ERR_SUBST is needed because on some systems (e.g. OpenBSD),
           # The error message from 'getopt_long' is slightly different then Linux's.
           {ERR_SUBST=>'s/(unknown|unrecognized) option.*(foobar).*/unrecognized option $2/'}],
-  ['e12',  '-H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+  ['e12',  '-t" " -H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
 	  {ERR=>"$prog: not enough input fields (field 4 requested, input has only 3 fields)\n"}],
   ['e13',  'sum 6' ,  {IN_PIPE=>$in_g3}, {EXIT=>1},
 	  {ERR=>"$prog: invalid numeric input in line 1 field 6: ''\n"}],
@@ -280,7 +286,7 @@ my @Tests =
 	  {ERR=>"$prog: invalid numeric input in line 2 field 6: ''\n"}],
   ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
 	  {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
-  ['e16',  'sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
+  ['e16',  '-t" " sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
 	  {ERR=>"$prog: invalid numeric input in line 3 field 2: '3a'\n"}],
 
   # No newline at the end of the lines
@@ -300,13 +306,26 @@ my @Tests =
 
 
   ## Field extraction
-  ['f1', 'sum 1', {IN_PIPE=>$in2}, {OUT=>"5\n"}],
-  ['f2', 'sum 2', {IN_PIPE=>$in2}, {OUT=>"7\n"}],
-  ['f3', 'sum 3', {IN_PIPE=>$in2}, {OUT=>"9\n"}],
-  ['f4', 'sum 3 sum 1', {IN_PIPE=>$in2}, {OUT=>"9 5\n"}],
+  ['f1', '-W sum 1', {IN_PIPE=>$in2}, {OUT=>"5\n"}],
+  ['f2', '-W sum 2', {IN_PIPE=>$in2}, {OUT=>"7\n"}],
+  ['f3', '-W sum 3', {IN_PIPE=>$in2}, {OUT=>"9\n"}],
+  ['f4', '-W sum 3 sum 1', {IN_PIPE=>$in2}, {OUT=>"9\t5\n"}],
   ['f5', '-t: sum 4', {IN_PIPE=>"11:12::13:14"}, {OUT=>"13\n"}],
   # collase non-last field (followed by whitespace, not new-line)
-  ['f6', 'unique 1', {IN_PIPE=>$in_g2}, {OUT=>"A,B\n"}],
+  ['f6', '-t" " unique 1', {IN_PIPE=>$in_g2}, {OUT=>"A,B\n"}],
+  ['f7', 'unique 1', {IN_PIPE=>$in_g2_tab}, {OUT=>"A,B\n"}],
+  # Differences between TAB (detail), Space, and whitespace delimiters
+  ['f8', 'collapse 1', {IN_PIPE=>$in2}, {OUT=>"1 2,4\n"}],
+  ['f9', 'collapse 2', {IN_PIPE=>$in2}, {OUT=>" 3,5 6\n"}],
+  ['f10', '-t" " collapse 1', {IN_PIPE=>$in2}, {OUT=>"1,4\t5\n"}],
+  ['f11', '-t" " collapse 2', {IN_PIPE=>$in2}, {OUT=>"2\t,6\n"}],
+  ['f12', '-W collapse 1', {IN_PIPE=>$in2}, {OUT=>"1,4\n"}],
+  ['f13', '-W collapse 2', {IN_PIPE=>$in2}, {OUT=>"2,5\n"}],
+  ['f14', '-W collapse 3', {IN_PIPE=>$in2}, {OUT=>"3,6\n"}],
+  ['f15', '-W collapse 1', {IN_PIPE=>$in3}, {OUT=>"1,4\n"}],
+  ['f16', '-W collapse 2', {IN_PIPE=>$in3}, {OUT=>"2,5\n"}],
+  ['f17', '-W collapse 3', {IN_PIPE=>$in3}, {OUT=>"3,6\n"}],
+
 
   # Test Absolute min/max
   ['mm1', 'min 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
@@ -319,56 +338,56 @@ my @Tests =
   #
 
   # Single group (key in column 1)
-  ['g1.1', '-g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
-  ['g2.1', '-g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
-  ['g3.1', '-g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
+  ['g1.1', '-t" " -g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
+  ['g2.1', '-t" " -g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
+  ['g3.1', '-t" " -g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
 
   # 3 groups, single line per group, custom delimiter
   ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
      {OUT=>"A=1\nB=2\nC=3\n"}],
 
   # Multiple keys (from different columns)
-  ['g8.1',     '-g1,3 sum 2', {IN_PIPE=>$in_g3},
+  ['g8.1',     '-t" " -g1,3 sum 2', {IN_PIPE=>$in_g3},
      {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
 
 
   # --full option - without grouping, returns the first line
-  ['fl1', '--full sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"A 3  W 98\n"}],
+  ['fl1', '-t" " --full sum 2', {IN_PIPE=>$in_g3},
+     {OUT=>"A 3 W 98\n"}],
   # --full with grouping - print entire line of each group
-  ['fl2', '--full -g3 sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"A 3  W 15\nA 11 X 24\nB 17 Y 17\nB 19 Z 42\n"}],
+  ['fl2', '-t" " --full -g3 sum 2', {IN_PIPE=>$in_g3},
+     {OUT=>"A 3 W 15\nA 11 X 24\nB 17 Y 17\nB 19 Z 42\n"}],
 
   # count on non-numeric fields
-  ['cnt1', '-g 1 count 1', {IN_PIPE=>$in_g2},
+  ['cnt1', '-t" " -g 1 count 1', {IN_PIPE=>$in_g2},
      {OUT=>"A 4\nB 3\n"}],
 
   # Input Header
-  ['hdr1', '-g 1 --header-in count 2',{IN_PIPE=>$in_hdr1},
+  ['hdr1', '-t" " -g 1 --header-in count 2',{IN_PIPE=>$in_hdr1},
      {OUT=>"A 5\nB 3\nC 4\n"}],
 
   # Input and output header
-  ['hdr2', '-g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
+  ['hdr2', '-t" " -g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
      {OUT=>"GroupBy(x) count(y)\nA 5\nB 3\nC 4\n"}],
 
   # Input and output header, with full line
-  ['hdr3', '-g 1 --full --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
+  ['hdr3', '-t" " -g 1 --full --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
      {OUT=>"x y z count(y)\nA 1 10 5\nB 5 10 3\nC 8 11 4\n"}],
 
   # Output Header
-  ['hdr4', '-g 1 --header-out count 2', {IN_PIPE=>$in_g3},
+  ['hdr4', '-t" " -g 1 --header-out count 2', {IN_PIPE=>$in_g3},
      {OUT=>"GroupBy(field-1) count(field-2)\nA 5\nB 2\nC 1\n"}],
 
   # Output Header with --full
-  ['hdr5', '-g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
-     {OUT=>"field-1 field-2 field-3 count(field-2)\nA 3  W 5\nB 17 Y 2\nC 23 Z 1\n"}],
+  ['hdr5', '-t" " -g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
+     {OUT=>"field-1 field-2 field-3 count(field-2)\nA 3 W 5\nB 17 Y 2\nC 23 Z 1\n"}],
 
   # Header without grouping
-  ['hdr6', '--header-out count 2', {IN_PIPE=>$in_g3},
+  ['hdr6', '-t" " --header-out count 2', {IN_PIPE=>$in_g3},
      {OUT=>"count(field-2)\n8\n"}],
 
   # Output Header, multiple ops
-  ['hdr7', '-g 1 --header-out count 2 unique 3', {IN_PIPE=>$in_g3},
+  ['hdr7', '-t" " -g 1 --header-out count 2 unique 3', {IN_PIPE=>$in_g3},
      {OUT=>"GroupBy(field-1) count(field-2) unique(field-3)\nA 5 W,X\nB 2 Y,Z\nC 1 Z\n"}],
 
   # Headers, non white-space separator
@@ -381,46 +400,45 @@ my @Tests =
 
 
   # Test single line per group
-  ['sl1', '-g 1 mean 2', {IN_PIPE=>$in_g4},
+  ['sl1', '-t" " -g 1 mean 2', {IN_PIPE=>$in_g4},
      {OUT=>"A 5\nK 6\nP 2\n"}],
-  ['sl2', '--full -g 1 mean 2', {IN_PIPE=>$in_g4},
+  ['sl2', '-t" " --full -g 1 mean 2', {IN_PIPE=>$in_g4},
      {OUT=>"A 5 5\nK 6 6\nP 2 2\n"}],
 
   # Test countunique operation
-  ['cuq1', '-g 1 countunique 3', {IN_PIPE=>$in_g3},
+  ['cuq1', '-t" " -g 1 countunique 3', {IN_PIPE=>$in_g3},
      {OUT=>"A 2\nB 2\nC 1\n"}],
-  ['cuq2', '-g 1 countunique 2', {IN_PIPE=>$in_g4},
+  ['cuq2', '-t" " -g 1 countunique 2', {IN_PIPE=>$in_g4},
      {OUT=>"A 1\nK 1\nP 1\n"}],
-  ['cuq3', '--header-in -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq1},
+  ['cuq3', '-t" " --header-in -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq1},
      {OUT=>"A 2\nB 2\n"}],
 
   # Test Tab vs White-space field separator
-  ['tab1', 'sum 2',         {IN_PIPE=>$in_tab1}, {OUT=>"6\n"}],
-  ['tab2', "-t '\t' sum 2", {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
-  ['tab3', '-T sum 2',      {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
+  ['tab1', "sum 2", {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
+  ['tab2', '-W sum 2',         {IN_PIPE=>$in_tab1}, {OUT=>"6\n"}],
 
   # Test Auto-Sorting
   # With default separator (White-space), the second column is A,B,C,D
-  ['sort1', '-s -g 2 unique 3', {IN_PIPE=>$in_sort1},
-     {OUT=>"A x\nB k,x\nC g,j\nD j\n"}],
+  ['sort1', '-W -s -g 2 unique 3', {IN_PIPE=>$in_sort1},
+     {OUT=>"A\tx\nB\tk,x\nC\tg,j\nD\tj\n"}],
   # With TAB separator, the second column is g,j,k,x
-  ['sort2', '-s -T -g 2 unique 3', {IN_PIPE=>$in_sort1},
+  ['sort2', '-s -g 2 unique 3', {IN_PIPE=>$in_sort1},
      {OUT=>"g\t6\nj\t3,4\nk\t2\nx\t1,5\n"}],
   # Control check: if we do not sort, the some groups will appear twice
   # because the input is not sorted.
-  ['sort3', '-T -g 2 unique 3', {IN_PIPE=>$in_sort1},
+  ['sort3', '-g 2 unique 3', {IN_PIPE=>$in_sort1},
      {OUT=>"x\t1\nk\t2\nj\t3\nx\t5\nj\t4\ng\t6\n"}],
 
 
   # Test Case-sensitivity, on sorted input (no 'sort' piping)
   # on both grouping and string operations
-  ['case1', '-g 1 sum 3', {IN_PIPE=>$in_case_sorted},
+  ['case1', '-t" " -g 1 sum 3', {IN_PIPE=>$in_case_sorted},
      {OUT=>"a 4\nA 7\nb 4\nB 6\n"}],
-  ['case2', '-i -g 1 sum 3', {IN_PIPE=>$in_case_sorted},
+  ['case2', '-t" " -i -g 1 sum 3', {IN_PIPE=>$in_case_sorted},
      {OUT=>"a 11\nb 10\n"}],
-  ['case3', '-g 1 unique 2', {IN_PIPE=>$in_case_sorted},
+  ['case3', '-t" " -g 1 unique 2', {IN_PIPE=>$in_case_sorted},
      {OUT=>"a X,x\nA X,x\nb Y\nB Y\n"}],
-  ['case4', '-i -g 1 unique 2', {IN_PIPE=>$in_case_sorted},
+  ['case4', '-t" " -i -g 1 unique 2', {IN_PIPE=>$in_case_sorted},
      {OUT=>"a X\nb Y\n"}],
 
   # Test Case-sensitivity, on non-sorted input (with 'sort' piping)
@@ -428,19 +446,19 @@ my @Tests =
   # NOTE: 'sort' is used with '-s' (stable sort),
   #       so with case-insensitive sort, the first appearing letter is
   #       reported (the lowercase a/b in case6 & case8).
-  ['case5', '-s -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
+  ['case5', '-t" " -s -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"A 7\nB 6\na 4\nb 4\n"}],
-  ['case6', '-s -i -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
+  ['case6', '-t" " -s -i -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"a 11\nb 10\n"}],
-  ['case7', '-s -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
+  ['case7', '-t" " -s -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"A X,x\nB Y\na X,x\nb Y\n"}],
-  ['case8', '-s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
+  ['case8', '-t" " -s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"a X\nb Y\n"}],
 
   ## Test nul-terminated lines
-  ['nul1', '-z -g 1 sum 2', {IN_PIPE=>$in_nul1},
+  ['nul1', '-t" " -z -g 1 sum 2', {IN_PIPE=>$in_nul1},
      {OUT=>"A 3\x00B 7\x00"}],
-  ['nul2', '--zero-terminated -g 1 sum 2', {IN_PIPE=>$in_nul1},
+  ['nul2', '-t" " --zero-terminated -g 1 sum 2', {IN_PIPE=>$in_nul1},
      {OUT=>"A 3\x00B 7\x00"}],
 
   # Test --help (but don't verify the output)
@@ -464,32 +482,32 @@ my @Tests =
   ['prcs11', 'sum 1', {IN_PIPE=>$in_precision2},  {OUT => "3e+14\n"}],
 
   # Test first,last operations (and 'field_op_replace_string()')
-  ['fst1',   'first 2', {IN_PIPE=>$in_g1}, {OUT=>"100\n"}],
-  ['fst2',   '-g 1 first 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100\n"}],
-  ['fst3',   '-g 1 first 2', {IN_PIPE=>$in_g2}, {OUT=>"A 100\nB 66\n"}],
-  ['fst4',   '-g 1 first 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
-  ['fst5',   '-g 1 first 2', {IN_PIPE=>$in_large_buffer1},
+  ['fst1',   '-t" " first 2', {IN_PIPE=>$in_g1}, {OUT=>"100\n"}],
+  ['fst2',   '-t" " -g 1 first 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100\n"}],
+  ['fst3',   '-t" " -g 1 first 2', {IN_PIPE=>$in_g2}, {OUT=>"A 100\nB 66\n"}],
+  ['fst4',   '-t" " -g 1 first 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
+  ['fst5',   '-t" " -g 1 first 2', {IN_PIPE=>$in_large_buffer1},
             {OUT=>"A 1\nB 3\n"}],
-  ['fst6',   '-g 1 first 2', {IN_PIPE=>$in_large_buffer2},
+  ['fst6',   '-t" " -g 1 first 2', {IN_PIPE=>$in_large_buffer2},
             {OUT=>$out_large_buffer_first}],
   # First with sort, test the 'stable' sort
-  ['fst7',   '--sort -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
+  ['fst7',   '-t" " --sort -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
             {OUT=>"A 2\nB 6\na 1\nb 4\n"}],
-  ['fst8',   '--sort -i -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
+  ['fst8',   '-t" " --sort -i -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
             {OUT=>"a 1\nb 4\n"}],
 
-  ['lst1',   'last 2', {IN_PIPE=>$in_g1}, {OUT=>"35\n"}],
-  ['lst2',   '-g 1 last 2', {IN_PIPE=>$in_g1}, {OUT=>"A 35\n"}],
-  ['lst3',   '-g 1 last 2', {IN_PIPE=>$in_g2}, {OUT=>"A 35\nB 55\n"}],
-  ['lst4',   '-g 1 last 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
-  ['lst5',   '-g 1 last 2', {IN_PIPE=>$in_large_buffer1},
+  ['lst1',   '-t" " last 2', {IN_PIPE=>$in_g1}, {OUT=>"35\n"}],
+  ['lst2',   '-t" " -g 1 last 2', {IN_PIPE=>$in_g1}, {OUT=>"A 35\n"}],
+  ['lst3',   '-t" " -g 1 last 2', {IN_PIPE=>$in_g2}, {OUT=>"A 35\nB 55\n"}],
+  ['lst4',   '-t" " -g 1 last 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
+  ['lst5',   '-t" " -g 1 last 2', {IN_PIPE=>$in_large_buffer1},
             {OUT=>"A 2\nB 4\n"}],
-  ['lst6',   '-g 1 last 2', {IN_PIPE=>$in_large_buffer2},
+  ['lst6',   '-t" " -g 1 last 2', {IN_PIPE=>$in_large_buffer2},
             {OUT=>$out_large_buffer_last}],
   # last with sort, test the 'stable' sort
-  ['lst7',   '--sort -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
+  ['lst7',   '-t" " --sort -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
             {OUT=>"A 5\nB 6\na 3\nb 4\n"}],
-  ['lst8',   '--sort -i -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
+  ['lst8',   '-t" " --sort -i -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
             {OUT=>"a 5\nb 6\n"}],
 );
 

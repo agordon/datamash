@@ -26,12 +26,14 @@
 extern char eolchar;
 
 /* If TAB has this value, blanks separate fields.  */
-enum { TAB_DEFAULT = CHAR_MAX + 1 };
+enum { TAB_WHITESPACE = CHAR_MAX + 1 };
 
-/* Tab character separating fields.  If TAB_DEFAULT, then fields are
+/* Tab character separating fields.  If TAB_WHITESPACE, then fields are
    separated by the empty string between a non-blank character and a blank
    character. */
-extern int tab ;
+extern int in_tab ;
+/* The output field separator character, defaults to a TAB (ASCII 9) */
+extern int out_tab ;
 
 /* Global case-sensitivity option. Defaults to 'true' . */
 extern bool case_sensitive ;
@@ -44,7 +46,7 @@ void init_blank_table (void);
 
 static inline void print_field_separator()
 {
-  putchar( (tab==TAB_DEFAULT)?' ':tab );
+  putchar( out_tab  );
 }
 
 static inline void print_line_separator()

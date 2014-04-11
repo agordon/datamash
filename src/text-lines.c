@@ -57,17 +57,17 @@ get_field (const struct linebuffer *line, size_t field,
   const size_t buflen = line->length;
   char* fptr = line->buffer;
   /* Move 'fptr' to point to the beginning of 'field' */
-  if (tab != TAB_DEFAULT)
+  if (in_tab != TAB_WHITESPACE)
     {
       /* delimiter is explicit character */
       while ((pos<buflen) && --field)
         {
-          while ( (pos<buflen) && (*fptr != tab))
+          while ( (pos<buflen) && (*fptr != in_tab))
             {
               ++fptr;
               ++pos;
             }
-          if ( (pos<buflen) && (*fptr == tab))
+          if ( (pos<buflen) && (*fptr == in_tab))
             {
               ++fptr;
               ++pos;
@@ -94,9 +94,9 @@ get_field (const struct linebuffer *line, size_t field,
     }
 
   /* Find the length of the field (until the next delimiter/eol) */
-  if (tab != TAB_DEFAULT)
+  if (in_tab != TAB_WHITESPACE)
     {
-      while ( (pos+flen<buflen) && (*(fptr+flen) != tab) )
+      while ( (pos+flen<buflen) && (*(fptr+flen) != in_tab) )
         flen++;
     }
   else

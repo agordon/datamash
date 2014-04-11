@@ -27,10 +27,11 @@
 /* The character marking end of line. Default to \n. */
 char eolchar = '\n';
 
-/* Tab character separating fields.  If TAB_DEFAULT, then fields are
+/* Tab character separating fields.  If TAB_WHITESPACE, then fields are
    separated by the empty string between a non-blank character and a blank
    character. */
-int tab = TAB_DEFAULT;
+int in_tab = '\t';
+int out_tab= '\t';
 
 /* Global case-sensitivity option. Defaults to 'true' . */
 bool case_sensitive = true;

@@ -84,12 +84,13 @@ enum
 #endif
 };
 
-static char const short_options[] = "sfizg:t:TH";
+static char const short_options[] = "sfizg:t:HW";
 
 static struct option const long_options[] =
 {
   {"zero-terminated", no_argument, NULL, 'z'},
   {"field-separator", required_argument, NULL, 't'},
+  {"whitespace", no_argument, NULL, 'W'},
   {"group", required_argument, NULL, 'g'},
   {"ignore-case", no_argument, NULL, 'i'},
   {"header-in", no_argument, NULL, INPUT_HEADER_OPTION},
@@ -197,9 +198,9 @@ General options:\n\
                             This affects grouping, and string operations\n\
   -s, --sort                Sort the input before grouping\n\
                             Removes the need to manually pipe the input through 'sort'\n\
-  -t, --field-separator=X   use X instead of whitespace for field delimiter\n\
-  -T                        Use tab as field separator\n\
-                            Same as -t $'\\t'\n\
+  -t, --field-separator=X   use X instead of TAB as field delimiter\n\
+  -W, --whitespace          use whitespace (one or more spaces and/or tabs)\n\
+                            for field delimiters\n\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
 "), stdout);
 
@@ -538,9 +539,9 @@ open_input()
          '-s' is not standard POSIX, but very commonly supported, including
          on GNU coreutils, Busybox, FreeBSD, MacOSX */
       strcat(cmd,"-s ");
-      if (tab != TAB_DEFAULT)
+      if (in_tab != TAB_WHITESPACE)
         {
-          snprintf(tmp,sizeof(tmp),"-t '%c' ",tab);
+          snprintf(tmp,sizeof(tmp),"-t '%c' ",in_tab);
           strcat(cmd,tmp);
         }
       for (size_t *key = group_columns; key && *key; ++key)
@@ -711,15 +712,15 @@ int main(int argc, char* argv[])
           break;
 
         case 't':
-          /* Interpret -t '' to mean 'use the NUL byte as the delimiter.'  */
           if (optarg[0] != '\0' && optarg[1] != '\0')
             error (EXIT_FAILURE, 0,
                    _("the delimiter must be a single character"));
-          tab = optarg[0];
+          in_tab = out_tab = optarg[0];
           break;
 
-        case 'T':
-          tab = '\t';
+        case 'W':
+          in_tab = TAB_WHITESPACE;
+          out_tab = '\t';
           break;
 
         case_GETOPT_HELP_CHAR;
