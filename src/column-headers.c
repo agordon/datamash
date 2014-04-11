@@ -18,6 +18,7 @@
 #include <config.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <strings.h>
 
 #include "system.h"
 #include "xalloc.h"
