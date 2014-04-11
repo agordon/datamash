@@ -86,6 +86,15 @@ if test "x$enable_debian_hardening" = "xyes" ; then
 	LDFLAGS="$LDFLAGS $DEBHARD_LDFLAGS"
 fi
 
+##
+## Check if the system's sort support "-s" (stable) sort.
+##  'sort' from GNU Coreutils, FreeBSD, OpenBSD, Busybox support it.
+##  DilOS (illumos/opensolaris) does not.
+##
+if sort -s < /dev/null > /dev/null 2>/dev/null ; then
+	AC_DEFINE([HAVE_STABLE_SORT],[1],[Define to 1 if sort on this system supports -s for stable sorting])
+fi
+
 
 # i18n support from GNU gettext.
 AM_GNU_GETTEXT_VERSION([0.17])

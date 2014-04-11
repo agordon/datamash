@@ -29,6 +29,16 @@ use CuTmpdir qw(compute);
 (my $program_name = $0) =~ s|.*/||;
 my $prog = 'compute';
 
+## Portability hack
+## Check if the system's sort supports stable sorting ('-s').
+## If it doesn't - skip some tests
+my $rc = system("sort -s < /dev/null > /dev/null 2>/dev/null");
+die "testing framework failure: failed to execute sort -s"
+  if ( ($rc == -1) || ($rc & 127) );
+my $sort_exit_code = ($rc >> 8);
+my $have_stable_sort = ($sort_exit_code==0);
+
+
 # TODO: add localization tests with "grouping"
 # Turn off localization of executable's output.
 @ENV{qw(LANGUAGE LANG LC_ALL)} = ('C') x 3;
@@ -443,17 +453,10 @@ my @Tests =
 
   # Test Case-sensitivity, on non-sorted input (with 'sort' piping)
   # on both grouping and string operations.
-  # NOTE: 'sort' is used with '-s' (stable sort),
-  #       so with case-insensitive sort, the first appearing letter is
-  #       reported (the lowercase a/b in case6 & case8).
   ['case5', '-t" " -s -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"A 7\nB 6\na 4\nb 4\n"}],
-  ['case6', '-t" " -s -i -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
-     {OUT=>"a 11\nb 10\n"}],
-  ['case7', '-t" " -s -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
+  ['case6', '-t" " -s -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
      {OUT=>"A X,x\nB Y\na X,x\nb Y\n"}],
-  ['case8', '-t" " -s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
-     {OUT=>"a X\nb Y\n"}],
 
   ## Test nul-terminated lines
   ['nul1', '-t" " -z -g 1 sum 2', {IN_PIPE=>$in_nul1},
@@ -490,11 +493,6 @@ my @Tests =
             {OUT=>"A 1\nB 3\n"}],
   ['fst6',   '-t" " -g 1 first 2', {IN_PIPE=>$in_large_buffer2},
             {OUT=>$out_large_buffer_first}],
-  # First with sort, test the 'stable' sort
-  ['fst7',   '-t" " --sort -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
-            {OUT=>"A 2\nB 6\na 1\nb 4\n"}],
-  ['fst8',   '-t" " --sort -i -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
-            {OUT=>"a 1\nb 4\n"}],
 
   ['lst1',   '-t" " last 2', {IN_PIPE=>$in_g1}, {OUT=>"35\n"}],
   ['lst2',   '-t" " -g 1 last 2', {IN_PIPE=>$in_g1}, {OUT=>"A 35\n"}],
@@ -504,12 +502,29 @@ my @Tests =
             {OUT=>"A 2\nB 4\n"}],
   ['lst6',   '-t" " -g 1 last 2', {IN_PIPE=>$in_large_buffer2},
             {OUT=>$out_large_buffer_last}],
-  # last with sort, test the 'stable' sort
-  ['lst7',   '-t" " --sort -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
-            {OUT=>"A 5\nB 6\na 3\nb 4\n"}],
-  ['lst8',   '-t" " --sort -i -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
-            {OUT=>"a 5\nb 6\n"}],
 );
+
+if ($have_stable_sort) {
+  push @Tests, (
+    # last with sort, test the 'stable' sort
+    ['lst7',   '-t" " --sort -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
+       {OUT=>"A 5\nB 6\na 3\nb 4\n"}],
+    ['lst8',   '-t" " --sort -i -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
+       {OUT=>"a 5\nb 6\n"}],
+    # First with sort, test the 'stable' sort
+    ['fst7',   '-t" " --sort -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
+       {OUT=>"A 2\nB 6\na 1\nb 4\n"}],
+    ['fst8',   '-t" " --sort -i -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
+       {OUT=>"a 1\nb 4\n"}],
+    # NOTE: 'sort' is used with '-s' (stable sort),
+    #       so with case-insensitive sort, the first appearing letter is
+    #       reported (the lowercase a/b in case7 & case8).
+    ['case7', '-t" " -s -i -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
+       {OUT=>"a 11\nb 10\n"}],
+    ['case8', '-t" " -s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
+       {OUT=>"a X\nb Y\n"}],
+ );
+}
 
 my $save_temps = $ENV{SAVE_TEMPS};
 my $verbose = $ENV{VERBOSE};

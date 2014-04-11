@@ -535,11 +535,13 @@ open_input()
       strcat(cmd,"LC_ALL=C sort ");
       if (!case_sensitive)
         strcat(cmd,"-f ");
+#ifdef HAVE_STABLE_SORT
       /* stable sort (-s) is needed to support first/last operations
          (prevent sort from re-ordering lines which are not part of the group.
          '-s' is not standard POSIX, but very commonly supported, including
          on GNU coreutils, Busybox, FreeBSD, MacOSX */
       strcat(cmd,"-s ");
+#endif
       if (in_tab != TAB_WHITESPACE)
         {
           snprintf(tmp,sizeof(tmp),"-t '%c' ",in_tab);
