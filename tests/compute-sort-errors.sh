@@ -60,7 +60,7 @@ COMPUTEDIR=$(dirname $(which compute))
 test -z "$COMPUTEDIR" && framework_failure_ "failed to find compute's directory"
 
 ## Create a 'sort' which will crash
-BADDIR=$(mktemp -d badsort.XXXXX) || framework_failure_ "failed to create bad-sort-dir"
+BADDIR=$(mktemp -d badsort.XXXXXX) || framework_failure_ "failed to create bad-sort-dir"
 echo '#!/bin/sh
 read A
 echo "$A"
