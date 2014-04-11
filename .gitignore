@@ -19,7 +19,7 @@ build-aux/
 
 
 # Autogenerate man page
-calc.1
+compute.1
 
 config.h
 config.h.in
@@ -50,6 +50,10 @@ stamp-h1
 *.o
 
 ChangeLog
+INSTALL
+
+# Jekyll's _site
+_site/
 bin/
 
 # gnulib modules, auto-generated in "./reconf"
@@ -67,18 +71,18 @@ po/remove-potcdate.sed
 
 test-suite.log
 
-calc
+compute
 
 # Coverage files
 src/*.gcda
 src/*.gcno
 lib/*.gcda
 lib/*.gcno
-calc.lcov
-calc-cov/
+compute.lcov
+compute-cov/
 
 ## TODO: change this to the name of your package tarball
-calc-*.tar.gz
+compute-*.tar.gz
 /GNUmakefile
 /README-release
 /maint.mk
