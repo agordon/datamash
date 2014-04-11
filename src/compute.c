@@ -141,13 +141,13 @@ Textual/Numeric operations:\n\
   last        the last value of the group\n\
   rand        one random value from the group\n\
   unique      comma-separated sorted list of unique values\n\
-  collapse    comma-separed list of all input values\n\
+  collapse    comma-separated list of all input values\n\
   countunique number of unique/distinct values\n\
 \n\
 "),stdout);
 
       fputs (_("\
-Statistical opeations:\n\
+Statistical operations:\n\
   mean       mean of the values\n\
   median     median value\n\
   q1         1st quartile value\n\
@@ -161,7 +161,7 @@ Statistical opeations:\n\
   svar       sample variance\n\
   mad        Median Absolute Deviation,\n\
              scaled by constant 1.4826 for normal distributions\n\
-  madraw     Median Absolute Debiation, unscaled\n\
+  madraw     Median Absolute Deviation, unscaled\n\
 "), stdout);
       fputs (_("\
   sskew      skewness of the (sample) group\n\
@@ -181,14 +181,14 @@ Statistical opeations:\n\
              For 'jarque' and 'dpo' operations:\n\
                Null hypothesis is normality.\n\
                Low p-Values indicate non-normal data.\n\
-               Hihg p-Values indicate null-hypothesis cannot be rejected.\n\
+               High p-Values indicate null-hypothesis cannot be rejected.\n\
 \n\
 "), stdout);
       fputs (_("\
 \n\
 General options:\n\
   -f, --full                Print entire input line before op results\n\
-                            (default: print only the groupped keys)\n\
+                            (default: print only the grouped keys)\n\
   -g, --group=X[,Y,Z]       Group via fields X,[Y,Z]\n\
   --header-in               First input line is column headers\n\
   --header-out              Print column headers as first line\n\
