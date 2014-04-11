@@ -86,56 +86,54 @@ make -j || die "make failed"
 make dist || die "make dist failed"
 make distcheck || die "make distcheck failed"
 
-##
-## Ask if the user wants to push (=publish) this version to GitHub.
-##
-echo ""
-echo "Do you want to publish this version (push it to github and make it public)?"
-echo "NOTE: Modifying published tags is highly discouraged, so there's no going back."
-echo "      If later on you want to change this tag (or re-tag another revision),"
-echo "      The recommended way is to simply bump the verison and publish a new tag."
-echo ""
-echo "If you abort now, you can later delete the tag with 'git tag -d $NEWVERSION',"
-echo "or publish the tag with 'git push --tags'"
-echo ""
-printf "Type 'yes' + enter to continue and publish the new tag, or CTRL-C to stop: "
-read PUSHTAG
-if [ "$PUSHTAG" = "yes" ] ; then
-	echo "Pushing tags"
-	git push --tags || die "Pushing new tags failed"
-fi
-echo
-echo
-echo
 
 ##
 ## Suggest further action
 ##
+TARBALL=compute-$NEWGITID.tar.gz
+SRCURL=https://s3.amazonaws.com/agordon/compute/src/$TARBALL
+SHA1=$(sha1sum "$TARBALL" | cut -f1 -d" ")
 echo "
 
 Further actions:
  1. Upload source tarball to S3:
-       ./build-aux/aws-upload.sh compute-$NEWGITID.tar.gz src
+       ./build-aux/aws-upload.sh "$TARBALL" src
 
- 2. Upload source tarball to GitHub Releases:
-       https://github.com/agordon/compute/releases
+ 2. Update DEB package
+       ssh deb7 ./make_deb.sh $SRCURL
 
- 3. Update Homebrew Formula
+ 3. Update RPM package
+       ssh centos ./make_rpm.sh $SRCURL
 
- 4. Update Travis-CI MacOSX
-       git co TravisMacOSX4
-       git merge master
-       git push
+ 4. Update FreeBSD binary
+       ssh fbsd ./make_bsd.sh $SRCURL
 
- 5. Create static binary:
+ 5. Update Homebrew Formula
+       URL:   $SRCURL
+       SHA1:  $SHA1
+
+ 6. Update Travis-CI MacOSX
+       git checkout -b macosx1 master
+       cp .travis.yml.MAC .travis.yml
+       git add .travis.yml
+       git commit -m "Travis Mac OS X Update"
+       git push --set-upstream origin macosx1
+       git checkout master
+
+ 7. Create static binary:
        ./build-aux/make_bin_dist.sh
-
- 6. Update RPM package
-
- 7. Update DEB package
 
  8. Update GitHub-pages (and website) to version $NEWGITID
        git co gh-pages
        vi _config.yml
+
+ 9. Push new tag to GitHub:     | To remove local git tag:
+       git push --tags          |      git tag -d $NEWVERSION
+                                | To remove Remote GitHub tag:
+                                |      git tag -d $NEWVERSION
+                                |      git push origin :refs/tags/$NEWVERSION
+
+ 10. Upload source tarball to GitHub Releases:
+       https://github.com/agordon/compute/releases
 
 "
