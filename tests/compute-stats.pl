@@ -38,6 +38,17 @@ my $prog = 'compute';
 # Turn off localization of executable's output.
 @ENV{qw(LANGUAGE LANG LC_ALL)} = ('C') x 3;
 
+
+##
+## Portability hack:
+## find the exact wording of 'nan' (not-a-number).
+## It's lower case in Linux,FreeBSD,OpenBSD, but is "NaN" on DilOS.
+my $nan = `echo "1" | $prog sskew 1`;
+chomp $nan;
+if ($nan !~ m/^nan$/i) {
+  die "Failed to detect wording of 'nan' (got '$nan')";
+}
+
 =pod
 Helper function, given a list of items,
 returns a string scalar of the items with newlines.
@@ -313,7 +324,7 @@ my @Tests =
   # Test sample standard deviation
   ['sstdev_1', 'sstdev 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.290\n"}],
   ['sstdev_2', 'sstdev 1' ,  {IN_PIPE=>$seq2},   {OUT => "1\n"}],
-  ['sstdev_3', 'sstdev 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['sstdev_3', 'sstdev 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['sstdev_4', 'sstdev 1' ,  {IN_PIPE=>$seq9},   {OUT => "7.457\n"}],
   ['sstdev_5', 'sstdev 1' ,  {IN_PIPE=>$seq10},  {OUT => "9.024\n"}],
   ['sstdev_6', 'sstdev 1' ,  {IN_PIPE=>$seq11},  {OUT => "10.152\n"}],
@@ -339,7 +350,7 @@ my @Tests =
   # Test sample variance
   ['svar_1', 'svar 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.666\n"}],
   ['svar_2', 'svar 1' ,  {IN_PIPE=>$seq2},   {OUT => "1\n"}],
-  ['svar_3', 'svar 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['svar_3', 'svar 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['svar_4', 'svar 1' ,  {IN_PIPE=>$seq9},   {OUT => "55.611\n"}],
   ['svar_5', 'svar 1' ,  {IN_PIPE=>$seq10},  {OUT => "81.433\n"}],
   ['svar_6', 'svar 1' ,  {IN_PIPE=>$seq11},  {OUT => "103.072\n"}],
@@ -400,7 +411,7 @@ my @Tests =
   # Test Skewness for a population
   ['pskew_1', 'pskew 1' ,  {IN_PIPE=>$seq1},   {OUT => "0\n"}],
   ['pskew_2', 'pskew 1' ,  {IN_PIPE=>$seq2},   {OUT => "0\n"}],
-  ['pskew_3', 'pskew 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['pskew_3', 'pskew 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['pskew_4', 'pskew 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.254\n"}],
   ['pskew_5', 'pskew 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.403\n"}],
   ['pskew_6', 'pskew 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.332\n"}],
@@ -413,7 +424,7 @@ my @Tests =
   # Test Skewness for a sample
   ['sskew_1', 'sskew 1' ,  {IN_PIPE=>$seq1},   {OUT => "0\n"}],
   ['sskew_2', 'sskew 1' ,  {IN_PIPE=>$seq2},   {OUT => "0\n"}],
-  ['sskew_3', 'sskew 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['sskew_3', 'sskew 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['sskew_4', 'sskew 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.307\n"}],
   ['sskew_5', 'sskew 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.477\n"}],
   ['sskew_6', 'sskew 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.387\n"}],
@@ -426,7 +437,7 @@ my @Tests =
   # Test Popluation Excess Kurtosis
   ['pkurt_1', 'pkurt 1' ,  {IN_PIPE=>$seq1},   {OUT => "-1.36\n"}],
   ['pkurt_2', 'pkurt 1' ,  {IN_PIPE=>$seq2},   {OUT => "-1.5\n"}],
-  ['pkurt_3', 'pkurt 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['pkurt_3', 'pkurt 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['pkurt_4', 'pkurt 1' ,  {IN_PIPE=>$seq9},   {OUT => "-1.273\n"}],
   ['pkurt_5', 'pkurt 1' ,  {IN_PIPE=>$seq10},  {OUT => "-0.987\n"}],
   ['pkurt_6', 'pkurt 1' ,  {IN_PIPE=>$seq11},  {OUT => "-1.169\n"}],
@@ -438,8 +449,8 @@ my @Tests =
 
   # Test Sample Excess Kurtosis
   ['skurt_1', 'skurt 1' ,  {IN_PIPE=>$seq1},   {OUT => "-1.2\n"}],
-  ['skurt_2', 'skurt 1' ,  {IN_PIPE=>$seq2},   {OUT => "nan\n"}],
-  ['skurt_3', 'skurt 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['skurt_2', 'skurt 1' ,  {IN_PIPE=>$seq2},   {OUT => "$nan\n"}],
+  ['skurt_3', 'skurt 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['skurt_4', 'skurt 1' ,  {IN_PIPE=>$seq9},   {OUT => "-1.283\n"}],
   ['skurt_5', 'skurt 1' ,  {IN_PIPE=>$seq10},  {OUT => "-0.781\n"}],
   ['skurt_6', 'skurt 1' ,  {IN_PIPE=>$seq11},  {OUT => "-1.116\n"}],
@@ -452,7 +463,7 @@ my @Tests =
   # Test Jarque-Bera normality pVale
   ['jarque_1', 'jarque 1' ,  {IN_PIPE=>$seq1},   {OUT => "0.857\n"}],
   ['jarque_2', 'jarque 1' ,  {IN_PIPE=>$seq2},   {OUT => "0.868\n"}],
-  ['jarque_3', 'jarque 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['jarque_3', 'jarque 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['jarque_4', 'jarque 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.702\n"}],
   ['jarque_5', 'jarque 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.712\n"}],
   ['jarque_6', 'jarque 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.660\n"}],
@@ -464,8 +475,8 @@ my @Tests =
 
   # Test D'Agostino-Pearson omnibus test for normality
   ['dpo_1', 'dpo 1' ,  {IN_PIPE=>$seq1},   {OUT => "0.900\n"}],
-  ['dpo_2', 'dpo 1' ,  {IN_PIPE=>$seq2},   {OUT => "nan\n"}],
-  ['dpo_3', 'dpo 1' ,  {IN_PIPE=>$seq3},   {OUT => "nan\n"}],
+  ['dpo_2', 'dpo 1' ,  {IN_PIPE=>$seq2},   {OUT => "$nan\n"}],
+  ['dpo_3', 'dpo 1' ,  {IN_PIPE=>$seq3},   {OUT => "$nan\n"}],
   ['dpo_4', 'dpo 1' ,  {IN_PIPE=>$seq9},   {OUT => "0.599\n"}],
   ['dpo_5', 'dpo 1' ,  {IN_PIPE=>$seq10},  {OUT => "0.661\n"}],
   ['dpo_6', 'dpo 1' ,  {IN_PIPE=>$seq11},  {OUT => "0.575\n"}],
