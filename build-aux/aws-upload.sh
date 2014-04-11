@@ -57,9 +57,9 @@ aws --profile "$AWS_PROFILE" s3 cp \
 	--acl public-read \
 	--storage-class REDUCED_REDUNDANCY \
 	"$FILE" \
-	s3://$AWS_BUCKET/$AWS_DIRECTORY/$DEST/ || die "failed to upload file to AWS"
+	s3://$AWS_BUCKET/$AWS_DIRECTORY/$DEST/ >/dev/null || die "failed to upload file to AWS"
 
 URL=https://s3.amazonaws.com/$AWS_BUCKET/$AWS_DIRECTORY/$DEST/$(basename "$FILE")
 
-echo "URL: $URL"
+echo "$URL"
 
