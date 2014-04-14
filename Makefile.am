@@ -40,17 +40,22 @@ compute_SOURCES = src/system.h \
 compute_CFLAGS = $(WARN_CFLAGS)
 compute_LDADD = \
        $(top_builddir)/lib/lib$(PACKAGE).a \
-       $(FABSL_LIBM) \
+       $(EXP_LIBM) \
+       $(EXPL_LIBM) \
        $(FABS_LIBM) \
-       $(FREXPL_LIBM) \
+       $(FABSL_LIBM) \
+       $(FLOOR_LIBM) \
        $(FREXP_LIBM) \
+       $(FREXPL_LIBM) \
        $(ISNANL_LIBM) \
-       $(LDEXPL_LIBM) \
        $(LDEXP_LIBM) \
+       $(LDEXPL_LIBM) \
        $(LIBICONV) \
        $(LIBINTL) \
-       $(SQRTL_LIBM) \
-       $(SQRT_LIBM)
+       $(ROUND_LIBM) \
+       $(ROUNDL_LIBM) \
+       $(SQRT_LIBM) \
+       $(SQRTL_LIBM)
 
 # Add LOCALDIR for gettext
 localedir = $(datadir)/locale

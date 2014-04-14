@@ -131,3 +131,12 @@
 /xstrndup.m4
 /absolute-header.m4
 /stdio_h.m4
+/ceil.m4
+/ceill.m4
+/check-math-lib.m4
+/exp.m4
+/expl.m4
+/floor.m4
+/floorl.m4
+/round.m4
+/roundl.m4

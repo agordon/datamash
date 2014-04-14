@@ -28,6 +28,14 @@
 
 #include "utils.h"
 
+/* On some systems (e.g. Cygwin) nanl is not defined,
+   and gnulib does not yet provide a replacment
+   (though it does provide 'isnanl' replacement) */
+#ifndef nanl
+  #define nanl nan
+#endif
+
+
 /* Compare two flowting-point variables, while avoiding '==' .
 see:
 http://www.gnu.org/software/libc/manual/html_node/Comparison-Functions.html */
