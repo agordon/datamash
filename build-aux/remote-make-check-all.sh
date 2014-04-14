@@ -26,11 +26,12 @@ TARBALL=$1
 
 LOGDIR=$(mktemp -d -t buildlog.XXXXXX) || die "Failed to create build log directory"
 
-HOSTS="deb7 centos fbsd obsd dilos"
+HOSTS="deb7 centos fbsd obsd dilos hurd"
 
 ##
 ## Start build on all hosts
 ##
+ALLLOGFILES=""
 for host in $HOSTS ;
 do
     LOGFILE=$LOGDIR/$host.log
@@ -38,9 +39,13 @@ do
     ./build-aux/remote-make-check.sh "$TARBALL" "$host" 1>$LOGFILE 2>&1 &
     pid=$!
     dict_set $host $pid
+    ALLLOGFILES="$ALLLOGFILES $LOGFILE"
 done
 
 echo "Waiting for remote builds to complete..."
+echo "To monitor build progress, run:"
+echo "   tail -f $ALLLOGFILES"
+echo ""
 
 
 ##
