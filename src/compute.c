@@ -50,9 +50,9 @@
 /* Until someone better comes along */
 const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon" ;
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
 /* enable debugging */
-static bool debug = false;
+bool debug = false;
 #endif
 
 /* Line number in the input file */
@@ -80,7 +80,7 @@ enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
   OUTPUT_HEADER_OPTION,
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
   DEBUG_OPTION
 #endif
 };
@@ -99,7 +99,7 @@ static struct option const long_options[] =
   {"headers", no_argument, NULL, 'H'},
   {"full", no_argument, NULL, 'f'},
   {"sort", no_argument, NULL, 's'},
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
   {"debug", no_argument, NULL, DEBUG_OPTION},
 #endif
   {GETOPT_HELP_OPTION_DECL},
@@ -204,6 +204,11 @@ General options:\n\
                             for field delimiters\n\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
 "), stdout);
+#ifdef ENABLE_BUILTIN_DEBUG
+      fputs (_("\
+      --debug               print helpful debugging information\n\
+"), stdout);
+#endif
 
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -273,7 +278,7 @@ different (const struct linebuffer* l1, const struct linebuffer* l2)
       size_t len1,len2;
       get_field(l1,*key,&str1,&len1);
       get_field(l2,*key,&str2,&len2);
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
       if (debug)
         {
           fprintf(stderr,"diff, key column = %zu, str1='", *key);
@@ -305,7 +310,7 @@ process_line (const struct linebuffer *line)
   while (op)
     {
       get_field (line, op->field, &str, &len);
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
       if (debug)
         {
           fprintf(stderr,"getfield(%zu) = len %zu: '", op->field,len);
@@ -465,7 +470,7 @@ process_file ()
           new_group = (group_first_line->length == 0
                        || different (thisline, group_first_line));
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
           if (debug)
             {
               fprintf(stderr,"group_first_line = '");
@@ -555,7 +560,7 @@ open_input()
           strcat(cmd,tmp);
         }
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
       if (debug)
         fprintf(stderr,"sort cmd = '%s'\n", cmd);
 #endif
@@ -605,7 +610,7 @@ parse_group_spec ( char* spec )
 
   /* Count number of groups parameters, by number of commas */
   num_group_colums = 1;
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
   if (debug)
     fprintf(stderr,"parse_group_spec (spec='%s')\n", spec);
 #endif
@@ -644,7 +649,7 @@ parse_group_spec ( char* spec )
     }
   group_columns[idx] = 0 ; /* marker for the last element */
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
   if (debug)
     {
       fprintf(stderr,"group columns (%p) num=%zu = ", group_columns,num_group_colums);
@@ -693,7 +698,7 @@ int main(int argc, char* argv[])
           eolchar = 0;
           break;
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
         case DEBUG_OPTION:
           debug = true;
           break;

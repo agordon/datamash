@@ -29,6 +29,11 @@
 #include "text-options.h"
 #include "column-headers.h"
 
+#ifdef ENABLE_BUILTIN_DEBUG
+/* enable debugging */
+extern bool debug;
+#endif
+
 struct columnheader
 {
         char *name;
@@ -124,7 +129,7 @@ build_input_line_headers(const char*line, size_t len, bool store_names)
        add_named_input_column_header(ptr, end-ptr);
      ++num_input_column_headers;
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
      if (debug)
        {
          fprintf(stderr,"input line header = ");

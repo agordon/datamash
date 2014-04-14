@@ -53,6 +53,26 @@ gl_WARN_ADD([-Wunused-parameter])
 gl_WARN_ADD([-Wfloat-equal])
 gl_WARN_ADD([-Werror])
 
+# Add built-in --debug option.
+# To enable, use:
+#   ./configure --enable-debug
+# Then, when running compute, use:
+#   compute --debug [other options]
+AC_ARG_ENABLE(debug,
+    AS_HELP_STRING([--enable-debug],
+                   [Build with --debug option]),
+                   [
+                     if test "$enableval" = "yes" ; then
+                       :
+                     elif test "$enableval" = "no" ; then
+                       AC_MSG_ERROR([--enable-debug does not accept an argument])
+                     fi
+                   ])
+if test "x$enable_debug" = "xyes" ; then
+	AC_DEFINE([ENABLE_BUILTIN_DEBUG],[1],[Define to 1 to enable --debug option])
+fi
+
+
 # Add Debian-specific Hardening flags
 # See:  https://wiki.debian.org/HardeningWalkthrough
 # Requires 'dpkg-buildflags' from the 'dpkg-dev' package

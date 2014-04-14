@@ -34,6 +34,11 @@
 #include "text-options.h"
 #include "field-ops.h"
 
+#ifdef ENABLE_BUILTIN_DEBUG
+/* enable debugging */
+extern bool debug;
+#endif
+
 int field_op_output_precision = 14 ; /* In the future: allow users to
 					change this */
 
@@ -207,7 +212,7 @@ field_op_collect (struct fieldop *op,
   char *endptr=NULL;
   long double num_value = 0;
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
   if (debug)
     {
       fprintf (stderr, "-- collect for %s(%zu) val='", op->name, op->field);
@@ -224,6 +229,10 @@ field_op_collect (struct fieldop *op,
       num_value = strtold (str, &endptr);
       if (errno==ERANGE || endptr==str || endptr!=(str+slen))
         return false;
+#ifdef ENABLE_BUILTIN_DEBUG
+      if (debug)
+        fprintf(stderr,"stdtold('%s') = %Lg\n", str, num_value);
+#endif
     }
 
   if (op->first && op->auto_first && op->numeric)
@@ -423,7 +432,7 @@ field_op_summarize (struct fieldop *op)
   long double numeric_result = 0 ;
   char *string_result = NULL;
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
   if (debug)
     fprintf (stderr, "-- summarize for %s(%zu)\n", op->name, op->field);
 #endif
@@ -552,7 +561,7 @@ field_op_summarize (struct fieldop *op)
     }
 
 
-#ifdef ENABLE_DEBUG
+#ifdef ENABLE_BUILTIN_DEBUG
   if (debug)
     {
       if (print_numeric_result)
