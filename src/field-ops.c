@@ -211,6 +211,9 @@ field_op_collect (struct fieldop *op,
 {
   char *endptr=NULL;
   long double num_value = 0;
+#ifdef HAVE_BROKEN_STRTOLD
+  char tmpbuf[512];
+#endif
 
 #ifdef ENABLE_BUILTIN_DEBUG
   if (debug)
@@ -226,9 +229,21 @@ field_op_collect (struct fieldop *op,
   if (op->numeric)
     {
       errno = 0;
+#ifdef HAVE_BROKEN_STRTOLD
+      /* On Cygwin, strtold doesn't stop at a tab character, and returns invalid
+         value. Make a copy of the input buffer and NULL-terminate it */
+      if (slen >= sizeof(tmpbuf))
+        error (EXIT_FAILURE, 0, _("internal error: input field too long (%zu)"), slen);
+      memcpy(tmpbuf,str,slen);
+      tmpbuf[slen]=0;
+      num_value = strtold (tmpbuf, &endptr);
+      if (errno==ERANGE || endptr==tmpbuf || endptr!=(tmpbuf+slen))
+        return false;
+#else
       num_value = strtold (str, &endptr);
       if (errno==ERANGE || endptr==str || endptr!=(str+slen))
         return false;
+#endif
 #ifdef ENABLE_BUILTIN_DEBUG
       if (debug)
         fprintf(stderr,"stdtold('%s') = %Lg\n", str, num_value);

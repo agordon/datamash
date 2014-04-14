@@ -106,6 +106,17 @@ if test "x$enable_debian_hardening" = "xyes" ; then
 	LDFLAGS="$LDFLAGS $DEBHARD_LDFLAGS"
 fi
 
+
+## Test for CygWin hosts - these have a broken 'strtold()' implementation:
+##  calling strtold("4\t5",NULL) returns "e+9999",
+## whereas every other (sane) system returns "4" and stops at the whitespace.
+case "$host" in
+  *-cygwin) have_broken_strtold=yes ;;
+esac
+if test "x$have_broken_strtold" = "xyes" ; then
+AC_DEFINE([HAVE_BROKEN_STRTOLD],[1],[Define to 1 if strtold does not work properly (e.g. in cygwin)])
+fi
+
 ##
 ## Check if the system's sort support "-s" (stable) sort.
 ##  'sort' from GNU Coreutils, FreeBSD, OpenBSD, Busybox support it.
