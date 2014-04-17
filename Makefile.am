@@ -172,9 +172,20 @@ MOSTLYCLEANFILES =
 MOSTLYCLEANDIRS =
 BUILT_SOURCES =
 
+##
+## Documentation, using Gnulib's 'gendocs' module
+##
+gendocs = build-aux/gendocs.sh
+gendocs_envvars = GENDOCS_TEMPLATE_DIR=doc
+#
+manual = compute
+manual_title=Compute
+email = $(PACKAGE_BUGREPORT)
+gendocs_args = --email $(email) $(manual) $(manual_title)
+
 
 include $(top_srcdir)/lib/local.mk
-#include $(top_srcdir)/doc/local.mk
+include $(top_srcdir)/doc/local.mk
 
 ##
 ##
