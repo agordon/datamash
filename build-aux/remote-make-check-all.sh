@@ -26,7 +26,7 @@ TARBALL=$1
 
 LOGDIR=$(mktemp -d -t buildlog.XXXXXX) || die "Failed to create build log directory"
 
-HOSTS="deb7 centos fbsd obsd dilos hurd"
+HOSTS=${HOSTS:="deb7 deb7clang deb732 deb732clang centos fbsd dilos dilos64 hurd obsd"}
 
 ##
 ## Start build on all hosts
