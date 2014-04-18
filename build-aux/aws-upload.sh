@@ -62,4 +62,3 @@ aws --profile "$AWS_PROFILE" s3 cp \
 URL=https://s3.amazonaws.com/$AWS_BUCKET/$AWS_DIRECTORY/$DEST/$(basename "$FILE")
 
 echo "$URL"
-

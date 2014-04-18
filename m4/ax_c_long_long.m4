@@ -33,6 +33,6 @@ AC_DEFUN([AX_C_LONG_LONG],
    ac_cv_c_long_long=no)
    fi])
    if test $ac_cv_c_long_long = yes; then
-     AC_DEFINE(HAVE_LONG_LONG, 1, [compiler understands long long])
+     AC_DEFINE([HAVE_LONG_LONG], 1, [compiler understands long long])
    fi
 ])

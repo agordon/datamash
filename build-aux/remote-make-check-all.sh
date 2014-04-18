@@ -49,7 +49,7 @@ echo ""
 
 
 ##
-## For for completion, report result
+## For completion, report result
 ##
 for host in $HOSTS ;
 do
