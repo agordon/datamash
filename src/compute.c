@@ -525,7 +525,7 @@ open_input()
     {
       char tmp[INT_BUFSIZE_BOUND(size_t)*2+5];
       char cmd[1024];
-      bzero(cmd,sizeof(cmd));
+      memset(cmd,0,sizeof(cmd));
 
       if (input_header)
         {

@@ -66,7 +66,7 @@ static void add_named_input_column_header(const char* buffer, size_t len)
 {
   struct columnheader *h = XZALLOC(struct columnheader);
   h->name = xmalloc(len+1);
-  bcopy(buffer,h->name,len);
+  memmove(h->name,buffer,len);
   h->name[len]=0;
 
   if (input_column_headers != NULL)
