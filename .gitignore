@@ -73,6 +73,14 @@ test-suite.log
 
 compute
 
+# Documentation files
+doc/.dirstamp
+doc/compute.info
+doc/compute.pdf
+doc/compute.t2p
+doc/stamp-vti
+doc/version.texi
+
 # Coverage files
 src/*.gcda
 src/*.gcno
