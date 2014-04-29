@@ -1,4 +1,7 @@
 package CuTmpdir;
+# This file (CuTmpDir.pm) was copied from GNU Coretils.
+# It has the following copyright notice and license:
+#
 # create, then chdir into a temporary sub-directory
 
 # Copyright (C) 2007-2013 Free Software Foundation, Inc.

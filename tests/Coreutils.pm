@@ -1,4 +1,7 @@
 package Coreutils;
+# This file (Coreutils.pm) was copied from GNU Coretils.
+# It has the following copyright notice and license:
+
 # This is a testing framework.
 
 # Copyright (C) 1998-2013 Free Software Foundation, Inc.

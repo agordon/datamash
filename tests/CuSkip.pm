@@ -1,4 +1,7 @@
 package CuSkip;
+# This file (CuSkip.pm) was copied from GNU Coretils.
+# It has the following copyright notice and license:
+
 # Skip a test: emit diag to log and to stderr, and exit 77
 
 # Copyright (C) 2011-2013 Free Software Foundation, Inc.
