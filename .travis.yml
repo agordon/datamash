@@ -5,7 +5,7 @@ compiler:
   - clang
   - gcc
 before_install:
-  - sudo apt-get install valgrind gperf lcov gettext autopoint dpkg-dev texinfo
+  - sudo apt-get install valgrind gperf lcov gettext autopoint dpkg-dev texinfo texlive
   - which automake
   - automake --version
   - which autoconf
