@@ -46,7 +46,7 @@ my $prog = 'compute';
 ##
 ## Portability hack:
 ## find the exact wording of 'nan' (not-a-number).
-## It's lower case in Linux,FreeBSD,OpenBSD, but is "NaN" on DilOS.
+## It's lower case in GNU/Linux,FreeBSD,OpenBSD, but is "NaN" on DilOS.
 my $nan = `echo "1" | $prog sskew 1`;
 chomp $nan;
 if ($nan !~ m/^nan$/i) {

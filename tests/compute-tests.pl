@@ -290,7 +290,7 @@ my @Tests =
 	  {ERR=>"$prog: unrecognized option foobar\n" .
                 "Try '$prog --help' for more information.\n"},
           # This ERR_SUBST is needed because on some systems (e.g. OpenBSD),
-          # The error message from 'getopt_long' is slightly different then Linux's.
+          # The error message from 'getopt_long' is slightly different than GNU libc's.
           {ERR_SUBST=>'s/(unknown|unrecognized) option.*(foobar).*/unrecognized option $2/'}],
   ['e12',  '-t" " -H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
 	  {ERR=>"$prog: not enough input fields (field 4 requested, input has only 3 fields)\n"}],
