@@ -27,18 +27,18 @@ SUBDIRS = po
 ##
 ## Main Program
 ##
-bin_PROGRAMS = compute
+bin_PROGRAMS = datamash
 
-compute_SOURCES = src/system.h \
+datamash_SOURCES = src/system.h \
 	       src/text-options.c src/text-options.h \
 	       src/utils.c src/utils.h \
 	       src/text-lines.c src/text-lines.h \
 	       src/column-headers.c src/column-headers.h \
 	       src/field-ops.c src/field-ops.h \
-	       src/compute.c
+	       src/datamash.c
 
-compute_CFLAGS = $(WARN_CFLAGS)
-compute_LDADD = \
+datamash_CFLAGS = $(WARN_CFLAGS)
+datamash_LDADD = \
        $(top_builddir)/lib/lib$(PACKAGE).a \
        $(EXP_LIBM) \
        $(EXPL_LIBM) \
@@ -66,16 +66,16 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 ## Man Page
 ##
 
-man_MANS = compute.1
+man_MANS = datamash.1
 EXTRA_DIST += $(man_MANS) \
-		man/compute.x \
+		man/datamash.x \
 		man/help2man
 
 CLEANFILES = $(man_MANS)
 
-compute.1: compute
+datamash.1: datamash
 	PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
-	   $(abs_top_srcdir)/man/help2man --include=$(top_srcdir)/man/compute.x compute -o $@-t
+	   $(abs_top_srcdir)/man/help2man --include=$(top_srcdir)/man/datamash.x datamash -o $@-t
 	chmod u=rw,go=r $@-t
 	mv -f $@-t $@
 
@@ -83,13 +83,13 @@ compute.1: compute
 ## Tests
 ##
 TESTS = \
-	tests/compute-show-env.sh \
-	tests/compute-tests.pl \
-	tests/compute-rand.sh \
-	tests/compute-stats.pl \
-	tests/compute-sort-header.sh \
-	tests/compute-sort-errors.sh \
-	tests/compute-valgrind.sh
+	tests/datamash-show-env.sh \
+	tests/datamash-tests.pl \
+	tests/datamash-rand.sh \
+	tests/datamash-stats.pl \
+	tests/datamash-sort-header.sh \
+	tests/datamash-sort-errors.sh \
+	tests/datamash-valgrind.sh
 
 EXTRA_DIST += \
 	tests/Coreutils.pm \
@@ -102,9 +102,9 @@ TESTS_ENVIRONMENT = \
   top_srcdir=$(abs_top_srcdir) \
   PERL5LIB='$(abs_top_srcdir)/tests$(PATH_SEPARATOR)'"$$PERL5LIB" \
   PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
-  COMPUTE=`echo compute | sed '$(transform)'` \
+  DATAMASH=`echo datamash | sed '$(transform)'` \
   test_dir='$(abs_top_srcdir)/tests' ; \
-  export top_srcdir PERL5LIB PATH COMPUTE test_dir ;
+  export top_srcdir PERL5LIB PATH DATAMASH test_dir ;
 
 ##
 ## For 'make syntax-check'
@@ -119,7 +119,7 @@ EXTRA_DIST += \
 ##
 
 ## These example files will be installed in the "{prefix}/share/APPNAME/examples"
-## directory (default "/usr/local/share/compute/examples")
+## directory (default "/usr/local/share/datamash/examples")
 examplesdir = $(pkgdatadir)/examples
 
 dist_examples_DATA = examples/readme.md \
@@ -178,8 +178,8 @@ BUILT_SOURCES =
 gendocs = build-aux/gendocs.sh
 gendocs_envvars = GENDOCS_TEMPLATE_DIR=doc
 #
-manual = compute
-manual_title=Compute
+manual = datamash
+manual_title=GNU datamash
 email = $(PACKAGE_BUGREPORT)
 gendocs_args = --email $(email) $(manual) $(manual_title)
 

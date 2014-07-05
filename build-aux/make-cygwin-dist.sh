@@ -2,20 +2,20 @@
 
 ## Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
 ##
-## This file is part of Compute.
+## This file is part of GNU Datamash.
 ##
-## Compute is free software: you can redistribute it and/or modify
+## GNU Datamash is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
 ##
-## Compute is distributed in the hope that it will be useful,
+## GNU Datamash is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+## along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ##
@@ -31,20 +31,20 @@ die()
 
 cd $(dirname "$0")/.. || die "failed to set directory"
 
-COMPUTEVER=$(./build-aux/git-version-gen .tarball-version) || die "can't get compute version"
+DATAMASHVER=$(./build-aux/git-version-gen .tarball-version) || die "can't get datamash version"
 
 KERNEL=cygwin
 MACHINE=win64
 
-SRC=./compute.exe
+SRC=./datamash.exe
 [ -e "$SRC" ] || die "Expected program file '$SRC' not found"
 
 DATE=$(date -u +"%F-%H%M%S")
 
-NAME="compute-${COMPUTEVER}-bin__${KERNEL}__${MACHINE}"
+NAME="datamash-${DATAMASHVER}-bin__${KERNEL}__${MACHINE}"
 mkdir -p "bin/$NAME" || die "failed to create 'bin/$NAME' directory"
 
-cp "$SRC" "bin/$NAME/compute.exe" || die "failed to create destination binary (bin/$NAME/compute)"
+cp "$SRC" "bin/$NAME/datamash.exe" || die "failed to create destination binary (bin/$NAME/datamash)"
 # Copy additional Cygwin DLLs
 DLLS=$(ldd "$SRC" | awk '{print $1}' | grep "^cyg.*\.dll") || die "Failed to detect DLLs"
 for d in $DLLS ; do

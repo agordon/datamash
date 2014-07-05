@@ -1,8 +1,8 @@
-# Compute  [![Build Status](https://travis-ci.org/agordon/compute.png?branch=master)](https://travis-ci.org/agordon/compute)
+# datamash  [![Build Status](https://travis-ci.org/agordon/datamash.png?branch=master)](https://travis-ci.org/agordon/datamash)
 
 Command-line Calculations based on input fields.
 
-Website: <http://agordon.github.io/compute/>
+Website: <http://www.gnu.org/software/datamash>
 
 
 
@@ -10,7 +10,7 @@ Website: <http://agordon.github.io/compute/>
 
 What's the sum and mean of the values in field 1 ?
 
-    $ seq 10 | compute sum 1 mean 1
+    $ seq 10 | datamash sum 1 mean 1
     55 5.5
 
 Given a file with three columns (Name, College Major, Score),
@@ -27,7 +27,7 @@ what is the average, grouped by college major?
 
     # Sort input and group by column 2, calculate average on column 3:
 
-    $ compute --sort --group 2  mean 3 < scores.txt
+    $ datamash --sort --group 2  mean 3 < scores.txt
     Arts             68.9474
     Business         87.3636
     Health-Medicine  90.6154

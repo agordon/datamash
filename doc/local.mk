@@ -1,4 +1,4 @@
-# Make compute documentation.				-*-Makefile-*-
+# Make GNU Datamash documentation.				-*-Makefile-*-
 # This is included by the top-level Makefile.am.
 
 # Based on GNU Hello:
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-info_TEXINFOS = doc/compute.texi
+info_TEXINFOS = doc/datamash.texi
 
-doc_compute_TEXINFOS = \
+doc_datamash_TEXINFOS = \
   doc/fdl.texi

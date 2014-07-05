@@ -1,23 +1,23 @@
 #!/usr/bin/perl
 =pod
-  Unit Tests for compute - perform simple calculation on input data
+  Unit Tests for GNU Datamash - perform simple calculation on input data
 
    Copyright (C) 2013-2014 Assaf Gordon <assafgordon@gmail.com
 
-   This file is part of Compute.
+   This file is part of GNU Datamash.
 
-   Compute is free software: you can redistribute it and/or modify
+   GNU Datamash is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   Compute is distributed in the hope that it will be useful,
+   GNU Datamash is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+   along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
 
    Written by Assaf Gordon.
 =cut
@@ -33,10 +33,10 @@ use warnings;
 # as in the coreutils' autotools system.
 use Coreutils;
 use CuSkip;
-use CuTmpdir qw(compute);
+use CuTmpdir qw(datamash);
 
 (my $program_name = $0) =~ s|.*/||;
-my $prog = 'compute';
+my $prog = 'datamash';
 
 # TODO: add localization tests with "grouping"
 # Turn off localization of executable's output.
@@ -128,7 +128,7 @@ my $seq23 =  c(rep(1,7),rep(2,33),rep(3,58),rep(4,116),rep(5,125),rep(6,126),
                rep(7,121),rep(8,107),rep(9,56),rep(10,37),rep(11,25),rep(12,4));
 
 =pod
-The compute tests below should return the same results are thes R commands:
+The datamash tests below should return the same results are thes R commands:
 
     seq1  = c(1,2,3,4)
     seq2  = c(1,2,3)

@@ -1,8 +1,8 @@
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
-@setfilename compute.info
+@setfilename datamash.info
 @include version.texi
-@settitle Compute @value{VERSION}
+@settitle GNU Datamash @value{VERSION}
 
 @c Define a new index for options.
 @defcodeindex op
@@ -12,7 +12,7 @@
 @c %**end of header
 
 @copying
-This manual is for Compute (version @value{VERSION}, @value{UPDATED}),
+This manual is for GNU Datamash (version @value{VERSION}, @value{UPDATED}),
 which provides command-line computations on input files.
 
 Copyright @copyright{} 2014 Assaf Gordon.
@@ -32,13 +32,13 @@ Texts.  A copy of the license is included in the section entitled
 
 @dircategory Basics
 @direntry
-* Compute: (compute).               compute
+* Datamash: (datamash).               datamash
 @end direntry
 
 @titlepage
-@title Compute
+@title GNU Datamash
 @subtitle for version @value{VERSION}, @value{UPDATED}
-@author Compute Developers (@email{assafgordon@@gmail.com})
+@author GNU Datamash Developers (@email{assafgordon@@gmail.com})
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -49,16 +49,16 @@ Texts.  A copy of the license is included in the section entitled
 
 @ifnottex
 @node Top
-@top Compute
+@top Datamash
 
-This manual is for Compute (version @value{VERSION}, @value{UPDATED}),
+This manual is for GNU Datamash (version @value{VERSION}, @value{UPDATED}),
 which provides command-line computations on input files.
 @end ifnottex
 
 @menu
 * Overview::		General purpose and information.
-* Invoking compute::	How to run @command{compute}.
-* Statistical Operations::	Statistical operations in @command{compute}.
+* Invoking datamash::	How to run @command{datamash}.
+* Statistical Operations::	Statistical operations in @command{datamash}.
 * Reporting bugs::	Sending bug reports and feature suggestions.
 * GNU Free Documentation License:: Copying and sharing this documentation.
 * Concept index::	Index of concepts.
@@ -70,17 +70,17 @@ which provides command-line computations on input files.
 
 @cindex overview
 
-The @command{compute} program
-(@url{http://compute.teamerlich.org}) performs calculation (e.g. @emph{sum,},
+The @command{datamash} program
+(@url{http://www.gnu.org/software/datamash}) performs calculation (e.g. @emph{sum,},
 @emph{count}, @emph{min}, @emph{max}, @emph{skewness}, @emph{standard deviation})
 on input files. A simple example: sum up the values in the first column of the input:
 
 @example
-$ seq 10 | compute sum 1
+$ seq 10 | datamash sum 1
 55
 @end example
 
-@command{compute} can group input data and perform operations on each group.
+@command{datamash} can group input data and perform operations on each group.
 It can sort the file, and read header lines. An example: Finding the average
 score in statistics course of college students, grouped by their college major:
 
@@ -100,7 +100,7 @@ Zackery     Engineering      54
 @cindex grouping
 @cindex example, sorting
 @cindex example, grouping
-$ compute --sort --headers --group 2 mean 3 sstdev 3 < scores.txt
+$ datamash --sort --headers --group 2 mean 3 sstdev 3 < scores.txt
 GroupBy(Major)     mean(Score)   sstdev(Score)
 Arts               68.9474       10.4215
 Business           87.3636       5.18214
@@ -110,44 +110,44 @@ Life-Sciences      55.3333       20.606
 Social-Sciences    60.2667       17.2273
 @end example
 
-@command{compute} is designed for interactive exploration of textual data,
+@command{datamash} is designed for interactive exploration of textual data,
 and for automating tasks in shell scripts.
 
-@command{compute} has a rich set of statistical functions to quickly assess
+@command{datamash} has a rich set of statistical functions to quickly assess
 information in textual input files. An example of calculating basic statistic
 (mean, 1st quartile, median, 3rd quarile, IQR, sample-standard-deviation,
 and p-value of Jarque-Bera test for normal distribution:
 
 @cindex example, statistics
 @example
-$ compute -H mean 1 q1 1 median 1 q3 1 iqr 1 sstdev 1 jarque 1 < FILE
+$ datamash -H mean 1 q1 1 median 1 q3 1 iqr 1 sstdev 1 jarque 1 < FILE
 mean(x)   q1(x)  median(x)  q3(x)   iqr(x)  sstdev(x)  jarque(x)
 45.32     23     37         61.5    38.5    30.4487    8.0113-09
 @end example
 
 
 
-@node Invoking compute
-@chapter Invoking @command{compute}
+@node Invoking datamash
+@chapter Invoking @command{datamash}
 
 @cindex invoking
 @cindex options
 @cindex usage
 @cindex help
 
-The format for running the @command{compute} program is:
+The format for running the @command{datamash} program is:
 
 @example
-compute [@var{option}]@dots{} @var{op1} @var{column1} [@var{op2} @var{column2} @dots{}]
+datamash [@var{option}]@dots{} @var{op1} @var{column1} [@var{op2} @var{column2} @dots{}]
 @end example
 
 Where @var{op1} is the operation to perform on the values in @var{column1}.
-@command{compute} reads input from stdin and performs one or more operations
+@command{datamash} reads input from stdin and performs one or more operations
 on the input data. If @option{--group} is used, each operation is performed
 on every group. If @option{--group} is not used, each operation is performed on
 all the values in the input file.
 
-@exdent @command{compute} supports the following operations:
+@exdent @command{datamash} supports the following operations:
 
 @table @asis
 @item Numeric operations:
@@ -236,7 +236,7 @@ p-value of the D'Agostino-Pearson Omnibus test for normality.
 
 @end table
 
-@exdent @command{compute} supports the following options:
+@exdent @command{datamash} supports the following options:
 
 @table @option
 @item --full
@@ -288,14 +288,14 @@ unique values in the @samp{countunique} and @samp{unique} operations.
 @opindex --sort
 @opindex -s
 @cindex sorting
-Sort the input before grouping. @command{compute} requires sorted input. If
+Sort the input before grouping. @command{datamash} requires sorted input. If
 the input is not sorted, using @option{--sort} will automatically sort the input
 before processing it further. Sorting will be performed based on the specified
 @option{--group} parameter, and respecting case @option{--ignore-case} option
 (if used). The following commands are equivalent:
 @example
-$ cat FILE | sort -k1,1 | compute --group 1 sum 1
-$ cat FILE | compute --sort --group 1 sum 1
+$ cat FILE | sort -k1,1 | datamash --group 1 sum 1
+$ cat FILE | datamash --sort --group 1 sum 1
 @end example
 
 @item --field-separator=@var{x}
@@ -343,10 +343,10 @@ standard output and then exit successfully.
 @cindex statistical operations
 
 @unnumberedsec Equivalent R functions
-compute is designed to closely follow R project's (@url{http://www.r-project.org/})
-statistical functions. See @url{http://agordon.github.io/compute/files/operators.R}
-for the R equivalent code for each of compute's operators.
-When building @command{compute} from source code on your local computer,
+GNU Datamash is designed to closely follow R project's (@url{http://www.r-project.org/})
+statistical functions. See the @file{files/operators.R} file
+for the R equivalent code for each of datamash's operators.
+When building @command{datamash} from source code on your local computer,
 operators are compared to known results of the equivalent R functions.
 
 
@@ -358,7 +358,7 @@ operators are compared to known results of the equivalent R functions.
 @cindex reporting bugs
 
 To report bugs, suggest enhancements or otherwise discuss GNU Hello,
-please send electronic mail to @email{bug-hello@@gnu.org}.
+please send electronic mail to @email{bug-datamash@@gnu.org}.
 
 @cindex checklist for bug reports
 For bug reports, please include enough information for the maintainers

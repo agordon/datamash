@@ -2,20 +2,20 @@
 
 ## Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
 ##
-## This file is part of Compute.
+## This file is part of GNU Datamash.
 ##
-## Compute is free software: you can redistribute it and/or modify
+## GNU Datamash is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
 ##
-## Compute is distributed in the hope that it will be useful,
+## GNU Datamash is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+## along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ##
@@ -29,7 +29,7 @@ fi
 
 (cat refGene.txt |
 		sort -k13,13 |
-		../compute -g 13 countunique 3 countunique 4 |
+		../datamash -g 13 countunique 3 countunique 4 |
 		awk '$2>1 || $3>1' | sort -R | head -n 100 | cut -f1 -d " " ;
 	   cut -f13 refGene.txt | sort -R -u | head -n 1000 ) |
 		 sort -u > genelist.txt

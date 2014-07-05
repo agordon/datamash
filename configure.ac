@@ -8,10 +8,10 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT([compute],
+AC_INIT([GNU datamash],
         [m4_esyscmd([build-aux/git-version-gen .tarball-version])],
 	[assafgordon@gmail.com], [],
-	[http://agordon.github.io/compute/])
+	[http://www.gnu.org/software/datamash])
 
 dnl Must come before AM_INIT_AUTOMAKE.
 AC_CONFIG_AUX_DIR([build-aux])
@@ -26,7 +26,7 @@ AC_PREREQ(2.62)
 
 # Where to generate output; srcdir location.
 AC_CONFIG_HEADERS([config.h:config.in])dnl Keep filename to 8.3 for MS-DOS.
-AC_CONFIG_SRCDIR([src/compute.c])
+AC_CONFIG_SRCDIR([src/datamash.c])
 
 dnl Checks for programs.
 # We need a C compiler.
@@ -41,8 +41,8 @@ AC_PROG_CPP
 gl_EARLY
 gl_INIT
 
-# Add extra compilation warnings. These will only apply to compute.c not to any
-# gnulib modules). See $(WARN_CFLAGS) in Makefile.am
+# Add extra compilation warnings. These will only apply to datamash.c not to
+# any gnulib modules). See $(WARN_CFLAGS) in Makefile.am
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wextra])
 gl_WARN_ADD([-Wformat-security])
@@ -51,13 +51,12 @@ gl_WARN_ADD([-Wswitch-default])
 gl_WARN_ADD([-Wformat-nonliteral])
 gl_WARN_ADD([-Wunused-parameter])
 gl_WARN_ADD([-Wfloat-equal])
-gl_WARN_ADD([-Werror])
 
 # Add built-in --debug option.
 # To enable, use:
 #   ./configure --enable-debug
-# Then, when running compute, use:
-#   compute --debug [other options]
+# Then, when running datamash, use:
+#   datamash --debug [other options]
 AC_ARG_ENABLE(debug,
     AS_HELP_STRING([--enable-debug],
                    [Build with --debug option]),

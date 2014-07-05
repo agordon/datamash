@@ -1,22 +1,22 @@
 #!/bin/sh
-#   Unit Tests for compute - perform simple calculation on input data
+#   Unit Tests for GNU Datamash - perform simple calculation on input data
 
 #    Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
 #
-#    This file is part of Compute.
+#    This file is part of GNU Datamash.
 #
-#    Compute is free software: you can redistribute it and/or modify
+#    GNU Datamash is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Compute is distributed in the hope that it will be useful,
+#    GNU Datamash is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+#    along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
 #
 #    Written by Assaf Gordon
 
@@ -43,11 +43,11 @@ GROUPPARAM=$(seq 1000 2000 | paste -d "," -s -) ||
 
 ## The expected error message when the group parameter is too long
 ## to pass to the 'sort' pipe
-echo "compute: sort command too-long (please report this bug)" > exp_err1 ||
+echo "datamash: sort command too-long (please report this bug)" > exp_err1 ||
 	framework_failure_ "failed to create exp_err1"
 
 ## The expected error message when 'sort' is not found
-printf 'sh: sort: not found\ncompute: read error (on close)' > exp_err2 ||
+printf 'sh: sort: not found\ndatamash: read error (on close)' > exp_err2 ||
 	framework_failure_ "failed to create exp_err2"
 
 ##
@@ -59,9 +59,9 @@ printf "#!/foo/bar/bad/interpreter" > "$BADDIR1/sort" ||
 chmod a+x "$BADDIR1/sort" || framework_failure_ "failed to make bad-sort executable"
 ORIGPATH=$PATH
 
-## The directory where the "compute' executable is
-COMPUTEDIR=$(dirname $(which compute))
-test -z "$COMPUTEDIR" && framework_failure_ "failed to find compute's directory"
+## The directory where the "datamash' executable is
+DATAMASHDIR=$(dirname $(which datamash))
+test -z "$DATAMASHDIR" && framework_failure_ "failed to find datamash's directory"
 
 ## Create a 'sort' which will crash
 BADDIR=$(mktemp -d badsort.XXXXXX) || framework_failure_ "failed to create bad-sort-dir"
@@ -86,8 +86,8 @@ chmod a+x "$BADDIR/sort" || framework_failure_ "failed to make $BADDIR/sort exec
 ##
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-echo "" | compute --sort --group "$GROUPPARAM" sum 1 2>err1 &&
-	{ warn_ "compute --sort (group too-long) failed to detect error" ; fail=1 ; }
+echo "" | datamash --sort --group "$GROUPPARAM" sum 1 2>err1 &&
+	{ warn_ "datamash --sort (group too-long) failed to detect error" ; fail=1 ; }
 compare_ err1 exp_err1 || { warn_ "group-too-long error message is incorrect" ; fail=1 ; }
 
 ##
@@ -96,14 +96,14 @@ compare_ err1 exp_err1 || { warn_ "group-too-long error message is incorrect" ; 
 ##
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-seq 10 | PATH=$COMPUTEDIR compute --sort -g 1 sum 1 &&
-	{ warn_ "compute --sort with non existing 'sort' did not fail (it should have failed)" ; fail=1 ; }
+seq 10 | PATH=$DATAMASHDIR datamash --sort -g 1 sum 1 &&
+	{ warn_ "datamash --sort with non existing 'sort' did not fail (it should have failed)" ; fail=1 ; }
 
 ##
 ## Test with a 'sort' that crashes
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-seq 10 | PATH=$BADDIR:$COMPUTEDIR compute --sort -g 1 sum 1 &&
-	{ warn_ "compute --sort with crashing 'sort' did not fail (it should have failed)" ; fail=1 ; }
+seq 10 | PATH=$BADDIR:$DATAMASHDIR datamash --sort -g 1 sum 1 &&
+	{ warn_ "datamash --sort with crashing 'sort' did not fail (it should have failed)" ; fail=1 ; }
 
 Exit $fail

@@ -2,20 +2,20 @@
 
 ## Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
 ##
-## This file is part of Compute.
+## This file is part of GNU Datamash.
 ##
-## Compute is free software: you can redistribute it and/or modify
+## GNU Datamash is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
 ##
-## Compute is distributed in the hope that it will be useful,
+## GNU Datamash is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+## along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
 
 
 die()
@@ -39,7 +39,7 @@ dict_get()
 }
 
 TARBALL=$1
-[ -z "$TARBALL" ] && die "missing TARBALL file name (e.g. compute-1.0.1.tar.gz)"
+[ -z "$TARBALL" ] && die "missing TARBALL file name (e.g. datamash-1.0.1.tar.gz)"
 [ -e "$TARBALL" ] || die "Tarball '$TARBALL' not found"
 
 LOGDIR=$(mktemp -d -t buildlog.XXXXXX) || die "Failed to create build log directory"

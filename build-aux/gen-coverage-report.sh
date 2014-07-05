@@ -2,20 +2,20 @@
 
 ## Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
 ##
-## This file is part of Compute.
+## This file is part of GNU Datamash.
 ##
-## Compute is free software: you can redistribute it and/or modify
+## GNU Datamash is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
 ##
-## Compute is distributed in the hope that it will be useful,
+## GNU Datamash is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+## along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ##
@@ -35,7 +35,7 @@ GCDAFILES=$(find -name "*.gcda") || die "failed to search for *.gcda files"
 GCNOFILES=$(find -name "*.gcno") || die "failed to search for *.gcno files"
 [ -z "$GCDAFILES" -o -z "$GCNOFILES" ] && die "No coverage files found (*.gcda/*.gcno) - did you rebuild with coverage instrumentation? try ./build-aux/rebuild-coverage.sh"
 
-PROJECT=compute
+PROJECT=datamash
 LCOVFILE="$PROJECT.lcov"
 REPORTDIR="$PROJECT-cov"
 

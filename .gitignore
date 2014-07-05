@@ -19,7 +19,7 @@ build-aux/
 
 
 # Autogenerate man page
-compute.1
+datamash.1
 
 config.h
 config.h.in
@@ -71,13 +71,13 @@ po/remove-potcdate.sed
 
 test-suite.log
 
-compute
+datamash
 
 # Documentation files
 doc/.dirstamp
-doc/compute.info
-doc/compute.pdf
-doc/compute.t2p
+doc/datamash.info
+doc/datamash.pdf
+doc/datamash.t2p
 doc/stamp-vti
 doc/version.texi
 
@@ -86,11 +86,11 @@ src/*.gcda
 src/*.gcno
 lib/*.gcda
 lib/*.gcno
-compute.lcov
-compute-cov/
+datamash.lcov
+datamash-cov/
 
 ## TODO: change this to the name of your package tarball
-compute-*.tar.gz
+datamash-*.tar.gz
 /GNUmakefile
 /README-release
 /maint.mk

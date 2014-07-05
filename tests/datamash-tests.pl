@@ -1,23 +1,23 @@
 #!/usr/bin/perl
 =pod
-  Unit Tests for compute - perform simple calculation on input data
+  Unit Tests for GNU Datamash - perform simple calculation on input data
 
    Copyright (C) 2013,2014 Assaf Gordon <assafgordon@gmail.com>
 
-   This file is part of Compute.
+   This file is part of GNU Datamash.
 
-   Compute is free software: you can redistribute it and/or modify
+   GNU Datamash is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   Compute is distributed in the hope that it will be useful,
+   GNU Datamash is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+   along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
 
    Written by Assaf Gordon.
 =cut
@@ -28,10 +28,10 @@ use warnings;
 # as in the coreutils' autotools system.
 use Coreutils;
 use CuSkip;
-use CuTmpdir qw(compute);
+use CuTmpdir qw(datamash);
 
 (my $program_name = $0) =~ s|.*/||;
-my $prog = 'compute';
+my $prog = 'datamash';
 
 ## Portability hack
 ## Check if the system's sort supports stable sorting ('-s').
@@ -258,7 +258,7 @@ my @Tests =
   ['b20', 'first 1',    {IN_PIPE=>$in1},  {OUT => "1\n"}],
   ['b21', 'last 1',     {IN_PIPE=>$in1},  {OUT => "10\n"}],
   # This test just ensures the 'rand' operation is functioning.
-  # It does not verify randomness (see compute-rand.sh test for that).
+  # It does not verify randomness (see datamash-rand.sh test for that).
   ['b22', 'rand 1',     {IN_PIPE=>$in1},  {OUT => "\n"},
 	  {OUT_SUBST=>'s/[0-9]+//'}],
 
