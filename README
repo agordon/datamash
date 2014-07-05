@@ -1,8 +1,81 @@
-datamash
-========
+GNU Datamash
+============
 
-Command-line Calculations based on input fields.
+GNU Datamash is a command-line program which performs basic
+numeric,textual and statistical operations on input textual data files.
+
+it is designed to be portable and reliable, and aid researchers
+to easily automate analysis pipelines, without writing code or even short scripts.
 
 Website: http://www.gnu.org/software/datamash
 
-See README.md for details.
+License: GPL Version 3 (or later).
+
+
+
+Usage
+=====
+
+Try 'datamash --help' for basic usage information.
+
+Try 'info datamash' for detailed usage information.
+
+Visit <http://www.gnu.org/software/datamash/manual.html> for more information.
+
+
+
+Examples
+========
+
+What's the sum and mean of the values in field 1 ?
+
+    $ seq 10 | datamash sum 1 mean 1
+    55 5.5
+
+Given a file with three columns (Name, College Major, Score),
+what is the average, grouped by college major?
+
+    $ cat scores.txt
+    John       Life-Sciences    91
+    Dilan      Health-Medicine  84
+    Nathaniel  Arts             88
+    Antonio    Engineering      56
+    Kerris     Business         82
+    ...
+
+
+    # Sort input and group by column 2, calculate average on column 3:
+
+    $ datamash --sort --group 2  mean 3 < scores.txt
+    Arts             68.9474
+    Business         87.3636
+    Health-Medicine  90.6154
+    Social-Sciences  60.2667
+    Life-Sciences    55.3333
+    Engineering      66.5385
+
+See more examples at <http://www.gnu.org/software/datamash/examples.html>
+
+
+
+
+Download and Installation
+=========================
+
+Download the latest source code at <http://www.gnu.org/software/datamash>.
+
+General installation commands:
+
+    $ tar -xzf datamash-[VERSION].tar.gz
+    $ cd datamash-[VERSION]
+    $ ./configure
+    $ make
+    $ make check
+    $ sudo make install
+
+
+
+Questions and Bug Reports
+=========================
+
+Please send questions and bug reports to <bug-datamash@gnu.org> .
