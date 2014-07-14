@@ -124,87 +124,57 @@ Usage: %s [OPTION] op col [op col ...]\n\
       fputs (_("\
 Performs numeric/string operations on input from stdin.\n\
 "), stdout);
-      fputs(_("\
+      fputs ("\n\
+ 'op' is the operation to perform on field 'col'.\n\
 \n\
-'op' is the operation to perform on field 'col'.\n\
-\n\
-"), stdout);
+", stdout);
 
-      fputs (_("\
-Numeric operations:\n\
-  sum        sum the of values\n\
-  min        minimum value\n\
-  max        maximum value\n\
-  absmin     minimum of the absolute values\n\
-  absmax     maximum of the absolute values\n\
-\n\
-"), stdout);
-      fputs (_("\
-Textual/Numeric operations:\n\
-  count       count number of elements in the group\n\
-  first       the first value of the group\n\
-  last        the last value of the group\n\
-  rand        one random value from the group\n\
-  unique      comma-separated sorted list of unique values\n\
-  collapse    comma-separated list of all input values\n\
-  countunique number of unique/distinct values\n\
-\n\
-"),stdout);
+      fputs (_("Numeric operations:\n"),stdout);
+      fputs ("  sum, min, max, absmin, absmax\n",stdout);
 
+      fputs (_("Textual/Numeric operations:\n"),stdout);
+      fputs ("  count, first, last, rand \n", stdout);
+      fputs ("  unique, collapse, countunique\n",stdout);
+
+      fputs (_("Statistical operations:\n"),stdout);
+      fputs ("  mean, median, q1, q3, iqr, mode, antimode\n", stdout);
+      fputs ("  pstdev, sstdev, pvar, svar, mad, madraw\n", stdout);
+      fputs ("  pskew, sskew, pkurt, skurt, pto, jarque\n", stdout);
+      fputs ("\n", stdout);
+
+      fputs (_("Options:\n"),stdout);
       fputs (_("\
-Statistical operations:\n\
-  mean       mean of the values\n\
-  median     median value\n\
-  q1         1st quartile value\n\
-  q3         3rd quartile value\n\
-  iqr        inter-quartile range\n\
-  mode       mode value (most common value)\n\
-  antimode   anti-mode value (least common value)\n\
-  pstdev     population standard deviation\n\
-  sstdev     sample standard deviation\n\
-  pvar       population variance\n\
-  svar       sample variance\n\
-  mad        Median Absolute Deviation,\n\
-             scaled by constant 1.4826 for normal distributions\n\
-  madraw     Median Absolute Deviation, unscaled\n\
+  -f, --full                print entire input line before op results\n\
+                              (default: print only the grouped keys)\n\
 "), stdout);
       fputs (_("\
-  sskew      skewness of the (sample) group\n\
-  pskew      skewness of the (population) group\n\
-             For values x reported by 'sskew' and 'pskew' operations:\n\
-                     x > 0       -  positively skewed / skewed right\n\
-                 0 > x           -  negatively skewed / skewed left\n\
-                     x > 1       -  highly skewed right \n\
-                 1 > x >  0.5    -  moderately skewed right\n\
-               0.5 > x > -0.5    -  approximately symmetric\n\
-              -0.5 > x > -1      -  moderately skewed left\n\
-                -1 > x           -  highly skewed left\n\
-  skurt      Excess Kurtosis of the (sample) group\n\
-  pkurt      Excess Kurtosis of the (population) group\n\
-  jarque     p-value of the Jarque-Beta test for normality\n\
-  dpo        p-value of the D'Agostino-Pearson Omnibus test for normality.\n\
-             For 'jarque' and 'dpo' operations:\n\
-               Null hypothesis is normality.\n\
-               Low p-Values indicate non-normal data.\n\
-               High p-Values indicate null-hypothesis cannot be rejected.\n\
-\n\
+  -g, --group=X[,Y,Z]       group via fields X,[Y,Z]\n\
 "), stdout);
       fputs (_("\
-\n\
-General options:\n\
-  -f, --full                Print entire input line before op results\n\
-                            (default: print only the grouped keys)\n\
-  -g, --group=X[,Y,Z]       Group via fields X,[Y,Z]\n\
-  --header-in               First input line is column headers\n\
-  --header-out              Print column headers as first line\n\
-  -H, --headers             Same as '--header-in --header-out'\n\
-  -i, --ignore-case         Ignore upper/lower case when comparing text\n\
-                            This affects grouping, and string operations\n\
-  -s, --sort                Sort the input before grouping\n\
-                            Removes the need to manually pipe the input through 'sort'\n\
+  --header-in               first input line is column headers\n\
+"), stdout);
+      fputs (_("\
+  --header-out              print column headers as first line\n\
+"), stdout);
+      fputs (_("\
+  -H, --headers             same as '--header-in --header-out'\n\
+"), stdout);
+      fputs (_("\
+  -i, --ignore-case         ignore upper/lower case when comparing text;\n\
+                              this affects grouping, and string operations\n\
+"), stdout);
+      fputs (_("\
+  -s, --sort                sort the input before grouping; this removes the\n\
+                              need to manually pipe the input through 'sort'\n\
+"), stdout);
+      fputs (_("\
   -t, --field-separator=X   use X instead of TAB as field delimiter\n\
+"), stdout);
+      fputs (_("\
   -W, --whitespace          use whitespace (one or more spaces and/or tabs)\n\
-                            for field delimiters\n\
+                              for field delimiters\n\
+"), stdout);
+      fputs (_("\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
 "), stdout);
 #ifdef ENABLE_BUILTIN_DEBUG
@@ -216,55 +186,25 @@ General options:\n\
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
 
-      printf (_("\
+      fputs ("\n", stdout);
+
+      fputs (_("\
 \n\
-Examples:\n\
+Example:\n\
 \n\
 Print the sum and the mean of values from column 1:\n\
 \n\
+"), stdout);
+
+      printf ("\
   $ seq 10 | %s sum 1 mean 1\n\
   55  5.5\n\
-\n"), program_name);
+\n", program_name);
 
-      printf (_("\
-Group input based on field 1, and sum values (per group) on field 2:\n\
-\n\
-  $ cat example.txt\n\
-  A  10\n\
-  A  5\n\
-  B  9\n\
-  B  11\n\
-  $ %s -g 1 sum 2 < example.txt \n\
-  A  15\n\
-  B  20\n\
-\n"), program_name);
-
-      printf (_("\
-Unsorted input must be sorted (with '-s'):\n\
-\n\
-  $ cat example.txt\n\
-  A  10\n\
-  C  4\n\
-  B  9\n\
-  C  1\n\
-  A  5\n\
-  B  11\n\
-  $ %s -s -g1 sum 2 < example.txt \n\
-  A 15\n\
-  B 20\n\
-  C 5\n\
-\n\
-Which is equivalent to:\n\
-  $ cat example.txt | sort -k1,1 | %s -g 1 sum 2\n\
-\n\
-\n\
-"), program_name, program_name);
-
-      fputs (_("\
-More detailed manual and examples, please visit\n  " PACKAGE_URL "\
-\n\
-\n\
-"), stdout);
+      fputs (_("For detailed usage information and examples, see\n"),stdout);
+      printf ("  man %s\n", program_name);
+      fputs (_("Manual and more examples available at\n"), stdout);
+      fputs ("  " PACKAGE_URL "\n", stdout);
     }
   exit (status);
 }
