@@ -411,7 +411,7 @@ my $PAT_AUTHOR        = _('Written +by');
 my $PAT_OPTIONS       = _('Options');
 my $PAT_ENVIRONMENT   = _('Environment');
 my $PAT_FILES         = _('Files');
-my $PAT_EXAMPLES      = _('Examples');
+my $PAT_EXAMPLES      = _('Examples?');
 my $PAT_FREE_SOFTWARE = _('This +is +free +software');
 
 # Start a new paragraph (if required) for these.
