@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 =pod
   Unit Tests for GNU Datamash - perform simple calculation on input data
 
