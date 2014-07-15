@@ -7,7 +7,7 @@ numeric,textual and statistical operations on input textual data files.
 it is designed to be portable and reliable, and aid researchers
 to easily automate analysis pipelines, without writing code or even short scripts.
 
-Website: http://www.gnu.org/software/datamash
+Home page: http://www.gnu.org/software/datamash
 
 License: GPL Version 3 (or later).
 
@@ -16,11 +16,12 @@ License: GPL Version 3 (or later).
 Usage
 =====
 
-Try 'datamash --help' for basic usage information.
+See `datamash --help` for basic usage information.
 
-Try 'info datamash' for detailed usage information.
+See `man datamash` for examples and operation details.
 
-Visit <http://www.gnu.org/software/datamash/manual.html> for more information.
+For the instrucions manual, see `info datamash` or visit
+  http://www.gnu.org/software/datamash/manual/
 
 
 
@@ -54,15 +55,13 @@ what is the average, grouped by college major?
     Life-Sciences    55.3333
     Engineering      66.5385
 
-See more examples at <http://www.gnu.org/software/datamash/examples.html>
-
-
+See more examples at http://www.gnu.org/software/datamash/examples/
 
 
 Download and Installation
 =========================
 
-Download the latest source code at <http://www.gnu.org/software/datamash>.
+Download the latest source code at http://www.gnu.org/software/datamash .
 
 General installation commands:
 
@@ -73,9 +72,13 @@ General installation commands:
     $ make check
     $ sudo make install
 
+See Platform/OS-specific download instructions at
+  http://www.gnu.org/software/datamash/download/
 
 
 Questions and Bug Reports
 =========================
 
-Please send questions and bug reports to <bug-datamash@gnu.org> .
+- Please send questions and bug reports to bug-datamash@gnu.org .
+- Searchable archive at http://lists.gnu.org/archive/html/bug-datamash .
+- Subscribe at https://lists.gnu.org/mailman/listinfo/bug-datamash .
