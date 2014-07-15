@@ -73,7 +73,9 @@ CLEANFILES = $(man_MANS)
 
 datamash.1: datamash $(top_srcdir)/man/datamash.x
 	PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
-	   $(abs_top_srcdir)/man/help2man --include=$(top_srcdir)/man/datamash.x datamash -o $@-t
+	   perl $(abs_top_srcdir)/man/help2man \
+	            --include=$(top_srcdir)/man/datamash.x \
+	            datamash -o $@-t
 	chmod u=rw,go=r $@-t
 	mv -f $@-t $@
 
