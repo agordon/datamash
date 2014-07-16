@@ -83,6 +83,7 @@ sub rep
 my $seq1 = c( 1,2,3,4 );
 my $seq2 = c( 1,2,3 );
 my $seq3 = c( 2 );
+my $seq4 = c( 1,2 );
 
 # These sequences are taken from the nice illustration
 # of R's 'summary()' function at:
@@ -437,6 +438,7 @@ my @Tests =
   ['sskew_9', 'sskew 1' ,  {IN_PIPE=>$seq21},  {OUT => "1.212\n"},],
   ['sskew_10','sskew 1' ,  {IN_PIPE=>$seq22},  {OUT => "-0.109\n"},],
   ['sskew_11','sskew 1' ,  {IN_PIPE=>$seq23},  {OUT => "0.173\n"},],
+  ['sskew_12','sskew 1' ,  {IN_PIPE=>$seq4},   {OUT => "$nan\n"}],
 
   # Test Popluation Excess Kurtosis
   ['pkurt_1', 'pkurt 1' ,  {IN_PIPE=>$seq1},   {OUT => "-1.36\n"}],
