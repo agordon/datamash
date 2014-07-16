@@ -237,7 +237,8 @@ field_op_collect (struct fieldop *op,
       /* On Cygwin, strtold doesn't stop at a tab character, and returns invalid
          value. Make a copy of the input buffer and NULL-terminate it */
       if (slen >= sizeof(tmpbuf))
-        error (EXIT_FAILURE, 0, _("internal error: input field too long (%zu)"), slen);
+        error (EXIT_FAILURE, 0,
+                "internal error: input field too long (%zu)", slen);
       memcpy(tmpbuf,str,slen);
       tmpbuf[slen]=0;
       num_value = strtold (tmpbuf, &endptr);
@@ -345,7 +346,8 @@ field_op_collect (struct fieldop *op,
 
     default:
       /* Should never happen */
-      error (EXIT_FAILURE, 0, _("internal error 3"));
+      error (EXIT_FAILURE, 0,       /* LCOV_EXCL_LINE */
+               "internal error 3"); /* LCOV_EXCL_LINE */
     }
 
   if (op->first)
@@ -576,7 +578,8 @@ field_op_summarize (struct fieldop *op)
 
     default:
       /* Should never happen */
-      error (EXIT_FAILURE, 0, _("internal error 2"));
+      error (EXIT_FAILURE, 0,        /* LCOV_EXCL_LINE */
+                "internal error 2"); /* LCOV_EXCL_LINE */
     }
 
 

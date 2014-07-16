@@ -73,8 +73,9 @@ long double percentile_value ( const long double * const values,
   const double h = ( (n-1) * percentile ) ;
   const size_t fh = floor(h);
 
+  /* Error in the calling parameters, should not happen */
   if (n==0 || percentile<0.0 || percentile>100.0)
-    return 0;
+    return 0; /* LCOV_EXCL_LINE */
 
   if (n==1)
     return values[0];
