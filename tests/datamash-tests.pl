@@ -111,7 +111,7 @@ C 1 33
 C 2 44
 EOF
 
-# Same data, different field separator
+# Header line, with custom field separator
 my $in_hdr2=<<'EOF';
 x:y:z
 A:3:W
@@ -122,6 +122,23 @@ A:13:X
 B:17:Y
 B:19:Z
 C:23:Z
+EOF
+
+# Same as $in_hdr1, but with whitespace delimiters
+my $in_hdr3=<<"EOF";
+x \t  y   z
+A  1 10
+A 2  10
+A  3 10
+A 4 10
+A   4 10
+B  5 10
+B   6\t20
+B 7 30
+C\t 8 \t11
+C\t9\t\t22
+C 1 33
+C 2 44
 EOF
 
 my $in_cnt_uniq1=<<'EOF';
@@ -411,6 +428,10 @@ my @Tests =
   # Headers, non white-space separator, 3 operations
   ['hdr9', '-g 1 -H -t: count 2 unique 3 sum 2', {IN_PIPE=>$in_hdr2},
      {OUT=>"GroupBy(x):count(y):unique(z):sum(y)\nA:5:W,X:39\nB:2:Y,Z:36\nC:1:Z:23\n"}],
+
+  # Headers, white-space separator, 3 operations
+  ['hdr10', '-W -g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr3},
+     {OUT=>"GroupBy(x)\tcount(y)\nA\t5\nB\t3\nC\t4\n"}],
 
 
   # Test single line per group
