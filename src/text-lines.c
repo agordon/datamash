@@ -32,24 +32,15 @@
 
 
 /* Force NUL-termination of the string in the linebuffer struct.
-   NOTE 1: The buffer is assumed to contain NUL later on in the program,
-           and is used in 'strtoul()'.
-   NOTE 2: The buffer cannot be simply chomp'd (by derementing length),
-           because sort's "keycompare()" function assume the last valid index
-           is one PAST the last character of the line (i.e. there is an EOL
-           charcter in the buffer). */
+   gnulib's readlinebuffer_delim() ALWAYS adds a delimiter to the buffer.
+   Change the delimiter into a NUL.
+*/
 void
 linebuffer_nullify (struct linebuffer *line)
 {
-  if (line->buffer[line->length-1]==eolchar)
-    {
-      line->buffer[line->length-1] = 0; /* make it NUL terminated */
-    }
-  else
-    {
-      /* TODO: verify this is safe, and the allocated buffer is large enough */
-      line->buffer[line->length] = 0;
-    }
+  if (line->length==0)
+    return; /* LCOV_EXCL_LINE */
+  line->buffer[line->length-1] = 0; /* make it NUL terminated */
 }
 
 void
