@@ -63,7 +63,7 @@ AC_ARG_ENABLE(debug,
                    [
                      if test "$enableval" = "yes" ; then
                        :
-                     elif test "$enableval" = "no" ; then
+                     elif test "$enableval" != "no" ; then
                        AC_MSG_ERROR([--enable-debug does not accept an argument])
                      fi
                    ])
