@@ -121,14 +121,12 @@ usage (int status)
 Usage: %s [OPTION] op col [op col ...]\n\
 "),
               program_name);
-      fputs (_("\
-Performs numeric/string operations on input from stdin.\n\
-"), stdout);
-      fputs ("\n\
- 'op' is the operation to perform on field 'col'.\n\
-\n\
-", stdout);
-
+      fputs (_("Performs numeric/string operations on input from stdin."),
+             stdout);
+      fputs ("\n\n", stdout);
+      fputs (_("'op' is the operation to perform on field 'col'."),
+             stdout);
+      fputs ("\n\n", stdout);
       fputs (_("Numeric operations:\n"),stdout);
       fputs ("  sum, min, max, absmin, absmax\n",stdout);
 
@@ -151,10 +149,10 @@ Performs numeric/string operations on input from stdin.\n\
   -g, --group=X[,Y,Z]       group via fields X,[Y,Z]\n\
 "), stdout);
       fputs (_("\
-  --header-in               first input line is column headers\n\
+      --header-in           first input line is column headers\n\
 "), stdout);
       fputs (_("\
-  --header-out              print column headers as first line\n\
+      --header-out          print column headers as first line\n\
 "), stdout);
       fputs (_("\
   -H, --headers             same as '--header-in --header-out'\n\
@@ -203,7 +201,7 @@ Print the sum and the mean of values from column 1:\n\
 
       fputs (_("For detailed usage information and examples, see\n"),stdout);
       printf ("  man %s\n", program_name);
-      fputs (_("Manual and more examples available at\n"), stdout);
+      fputs (_("The manual and more examples are available at\n"), stdout);
       fputs ("  " PACKAGE_URL "\n", stdout);
     }
   exit (status);
