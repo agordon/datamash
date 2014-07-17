@@ -137,7 +137,7 @@ Usage: %s [OPTION] op col [op col ...]\n\
       fputs (_("Statistical operations:\n"),stdout);
       fputs ("  mean, median, q1, q3, iqr, mode, antimode\n", stdout);
       fputs ("  pstdev, sstdev, pvar, svar, mad, madraw\n", stdout);
-      fputs ("  pskew, sskew, pkurt, skurt, pto, jarque\n", stdout);
+      fputs ("  pskew, sskew, pkurt, skurt, dpo, jarque\n", stdout);
       fputs ("\n", stdout);
 
       fputs (_("Options:\n"),stdout);
