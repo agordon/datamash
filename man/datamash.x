@@ -5,7 +5,15 @@ datamash - command-line calculations
 .PP
 .SH AVAILABLE OPERATIONS
 .PP
-.SS Numeric operations
+.SS File operations:
+.TP "\w'\fBcountunique\fR'u+1n"
+.B transpose
+transpose rows, columns of the input file
+.TP
+.B reverse
+reverse field order in each line
+.PP
+.SS Numeric Grouping operations
 .TP "\w'\fBcountunique\fR'u+1n"
 .B sum
 sum the of values
@@ -22,7 +30,7 @@ minimum of the absolute values
 .B absmax
 maximum of the absolute values
 .PP
-.SS Textual/Numeric operations
+.SS Textual/Numeric Grouping operations
 .TP "\w'\fBcountunique\fR'u+1n"
 .B count
 count number of elements in the group
@@ -45,7 +53,7 @@ comma-separated list of all input values
 .B countunique
 number of unique/distinct values
 .PP
-.SS Statistical operations
+.SS Statistical Grouping operations
 .TP "\w'\fBcountunique\fR'u+1n"
 .B mean
 mean of the values
@@ -193,6 +201,27 @@ Engineering       66.5          19.1
 Health-Medicine   90.6           8.8
 Life-Sciences     55.3          19.7
 Social-Sciences   60.2          16.6
+.RE
+.fi
+.PP
+Reverse field order in each line:
+.PP
+.nf
+.RS
+$ seq 6 | paste - - | \fBdatamash\fR reverse
+2    1
+4    3
+6    5
+.RE
+.fi
+.PP
+Transpose rows, columns:
+.PP
+.nf
+.RS
+$ seq 6 | paste - - | \fBdatamash\fR transpose
+1    3    5
+2    4    6
 .RE
 .fi
 .PP

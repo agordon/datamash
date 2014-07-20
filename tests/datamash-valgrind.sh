@@ -55,6 +55,16 @@ fi
 ) > in_first || framework_failure "failed to prepare 'in_first' file"
 
 
+## Prepare file with many rows, to test transpose/reverse
+seq -w 16000 | paste - - - - > in_4k_rows || framework_failure "failed to prepare 'in_4k_rows' file"
+seq -w 16000 | paste - - - - - - - - > in_2k_rows || framework_failure "failed to prepare 'in_2k_rows' file"
+
+## Prepare file with many columns and 100 rows, to test transpose/reverse
+( for i in $(seq 0 99) ; do
+    seq $((i*1000)) $((i*1000+999)) | paste -s
+  done
+) > in_1k_cols || framework_failure "failed to prepare 'in_1k_cols' file"
+
 fail=0
 
 seq 10000 | valgrind --track-origins=yes  --show-reachable=yes \
@@ -94,5 +104,16 @@ cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
                           --show-reachable=yes  --error-exitcode=1 \
                  datamash -g 1 last 2 > /dev/null || { warn_ "-g 1 last 2" ; fail=1 ; }
 
+## Test transpose and reverse on multiple (medium-sized) inputs
+for INFILE in in_4k_rows in_2k_rows in_1k_cols ;
+do
+  for CMD in transpose reverse ;
+  do
+    cat "$INFILE" | valgrind --track-origins=yes  --leak-check=full \
+                             --show-reachable=yes  --error-exitcode=1 \
+                       datamash "$CMD" > /dev/null || { warn_ "$CMD failed on $INFILE" ; fail=1 ; }
+
+  done
+done
 
 Exit $fail

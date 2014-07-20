@@ -79,16 +79,27 @@ static size_t num_group_colums = 0;
 static bool pipe_through_sort = false;
 static FILE* input_stream = NULL;
 
+/* if true, 'transpose' and 'reverse' require every line to have
+   the exact same number of fields. Otherwise, the program
+   will fail with non-zero exit code. */
+static bool strict = true;
+
+/* if 'strict' is false, lines with fewer-than-expected fields
+   will be filled with this value */
+static char* missing_field_filler = "N/A";
+
+
 enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
   OUTPUT_HEADER_OPTION,
+  NO_STRICT_OPTION,
 #ifdef ENABLE_BUILTIN_DEBUG
   DEBUG_OPTION
 #endif
 };
 
-static char const short_options[] = "sfizg:t:HW";
+static char const short_options[] = "sfF:izg:t:HW";
 
 static struct option const long_options[] =
 {
@@ -101,7 +112,9 @@ static struct option const long_options[] =
   {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
   {"headers", no_argument, NULL, 'H'},
   {"full", no_argument, NULL, 'f'},
+  {"filler", required_argument, NULL, 'F'},
   {"sort", no_argument, NULL, 's'},
+  {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
 #ifdef ENABLE_BUILTIN_DEBUG
   {"debug", no_argument, NULL, DEBUG_OPTION},
 #endif
@@ -117,30 +130,34 @@ usage (int status)
     emit_try_help ();
   else
     {
-      printf (_("\
-Usage: %s [OPTION] op col [op col ...]\n\
-"),
-              program_name);
+      printf (_("Usage: %s [OPTION] op [col] [op col ...]\n"),
+          program_name);
+      fputs ("\n", stdout);
       fputs (_("Performs numeric/string operations on input from stdin."),
-             stdout);
+          stdout);
       fputs ("\n\n", stdout);
-      fputs (_("'op' is the operation to perform on field 'col'."),
-             stdout);
+      fputs (_("'op' is the operation to perform;\n"), stdout);
+      fputs (_("For grouping operations 'col' is the input field to use."),
+          stdout);
       fputs ("\n\n", stdout);
-      fputs (_("Numeric operations:\n"),stdout);
+      fputs (_("File operations:\n"),stdout);
+      fputs ("  transpose, reverse\n",stdout);
+
+      fputs (_("Numeric Grouping operations:\n"),stdout);
       fputs ("  sum, min, max, absmin, absmax\n",stdout);
 
-      fputs (_("Textual/Numeric operations:\n"),stdout);
+      fputs (_("Textual/Numeric Grouping operations:\n"),stdout);
       fputs ("  count, first, last, rand \n", stdout);
       fputs ("  unique, collapse, countunique\n",stdout);
 
-      fputs (_("Statistical operations:\n"),stdout);
+      fputs (_("Statistical Grouping operations:\n"),stdout);
       fputs ("  mean, median, q1, q3, iqr, mode, antimode\n", stdout);
       fputs ("  pstdev, sstdev, pvar, svar, mad, madraw\n", stdout);
       fputs ("  pskew, sskew, pkurt, skurt, dpo, jarque\n", stdout);
       fputs ("\n", stdout);
 
       fputs (_("Options:\n"),stdout);
+      fputs (_("Grouping Options:\n"),stdout);
       fputs (_("\
   -f, --full                print entire input line before op results\n\
                               (default: print only the grouped keys)\n\
@@ -165,6 +182,16 @@ Usage: %s [OPTION] op col [op col ...]\n\
   -s, --sort                sort the input before grouping; this removes the\n\
                               need to manually pipe the input through 'sort'\n\
 "), stdout);
+
+      fputs (_("File Operation Options:\n"),stdout);
+      fputs (_("\
+      --no-strict           allow lines with varying number of fields\n\
+"), stdout);
+      fputs (_("\
+      --filler=X            fill missing values with X (default %s)\n\
+"), stdout);
+
+      fputs (_("General Options:\n"),stdout);
       fputs (_("\
   -t, --field-separator=X   use X instead of TAB as field delimiter\n\
 "), stdout);
@@ -184,25 +211,26 @@ Usage: %s [OPTION] op col [op col ...]\n\
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
 
-      fputs ("\n", stdout);
+      fputs ("\n\n", stdout);
 
-      fputs (_("\
-\n\
-Example:\n\
-\n\
-Print the sum and the mean of values from column 1:\n\
-\n\
-"), stdout);
-
-      printf ("\
+      fputs (_("Examples:"), stdout);
+      fputs ("\n\n", stdout);
+      fputs (_("Print the sum and the mean of values from column 1:"), stdout);
+      printf ("\n\
   $ seq 10 | %s sum 1 mean 1\n\
   55  5.5\n\
+\n", program_name);
+      fputs (_("Transpose input:"), stdout);
+      printf ("\n\
+  $ seq 10 | paste - - | %s transpose\n\
+  1    3    5    7    9\n\
+  2    4    6    8    10\n\
 \n", program_name);
 
       fputs (_("For detailed usage information and examples, see\n"),stdout);
       printf ("  man %s\n", program_name);
       fputs (_("The manual and more examples are available at\n"), stdout);
-      fputs ("  " PACKAGE_URL "\n", stdout);
+      fputs ("  " PACKAGE_URL "\n\n", stdout);
     }
   exit (status);
 }
@@ -456,9 +484,173 @@ process_file ()
       reset_field_ops ();
     }
 
-  free (lb1.buffer);
-  free (lb2.buffer);
+  freebuffer (&lb1);
+  freebuffer (&lb2);
 }
+
+struct fieldop*
+collapse_fields_in_line (struct fieldop *op, const struct linebuffer* lb)
+{
+  size_t field_num = 1;
+  const char *field_txt = NULL ;
+  size_t field_len = 0;
+
+  /* If re-using existing (already allocated) fieldop, reset it.
+     otherwise, allocate a new one. */
+  if (op)
+    reset_field_ops (op);
+  else
+    op = new_field_op(OP_COLLAPSE,0);
+
+  get_field (lb,field_num,&field_txt,&field_len);
+  while (field_len>0)
+    {
+#ifdef ENABLE_BUILTIN_DEBUG
+      if (debug)
+        {
+          fprintf(stderr,"transpose line %zu field %zu = ",
+                line_number,field_num);
+          fwrite(field_txt,sizeof(char),field_len,stderr);
+          fprintf(stderr,"\n");
+        }
+#endif
+      field_op_collect (op, field_txt, field_len);
+      field_num++;
+
+      get_field (lb,field_num,&field_txt,&field_len);
+    }
+  return op;
+}
+
+/*
+    Transpose rows and columns in input file
+ */
+static void
+transpose_file ()
+{
+  struct linebuffer lb;
+  struct linebuffer *thisline;
+  struct fieldop *op = NULL;
+  size_t field_num_max = 0;
+  size_t i,j;
+  const char*** ptrs; /* a 2D array of strings */
+  size_t *fields_num; /* array containing number-of-fields
+                         in each line */
+
+  thisline = &lb;
+
+  initbuffer (thisline);
+
+  /* For every line, collect all fields, using OP_COLLASE */
+  while (!feof (input_stream))
+    {
+      if (readlinebuffer_delim (thisline, input_stream, eolchar) == 0)
+        break;
+      linebuffer_nullify (thisline);
+      line_number++;
+
+      op = collapse_fields_in_line (NULL, thisline);
+      if (op->count > field_num_max)
+        field_num_max = op->count;
+
+      if (strict && op->count != field_num_max)
+          error (EXIT_FAILURE, 0, _("transpose input error: line %zu has " \
+                       "%zu fields (previous lines had %zu);\n" \
+                       "see --help to disable strict mode"),
+                         line_number, op->count, field_num_max);
+    }
+
+  /* For each collected line, get array of pointers to the collected
+     strings of fields */
+  ptrs = (const char***)xnmalloc (line_number, sizeof (const char**));
+  fields_num = (size_t*)xnmalloc (line_number, sizeof (size_t));
+  for (op = field_ops, i = 0; op ; op = op->next, ++i)
+    {
+      ptrs[i] = field_op_get_string_ptrs (op, false, false);
+      fields_num[i] = op->count;
+#ifdef ENABLE_BUILTIN_DEBUG
+      if (debug)
+        fprintf(stderr,"line %zu has %zu fields\n", i, fields_num[i]);
+#endif
+    }
+
+  /* Output all fields */
+  for (i = 0 ; i < field_num_max ; ++i)
+    {
+      for (j = 0; j < line_number; ++j)
+        {
+          if (j>0)
+            print_field_separator();
+
+          const char* pc = ( fields_num[j]> i) ?
+                             ( ptrs[j][i] ) : missing_field_filler ;
+          fputs (pc, stdout);
+        }
+      print_line_separator ();
+    }
+
+  /* Free pointers */
+  for (i = 0; i < line_number; ++i)
+    free (ptrs[i]);
+  free (ptrs);
+  free (fields_num);
+  freebuffer (&lb);
+}
+
+/*
+    Revers the fields in each line of the input file
+ */
+static void
+reverse_fields_in_file ()
+{
+  struct linebuffer lb;
+  struct linebuffer *thisline;
+  struct fieldop *op = NULL;
+  size_t field_num_max = 0;
+  const char** ptrs; /* a array of strings */
+
+  thisline = &lb;
+
+  initbuffer (thisline);
+#ifdef ENABLE_BUILTIN_DEBUG
+          if (debug)
+            {
+               fputs("Yo\n",stderr);
+            }
+#endif
+
+  while (!feof (input_stream))
+    {
+      if (readlinebuffer_delim (thisline, input_stream, eolchar) == 0)
+        break;
+      linebuffer_nullify (thisline);
+      line_number++;
+
+      /* For every line, collect all fields, using OP_COLLASE */
+      op = collapse_fields_in_line (op, thisline);
+      if (op->count > field_num_max)
+        field_num_max = op->count;
+
+      if (strict && op->count != field_num_max)
+          error (EXIT_FAILURE, 0, _("reverse-field input error: line %zu has " \
+                       "%zu fields (previous lines had %zu);\n" \
+                       "see --help to disable strict mode"),
+                         line_number, op->count, field_num_max);
+
+      /* Then print them in reverse order */
+      ptrs = field_op_get_string_ptrs (op, false, false);
+      for (size_t i = op->count; i > 0; i--)
+        {
+          if (i < op->count)
+            print_field_separator ();
+          fputs (ptrs[i-1], stdout);
+        }
+      print_line_separator ();
+      free (ptrs);
+    }
+  freebuffer (&lb);
+}
+
 
 static void
 open_input()
@@ -606,7 +798,7 @@ parse_group_spec ( char* spec )
 int main(int argc, char* argv[])
 {
   int optc;
-
+  enum operation_mode op_mode;
   set_program_name (argv[0]);
 
   setlocale (LC_ALL, "");
@@ -623,6 +815,10 @@ int main(int argc, char* argv[])
     {
       switch (optc)
         {
+        case 'F':
+          missing_field_filler = optarg;
+          break;
+
         case 'f':
           print_full_line = true;
           break;
@@ -660,6 +856,10 @@ int main(int argc, char* argv[])
           pipe_through_sort = true;
           break;
 
+        case NO_STRICT_OPTION:
+          strict = false;
+          break;
+
         case 't':
           if (optarg[0] != '\0' && optarg[1] != '\0')
             error (EXIT_FAILURE, 0,
@@ -687,9 +887,27 @@ int main(int argc, char* argv[])
       usage (EXIT_FAILURE);
     }
 
-  parse_operations (argc, optind, argv);
+  op_mode = parse_operation_mode (argc, optind, argv);
+
   open_input ();
-  process_file ();
+  switch(op_mode)
+    {
+    case GROUPING_MODE:
+      process_file ();
+      break;
+
+    case TRANSPOSE_MODE:
+      transpose_file ();
+      break;
+
+    case REVERSE_FIELD_MODE:
+      reverse_fields_in_file ();
+      break;
+
+    case UNKNOWN_MODE:
+    default:
+      error (EXIT_FAILURE,0,_("internal error 4"));
+    }
   free_field_ops ();
   free_sort_keys ();
   free_column_headers ();

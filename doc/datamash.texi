@@ -58,6 +58,7 @@ which provides command-line computations on input files.
 @menu
 * Overview::		General purpose and information.
 * Invoking datamash::	How to run @command{datamash}.
+* Available Operations::        Available operations in @command{datamash}.
 * Statistical Operations::	Statistical operations in @command{datamash}.
 * Reporting bugs::	Sending bug reports and feature suggestions.
 * GNU Free Documentation License:: Copying and sharing this documentation.
@@ -150,6 +151,158 @@ all the values in the input file.
 @exdent @command{datamash} supports the following operations:
 
 @table @asis
+@item File operations:
+@code{transpose}, @code{reverse}
+
+@item Numeric operations:
+@code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}
+
+@item Textual/Numeric operations:
+@code{count}, @code{first}, @code{last}, @code{rand}, @code{unique},
+@code{collapse}, @code{countunique}
+
+@item Statistical operations:
+@code{mean}, @code{median}, @code{q1}, @code{q3}, @code{iqr}, @code{mode},
+@code{antimode}, @code{pstdev}, @code{sstdev}, @code{pvar}, @code{svar},
+@code{mad}, @code{madraw}, @code{sskew}, @code{pskew}, @code{skurt},
+@code{pkurt}, @code{jarque}, @code{dpo}
+
+@end table
+
+@exdent Grouping options:
+
+@table @option
+@item --full
+@itemx -f
+@opindex --full
+@opindex -f
+Print entire input line before op results (default: print only the grouped keys).
+
+@item --group=@var{X[,Y,X]}
+@itemx -g @var{X[,Y,X]}
+@opindex --group
+@opindex -g
+@cindex grouping
+Group input via fields @var{X[,Y,Z]}. By default, fields are separated by TABs.
+Use @option{--field-separator} to change the delimiter character. Input file must
+be sorted by the same fields @var{X[,Y,Z]}. Use @option{--sort} to automatically
+sort the input. If @option{--group} is not specified, each operation is performed
+in the entire input file.
+
+@item --header-in
+@opindex --header-in
+Indicates the first input line is column headers, and should not be used for
+any calculations.
+
+@item --header-out
+@opindex --header-out
+Print column headers as first line. If the column header names are known (i.e.
+the input file had a header line, and the @command{command} was invoked with
+@option{--header-in}, @option{-H} or @option{--headers}), prints the operation
+and the name of the field (e.g. @samp{mean(X)}). Otherwise, prints the number
+operation and the field number (e.g. @samp{mean(field-3)}).
+
+@item --headers
+@itemx -H
+@opindex --headers
+@opindex -H
+Same as @samp{--header-in --header-out}. A short option indicating the input
+file has a header line, and the output should contain a header line as well.
+
+@item --ignore-case
+@itemx -i
+@opindex --ignore-case
+@opindex -i
+Ignore upper/lower case when comparing text for grouping, sorting, and comparing
+unique values in the @samp{countunique} and @samp{unique} operations.
+
+@item --sort
+@itemx -s
+@opindex --sort
+@opindex -s
+@cindex sorting
+Sort the input before grouping. @command{datamash} requires sorted input. If
+the input is not sorted, using @option{--sort} will automatically sort the input
+before processing it further. Sorting will be performed based on the specified
+@option{--group} parameter, and respecting case @option{--ignore-case} option
+(if used). The following commands are equivalent:
+@example
+$ cat FILE | sort -k1,1 | datamash --group 1 sum 1
+$ cat FILE | datamash --sort --group 1 sum 1
+@end example
+
+@end table
+
+@exdent File Operation Options:
+
+@table @option
+
+@item --no-strict
+@opindex --no-strict
+Allow lines with varying number of fields. By default, @option{transpose} and
+@option{reverse} will fail with an error message unless all input lines have
+the same number of fields.
+
+@item --filler=@var{x}
+@opindex --filler
+When use @option{--no-strict} option, missing fields will be filled with this
+value.
+@end table
+
+@exdent General options:
+
+@table @option
+
+@item --field-separator=@var{x}
+@itemx -t @var{x}
+@opindex --field-separator
+@opindex -t
+Use character @var{X} instead of TAB as field delimiter.
+
+@item --whitespace
+@itemx -W
+@opindex --whitespace
+@opindex -W
+Use whitespace (one or more spaces and/or tabs) for field delimiters.
+TAB character will be used as output field separator.
+
+@item --zero-terminated
+@item -z
+@opindex --zero-terminated
+@opindex -z
+end lines with 0 byte, not newline
+
+@item --help
+@itemx -h
+@opindex --help
+@opindex -h
+Print an informative help message on standard output and exit
+successfully.
+
+@item --version
+@itemx -v
+@opindex --version
+@opindex -v
+Print the version number and licensing information of Hello on
+standard output and then exit successfully.
+
+@end table
+
+@node Available Operations
+@chapter Available operations in @command{datamash}
+
+@table @asis
+@item File operations:
+@cindex file operations
+@cindex operations, file
+
+@table @option
+@item transpose
+transpose rows, columns of a text file
+@item reverse
+reverse fields in each line of a text file
+@end table
+
 @item Numeric operations:
 @cindex numeric operations
 @cindex operations, numeric
@@ -236,104 +389,6 @@ p-value of the D'Agostino-Pearson Omnibus test for normality.
 
 @end table
 
-@exdent @command{datamash} supports the following options:
-
-@table @option
-@item --full
-@itemx -f
-@opindex --full
-@opindex -f
-Print entire input line before op results (default: print only the grouped keys).
-
-@item --group=@var{X[,Y,X]}
-@itemx -g @var{X[,Y,X]}
-@opindex --group
-@opindex -g
-@cindex grouping
-Group input via fields @var{X[,Y,Z]}. By default, fields are separated by TABs.
-Use @option{--field-separator} to change the delimiter character. Input file must
-be sorted by the same fields @var{X[,Y,Z]}. Use @option{--sort} to automatically
-sort the input. If @option{--group} is not specified, each operation is performed
-in the entire input file.
-
-@item --header-in
-@opindex --header-in
-Indicates the first input line is column headers, and should not be used for
-any calculations.
-
-@item --header-out
-@opindex --header-out
-Print column headers as first line. If the column header names are known (i.e.
-the input file had a header line, and the @command{command} was invoked with
-@option{--header-in}, @option{-H} or @option{--headers}), prints the operation
-and the name of the field (e.g. @samp{mean(X)}). Otherwise, prints the number
-operation and the field number (e.g. @samp{mean(field-3)}).
-
-@item --headers
-@itemx -H
-@opindex --headers
-@opindex -H
-Same as @samp{--header-in --header-out}. A short option indicating the input
-file has a header line, and the output should contain a header line as well.
-
-@item --ignore-case
-@itemx -i
-@opindex --ignore-case
-@opindex -i
-Ignore upper/lower case when comparing text for grouping, sorting, and comparing
-unique values in the @samp{countunique} and @samp{unique} operations.
-
-@item --sort
-@itemx -s
-@opindex --sort
-@opindex -s
-@cindex sorting
-Sort the input before grouping. @command{datamash} requires sorted input. If
-the input is not sorted, using @option{--sort} will automatically sort the input
-before processing it further. Sorting will be performed based on the specified
-@option{--group} parameter, and respecting case @option{--ignore-case} option
-(if used). The following commands are equivalent:
-@example
-$ cat FILE | sort -k1,1 | datamash --group 1 sum 1
-$ cat FILE | datamash --sort --group 1 sum 1
-@end example
-
-@item --field-separator=@var{x}
-@itemx -t @var{x}
-@opindex --field-separator
-@opindex -t
-Use character @var{X} instead of TAB as field delimiter.
-
-@item --whitespace
-@itemx -W
-@opindex --whitespace
-@opindex -W
-Use whitespace (one or more spaces and/or tabs) for field delimiters.
-TAB character will be used as output field separator.
-
-@item --zero-terminated
-@item -z
-@opindex --zero-terminated
-@opindex -z
-end lines with 0 byte, not newline
-
-@item --help
-@itemx -h
-@opindex --help
-@opindex -h
-Print an informative help message on standard output and exit
-successfully.
-
-@item --version
-@itemx -v
-@opindex --version
-@opindex -v
-Print the version number and licensing information of Hello on
-standard output and then exit successfully.
-
-@end table
-
-
 
 @node Statistical Operations
 @chapter Statistical Operations
@@ -357,7 +412,7 @@ operators are compared to known results of the equivalent R functions.
 @cindex problems
 @cindex reporting bugs
 
-To report bugs, suggest enhancements or otherwise discuss GNU Hello,
+To report bugs, suggest enhancements or otherwise discuss GNU Datamash,
 please send electronic mail to @email{bug-datamash@@gnu.org}.
 
 @cindex checklist for bug reports
@@ -365,8 +420,8 @@ For bug reports, please include enough information for the maintainers
 to reproduce the problem.  Generally speaking, that means:
 
 @itemize @bullet
-@item The version numbers of Hello (which you can find by running
-      @w{@samp{hello --version}}) and any other program(s) or
+@item The version numbers of Datamash (which you can find by running
+      @w{@samp{datamash --version}}) and any other program(s) or
       manual(s) involved.
 @item Hardware and operating system names and versions.
 @item The contents of any input files necessary to reproduce the bug.

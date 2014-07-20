@@ -49,36 +49,36 @@ int field_op_output_precision = 14 ; /* In the future: allow users to
 struct operation_data operations[] =
 {
   {"count",   STRING_SCALAR,  IGNORE_FIRST},   /* OP_COUNT */
-  {"sum",     NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_SUM */
-  {"min",     NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_MIN */
-  {"max",     NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_MAX */
-  {"absmin",  NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_ABSMIN */
-  {"absmax",  NUMERIC_SCALAR,  AUTO_SET_FIRST}, /* OP_ABSMAX */
-  {"first",   STRING_SCALAR,   IGNORE_FIRST},   /* OP_FIRST */
-  {"last",    STRING_SCALAR,   IGNORE_FIRST},   /* OP_LAST */
-  {"rand",    STRING_SCALAR,   IGNORE_FIRST},   /* OP_RAND */
-  {"mean",    NUMERIC_SCALAR,  IGNORE_FIRST},   /* OP_MEAN */
-  {"median",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MEDIAN */
-  {"q1",      NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_QUARTILE_1 */
-  {"q3",      NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_QUARTILE_3 */
-  {"iqr",     NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_IQR */
-  {"pstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PSTDEV */
-  {"sstdev",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SSTDEV */
-  {"pvar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_PVARIANCE */
-  {"svar",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_SVARIANCE */
-  {"mad",     NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MAD */
-  {"madraw",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MADRAW */
-  {"sskew",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_S_SKEWNESS */
-  {"pskew",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_P_SKEWNESS */
-  {"skurt",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_S_EXCESS_KURTOSIS */
-  {"pkurt",   NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_P_EXCESS_KURTOSIS */
-  {"jarque",  NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_JARQUE_BETA */
-  {"dpo",     NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_DP_OMNIBUS */
-  {"mode",    NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_MODE */
-  {"antimode",NUMERIC_VECTOR,  IGNORE_FIRST},   /* OP_ANTIMODE */
-  {"unique",  STRING_VECTOR,   IGNORE_FIRST},   /* OP_UNIQUE */
-  {"collapse",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COLLAPSE */
-  {"countunique",STRING_VECTOR,   IGNORE_FIRST},   /* OP_COUNT_UNIQUE */
+  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST},   /* OP_SUM */
+  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_MIN */
+  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_MAX */
+  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_ABSMIN */
+  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_ABSMAX */
+  {"first",   STRING_SCALAR,  IGNORE_FIRST},   /* OP_FIRST */
+  {"last",    STRING_SCALAR,  IGNORE_FIRST},   /* OP_LAST */
+  {"rand",    STRING_SCALAR,  IGNORE_FIRST},   /* OP_RAND */
+  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST},   /* OP_MEAN */
+  {"median",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MEDIAN */
+  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_QUARTILE_1 */
+  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_QUARTILE_3 */
+  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_IQR */
+  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_PSTDEV */
+  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_SSTDEV */
+  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_PVARIANCE */
+  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_SVARIANCE */
+  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MAD */
+  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MADRAW */
+  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_S_SKEWNESS */
+  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_P_SKEWNESS */
+  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_S_EXCESS_KURTOSIS */
+  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_P_EXCESS_KURTOSIS */
+  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_JARQUE_BETA */
+  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_DP_OMNIBUS */
+  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MODE */
+  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_ANTIMODE */
+  {"unique",  STRING_VECTOR,  IGNORE_FIRST},   /* OP_UNIQUE */
+  {"collapse",STRING_VECTOR,  IGNORE_FIRST},   /* OP_COLLAPSE */
+  {"countunique",STRING_VECTOR, IGNORE_FIRST},   /* OP_COUNT_UNIQUE */
   {NULL, 0, 0}
 };
 
@@ -179,15 +179,15 @@ field_op_sort_values (struct fieldop *op)
 
 /* Allocate a new fieldop, initialize it based on 'oper',
    and add it to the linked-list of operations */
-void
+struct fieldop *
 new_field_op (enum operation oper, size_t field)
 {
   struct fieldop *op = XZALLOC(struct fieldop);
 
   op->op = oper;
-  op->type = operations[oper].type;
+  op->acc_type = operations[oper].acc_type;
   op->name = operations[oper].name;
-  op->numeric = (op->type == NUMERIC_SCALAR || op->type == NUMERIC_VECTOR);
+  op->numeric = (op->acc_type == NUMERIC_SCALAR || op->acc_type == NUMERIC_VECTOR);
   op->auto_first = operations[oper].auto_first;
 
   op->field = field;
@@ -206,6 +206,8 @@ new_field_op (enum operation oper, size_t field)
     }
   else
     field_ops = op;
+
+  return op;
 }
 
 /* Add a value (from input) to the current field operation. */
@@ -341,6 +343,7 @@ field_op_collect (struct fieldop *op,
     case OP_UNIQUE:
     case OP_COLLAPSE:
     case OP_COUNT_UNIQUE:
+    case OP_TRANSPOSE:
       field_op_add_string (op, str, slen);
       break;
 
@@ -576,6 +579,7 @@ field_op_summarize (struct fieldop *op)
       numeric_result = count_unique_values(op,case_sensitive);
       break;
 
+    case OP_TRANSPOSE: /* output of transpose is not handled here */
     default:
       /* Should never happen */
       error (EXIT_FAILURE, 0,        /* LCOV_EXCL_LINE */
@@ -653,14 +657,27 @@ free_field_ops ()
 /* Given a string with operation name, returns the operation enum.
    exits with an error message if the string is not a valid/known operation. */
 enum operation
-get_operation (const char* op)
+get_grouping_operation (const char* keyword)
 {
   for (size_t i = 0; operations[i].name ; i++)
-      if ( STREQ(operations[i].name, op) )
+      if ( STREQ(operations[i].name, keyword) )
         return (enum operation)i;
 
-  error (EXIT_FAILURE, 0, _("invalid operation '%s'"), op);
+  error (EXIT_FAILURE, 0, _("invalid operation '%s'"), keyword);
   return 0; /* never reached LCOV_EXCL_LINE */
+}
+
+enum operation_mode
+get_operation_mode (const char* keyword)
+{
+  if ( STREQ(keyword, "transpose") )
+    return TRANSPOSE_MODE;
+  if ( STREQ(keyword, "reverse") )
+    return REVERSE_FIELD_MODE;
+  for (size_t i = 0; operations[i].name ; i++)
+      if ( STREQ(operations[i].name, keyword) )
+        return GROUPING_MODE;
+  return UNKNOWN_MODE;
 }
 
 /* Converts a string to number (field number).
@@ -683,15 +700,17 @@ safe_get_field_number(enum operation op, const char* field_str)
 
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
 void
-parse_operations (int argc, int start, char **argv)
+parse_grouping_operations (int argc, int start, char **argv)
 {
   int i = start;	/* Index into ARGV. */
   size_t field;
   enum operation op;
 
+  /* From here on, by default we assume it's a "groupby" operation */
   while ( i < argc )
     {
-      op = get_operation (argv[i]);
+      op = get_grouping_operation (argv[i]);
+      /* TODO: detect 'transpose' and 'reverse' out of place, warn user */
       i++;
       if ( i >= argc )
         error (EXIT_FAILURE, 0, _("missing field number after " \
@@ -701,6 +720,36 @@ parse_operations (int argc, int start, char **argv)
 
       new_field_op (op, field);
     }
+}
+
+/* Extract the operation mode based on the first keyword.
+   Possible modes are:
+     transpose
+     reverse (reverse fields)
+     groupby (the default, if the above keywords no found).
+
+  In 'groupby' mode,
+  calls 'parse_grouping_operations' to set the indivudual operaitons. */
+enum operation_mode
+parse_operation_mode (int argc, int start, char** argv)
+{
+  enum operation_mode om;
+
+  if (start >= argc)
+    error (EXIT_FAILURE, 0,
+           "internal error 5");
+
+  om = get_operation_mode ( argv[start] );
+  if (om == TRANSPOSE_MODE || om == REVERSE_FIELD_MODE)
+    {
+      if ( start+1 < argc )
+	error (EXIT_FAILURE, 0, _("extra operands after '%s'"), argv[start]);
+      return om;
+    }
+
+  /* default: assuming it's a grouping operation */
+  parse_grouping_operations (argc, start, argv);
+  return GROUPING_MODE;
 }
 
 void

@@ -59,10 +59,11 @@ enum operation
   OP_ANTIMODE,
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */
   OP_COLLAPSE,      /* Collapse strings into comma separated values */
-  OP_COUNT_UNIQUE   /* count number of unique values */
+  OP_COUNT_UNIQUE,  /* count number of unique values */
+  OP_TRANSPOSE      /* Transpose rows and columns */
 };
 
-enum operation_type
+enum accumulation_type
 {
   NUMERIC_SCALAR = 0,
   NUMERIC_VECTOR,
@@ -79,7 +80,7 @@ enum operation_first_value
 struct operation_data
 {
   const char* name;
-  enum operation_type type;
+  enum accumulation_type acc_type;
   enum operation_first_value auto_first;
 };
 
@@ -90,7 +91,7 @@ struct fieldop
 {
     /* operation 'class' information */
   enum operation op;
-  enum operation_type type;
+  enum accumulation_type acc_type;
   const char* name;
   bool numeric;
   bool auto_first; /* if true, automatically set 'value' if 'first' */
@@ -121,6 +122,14 @@ struct fieldop
 
 extern struct fieldop* field_ops ;
 
+enum operation_mode
+{
+	UNKNOWN_MODE = 0,
+	GROUPING_MODE,
+	TRANSPOSE_MODE,
+	REVERSE_FIELD_MODE
+};
+
 /* Add a numeric value to the values vector, allocating memory as needed */
 void field_op_add_value (struct fieldop *op, long double val);
 
@@ -140,7 +149,8 @@ void field_op_sort_values (struct fieldop *op);
 
 /* Allocate a new fieldop, initialize it based on 'oper',
    and add it to the linked-list of operations */
-void new_field_op (enum operation oper, size_t field);
+struct fieldop *
+new_field_op (enum operation oper, size_t field);
 
 /* Add a value (from input) to the current field operation.
    'str' does not need to be null-terminated.
@@ -166,10 +176,25 @@ void reset_field_ops ();
 
 void free_field_ops ();
 
-enum operation get_operation (const char* op);
+enum operation_mode
+get_operation_mode (const char* keyword);
+
+enum operation get_grouping_operation (const char* keyword);
 
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
-void parse_operations (int argc, int start, char **argv);
+void
+parse_grouping_operations (int argc, int start, char **argv);
+
+/* Extract the operation mode based on the first keyword.
+   Possible modes are:
+     transpose
+     reverse (reverse fields)
+     groupby (the default, if the above keywords no found).
+
+  In 'groupby' mode,
+  calls 'parse_grouping_operations' to set the indivudual operaitons. */
+enum operation_mode
+parse_operation_mode (int argc, int start, char** argv);
 
 /* Output precision, to be used with "printf("%.*Lg",)" */
 extern int field_op_output_precision;

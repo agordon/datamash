@@ -87,6 +87,7 @@ TESTS = \
 	tests/datamash-tests.pl \
 	tests/datamash-rand.sh \
 	tests/datamash-stats.pl \
+	tests/datamash-transpose.pl \
 	tests/datamash-sort-header.sh \
 	tests/datamash-sort-errors.sh \
 	tests/datamash-valgrind.sh
