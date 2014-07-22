@@ -125,6 +125,12 @@ if sort -s < /dev/null > /dev/null 2>/dev/null ; then
 	AC_DEFINE([HAVE_STABLE_SORT],[1],[Define to 1 if sort on this system supports -s for stable sorting])
 fi
 
+## Are we building from git checked-out sources?
+## (if not, assume it's from a tarball)
+## This is used in "Makefile.am" to avoid re-generating the manpage
+## when building from tarballs.
+AM_CONDITIONAL([BUILD_FROM_GIT], [test -d "$srcdir/.git"])
+
 
 # i18n support from GNU gettext.
 AM_GNU_GETTEXT_VERSION([0.17])

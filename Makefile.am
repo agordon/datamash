@@ -69,8 +69,18 @@ EXTRA_DIST += $(man_MANS) \
 		man/datamash.x \
 		man/help2man
 
-CLEANFILES = $(man_MANS)
+CLEANFILES =
 
+## Re-generate the man-page from the --help screen only if building from
+##   a GIT repository (implying developers).
+## When building from tar-ball, the manpage should already exist.
+## (This conditional is defined in 'configure.ac')
+## NOTE:
+##  If user is building from GIT *and* cross-compiling,
+##  the manpage would be required, but can't be generated.
+##  'make' will fail with an error.
+##  If this is ever a real-world issue, deal with it...
+if BUILD_FROM_GIT
 datamash.1: datamash $(top_srcdir)/man/datamash.x
 	PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
 	   perl $(abs_top_srcdir)/man/help2man \
@@ -78,6 +88,9 @@ datamash.1: datamash $(top_srcdir)/man/datamash.x
 	       datamash -o $@-t
 	chmod u=rw,go=r $@-t
 	mv -f $@-t $@
+
+CLEANFILES += $(man_MANS)
+endif
 
 ##
 ## Tests
