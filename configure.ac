@@ -72,40 +72,6 @@ if test "x$enable_debug" = "xyes" ; then
 fi
 
 
-# Add Debian-specific Hardening flags
-# See:  https://wiki.debian.org/HardeningWalkthrough
-# Requires 'dpkg-buildflags' from the 'dpkg-dev' package
-#
-# To use:
-#    ./configure --enable-debian-hardening
-#
-AC_ARG_ENABLE(debian-hardening,
-	      AS_HELP_STRING([--enable-debian-hardening],
-			     [Build with Debian-specific hardening flags]),
-			     [
-			      if test "$enableval" = "yes" ; then
-				      :
-			      elif test "$enableval" != "no" ; then
-				      AC_MSG_ERROR([--enable-debian-hardening does not accept an argument])
-			      fi
-			      ])
-
-AC_CHECK_PROG([DPKG_BUILDFLAGS],[dpkg-buildflags],[yes],[no],[])
-
-if test "x$enable_debian_hardening" = "xyes" ; then
-	if test "x$DPKG_BUILDFLAGS" != "xyes" ; then
-		AC_MSG_ERROR([debian-hardening requires the program dpkg-buildflag, which was not found])
-	fi
-	DEBHARD_CFLAGS=`dpkg-buildflags --get CFLAGS`
-	DEBHARD_CPPFLAGS=`dpkg-buildflags --get CPPFLAGS`
-	DEBHARD_LDFLAGS=`dpkg-buildflags --get LDFLAGS`
-
-	CFLAGS="$CFLAGS $DEBHARD_CFLAGS"
-	CPPFLAGS="$CPPFLAGS $DEBHARD_CPPFLAGS"
-	LDFLAGS="$LDFLAGS $DEBHARD_LDFLAGS"
-fi
-
-
 ## Test for CygWin hosts - these have a broken 'strtold()' implementation:
 ##  calling strtold("4\t5",NULL) returns "e+9999",
 ## whereas every other (sane) system returns "4" and stops at the whitespace.

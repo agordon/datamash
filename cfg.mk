@@ -19,3 +19,18 @@ local-checks-to-skip = \
 # checked by 'sc_immutable_NEWS' rule.
 # updated by 'update-NEWS-hash' rule.
 old_NEWS_hash = d41d8cd98f00b204e9800998ecf8427e
+
+
+
+# Helper rules to compile with Debian-Hardening flags
+# See https://wiki.debian.org/Hardening
+init-deb-hard:
+	$(MAKE) $(AM_MAKEFLAGS) clean
+
+build-deb-hard:
+	$(MAKE) $(AM_MAKEFLAGS) \
+           CFLAGS="$$(dpkg-buildflags --get CFLAGS)" \
+           CPPFLAGS="$$(dpkg-buildflags --get CPPFLAGS)" \
+           LDFLAGS="$$(dpkg-buildflags --get LDFLAGS)"
+
+deb-hard: init-deb-hard build-deb-hard check
