@@ -105,9 +105,9 @@ skewness of the (population) group
       0 > x           -  negatively skewed / skewed left
           x > 1       -  highly skewed right
       1 > x >  0.5    -  moderately skewed right
-    0.5 > x > -0.5    -  approximately symmetric
-   -0.5 > x > -1      -  moderately skewed left
-     -1 > x           -  highly skewed left
+    0.5 > x > \-0.5    -  approximately symmetric
+   \-0.5 > x > \-1      -  moderately skewed left
+     \-1 > x           -  highly skewed left
 .fi
 .TP
 .B   skurt
@@ -146,13 +146,13 @@ A  10
 A  5
 B  9
 B  11
-$ \fBdatamash\fR -g 1 sum 2 < example.txt
+$ \fBdatamash\fR \-g 1 sum 2 < example.txt
 A  15
 B  20
 .RE
 .fi
 .PP
-Unsorted input must be sorted (with '-s'):
+Unsorted input must be sorted (with '\-s'):
 .PP
 .nf
 .RS
@@ -163,7 +163,7 @@ B  9
 C  1
 A  5
 B  11
-$ \fBdatamash\fR -s -g1 sum 2 < example.txt
+$ \fBdatamash\fR \-s \-g1 sum 2 < example.txt
 A  15
 B  20
 C  5
@@ -174,16 +174,16 @@ Which is equivalent to:
 .PP
 .nf
 .RS
-$ cat example.txt | sort -k1,1 | \fBdatamash\fR -g 1 sum 2
+$ cat example.txt | sort \-k1,1 | \fBdatamash\fR \-g 1 sum 2
 .RE
 .fi
 .PP
-Use \fB-h\fR \fB(--headers)\fR if the input file has a header line:
+Use \fB\-h\fR \fB(\-\-headers)\fR if the input file has a header line:
 .PP
 .nf
 .RS
 # Given a file with student name, field, test score...
-$ head -n5 scores_h.txt
+$ head \-n5 scores_h.txt
 Name           Major            Score
 Shawn          Engineering      47
 Caleb          Business         87
@@ -191,9 +191,9 @@ Christian      Business         88
 Derek          Arts             60
 
 # Calculate the mean and standard devian for each major
-$ \fBdatamash\fR --sort --headers --group 2 mean 3 pstdev 3 < scores_h.txt
+$ \fBdatamash\fR \-\-sort \-\-headers \-\-group 2 mean 3 pstdev 3 < scores_h.txt
  (or use short form)
-$ \fBdatamash\fR -sH -g2 mean 3 pstdev 3 < scores_h.txt
+$ \fBdatamash\fR \-sH \-g2 mean 3 pstdev 3 < scores_h.txt
 GroupBy(Major)    mean(Score)   pstdev(Score)
 Arts              68.9          10.1
 Business          87.3           4.9
@@ -208,7 +208,7 @@ Reverse field order in each line:
 .PP
 .nf
 .RS
-$ seq 6 | paste - - | \fBdatamash\fR reverse
+$ seq 6 | paste \- \- | \fBdatamash\fR reverse
 2    1
 4    3
 6    5
@@ -219,7 +219,7 @@ Transpose rows, columns:
 .PP
 .nf
 .RS
-$ seq 6 | paste - - | \fBdatamash\fR transpose
+$ seq 6 | paste \- \- | \fBdatamash\fR transpose
 1    3    5
 2    4    6
 .RE
