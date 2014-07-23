@@ -906,7 +906,7 @@ int main(int argc, char* argv[])
 
     case UNKNOWN_MODE:
     default:
-      error (EXIT_FAILURE,0,_("internal error 4"));
+      internal_error ("op mode"); /* LCOV_EXCL_LINE */
     }
   free_field_ops ();
   free_sort_keys ();

@@ -149,4 +149,13 @@ select_plural (uintmax_t n)
   return (n <= ULONG_MAX ? n : n % PLURAL_REDUCER + PLURAL_REDUCER);
 }
 
+#define __STRX__(x) #x
+#define __STR__(x) __STRX__(x)
+#define __STR_LINE__ __STR__(__LINE__)
+#define internal_error(x) \
+  do { \
+    error (EXIT_FAILURE, 0, \
+        "internal error at " __FILE__ ":" __STR_LINE__ " (" #x ")" ); \
+  } while (0)
+
 #endif /* CALC_SYSTEM_H */

@@ -349,8 +349,7 @@ field_op_collect (struct fieldop *op,
 
     default:
       /* Should never happen */
-      error (EXIT_FAILURE, 0,       /* LCOV_EXCL_LINE */
-               "internal error 3"); /* LCOV_EXCL_LINE */
+      internal_error("bad op");     /* LCOV_EXCL_LINE */
     }
 
   if (op->first)
@@ -582,8 +581,7 @@ field_op_summarize (struct fieldop *op)
     case OP_TRANSPOSE: /* output of transpose is not handled here */
     default:
       /* Should never happen */
-      error (EXIT_FAILURE, 0,        /* LCOV_EXCL_LINE */
-                "internal error 2"); /* LCOV_EXCL_LINE */
+      internal_error("bad op");     /* LCOV_EXCL_LINE */
     }
 
 
@@ -736,8 +734,7 @@ parse_operation_mode (int argc, int start, char** argv)
   enum operation_mode om;
 
   if (start >= argc)
-    error (EXIT_FAILURE, 0,
-           "internal error 5");
+    internal_error ("prase op mode"); /* LCOV_EXCL_LINE */
 
   om = get_operation_mode ( argv[start] );
   if (om == TRANSPOSE_MODE || om == REVERSE_FIELD_MODE)
