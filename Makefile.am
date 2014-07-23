@@ -18,6 +18,8 @@ EXTRA_DIST = \
         build-aux/gen-coverage-report.sh \
 	build-aux/tag-new-version.sh \
 	build-aux/git-log-fix \
+	build-aux/create_small_file_system.sh \
+	build-aux/create_corrupted_file_system.sh \
 	m4/gnulib-cache.m4
 
 SUBDIRS = po
@@ -103,6 +105,7 @@ TESTS = \
 	tests/datamash-transpose.pl \
 	tests/datamash-sort-header.sh \
 	tests/datamash-sort-errors.sh \
+	tests/datamash-io-errors.sh \
 	tests/datamash-valgrind.sh
 
 EXTRA_DIST += \
@@ -110,6 +113,7 @@ EXTRA_DIST += \
 	tests/CuSkip.pm \
 	tests/CuTmpdir.pm \
 	tests/init.sh \
+	init.cfg \
 	$(TESTS)
 
 TESTS_ENVIRONMENT = \
