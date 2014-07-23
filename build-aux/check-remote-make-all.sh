@@ -38,9 +38,8 @@ dict_get()
   eval "echo \$__data__$key"
 }
 
-TARBALL=$1
-[ -z "$TARBALL" ] && die "missing TARBALL file name (e.g. datamash-1.0.1.tar.gz)"
-[ -e "$TARBALL" ] || die "Tarball '$TARBALL' not found"
+SOURCE=$1
+[ -z "$SOURCE" ] && die "missing SOURCE file name / URL (e.g. datamash-1.0.1.tar.gz)"
 
 LOGDIR=$(mktemp -d -t buildlog.XXXXXX) || die "Failed to create build log directory"
 
@@ -54,7 +53,7 @@ for host in $HOSTS ;
 do
     LOGFILE=$LOGDIR/$host.log
     echo "Starting remote build on $host (log = $LOGFILE ) ..."
-    ./build-aux/remote-make-check.sh "$TARBALL" "$host" 1>$LOGFILE 2>&1 &
+    ./build-aux/check-remote-make.sh "$SOURCE" "$host" 1>$LOGFILE 2>&1 &
     pid=$!
     dict_set $host $pid
     ALLLOGFILES="$ALLLOGFILES $LOGFILE"
@@ -76,8 +75,8 @@ do
     wait $pid
     exitcode=$?
     if [ "$exitcode" -eq "0" ]; then
-        echo "$TARBALL on $host - build OK"
+        echo "$SOURCE on $host - build OK"
     else
-        echo "$TARBALL on $host - Error (log = $LOGFILE )"
+        echo "$SOURCE on $host - Error (log = $LOGFILE )"
     fi
 done
