@@ -31,7 +31,16 @@ use CuSkip;
 use CuTmpdir qw(datamash);
 
 (my $program_name = $0) =~ s|.*/||;
-my $prog = 'datamash';
+my $prog_bin = 'datamash';
+
+## Cross-Compiling portability hack:
+##  under qemu/binfmt, argv[0] (which is used to report errors) will contain
+##  the full path of the binary, if the binary is on the $PATH.
+##  So we try to detect what is the actual returned value of the program
+##  in case of an error.
+my $prog = `$prog_bin --foobar 2>&1 | head -n 1 | cut -f1 -d:`;
+chomp $prog if $prog;
+$prog = $prog_bin unless $prog;
 
 ## Portability hack
 ## Check if the system's sort supports stable sorting ('-s').

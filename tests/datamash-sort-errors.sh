@@ -33,6 +33,14 @@ fail=0
 seq 10 >/dev/null 2>/dev/null ||
     skip_ "requires a working seq"
 
+## Cross-Compiling portability hack:
+##  under qemu/binfmt, argv[0] (which is used to report errors) will contain
+##  the full path of the binary, if the binary is on the $PATH.
+##  So we try to detect what is the actual returned value of the program
+##  in case of an error.
+PROG_ARGV0=$(datamash --foobar 2>&1 | head -n 1 | cut -f1 -d:)
+[ -z "$PROG_ARGV0" ] && PROG_ARGV0="datamash"
+
 ##
 ##
 ## Test preparations
@@ -43,7 +51,7 @@ GROUPPARAM=$(seq 1000 2000 | paste -d "," -s -) ||
 
 ## The expected error message when the group parameter is too long
 ## to pass to the 'sort' pipe
-echo "datamash: sort command too-long (please report this bug)" > exp_err1 ||
+echo "$PROG_ARGV0: sort command too-long (please report this bug)" > exp_err1 ||
 	framework_failure_ "failed to create exp_err1"
 
 ## The expected error message when 'sort' is not found
