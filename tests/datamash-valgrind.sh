@@ -23,10 +23,8 @@
 
 . "${test_dir=.}/init.sh"; path_prepend_ ./src
 
-## Ensure valgrind is useable
-## (copied from coreutils' init.cfg)
-valgrind --error-exitcode=1 true 2>/dev/null ||
-    skip_ "requires a working valgrind"
+expensive_
+require_valgrind_
 
 ## Don't use valgrind on statically-compiled binary
 ## (it gives some false-positives and the test fails).
