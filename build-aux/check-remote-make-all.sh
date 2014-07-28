@@ -43,7 +43,8 @@ SOURCE=$1
 
 LOGDIR=$(mktemp -d -t buildlog.XXXXXX) || die "Failed to create build log directory"
 
-HOSTS=${HOSTS:="deb7 deb7clang deb732 deb732clang centos fbsd dilos dilos64 hurd obsd"}
+HOSTS=${HOSTS:="deb7 deb7clang deb732 deb732clang centos65 centos5 fbsd10
+fbsd93 fbsd84 netbsd614 dilos dilos64 hurd obsd"}
 
 ##
 ## Start build on all hosts

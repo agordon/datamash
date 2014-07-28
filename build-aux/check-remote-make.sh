@@ -52,6 +52,8 @@ HOST - Name of remote host to build and test on.
 
 OPTIONS:
    -h          - This help screen.
+   -b BRANCH   - If SOURCE is GIT, check-out BRANCH
+                 (instead of the default 'master' branch)
    -c PARAM    - Add PARAM as parameter to './configure'
    -m PARAM    - Add PARAM as parameter to 'make'
    -e NAME=VAL - Add NAME=VAL as environment variable to all commands.
@@ -73,11 +75,21 @@ Examples:
   #   ./configure CC=clang && make -j && make check
   $BASE -c CC=lang -m -j datamash-1.0.5.tar.gz brain
 
+  # Clone the git repository to host 'tom', with branch 'test', then run:
+  #   git clone -b test git://git.savannah.gnu.org/datamash.git &&
+  #    cd datamash &&
+  #      ./bootstrap &&
+  #        ./configure &&
+  #          make && make check
+  $BASE -b test git://git.savannah.gnu.org/datamash.git tom
+
   # Clone the git repository to host 'jerry', and run:
-  #   PATH=/tmp/custom/bin:\$PATH ./bootstrap &&
-  #     PATH=/tmp/custom/bin:\$PATH ./configure &&
-  #       PATH=/tmp/custom/bin:\$PATH make &&
-  #         PATH=/tmp/custom/bin:\$PATH make check
+  #  git clone git://git.savannah.gnu.org/datamash.git &&
+  #   cd datamash &&
+  #     PATH=/tmp/custom/bin:\$PATH ./bootstrap &&
+  #       PATH=/tmp/custom/bin:\$PATH ./configure &&
+  #         PATH=/tmp/custom/bin:\$PATH make &&
+  #           PATH=/tmp/custom/bin:\$PATH make check
   $BASE -e 'PATH=/tmp/custom/bin:\$PATH' git://git.savannah.gnu.org/datamash.git jerry
 "
 exit 0
@@ -93,9 +105,12 @@ show_help=
 configure_params=
 make_params=
 env_params=
-while getopts c:m:e:h name
+git_branch=
+while getopts b:c:m:e:h name
 do
         case $name in
+        b)      git_branch="-b '$OPTARG'"
+                ;;
         c)      configure_params="$configure_params '$OPTARG'"
                 ;;
         m)      make_params="$make_params '$OPTARG'"
@@ -189,6 +204,32 @@ if test -n "$TARBALL" ; then
 fi
 
 ##
+## The script to build the package
+##
+SCRIPT="
+echo '--SYSTEM-INFO-START--' ;
+echo 'UNAME_KERNEL='\$(uname -s) ;
+echo 'UNAME_KERNEL_RELEASE='\$(uname -r) ;
+echo 'UNAME_KERNEL_VERSION='\$(uname -v) ;
+echo 'UNAME_MACHINE='\$(uname -m 2>/dev/null||echo unknown) ;
+echo 'UNAME_HARDWARE='\$(uname -i 2>/dev/null||echo unknown) ;
+echo 'UNAME_PROCESSOR='\$(uname -p 2>/dev/null||echo unknown) ;
+echo 'UNAME_OS='\$(uname -o 2>/dev/null||echo unknown) ;
+echo 'DISTRIBUTION='\$(lsb_release -si 2>/dev/null||uname -o 2>/dev/null||echo unknown) ;
+echo 'DISTRIBUTION_VERSION='\$(lsb_release -sr 2>/dev/null||uname -r 2>/dev/null||echo unknown) ;
+echo 'PACKAGE_BASENAME=$BASENAME' ;
+echo 'PACKAGE_SOURCE=$SOURCE' ;
+echo 'START_DATE_UTC='\$(date -u +%Y-%m-%d_%H%M%S) ;
+echo 'START_DATE_LOCAL='\$(date) ;
+echo 'HOSTNAME='\$(hostname -f) ;
+echo 'BUILD_DIR=$DIR' ;
+echo 'BUILD_CONFIGURE_PARAMS=$configure_params' ;
+echo 'BUILD_MAKE_PARAMS=$make_params' ;
+echo 'BUILD_ENV_PARAMS=$env_params' ;
+echo '--SYSTEM-INFO-END--' ;
+"
+
+##
 ## Extract and run on the remote machine
 ##
 ## NOTE: about the convoluted 'cd' command:
@@ -200,32 +241,32 @@ fi
 ##   (e.g. 'grep-2.9.1.tar.gz' might have './grep-ss' sub directory).
 ##   So use 'find' to find the first sub directory (assuming there's only one).
 if test -n "$TARBALL" ; then
-SCRIPT="hostname ;
-uname -a ;
+SCRIPT="$SCRIPT
 cd $DIR ;
 $COMPPROG -dc $FILENAME | tar -xf - &&
   cd \$(find . -maxdepth 1 -type d | tail -n 1) &&
-  $env_params ./configure $configure_params &&
-  $env_params make $make_params &&
-  $env_params make check &&
-  cd $(dirname $DIR) &&
-  rm -r $(basename $DIR)"
-fi
-
-if test -n "$GIT_REPO" ; then
-SCRIPT="hostname ;
-uname -a ;
+"
+elif test -n "$GIT_REPO" ; then
+SCRIPT="$SCRIPT
 cd $DIR ;
-git clone $GIT_REPO $BASENAME &&
+git clone $git_branch $GIT_REPO $BASENAME &&
   cd $BASENAME &&
   $env_params ./bootstrap &&
+"
+else
+  die "internal error: not a TARBALL or a GIT_REPO"
+fi
+
+##
+## Add common building steps
+##
+SCRIPT="$SCRIPT
   $env_params ./configure $configure_params &&
   $env_params make $make_params &&
   $env_params make check &&
   cd $(dirname $DIR) &&
-  rm -r $(basename $DIR)"
-fi
-
+  rm -r $(basename $DIR)
+"
 
 ssh -q "$TARGET_HOST" "$SCRIPT" 2>&1 ||
 	die "Failed to build '$TARBALL' on '$TARGET_HOST:$DIR/'"
