@@ -98,6 +98,12 @@ fi
 AM_CONDITIONAL([BUILD_FROM_GIT], [test -d "$srcdir/.git"])
 
 
+## Perl is needed for some tests (but not required for building)
+## 'PERL_FOUND' is used in Makefile.am to skip some tests.
+AC_PATH_PROG([PERL], [perl])
+AC_SUBST([PERL])
+AM_CONDITIONAL([PERL_FOUND],[test -n "$PERL"])
+
 # i18n support from GNU gettext.
 AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT([external])

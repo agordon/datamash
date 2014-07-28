@@ -97,6 +97,14 @@ endif
 ##
 ## Tests
 ##
+TEST_EXTENSIONS = .pl .sh
+if PERL_FOUND
+PL_LOG_COMPILER=$(PERL)
+else
+PL_LOG_COMPILER=$(SHELL) $(top_srcdir)/tests/no-perl
+endif
+
+
 TESTS = \
 	tests/datamash-show-env.sh \
 	tests/datamash-tests.pl \
@@ -109,6 +117,7 @@ TESTS = \
 	tests/datamash-valgrind.sh
 
 EXTRA_DIST += \
+	tests/no-perl \
 	tests/Coreutils.pm \
 	tests/CuSkip.pm \
 	tests/CuTmpdir.pm \
