@@ -1,3 +1,18 @@
+* Noteworthy changes in release 1.0.6 (2014-07-29) [stable]
+
+** New Features
+
+  New operations: transpose, reverse.
+
+** Improvements
+
+  Tests: improve portability, add I/O error tests, add few edge-case tests.
+
+  Build: improve man-page generation, cross-compiling, auxiliary build scripts.
+
+  Documentation: expand and fix man-page (and shorten --help screen).
+
+
 * Noteworthy changes in release 1.0.5 (2014-07-15) [stable]
 
 First release as GNU Datamash.
