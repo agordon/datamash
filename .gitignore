@@ -80,6 +80,22 @@ doc/datamash.pdf
 doc/datamash.t2p
 doc/stamp-vti
 doc/version.texi
+# Auto-generated coverage info with 'make coverage'
+doc/coverage
+# Auto-generated HTML manual with 'make web-manual'
+doc/manual
+# Auto-generated PDF-related files
+doc/datamash.aux
+doc/datamash.cp
+doc/datamash.cps
+doc/datamash.fn
+doc/datamash.ky
+doc/datamash.log
+doc/datamash.op
+doc/datamash.pg
+doc/datamash.toc
+doc/datamash.tp
+doc/datamash.vr
 
 # Coverage files
 src/*.gcda
@@ -89,8 +105,8 @@ lib/*.gcno
 datamash.lcov
 datamash-cov/
 
-## TODO: change this to the name of your package tarball
 datamash-*.tar.gz
+datamash-*.tar.gz.sig
 /GNUmakefile
 /README-release
 /maint.mk
