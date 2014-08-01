@@ -1,0 +1,70 @@
+# datamash bash-completion
+#
+## Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
+##
+## This file is part of GNU Datamash.
+##
+## This file is free software; as a special exception the author gives
+## unlimited permission to copy and/or distribute it, with or without
+## modifications, as long as this notice is preserved.
+##
+## This program is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+## implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##
+
+_datamash ()
+{
+  local cur prev words cword split=false
+  _init_completion -n := || return
+
+  datamash_modes="transpose reverse"
+
+  datamash_operations="sum min max absmin absmax
+  count first last rand
+  unique collapse countunique
+  mean median q1 q3 iqr mode antimode
+  pstdev sstdev pvar svar mad madraw
+  pskew sskew pkurt skurt dpo jarque"
+
+  datamash_short_options="-f -g -H -i -s -t -W -z"
+
+  datamash_long_options="--full --group --header-in --header-out --headers
+  --ignore-case --sort --no-strict --filler --field-separator --whitespace
+  --zero-terminated --help --version"
+
+  # IF the previous word as an operator, the next parameter should
+  # be a numeric value, so don't offer any completion.
+  [[ "$datamash_operations $datamash_modes" == *"$prev"* ]] && return 0
+
+  # Check if any of the previous parameteters is an operator.
+  # If so, then suggest only other operators, not options.
+  local seen_operators=0
+  local i=$((cword-1))
+  while [ "$i" -gt 0 ] ; do
+      local tmp_word=${words[$i]}
+      if [[ "$datamash_operations $datamash_modes" == *"$tmp_word"* ]]; then
+        seen_operators=1
+        break
+      fi
+      i=$((i-1))
+  done
+  if [ "$seen_operators" -eq 1 ] ; then
+    COMPREPLY=( $(compgen -W "$datamash_operations" -- "$cur") )
+    return 0
+  fi
+
+  # Suggest options or operators
+  case "$cur" in
+   -*) COMPREPLY=( $(compgen -W "$datamash_short_options $datamash_long_options" -- "$cur") )
+       ;;
+   *)  COMPREPLY=( $(compgen -W "$datamash_modes $datamash_operations" -- "$cur") )
+       ;;
+  esac
+
+  return 0
+}
+
+complete -F _datamash datamash
+
+# ex: ts=4 sw=4 et filetype=sh

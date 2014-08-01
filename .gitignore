@@ -71,7 +71,7 @@ po/remove-potcdate.sed
 
 test-suite.log
 
-datamash
+./datamash
 
 # Documentation files
 doc/.dirstamp

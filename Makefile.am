@@ -20,6 +20,7 @@ EXTRA_DIST = \
 	build-aux/git-log-fix \
 	build-aux/create_small_file_system.sh \
 	build-aux/create_corrupted_file_system.sh \
+	contrib/datamash \
 	m4/gnulib-cache.m4
 
 SUBDIRS = po
