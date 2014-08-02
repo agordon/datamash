@@ -31,7 +31,13 @@
 
 #include "error.h"
 #include "minmax.h"
+#include "quote.h"
 #include "system.h"
+#include "md5.h"
+#include "sha1.h"
+#include "sha256.h"
+#include "sha512.h"
+#include "base64.h"
 #include "xalloc.h"
 
 #include "utils.h"
@@ -48,38 +54,54 @@ int field_op_output_precision = 14 ; /* In the future: allow users to
 
 struct operation_data operations[] =
 {
-  {"count",   STRING_SCALAR,  IGNORE_FIRST},   /* OP_COUNT */
-  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST},   /* OP_SUM */
-  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_MIN */
-  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_MAX */
-  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_ABSMIN */
-  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST}, /* OP_ABSMAX */
-  {"first",   STRING_SCALAR,  IGNORE_FIRST},   /* OP_FIRST */
-  {"last",    STRING_SCALAR,  IGNORE_FIRST},   /* OP_LAST */
-  {"rand",    STRING_SCALAR,  IGNORE_FIRST},   /* OP_RAND */
-  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST},   /* OP_MEAN */
-  {"median",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MEDIAN */
-  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_QUARTILE_1 */
-  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_QUARTILE_3 */
-  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_IQR */
-  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_PSTDEV */
-  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_SSTDEV */
-  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_PVARIANCE */
-  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_SVARIANCE */
-  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MAD */
-  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MADRAW */
-  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_S_SKEWNESS */
-  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_P_SKEWNESS */
-  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_S_EXCESS_KURTOSIS */
-  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_P_EXCESS_KURTOSIS */
-  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_JARQUE_BETA */
-  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_DP_OMNIBUS */
-  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_MODE */
-  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST},   /* OP_ANTIMODE */
-  {"unique",  STRING_VECTOR,  IGNORE_FIRST},   /* OP_UNIQUE */
-  {"collapse",STRING_VECTOR,  IGNORE_FIRST},   /* OP_COLLAPSE */
-  {"countunique",STRING_VECTOR, IGNORE_FIRST},   /* OP_COUNT_UNIQUE */
-  {NULL, 0, 0}
+  {"count",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_COUNT */
+  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},   /* OP_SUM */
+  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_MIN */
+  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_MAX */
+  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_ABSMIN */
+  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_ABSMAX */
+  {"first",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_FIRST */
+  {"last",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_LAST */
+  {"rand",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_RAND */
+  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MEAN */
+  {"median",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MEDIAN */
+  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_QUARTILE_1 */
+  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_QUARTILE_3 */
+  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_IQR */
+  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_PSTDEV */
+  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_SSTDEV */
+  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_PVARIANCE */
+  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_SVARIANCE */
+  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MAD */
+  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MADRAW */
+  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_S_SKEWNESS */
+  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_P_SKEWNESS */
+  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_S_EXCESS_KURTOSIS */
+  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_P_EXCESS_KURTOSIS */
+  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_JARQUE_BETA */
+  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_DP_OMNIBUS */
+  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MODE */
+  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_ANTIMODE */
+  {"unique",  STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_UNIQUE */
+  {"collapse",STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_COLLAPSE */
+  {"countunique",STRING_VECTOR, IGNORE_FIRST, GROUPING_MODE}, /* OP_COUNT_UNIQUE */
+  {"transpose",STRING_SCALAR, IGNORE_FIRST, TRANSPOSE_MODE},   /* OP_TRANSPOSE */
+  {"reverse", STRING_SCALAR, IGNORE_FIRST, REVERSE_FIELD_MODE},    /* OP_REVERSE */
+  {"base64",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_BASE64 */
+  {"debase64",STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_DEBASE64 */
+  {"md5",     STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_MD5 */
+  {"sha1",    STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_SHA1 */
+  {"sha256",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_SHA256 */
+  {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_SHA512 */
+  {NULL, 0, 0, UNKNOWN_MODE}
+};
+
+const char* operation_mode_name[] = {
+  "(unknown)",   /* UNKNOWN_MODE */
+  "grouping",    /* GROUPING_MODE */
+  "transpose",   /* TRANSPOSE_MODE */
+  "reverse",     /* REVERSE_FIELD_MODE */
+  "line"         /* LINE_MODE */
 };
 
 struct fieldop* field_ops = NULL;
@@ -101,6 +123,32 @@ field_op_add_value (struct fieldop *op, long double val)
     }
   op->values[op->num_values] = val;
   op->num_values++;
+}
+
+char*
+field_op_to_hex ( struct fieldop* op, const char *buffer, const size_t inlen )
+{
+	(void)(op);
+
+  static const char hex_digits[] =
+  {
+    '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+  };
+  size_t len = inlen*2+1;
+  const char* inp = buffer;
+  char* res = xmalloc(len);
+  char* ptr = res;
+  for (size_t i = 0 ; i < inlen; ++i)
+   {
+     *ptr = hex_digits[ ((*inp)>>4) & 0xf ] ;
+     ++ptr;
+     *ptr = hex_digits[  (*inp)     & 0xf ] ;
+     ++ptr;
+     ++inp;
+   }
+  *ptr = 0 ;
+  return res;
 }
 
 /* Add a string to the strings vector, allocating memory as needed */
@@ -177,6 +225,41 @@ field_op_sort_values (struct fieldop *op)
   qsortfl(op->values, op->num_values);
 }
 
+static inline size_t
+output_buffer_size (const enum operation oper)
+{
+  switch (oper)
+    {
+    case OP_BASE64:
+    case OP_DEBASE64:
+      return 512;
+
+    case OP_SHA512:
+      return 64;
+
+    case OP_SHA256:
+      return 32;
+
+    case OP_SHA1:
+      return 20;
+
+    case OP_MD5:
+      return 16;
+
+    case OP_MEAN: case OP_SUM: case OP_COUNT: case OP_MIN:
+    case OP_MAX: case OP_ABSMIN: case OP_ABSMAX: case OP_FIRST:
+    case OP_LAST: case OP_RAND: case OP_MEDIAN: case OP_QUARTILE_1:
+    case OP_QUARTILE_3: case OP_IQR: case OP_PSTDEV: case OP_SSTDEV:
+    case OP_PVARIANCE: case OP_SVARIANCE: case OP_MAD: case OP_MADRAW:
+    case OP_S_SKEWNESS: case OP_P_SKEWNESS: case OP_S_EXCESS_KURTOSIS:
+    case OP_P_EXCESS_KURTOSIS: case OP_JARQUE_BERA: case OP_DP_OMNIBUS:
+    case OP_MODE: case OP_ANTIMODE: case OP_UNIQUE: case OP_COLLAPSE:
+    case OP_COUNT_UNIQUE: case OP_TRANSPOSE: case OP_REVERSE:
+    default:
+      return 0;
+    }
+}
+
 /* Allocate a new fieldop, initialize it based on 'oper',
    and add it to the linked-list of operations */
 struct fieldop *
@@ -196,6 +279,11 @@ new_field_op (enum operation oper, size_t field)
   op->count = 0;
 
   op->next = NULL;
+
+  op->out_buf_alloc = output_buffer_size (oper);
+  if (op->out_buf_alloc)
+    op->out_buf = xmalloc (op->out_buf_alloc);
+  op->out_buf_used = 0 ;
 
   if (field_ops != NULL)
     {
@@ -304,6 +392,12 @@ field_op_collect (struct fieldop *op,
         field_op_replace_string(op, str, slen);
       break;
 
+    case OP_BASE64:
+    case OP_DEBASE64:
+    case OP_MD5:
+    case OP_SHA1:
+    case OP_SHA256:
+    case OP_SHA512:
     case OP_LAST:
       /* Replace the 'current' string with the latest one */
       field_op_replace_string(op, str, slen);
@@ -347,6 +441,7 @@ field_op_collect (struct fieldop *op,
       field_op_add_string (op, str, slen);
       break;
 
+    case OP_REVERSE:
     default:
       /* Should never happen */
       internal_error("bad op");     /* LCOV_EXCL_LINE */
@@ -454,6 +549,7 @@ field_op_summarize (struct fieldop *op)
   bool print_numeric_result = true;
   long double numeric_result = 0 ;
   char *string_result = NULL;
+  char tmpbuf[64]; /* 64 bytes - enough to hold sha512 */
 
 #ifdef ENABLE_BUILTIN_DEBUG
   if (debug)
@@ -574,11 +670,55 @@ field_op_summarize (struct fieldop *op)
       string_result = collapse_value (op);
       break;
 
-   case OP_COUNT_UNIQUE:
+    case OP_COUNT_UNIQUE:
       numeric_result = count_unique_values(op,case_sensitive);
       break;
 
-    case OP_TRANSPOSE: /* output of transpose is not handled here */
+    case OP_BASE64:
+      string_result = xmalloc ( BASE64_LENGTH (op->str_buf_used-1)+1 ) ;
+      base64_encode ( op->str_buf, op->str_buf_used-1,
+		      string_result, BASE64_LENGTH (op->str_buf_used-1)+1 );
+      print_numeric_result = false;
+      break;
+
+    case OP_DEBASE64:
+      {
+	size_t decoded_size = op->str_buf_used ;
+        string_result = xmalloc ( decoded_size ) ;
+	if (!base64_decode ( op->str_buf, op->str_buf_used-1,
+			string_result, &decoded_size ))
+		error (EXIT_FAILURE, 0, _("base64 decoding failed"));
+	string_result[decoded_size]=0;
+	print_numeric_result = false;
+      }
+      break;
+
+    case OP_MD5:
+      md5_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
+      string_result = field_op_to_hex (op, tmpbuf, 16);
+      print_numeric_result = false;
+      break;
+
+    case OP_SHA1:
+      sha1_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
+      string_result = field_op_to_hex (op, tmpbuf, 20);
+      print_numeric_result = false;
+      break;
+
+    case OP_SHA256:
+      sha256_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
+      string_result = field_op_to_hex (op, tmpbuf, 32);
+      print_numeric_result = false;
+      break;
+
+    case OP_SHA512:
+      sha512_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
+      string_result = field_op_to_hex (op, tmpbuf, 64);
+      print_numeric_result = false;
+      break;
+
+    case OP_TRANSPOSE: /* not handled here */
+    case OP_REVERSE:   /* not handled here */
     default:
       /* Should never happen */
       internal_error("bad op");     /* LCOV_EXCL_LINE */
@@ -612,6 +752,7 @@ reset_field_op (struct fieldop *op)
   op->value = 0;
   op->num_values = 0 ;
   op->str_buf_used = 0;
+  op->out_buf_used = 0;
   /* note: op->str_buf and op->str_alloc are not free'd, and reused */
 }
 
@@ -632,10 +773,15 @@ free_field_op (struct fieldop *op)
   op->num_values = 0 ;
   op->alloc_values = 0;
 
-  free(op->str_buf);
+  free (op->str_buf);
   op->str_buf = NULL;
   op->str_buf_alloc = 0;
   op->str_buf_used = 0;
+
+  free (op->out_buf);
+  op->out_buf = NULL;
+  op->out_buf_alloc = 0;
+  op->out_buf_used = 0;
 
   free(op);
 }
@@ -655,7 +801,7 @@ free_field_ops ()
 /* Given a string with operation name, returns the operation enum.
    exits with an error message if the string is not a valid/known operation. */
 enum operation
-get_grouping_operation (const char* keyword)
+get_operation (const char* keyword)
 {
   for (size_t i = 0; operations[i].name ; i++)
       if ( STREQ(operations[i].name, keyword) )
@@ -665,18 +811,16 @@ get_grouping_operation (const char* keyword)
   return 0; /* never reached LCOV_EXCL_LINE */
 }
 
+/*
 enum operation_mode
 get_operation_mode (const char* keyword)
 {
-  if ( STREQ(keyword, "transpose") )
-    return TRANSPOSE_MODE;
-  if ( STREQ(keyword, "reverse") )
-    return REVERSE_FIELD_MODE;
   for (size_t i = 0; operations[i].name ; i++)
       if ( STREQ(operations[i].name, keyword) )
-        return GROUPING_MODE;
+        return operations[i].mode;;
   return UNKNOWN_MODE;
 }
+*/
 
 /* Converts a string to number (field number).
    Exits with an error message (using 'op') on invalid field number. */
@@ -698,7 +842,8 @@ safe_get_field_number(enum operation op, const char* field_str)
 
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
 void
-parse_grouping_operations (int argc, int start, char **argv)
+parse_operations (enum operation_mode mode,
+		  int argc, int start, char **argv)
 {
   int i = start;	/* Index into ARGV. */
   size_t field;
@@ -707,8 +852,14 @@ parse_grouping_operations (int argc, int start, char **argv)
   /* From here on, by default we assume it's a "groupby" operation */
   while ( i < argc )
     {
-      op = get_grouping_operation (argv[i]);
-      /* TODO: detect 'transpose' and 'reverse' out of place, warn user */
+      op = get_operation (argv[i]);
+      if (operations[op].mode != mode)
+	error (EXIT_FAILURE, 0, _("conflicting operation found: "\
+		"expecting %s operations, but found %s operation %s"),
+		operation_mode_name[mode],
+		operation_mode_name[operations[op].mode],
+		quote(operations[op].name));
+
       i++;
       if ( i >= argc )
         error (EXIT_FAILURE, 0, _("missing field number after " \
@@ -720,33 +871,34 @@ parse_grouping_operations (int argc, int start, char **argv)
     }
 }
 
-/* Extract the operation mode based on the first keyword.
-   Possible modes are:
-     transpose
-     reverse (reverse fields)
-     groupby (the default, if the above keywords no found).
-
-  In 'groupby' mode,
-  calls 'parse_grouping_operations' to set the indivudual operaitons. */
 enum operation_mode
 parse_operation_mode (int argc, int start, char** argv)
 {
-  enum operation_mode om;
-
   if (start >= argc)
     internal_error ("prase op mode"); /* LCOV_EXCL_LINE */
 
-  om = get_operation_mode ( argv[start] );
-  if (om == TRANSPOSE_MODE || om == REVERSE_FIELD_MODE)
+  const enum operation op = get_operation ( argv[start] );
+  const enum operation_mode om = operations[op].mode;
+  switch (om)
     {
+    case TRANSPOSE_MODE:
+    case REVERSE_FIELD_MODE:
       if ( start+1 < argc )
 	error (EXIT_FAILURE, 0, _("extra operands after '%s'"), argv[start]);
-      return om;
+      break;
+
+    case LINE_MODE:
+    case GROUPING_MODE:
+      /* parse individual operations */
+      parse_operations (om, argc, start, argv);
+      break;
+
+    case UNKNOWN_MODE:
+      internal_error ("unknown mode"); /* LCOV_EXCL_LINE */
+      break;
     }
 
-  /* default: assuming it's a grouping operation */
-  parse_grouping_operations (argc, start, argv);
-  return GROUPING_MODE;
+  return om;
 }
 
 void

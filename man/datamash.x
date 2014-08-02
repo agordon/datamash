@@ -13,6 +13,20 @@ transpose rows, columns of the input file
 .B reverse
 reverse field order in each line
 .PP
+.SS Per-Line operations:
+.TP "\w'\fBcountunique\fR'u+1n"
+.B base64
+Encode the field as base64
+.TP
+.B debase64
+Decode the field as base64, exit with error if invalid base64 string
+.TP
+.B md5/sha1/sha256/sha512
+Calculate md5/sha1/sha256/sha512 hash of the field value
+.TP
+.B reverse
+reverse field order in each line
+.PP
 .SS Numeric Grouping operations
 .TP "\w'\fBcountunique\fR'u+1n"
 .B sum
@@ -222,6 +236,15 @@ Transpose rows, columns:
 $ seq 6 | paste \- \- | \fBdatamash\fR transpose
 1    3    5
 2    4    6
+.RE
+.fi
+.PP
+Calculate the sha256 hash value of each TXT file,
+after calculating the sha256 value of each file's content:
+.PP
+.nf
+.RS
+$ sha1sum *.txt | datamash -Wf sha256 2
 .RE
 .fi
 .PP

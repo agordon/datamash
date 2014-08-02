@@ -109,6 +109,7 @@ endif
 TESTS = \
 	tests/datamash-show-env.sh \
 	tests/datamash-tests.pl \
+	tests/datamash-sha.pl \
 	tests/datamash-rand.sh \
 	tests/datamash-stats.pl \
 	tests/datamash-transpose.pl \

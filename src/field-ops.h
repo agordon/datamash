@@ -60,7 +60,14 @@ enum operation
   OP_UNIQUE,        /* Collapse Unique string into comma separated values */
   OP_COLLAPSE,      /* Collapse strings into comma separated values */
   OP_COUNT_UNIQUE,  /* count number of unique values */
-  OP_TRANSPOSE      /* Transpose rows and columns */
+  OP_TRANSPOSE,     /* transpose */
+  OP_REVERSE,       /* reverse fields in each line */
+  OP_BASE64,        /* Encode Field to Base64 */
+  OP_DEBASE64,      /* Decode Base64 field */
+  OP_MD5,           /* Calculate MD5 of a field */
+  OP_SHA1,          /* Calculate SHA1 of a field */
+  OP_SHA256,        /* Calculate SHA256 of a field */
+  OP_SHA512,        /* Calculate SHA512 of a field */
 };
 
 enum accumulation_type
@@ -77,11 +84,22 @@ enum operation_first_value
   IGNORE_FIRST = false
 };
 
+enum operation_mode
+{
+	UNKNOWN_MODE = 0,
+	GROUPING_MODE,
+	TRANSPOSE_MODE,
+	REVERSE_FIELD_MODE,
+	LINE_MODE
+};
+
+
 struct operation_data
 {
   const char* name;
   enum accumulation_type acc_type;
   enum operation_first_value auto_first;
+  enum operation_mode mode;
 };
 
 extern struct operation_data operations[];
@@ -117,18 +135,15 @@ struct fieldop
   size_t str_buf_used; /* number of bytes used in the buffer */
   size_t str_buf_alloc; /* number of bytes allocated in the buffer */
 
+  /* Output buffer for line operations (md5/sha1/256/512/base64) */
+  char *out_buf;
+  size_t out_buf_used;
+  size_t out_buf_alloc;
+
   struct fieldop *next;
 };
 
 extern struct fieldop* field_ops ;
-
-enum operation_mode
-{
-	UNKNOWN_MODE = 0,
-	GROUPING_MODE,
-	TRANSPOSE_MODE,
-	REVERSE_FIELD_MODE
-};
 
 /* Add a numeric value to the values vector, allocating memory as needed */
 void field_op_add_value (struct fieldop *op, long double val);
@@ -166,6 +181,11 @@ bool field_op_collect (struct fieldop *op,
    of the input strings. The return string must be free()'d. */
 char* unique_value ( struct fieldop *op, bool case_sensitive );
 
+/* Returns a hexadecimal string of the fieldop's string buffer.
+   The return string must be free()'d. */
+char*
+field_op_to_hex ( struct fieldop *op, const char *buffer, const size_t inlen );
+
 /* Prints to stdout the result of the field operation,
    based on collected values */
 void field_op_summarize (struct fieldop *op);
@@ -176,23 +196,32 @@ void reset_field_ops ();
 
 void free_field_ops ();
 
+/*
 enum operation_mode
 get_operation_mode (const char* keyword);
+*/
 
-enum operation get_grouping_operation (const char* keyword);
+enum operation
+get_operation (const char* keyword);
 
-/* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
+/* Extract the operation patterns from args START through ARGC - 1 of ARGV.
+   Requires all operation to be of 'mode' - otherwise exits with an error.
+ */
 void
-parse_grouping_operations (int argc, int start, char **argv);
+parse_operations (enum operation_mode mode,
+		  int argc, int start, char **argv);
 
 /* Extract the operation mode based on the first keyword.
    Possible modes are:
      transpose
      reverse (reverse fields)
-     groupby (the default, if the above keywords no found).
+     line mode
+     grouping
+   depending on the 'operation_mode' of the first operation keyword
+   found.
 
-  In 'groupby' mode,
-  calls 'parse_grouping_operations' to set the indivudual operaitons. */
+  In grouping/line modes,
+  calls 'parse_operations' to set the indivudual operaitons. */
 enum operation_mode
 parse_operation_mode (int argc, int start, char** argv);
 

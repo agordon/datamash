@@ -75,6 +75,7 @@ static bool print_full_line = false;
 
 static size_t *group_columns = NULL;
 static size_t num_group_colums = 0;
+static bool line_mode = false; /* if TRUE, handle each line as a group */
 
 static bool pipe_through_sort = false;
 static FILE* input_stream = NULL;
@@ -137,23 +138,28 @@ usage (int status)
           stdout);
       fputs ("\n\n", stdout);
       fputs (_("'op' is the operation to perform;\n"), stdout);
-      fputs (_("For grouping operations 'col' is the input field to use."),
-          stdout);
+      fputs (_("\
+For grouping,per-line operations 'col' is the input field to use.\
+"), stdout);
       fputs ("\n\n", stdout);
       fputs (_("File operations:\n"),stdout);
       fputs ("  transpose, reverse\n",stdout);
+
+      fputs (_("Per-Line operations:\n"),stdout);
+      fputs ("  base64, debase64, md5, sha1, sha256, sha512\n",stdout);
 
       fputs (_("Numeric Grouping operations:\n"),stdout);
       fputs ("  sum, min, max, absmin, absmax\n",stdout);
 
       fputs (_("Textual/Numeric Grouping operations:\n"),stdout);
-      fputs ("  count, first, last, rand \n", stdout);
-      fputs ("  unique, collapse, countunique\n",stdout);
+      fputs ("  count, first, last, rand, unique, collapse, countunique\n",
+             stdout);
 
       fputs (_("Statistical Grouping operations:\n"),stdout);
-      fputs ("  mean, median, q1, q3, iqr, mode, antimode\n", stdout);
-      fputs ("  pstdev, sstdev, pvar, svar, mad, madraw\n", stdout);
-      fputs ("  pskew, sskew, pkurt, skurt, dpo, jarque\n", stdout);
+      fputs ("\
+  mean, median, q1, q3, iqr, mode, antimode, pstdev, sstdev, pvar\n\
+  svar, mad, madraw, pskew, sskew, pkurt, skurt, dpo, jarque\n\
+\n", stdout);
       fputs ("\n", stdout);
 
       fputs (_("Options:\n"),stdout);
@@ -191,6 +197,7 @@ usage (int status)
       --filler=X            fill missing values with X (default %s)\n\
 "), stdout);
 
+      fputs ("\n", stdout);
       fputs (_("General Options:\n"),stdout);
       fputs (_("\
   -t, --field-separator=X   use X instead of TAB as field delimiter\n\
@@ -434,9 +441,9 @@ process_file ()
       line_number++;
 
       /* If no keys are given, the entire input is considered one group */
-      if (num_group_colums)
+      if (num_group_colums || line_mode)
         {
-          new_group = (group_first_line->length == 0
+          new_group = (group_first_line->length == 0 || line_mode
                        || different (thisline, group_first_line));
 
 #ifdef ENABLE_BUILTIN_DEBUG
@@ -892,6 +899,9 @@ int main(int argc, char* argv[])
   open_input ();
   switch(op_mode)
     {
+    case LINE_MODE:
+      line_mode = true;
+      /* fall through */
     case GROUPING_MODE:
       process_file ();
       break;

@@ -154,6 +154,10 @@ all the values in the input file.
 @item File operations:
 @code{transpose}, @code{reverse}
 
+@item Per-Line operations:
+@code{base64}, @code{debase64}, @code{md5}, @code{sha1},
+@code{sha256}, @code{sha512}
+
 @item Numeric operations:
 @code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}
 
@@ -301,6 +305,26 @@ standard output and then exit successfully.
 transpose rows, columns of a text file
 @item reverse
 reverse fields in each line of a text file
+@end table
+
+@item Per-Line operations:
+@cindex Per-Line operations
+@cindex operations, per-line
+
+@table @option
+@item base64
+encode the field as base64
+@item debase64
+decode the field as base64. Exit with an error if the field is invalid base64
+value which cannot be decoded.
+@item md5
+calculates md5 hash of the field
+@item sha1
+calculates sha1 hash of the field
+@item sha256
+calculates sha256 hash of the field
+@item sha512
+calculates sha512 hash of the field
 @end table
 
 @item Numeric operations:

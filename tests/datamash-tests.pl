@@ -29,6 +29,8 @@ use warnings;
 use Coreutils;
 use CuSkip;
 use CuTmpdir qw(datamash);
+use Digest::MD5 qw(md5_hex);
+use MIME::Base64 ;
 
 (my $program_name = $0) =~ s|.*/||;
 my $prog_bin = 'datamash';
@@ -252,6 +254,38 @@ my $out_large_buffer_last =
 "A " . "FooBar" x 200 . "\n" .
 "B " . "FooBar" x 400 . "\n" ;
 
+=pod
+  Example:
+  my $data = "a 1\nb 2\n";
+  my $out = transform_column($data, 2, \&md5_hex);
+  # out => md5_hex("1") . "\n" . md5_hex("2") . "\n" ;
+=cut
+sub transform_column($$$)
+{
+  my $input_text = shift;
+  my $input_column = shift;
+  my $function = shift;
+
+  return join "",
+		map { "$_\n" }
+		map { &$function($_->[ $input_column - 1 ]) }
+		map { [ split / / ] }
+		split("\n", $input_text);
+}
+
+sub single_line_base64($)
+{
+	my $in = shift;
+	return encode_base64($in,'');
+}
+
+
+# md5 of the second column of '$in_g1'
+# NOTE: sha1/256/512 are tested in a separate file.
+my $out_g1_md5 = transform_column ($in_g1, 2, \&md5_hex);
+
+my $out_g1_base64 = transform_column ($in_g1, 2, \&single_line_base64);
+my $out_g1_debase64 = transform_column ($out_g1_base64, 1, \&decode_base64);
 
 my @Tests =
 (
@@ -536,6 +570,28 @@ my @Tests =
             {OUT=>"A 2\nB 4\n"}],
   ['lst6',   '-t" " -g 1 last 2', {IN_PIPE=>$in_large_buffer2},
             {OUT=>$out_large_buffer_last}],
+
+
+  ## Test md5 operation
+  # NOTE: sha1/256/512 are tested in a separate file.
+  ['md5-1',   '-W md5 2',    {IN_PIPE=>$in_g1}, {OUT=>$out_g1_md5}],
+
+  ## Test Base64
+  ['base64-1','-W base64 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_base64}],
+  ['debase64-1','-W debase64 1', {IN_PIPE=>$out_g1_base64},
+    {OUT=>$out_g1_debase64}],
+
+  ## Mixing grouping,line,transpose/reverse operators should fail
+  ['mixop1', 'sum 1 md5 2', {EXIT=>1},
+    {ERR=>"$prog: conflicting operation found: expecting grouping operations," .
+	        " but found line operation 'md5'\n"}],
+  ['mixop2', 'md5 1 sum 2', {EXIT=>1},
+    {ERR=>"$prog: conflicting operation found: expecting line operations," .
+	        " but found grouping operation 'sum'\n"}],
+  ['mixop3', 'md5 1 transpose 2', {EXIT=>1},
+    {ERR=>"$prog: conflicting operation found: expecting line operations," .
+	        " but found transpose operation 'transpose'\n"}],
+
 );
 
 if ($have_stable_sort) {

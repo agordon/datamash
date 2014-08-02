@@ -140,3 +140,10 @@
 /floorl.m4
 /round.m4
 /roundl.m4
+/base64.m4
+/gl-openssl.m4
+/md5.m4
+/sha1.m4
+/sha256.m4
+/sha512.m4
+/stdalign.m4
