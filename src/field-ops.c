@@ -125,11 +125,19 @@ field_op_add_value (struct fieldop *op, long double val)
   op->num_values++;
 }
 
-char*
+static void
+field_op_reserve_out_buf (struct fieldop *op, const size_t minsize)
+{
+  if (op->out_buf_alloc < minsize)
+    {
+      op->out_buf = xrealloc (op->out_buf, minsize);
+      op->out_buf_alloc = minsize;
+    }
+}
+
+void
 field_op_to_hex ( struct fieldop* op, const char *buffer, const size_t inlen )
 {
-	(void)(op);
-
   static const char hex_digits[] =
   {
     '0', '1', '2', '3', '4', '5', '6', '7',
@@ -137,8 +145,8 @@ field_op_to_hex ( struct fieldop* op, const char *buffer, const size_t inlen )
   };
   size_t len = inlen*2+1;
   const char* inp = buffer;
-  char* res = xmalloc(len);
-  char* ptr = res;
+  field_op_reserve_out_buf (op, len);
+  char* ptr = op->out_buf;
   for (size_t i = 0 ; i < inlen; ++i)
    {
      *ptr = hex_digits[ ((*inp)>>4) & 0xf ] ;
@@ -148,7 +156,6 @@ field_op_to_hex ( struct fieldop* op, const char *buffer, const size_t inlen )
      ++inp;
    }
   *ptr = 0 ;
-  return res;
 }
 
 /* Add a string to the strings vector, allocating memory as needed */
@@ -222,42 +229,7 @@ field_op_get_string_ptrs ( struct fieldop *op, bool sort, bool sort_case_sensiti
 void
 field_op_sort_values (struct fieldop *op)
 {
-  qsortfl(op->values, op->num_values);
-}
-
-static inline size_t
-output_buffer_size (const enum operation oper)
-{
-  switch (oper)
-    {
-    case OP_BASE64:
-    case OP_DEBASE64:
-      return 512;
-
-    case OP_SHA512:
-      return 64;
-
-    case OP_SHA256:
-      return 32;
-
-    case OP_SHA1:
-      return 20;
-
-    case OP_MD5:
-      return 16;
-
-    case OP_MEAN: case OP_SUM: case OP_COUNT: case OP_MIN:
-    case OP_MAX: case OP_ABSMIN: case OP_ABSMAX: case OP_FIRST:
-    case OP_LAST: case OP_RAND: case OP_MEDIAN: case OP_QUARTILE_1:
-    case OP_QUARTILE_3: case OP_IQR: case OP_PSTDEV: case OP_SSTDEV:
-    case OP_PVARIANCE: case OP_SVARIANCE: case OP_MAD: case OP_MADRAW:
-    case OP_S_SKEWNESS: case OP_P_SKEWNESS: case OP_S_EXCESS_KURTOSIS:
-    case OP_P_EXCESS_KURTOSIS: case OP_JARQUE_BERA: case OP_DP_OMNIBUS:
-    case OP_MODE: case OP_ANTIMODE: case OP_UNIQUE: case OP_COLLAPSE:
-    case OP_COUNT_UNIQUE: case OP_TRANSPOSE: case OP_REVERSE:
-    default:
-      return 0;
-    }
+  qsortfl (op->values, op->num_values);
 }
 
 /* Allocate a new fieldop, initialize it based on 'oper',
@@ -280,9 +252,11 @@ new_field_op (enum operation oper, size_t field)
 
   op->next = NULL;
 
-  op->out_buf_alloc = output_buffer_size (oper);
-  if (op->out_buf_alloc)
-    op->out_buf = xmalloc (op->out_buf_alloc);
+  if (op->res_type == STRING_RESULT)
+    {
+      op->out_buf_alloc = 1024;
+      op->out_buf = xmalloc (op->out_buf_alloc);
+    }
   op->out_buf_used = 0 ;
 
   if (field_ops != NULL)
@@ -392,8 +366,8 @@ field_op_collect (struct fieldop *op,
         field_op_replace_string(op, str, slen);
       break;
 
-    case OP_BASE64:
     case OP_DEBASE64:
+    case OP_BASE64:
     case OP_MD5:
     case OP_SHA1:
     case OP_SHA256:
@@ -455,20 +429,21 @@ field_op_collect (struct fieldop *op,
 
 /* Returns a nul-terimated string, composed of the unique values
    of the input strings. The return string must be free()'d. */
-char *
+void
 unique_value ( struct fieldop *op, bool case_sensitive )
 {
   const char *last_str;
-  char *buf, *pos;
+  char *pos;
 
   const char **ptrs = field_op_get_string_ptrs (op, true, case_sensitive);
 
   /* Uniquify them */
-  pos = buf = xzalloc ( op->str_buf_used );
+  field_op_reserve_out_buf (op, op->str_buf_used);
+  pos = op->out_buf ;
 
   /* Copy the first string */
   last_str = ptrs[0];
-  strcpy (buf, ptrs[0]);
+  strcpy (pos, ptrs[0]);
   pos += strlen(ptrs[0]);
 
   /* Copy the following strings, if they are different from the previous one */
@@ -488,8 +463,6 @@ unique_value ( struct fieldop *op, bool case_sensitive )
     }
 
   free(ptrs);
-
-  return buf;
 }
 
 /* Returns the number of unique string values in the given field operation */
@@ -526,19 +499,18 @@ count_unique_values ( struct fieldop *op, bool case_sensitive )
 
 /* Returns a nul-terimated string, composed of all the values
    of the input strings. The return string must be free()'d. */
-char *
+void
 collapse_value ( struct fieldop *op )
 {
   /* Copy the string buffer as-is */
-  char *buf = xzalloc ( op->str_buf_used );
+  field_op_reserve_out_buf (op, op->str_buf_used);
+  char *buf = op->out_buf;
   memcpy (buf, op->str_buf, op->str_buf_used);
 
   /* convert every NUL to comma, except for the last one */
   for (size_t i=0; i < op->str_buf_used-1 ; i++)
       if (buf[i] == 0)
         buf[i] = collapse_separator ;
-
-  return buf;
 }
 
 /* Prints to stdout the result of the field operation,
@@ -548,7 +520,6 @@ field_op_summarize (struct fieldop *op)
 {
   bool print_numeric_result = true;
   long double numeric_result = 0 ;
-  char *string_result = NULL;
   char tmpbuf[64]; /* 64 bytes - enough to hold sha512 */
 
 #ifdef ENABLE_BUILTIN_DEBUG
@@ -577,7 +548,8 @@ field_op_summarize (struct fieldop *op)
     case OP_RAND:
       /* Only one string is returned in the buffer, return it */
       print_numeric_result = false;
-      string_result = xstrdup(op->str_buf);
+      field_op_reserve_out_buf (op, op->str_buf_used);
+      memcpy (op->out_buf, op->str_buf, op->str_buf_used);
       break;
 
     case OP_MEDIAN:
@@ -662,12 +634,12 @@ field_op_summarize (struct fieldop *op)
 
     case OP_UNIQUE:
       print_numeric_result = false;
-      string_result = unique_value (op, case_sensitive);
+      unique_value (op, case_sensitive);
       break;
 
     case OP_COLLAPSE:
       print_numeric_result = false;
-      string_result = collapse_value (op);
+      collapse_value (op);
       break;
 
     case OP_COUNT_UNIQUE:
@@ -675,45 +647,45 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_BASE64:
-      string_result = xmalloc ( BASE64_LENGTH (op->str_buf_used-1)+1 ) ;
+      field_op_reserve_out_buf (op, BASE64_LENGTH (op->str_buf_used-1)+1 ) ;
       base64_encode ( op->str_buf, op->str_buf_used-1,
-		      string_result, BASE64_LENGTH (op->str_buf_used-1)+1 );
+		      op->out_buf, BASE64_LENGTH (op->str_buf_used-1)+1 );
       print_numeric_result = false;
       break;
 
     case OP_DEBASE64:
       {
 	size_t decoded_size = op->str_buf_used ;
-        string_result = xmalloc ( decoded_size ) ;
+        field_op_reserve_out_buf (op, decoded_size);
 	if (!base64_decode ( op->str_buf, op->str_buf_used-1,
-			string_result, &decoded_size ))
+			op->out_buf, &decoded_size ))
 		error (EXIT_FAILURE, 0, _("base64 decoding failed"));
-	string_result[decoded_size]=0;
+	op->out_buf[decoded_size]=0;
 	print_numeric_result = false;
       }
       break;
 
     case OP_MD5:
       md5_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
-      string_result = field_op_to_hex (op, tmpbuf, 16);
+      field_op_to_hex (op, tmpbuf, 16);
       print_numeric_result = false;
       break;
 
     case OP_SHA1:
       sha1_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
-      string_result = field_op_to_hex (op, tmpbuf, 20);
+      field_op_to_hex (op, tmpbuf, 20);
       print_numeric_result = false;
       break;
 
     case OP_SHA256:
       sha256_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
-      string_result = field_op_to_hex (op, tmpbuf, 32);
+      field_op_to_hex (op, tmpbuf, 32);
       print_numeric_result = false;
       break;
 
     case OP_SHA512:
       sha512_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
-      string_result = field_op_to_hex (op, tmpbuf, 64);
+      field_op_to_hex (op, tmpbuf, 64);
       print_numeric_result = false;
       break;
 
@@ -738,9 +710,7 @@ field_op_summarize (struct fieldop *op)
   if (print_numeric_result)
     printf ("%.*Lg", field_op_output_precision, numeric_result);
   else
-    printf ("%s", string_result);
-
-  free (string_result);
+    printf ("%s", op->out_buf);
 }
 
 /* reset operation values for next group */

@@ -177,13 +177,13 @@ bool field_op_collect (struct fieldop *op,
                   const char* str, size_t slen);
 
 
-/* Returns a nul-terimated string, composed of the unique values
-   of the input strings. The return string must be free()'d. */
-char* unique_value ( struct fieldop *op, bool case_sensitive );
+/* creates a list of unique strings from op->str_buf .
+   results are stored in op->out_buf. */
+void
+unique_value ( struct fieldop *op, bool case_sensitive );
 
-/* Returns a hexadecimal string of the fieldop's string buffer.
-   The return string must be free()'d. */
-char*
+/* stores the hexadecimal representation of 'buffer' in op->out_buf */
+void
 field_op_to_hex ( struct fieldop *op, const char *buffer, const size_t inlen );
 
 /* Prints to stdout the result of the field operation,
