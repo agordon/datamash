@@ -52,26 +52,6 @@ gl_WARN_ADD([-Wformat-nonliteral])
 gl_WARN_ADD([-Wunused-parameter])
 gl_WARN_ADD([-Wfloat-equal])
 
-# Add built-in --debug option.
-# To enable, use:
-#   ./configure --enable-debug
-# Then, when running datamash, use:
-#   datamash --debug [other options]
-AC_ARG_ENABLE(debug,
-    AS_HELP_STRING([--enable-debug],
-                   [Build with --debug option]),
-                   [
-                     if test "$enableval" = "yes" ; then
-                       :
-                     elif test "$enableval" != "no" ; then
-                       AC_MSG_ERROR([--enable-debug does not accept an argument])
-                     fi
-                   ])
-if test "x$enable_debug" = "xyes" ; then
-	AC_DEFINE([ENABLE_BUILTIN_DEBUG],[1],[Define to 1 to enable --debug option])
-fi
-
-
 ## Test for CygWin hosts - these have a broken 'strtold()' implementation:
 ##  calling strtold("4\t5",NULL) returns "e+9999",
 ## whereas every other (sane) system returns "4" and stops at the whitespace.

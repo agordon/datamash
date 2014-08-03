@@ -41,7 +41,7 @@ line_record_init (struct line_record_t* lr)
   lr->fields = XNMALLOC(lr->alloc_fields, struct field_record_t);
 }
 
-#ifdef ENABLE_BUILTIN_DEBUG
+#if 0
 static void
 line_record_debug_print_fields (const struct line_record_t *lr)
 {
@@ -173,9 +173,6 @@ line_record_fread (struct /* in/out */ line_record_t* lr,
   linebuffer_nullify (&lr->lbuf);
 
   line_record_parse_fields (lr, in_tab);
-#if ENABLE_BUILTIN_DEBUG
-  line_record_debug_print_fields (lr);
-#endif
   return true;
 }
 

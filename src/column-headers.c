@@ -35,11 +35,6 @@
 #include "text-lines.h"
 #include "column-headers.h"
 
-#ifdef ENABLE_BUILTIN_DEBUG
-/* enable debugging */
-extern bool debug;
-#endif
-
 static size_t num_input_column_headers = 0 ;
 static char** input_column_headers;
 

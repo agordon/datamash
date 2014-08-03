@@ -53,11 +53,6 @@
 /* Until someone better comes along */
 const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon" ;
 
-#ifdef ENABLE_BUILTIN_DEBUG
-/* enable debugging */
-bool debug = false;
-#endif
-
 /* Line number in the input file */
 static size_t line_number = 0 ;
 
@@ -94,10 +89,7 @@ enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
   OUTPUT_HEADER_OPTION,
-  NO_STRICT_OPTION,
-#ifdef ENABLE_BUILTIN_DEBUG
-  DEBUG_OPTION
-#endif
+  NO_STRICT_OPTION
 };
 
 static char const short_options[] = "sfF:izg:t:HW";
@@ -116,9 +108,6 @@ static struct option const long_options[] =
   {"filler", required_argument, NULL, 'F'},
   {"sort", no_argument, NULL, 's'},
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
-#ifdef ENABLE_BUILTIN_DEBUG
-  {"debug", no_argument, NULL, DEBUG_OPTION},
-#endif
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0},
@@ -209,11 +198,6 @@ For grouping,per-line operations 'col' is the input field to use.\
       fputs (_("\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
 "), stdout);
-#ifdef ENABLE_BUILTIN_DEBUG
-      fputs (_("\
-      --debug               print helpful debugging information\n\
-"), stdout);
-#endif
 
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -271,16 +255,6 @@ different (const struct line_record_t* l1, const struct line_record_t* l2)
       size_t len1=0,len2=0;
       safe_line_record_get_field (l1, *key, &str1, &len1);
       safe_line_record_get_field (l2, *key, &str2, &len2);
-#ifdef ENABLE_BUILTIN_DEBUG
-      if (debug)
-        {
-          fprintf(stderr,"diff, key column = %zu, str1='", *key);
-          fwrite(str1,sizeof(char),len1,stderr);
-          fprintf(stderr,"' str2='");
-          fwrite(str2,sizeof(char),len2,stderr);
-          fputs("\n",stderr);
-        }
-#endif
       if (len1 != len2)
         return true;
       if ((case_sensitive && (strncmp(str1,str2,len1)!=0))
@@ -303,14 +277,6 @@ process_line (const struct line_record_t *line)
   while (op)
     {
       safe_line_record_get_field (line, op->field, &str, &len);
-#ifdef ENABLE_BUILTIN_DEBUG
-      if (debug)
-        {
-          fprintf(stderr,"getfield(%zu) = len %zu: '", op->field,len);
-          fwrite(str,sizeof(char),len,stderr);
-          fprintf(stderr,"'\n");
-        }
-#endif
       if (!field_op_collect (op, str, len))
         {
           char *tmp = xmalloc(len+1);
@@ -465,19 +431,6 @@ process_file ()
         {
           new_group = (group_first_line->lbuf.length == 0 || line_mode
                        || different (thisline, group_first_line));
-
-#ifdef ENABLE_BUILTIN_DEBUG
-          if (debug)
-            {
-              fprintf(stderr,"group_first_line = '");
-              fwrite(group_first_line->buffer,sizeof(char),group_first_line->length,stderr);
-              fprintf(stderr,"'\n");
-              fprintf(stderr,"thisline = '");
-              fwrite(thisline->buffer,sizeof(char),thisline->length,stderr);
-              fprintf(stderr,"'\n");
-              fprintf(stderr, "newgroup = %d\n", new_group);
-            }
-#endif
 
           if (new_group && lines_in_group>0)
             {
@@ -668,11 +621,6 @@ open_input()
           strcat(cmd,tmp);
         }
 
-#ifdef ENABLE_BUILTIN_DEBUG
-      if (debug)
-        fprintf(stderr,"sort cmd = '%s'\n", cmd);
-#endif
-
       input_stream = popen(cmd,"r");
       if (input_stream == NULL)
         error (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
@@ -718,11 +666,6 @@ parse_group_spec ( char* spec )
 
   /* Count number of groups parameters, by number of commas */
   num_group_colums = 1;
-#ifdef ENABLE_BUILTIN_DEBUG
-  if (debug)
-    fprintf(stderr,"parse_group_spec (spec='%s')\n", spec);
-#endif
-
   endptr = spec;
   while ( *endptr != '\0' )
     {
@@ -754,18 +697,6 @@ parse_group_spec ( char* spec )
       spec = endptr;
     }
   group_columns[idx] = 0 ; /* marker for the last element */
-
-#ifdef ENABLE_BUILTIN_DEBUG
-  if (debug)
-    {
-      fprintf(stderr,"group columns (%p) num=%zu = ", group_columns,num_group_colums);
-      for (size_t *key=group_columns;key && *key; ++key)
-        {
-          fprintf(stderr,"%zu ", *key);
-        }
-      fputs("\n",stderr);
-    }
-#endif
 }
 
 int main(int argc, char* argv[])
@@ -808,11 +739,6 @@ int main(int argc, char* argv[])
           eolchar = 0;
           break;
 
-#ifdef ENABLE_BUILTIN_DEBUG
-        case DEBUG_OPTION:
-          debug = true;
-          break;
-#endif
         case INPUT_HEADER_OPTION:
           input_header = true;
           break;

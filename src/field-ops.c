@@ -44,11 +44,6 @@
 #include "text-options.h"
 #include "field-ops.h"
 
-#ifdef ENABLE_BUILTIN_DEBUG
-/* enable debugging */
-extern bool debug;
-#endif
-
 int field_op_output_precision = 14 ; /* In the future: allow users to
 					change this */
 
@@ -283,15 +278,6 @@ field_op_collect (struct fieldop *op,
   char tmpbuf[512];
 #endif
 
-#ifdef ENABLE_BUILTIN_DEBUG
-  if (debug)
-    {
-      fprintf (stderr, "-- collect for %s(%zu) val='", op->name, op->field);
-      fwrite (str, sizeof(char), slen, stderr);
-      fprintf (stderr, "'\n");
-    }
-#endif
-
   op->count++;
 
   if (op->numeric)
@@ -314,10 +300,6 @@ field_op_collect (struct fieldop *op,
       num_value = strtold (str, &endptr);
       if (errno==ERANGE || endptr==str || endptr!=(str+slen))
         return false;
-#endif
-#ifdef ENABLE_BUILTIN_DEBUG
-      if (debug)
-        fprintf(stderr,"stdtold('%s') = %Lg\n", str, num_value);
 #endif
     }
 
@@ -524,11 +506,6 @@ field_op_summarize (struct fieldop *op)
   long double numeric_result = 0 ;
   char tmpbuf[64]; /* 64 bytes - enough to hold sha512 */
 
-#ifdef ENABLE_BUILTIN_DEBUG
-  if (debug)
-    fprintf (stderr, "-- summarize for %s(%zu)\n", op->name, op->field);
-#endif
-
   switch (op->op)
     {
     case OP_MEAN:
@@ -697,17 +674,6 @@ field_op_summarize (struct fieldop *op)
       /* Should never happen */
       internal_error("bad op");     /* LCOV_EXCL_LINE */
     }
-
-
-#ifdef ENABLE_BUILTIN_DEBUG
-  if (debug)
-    {
-      if (print_numeric_result)
-        fprintf (stderr, "%s(%zu) = %Lg\n", op->name, op->field, numeric_result);
-      else
-        fprintf (stderr, "%s(%zu) = '%s'\n", op->name, op->field, string_result);
-    }
-#endif
 
   if (print_numeric_result)
     printf ("%.*Lg", field_op_output_precision, numeric_result);
