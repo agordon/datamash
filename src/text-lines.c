@@ -25,47 +25,104 @@
 #include <stdbool.h>
 
 #include "system.h"
+#include "minmax.h"
 #include "linebuffer.h"
+#include "xalloc.h"
 
 #include "text-options.h"
 #include "text-lines.h"
 
+void
+line_record_init (struct line_record_t* lr)
+{
+  initbuffer (&lr->lbuf);
+  lr->alloc_fields = 10 ;
+  lr->num_fields = 0;
+  lr->fields = XNMALLOC(lr->alloc_fields, struct field_record_t);
+}
+
+#ifdef ENABLE_BUILTIN_DEBUG
+static void
+line_record_debug_print_fields (const struct line_record_t *lr)
+{
+  fputs("line_record_t = {\n",stderr);
+  fprintf(stderr, "  linebuffer.length = %zu\n", lr->lbuf.length);
+  fputs("  linebuffer.buffer = '",stderr);
+    fwrite(lr->lbuf.buffer,lr->lbuf.length,sizeof(char),stderr);
+  fputs("'\n",stderr);
+
+  fprintf(stderr, "  num_fields = %zu\n", lr->num_fields);
+  fprintf(stderr, "  alloc_fields = %zu\n", lr->alloc_fields);
+
+  for (size_t i=0; i<lr->num_fields; ++i)
+    {
+	    fprintf(stderr, "  field[%zu] = '", i);
+	    fwrite(lr->fields[i].buf,lr->fields[i].len,sizeof(char),stderr);
+	    fprintf(stderr, "' (len = %zu)\n", lr->fields[i].len);
+    }
+  fputs("}\n", stderr);
+}
+#endif
 
 /* Force NUL-termination of the string in the linebuffer struct.
    gnulib's readlinebuffer_delim() ALWAYS adds a delimiter to the buffer.
    Change the delimiter into a NUL.
 */
-void
+static void
 linebuffer_nullify (struct linebuffer *line)
 {
   if (line->length==0)
     return; /* LCOV_EXCL_LINE */
   line->buffer[line->length-1] = 0; /* make it NUL terminated */
+  --line->length;
 }
 
-void
-get_field (const struct linebuffer *line, size_t field,
-               const char** /* OUT*/ _ptr, size_t /*OUT*/ *_len)
+static inline void
+line_record_reserve_fields (struct line_record_t* lr, const size_t n)
 {
-  size_t pos = 0;
-  size_t flen = 0;
-  const size_t buflen = line->length;
-  char* fptr = line->buffer;
-  /* Move 'fptr' to point to the beginning of 'field' */
-  if (in_tab != TAB_WHITESPACE)
+  if (lr->alloc_fields < n)
     {
-      /* delimiter is explicit character */
-      while ((pos<buflen) && --field)
+      lr->alloc_fields = MAX(n,lr->alloc_fields)*2;
+      lr->fields = xnrealloc (lr->fields, lr->alloc_fields,
+		                sizeof (struct field_record_t));
+    }
+}
+
+static void
+line_record_parse_fields (struct line_record_t *lr, int field_delim)
+{
+  size_t num_fields = 0;
+  size_t pos = 0;
+  const size_t buflen = line_record_length(lr);
+  const char* fptr = line_record_buffer(lr);
+
+  /* Move 'fptr' to point to the beginning of 'field' */
+  if (field_delim != TAB_WHITESPACE)
+    {
+      while (pos<buflen)
         {
-          while ( (pos<buflen) && (*fptr != in_tab))
+	  /* scan buffer until next delimiter */
+          const char* field_beg = fptr;
+          size_t flen = 0;
+          while ( (pos<buflen) && (*fptr != field_delim))
             {
               ++fptr;
-              ++pos;
+              ++flen;
+	      ++pos;
             }
-          if ( (pos<buflen) && (*fptr == in_tab))
+
+	  /* Add new field */
+	  ++num_fields;
+	  line_record_reserve_fields (lr, num_fields);
+	  lr->num_fields = num_fields;
+	  lr->fields[num_fields-1].buf = field_beg;
+	  lr->fields[num_fields-1].len = flen;
+
+	  /* Skip the delimiter */
+	  if (pos<buflen)
             {
-              ++fptr;
-              ++pos;
+	      ++pos;
+	      ++fptr;
             }
         }
     }
@@ -73,37 +130,62 @@ get_field (const struct linebuffer *line, size_t field,
     {
       /* delimiter is white-space transition
          (multiple whitespaces are one delimiter) */
-      while ((pos<buflen) && --field)
+      while (pos<buflen)
         {
-          while ( (pos<buflen) && !blanks[to_uchar(*fptr)])
-            {
-              ++fptr;
-              ++pos;
-            }
+          /* Skip leading whitespace */
           while ( (pos<buflen) && blanks[to_uchar(*fptr)])
             {
               ++fptr;
               ++pos;
             }
+
+	  /* Scan buffer until next whitespace */
+          const char* field_beg = fptr;
+          size_t flen = 0;
+          while ( (pos<buflen) && !blanks[to_uchar(*fptr)])
+            {
+              ++fptr;
+              ++pos;
+	      ++flen;
+            }
+
+	  /* Add new field */
+	  if (flen>0)
+            {
+	       ++num_fields;
+	       line_record_reserve_fields (lr, num_fields);
+	       lr->num_fields = num_fields;
+	       lr->fields[num_fields-1].buf = field_beg;
+	       lr->fields[num_fields-1].len = flen;
+	    }
         }
     }
+}
 
-  /* Find the length of the field (until the next delimiter/eol) */
-  if (in_tab != TAB_WHITESPACE)
-    {
-      while ( (pos+flen<buflen) && (*(fptr+flen) != in_tab) )
-        flen++;
-    }
-  else
-    {
-      while ( (pos+flen<buflen) && !blanks[to_uchar(*(fptr+flen))] )
-        flen++;
-    }
 
-  /* Chomp field if needed */
-  if ( (flen>1) && ((*(fptr + flen -1) == 0) || (*(fptr+flen-1)==eolchar)) )
-    flen--;
+bool
+line_record_fread (struct /* in/out */ line_record_t* lr,
+                  FILE *stream, char delimiter)
+{
+  if (readlinebuffer_delim (&lr->lbuf, stream, delimiter) == 0)
+    return false;
 
-  *_len = flen;
-  *_ptr = fptr;
+  linebuffer_nullify (&lr->lbuf);
+
+  line_record_parse_fields (lr, in_tab);
+#if ENABLE_BUILTIN_DEBUG
+  line_record_debug_print_fields (lr);
+#endif
+  return true;
+}
+
+void
+line_record_free (struct line_record_t* lr)
+{
+  freebuffer (&lr->lbuf);
+  lr->lbuf.buffer = NULL;
+  free (lr->fields);
+  lr->fields = NULL;
+  lr->alloc_fields = 0;
+  lr->num_fields = 0;
 }

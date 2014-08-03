@@ -34,8 +34,8 @@
 #include "closeout.h"
 #include "error.h"
 #include "lib/intprops.h"
-#include "linebuffer.h"
 #include "ignore-value.h"
+#include "linebuffer.h"
 #define Version VERSION
 #include "version-etc.h"
 #include "xalloc.h"
@@ -242,18 +242,35 @@ For grouping,per-line operations 'col' is the input field to use.\
   exit (status);
 }
 
+static inline void
+error_not_enough_fields (const size_t needed, const size_t found)
+{
+  error (EXIT_FAILURE, 0, _("invalid input: field %zu requested, " \
+        "line %zu has only %zu field(s)"),
+        needed, line_number, found);
+}
+
+
+static inline void
+safe_line_record_get_field (const struct line_record_t *lr, const size_t n,
+		       const char ** /* out */ pptr, size_t* /*out*/ plen)
+{
+  if (!line_record_get_field (lr, n, pptr, plen))
+    error_not_enough_fields (n, line_record_num_fields (lr));
+}
+
 /* returns TRUE if the lines are different, false if identical.
  * comparison is based on the specified keys */
 /* copied from coreutils's src/uniq.c (in the key-spec branch) */
 static bool
-different (const struct linebuffer* l1, const struct linebuffer* l2)
+different (const struct line_record_t* l1, const struct line_record_t* l2)
 {
   for (size_t *key = group_columns; key && *key ; ++key )
     {
-      const char *str1,*str2;
-      size_t len1,len2;
-      get_field(l1,*key,&str1,&len1);
-      get_field(l2,*key,&str2,&len2);
+      const char *str1=NULL,*str2=NULL;
+      size_t len1=0,len2=0;
+      safe_line_record_get_field (l1, *key, &str1, &len1);
+      safe_line_record_get_field (l2, *key, &str2, &len2);
 #ifdef ENABLE_BUILTIN_DEBUG
       if (debug)
         {
@@ -277,15 +294,15 @@ different (const struct linebuffer* l1, const struct linebuffer* l2)
 /* For a given line, extract all requested fields and process the associated
    operations on them */
 static void
-process_line (const struct linebuffer *line)
+process_line (const struct line_record_t *line)
 {
-  const char *str;
-  size_t len;
+  const char *str = NULL;
+  size_t len = 0;
 
   struct fieldop *op = field_ops;
   while (op)
     {
-      get_field (line, op->field, &str, &len);
+      safe_line_record_get_field (line, op->field, &str, &len);
 #ifdef ENABLE_BUILTIN_DEBUG
       if (debug)
         {
@@ -313,24 +330,24 @@ process_line (const struct linebuffer *line)
    if not full, print only the keys used for grouping.
  */
 static void
-print_input_line (const struct linebuffer* lb)
+print_input_line (const struct line_record_t* lb)
 {
+  const char *str = NULL;
+  size_t len = 0 ;
   if (print_full_line)
     {
-      size_t len = lb->length;
-      const char *buf = lb->buffer;
-      if (buf[len-1]==eolchar || buf[len-1]==0)
-        len--;
-      ignore_value(fwrite (buf, sizeof(char), len, stdout));
-      print_field_separator();
+      for (size_t i = 1; i <= line_record_num_fields (lb); ++i)
+        {
+          safe_line_record_get_field (lb, i, &str, &len);
+          ignore_value(fwrite (str, sizeof(char), len, stdout));
+          print_field_separator();
+        }
     }
   else
     {
       for (size_t *key = group_columns; key && *key != 0 ; ++key)
         {
-          const char *str;
-          size_t len;
-          get_field(lb,*key, &str, &len);
+          safe_line_record_get_field (lb, *key, &str, &len);
           ignore_value(fwrite(str,sizeof(char),len,stdout));
           print_field_separator();
         }
@@ -340,7 +357,7 @@ print_input_line (const struct linebuffer* lb)
 #define SWAP_LINES(A, B)			\
   do						\
     {						\
-      struct linebuffer *_tmp;			\
+      struct line_record_t *_tmp;		\
       _tmp = (A);				\
       (A) = (B);				\
       (B) = _tmp;				\
@@ -363,6 +380,8 @@ print_column_headers()
     {
       for (size_t *key = group_columns; key && *key != 0; ++key)
         {
+          if (*key > get_num_column_headers())
+            error_not_enough_fields(*key, get_num_column_headers());
           printf("GroupBy(%s)",get_input_field_name(*key));
           print_field_separator();
         }
@@ -370,6 +389,8 @@ print_column_headers()
 
   for (struct fieldop *op = field_ops; op ; op=op->next)
     {
+      if (op->field > get_num_column_headers())
+        error_not_enough_fields(op->field, get_num_column_headers());
       printf("%s(%s)",op->name, get_input_field_name(op->field));
 
       if (op->next)
@@ -386,16 +407,15 @@ print_column_headers()
 static void
 process_input_header(FILE *stream)
 {
-  struct linebuffer lb;
+  struct line_record_t lr;
 
-  initbuffer (&lb);
-  if (readlinebuffer_delim (&lb, stream, eolchar) != 0)
+  line_record_init (&lr);
+  if (line_record_fread (&lr, stream, eolchar))
     {
-      linebuffer_nullify (&lb);
-      build_input_line_headers(lb.buffer,lb.length,true);
+      build_input_line_headers(&lr, true);
       line_number++;
     }
-  freebuffer(&lb);
+  line_record_free (&lr);
 }
 
 /*
@@ -407,14 +427,14 @@ process_input_header(FILE *stream)
 static void
 process_file ()
 {
-  struct linebuffer lb1, lb2;
-  struct linebuffer *thisline, *group_first_line;
+  struct line_record_t lb1, lb2;
+  struct line_record_t *thisline, *group_first_line;
 
   thisline = &lb1;
   group_first_line = &lb2;
 
-  initbuffer (thisline);
-  initbuffer (group_first_line);
+  line_record_init (thisline);
+  line_record_init (group_first_line);
 
   if (input_header)
     process_input_header(input_stream);
@@ -423,16 +443,16 @@ process_file ()
     {
       bool new_group = false;
 
-      if (readlinebuffer_delim (thisline, input_stream, eolchar) == 0)
+      if (!line_record_fread (thisline, input_stream, eolchar))
         break;
-      linebuffer_nullify (thisline);
 
-      /* If asked to print the full-line, and the input doesn't have headers,
+      /* If asked to print the output headers,
+         and the input doesn't have headers,
          then count the number of fields in first input line.
          NOTE: 'input_header' might be false if 'sort piping' was used with header,
                  but in that case, line_number will be 1. */
-      if (line_number==0 && print_full_line && !input_header)
-        build_input_line_headers(thisline->buffer,thisline->length,false);
+      if (line_number==0 && output_header && !input_header)
+        build_input_line_headers(thisline, false);
 
       /* Print output header, only after reading the first line */
       if (output_header && line_number==1)
@@ -443,7 +463,7 @@ process_file ()
       /* If no keys are given, the entire input is considered one group */
       if (num_group_colums || line_mode)
         {
-          new_group = (group_first_line->length == 0 || line_mode
+          new_group = (group_first_line->lbuf.length == 0 || line_mode
                        || different (thisline, group_first_line));
 
 #ifdef ENABLE_BUILTIN_DEBUG
@@ -465,13 +485,13 @@ process_file ()
               summarize_field_ops ();
               reset_field_ops ();
               lines_in_group = 0 ;
-              group_first_line->length = 0;
+              group_first_line->lbuf.length = 0;
             }
         }
       else
         {
           /* The entire line is a "group", if it's the first line, keep it */
-          new_group = (group_first_line->length==0);
+          new_group = (group_first_line->lbuf.length==0);
         }
 
       lines_in_group++;
@@ -491,42 +511,8 @@ process_file ()
       reset_field_ops ();
     }
 
-  freebuffer (&lb1);
-  freebuffer (&lb2);
-}
-
-struct fieldop*
-collapse_fields_in_line (struct fieldop *op, const struct linebuffer* lb)
-{
-  size_t field_num = 1;
-  const char *field_txt = NULL ;
-  size_t field_len = 0;
-
-  /* If re-using existing (already allocated) fieldop, reset it.
-     otherwise, allocate a new one. */
-  if (op)
-    reset_field_ops (op);
-  else
-    op = new_field_op(OP_COLLAPSE,0);
-
-  get_field (lb,field_num,&field_txt,&field_len);
-  while (field_len>0)
-    {
-#ifdef ENABLE_BUILTIN_DEBUG
-      if (debug)
-        {
-          fprintf(stderr,"transpose line %zu field %zu = ",
-                line_number,field_num);
-          fwrite(field_txt,sizeof(char),field_len,stderr);
-          fprintf(stderr,"\n");
-        }
-#endif
-      field_op_collect (op, field_txt, field_len);
-      field_num++;
-
-      get_field (lb,field_num,&field_txt,&field_len);
-    }
-  return op;
+  line_record_free (&lb1);
+  line_record_free (&lb2);
 }
 
 /*
@@ -535,73 +521,65 @@ collapse_fields_in_line (struct fieldop *op, const struct linebuffer* lb)
 static void
 transpose_file ()
 {
-  struct linebuffer lb;
-  struct linebuffer *thisline;
-  struct fieldop *op = NULL;
-  size_t field_num_max = 0;
-  size_t i,j;
-  const char*** ptrs; /* a 2D array of strings */
-  size_t *fields_num; /* array containing number-of-fields
-                         in each line */
+  size_t num_lines = 0;
+  size_t alloc_lines = 0;
+  struct line_record_t *lines = NULL;
 
-  thisline = &lb;
+  size_t prev_num_fields = 0 ;
 
-  initbuffer (thisline);
-
-  /* For every line, collect all fields, using OP_COLLASE */
+  /* Read all input lines - but instead of reusing line_record_t,
+     keep all lines in memory. */
   while (!feof (input_stream))
     {
-      if (readlinebuffer_delim (thisline, input_stream, eolchar) == 0)
+      if (num_lines+1 > alloc_lines)
+        {
+          alloc_lines += 1000;
+          lines = xnrealloc ( lines, alloc_lines, sizeof (struct line_record_t));
+        }
+
+      struct line_record_t *thisline = &lines[num_lines];
+      num_lines++;
+      line_record_init (thisline);
+
+      if (!line_record_fread ( thisline, input_stream, eolchar))
         break;
-      linebuffer_nullify (thisline);
       line_number++;
 
-      op = collapse_fields_in_line (NULL, thisline);
-      if (op->count > field_num_max)
-        field_num_max = op->count;
+      const size_t num_fields = line_record_num_fields (thisline);
 
-      if (strict && op->count != field_num_max)
+      if (strict && line_number>1 && num_fields != prev_num_fields)
           error (EXIT_FAILURE, 0, _("transpose input error: line %zu has " \
                        "%zu fields (previous lines had %zu);\n" \
                        "see --help to disable strict mode"),
-                         line_number, op->count, field_num_max);
-    }
+                        line_number, num_fields, prev_num_fields);
 
-  /* For each collected line, get array of pointers to the collected
-     strings of fields */
-  ptrs = (const char***)xnmalloc (line_number, sizeof (const char**));
-  fields_num = (size_t*)xnmalloc (line_number, sizeof (size_t));
-  for (op = field_ops, i = 0; op ; op = op->next, ++i)
-    {
-      ptrs[i] = field_op_get_string_ptrs (op, false, false);
-      fields_num[i] = op->count;
-#ifdef ENABLE_BUILTIN_DEBUG
-      if (debug)
-        fprintf(stderr,"line %zu has %zu fields\n", i, fields_num[i]);
-#endif
+      prev_num_fields = num_fields;
+
     }
 
   /* Output all fields */
-  for (i = 0 ; i < field_num_max ; ++i)
+  for (size_t i = 1 ; i <= prev_num_fields ; ++i)
     {
-      for (j = 0; j < line_number; ++j)
+      for (size_t j = 0; j < line_number; ++j)
         {
           if (j>0)
             print_field_separator();
 
-          const char* pc = ( fields_num[j]> i) ?
-                             ( ptrs[j][i] ) : missing_field_filler ;
-          fputs (pc, stdout);
+          const struct line_record_t *line = &lines[j];
+          const char* str;
+          size_t len;
+          if (line_record_get_field (line, i, &str, &len))
+            fwrite (str, len, sizeof(char), stdout);
+          else
+            fputs (missing_field_filler, stdout);
         }
       print_line_separator ();
     }
 
   /* Free pointers */
-  for (i = 0; i < line_number; ++i)
-    free (ptrs[i]);
-  free (ptrs);
-  free (fields_num);
-  freebuffer (&lb);
+  for (size_t i = 0; i < num_lines; ++i)
+    line_record_free (&lines[i]);
+  free (lines);
 }
 
 /*
@@ -610,52 +588,42 @@ transpose_file ()
 static void
 reverse_fields_in_file ()
 {
-  struct linebuffer lb;
-  struct linebuffer *thisline;
-  struct fieldop *op = NULL;
-  size_t field_num_max = 0;
-  const char** ptrs; /* a array of strings */
+  struct line_record_t lr;
+  struct line_record_t *thisline;
+  size_t prev_num_fields = 0;
 
-  thisline = &lb;
-
-  initbuffer (thisline);
-#ifdef ENABLE_BUILTIN_DEBUG
-          if (debug)
-            {
-               fputs("Yo\n",stderr);
-            }
-#endif
+  thisline = &lr;
+  line_record_init (thisline);
 
   while (!feof (input_stream))
     {
-      if (readlinebuffer_delim (thisline, input_stream, eolchar) == 0)
+      if (!line_record_fread (thisline, input_stream, eolchar))
         break;
-      linebuffer_nullify (thisline);
       line_number++;
 
-      /* For every line, collect all fields, using OP_COLLASE */
-      op = collapse_fields_in_line (op, thisline);
-      if (op->count > field_num_max)
-        field_num_max = op->count;
+      const size_t num_fields = line_record_num_fields (thisline);
 
-      if (strict && op->count != field_num_max)
+      if (strict && line_number>1 && num_fields != prev_num_fields)
           error (EXIT_FAILURE, 0, _("reverse-field input error: line %zu has " \
                        "%zu fields (previous lines had %zu);\n" \
                        "see --help to disable strict mode"),
-                         line_number, op->count, field_num_max);
+                         line_number, num_fields, prev_num_fields);
 
-      /* Then print them in reverse order */
-      ptrs = field_op_get_string_ptrs (op, false, false);
-      for (size_t i = op->count; i > 0; i--)
+      prev_num_fields = num_fields;
+
+      for (size_t i = num_fields; i > 0; --i)
         {
-          if (i < op->count)
+          if (i < num_fields)
             print_field_separator ();
-          fputs (ptrs[i-1], stdout);
+
+          const char* str;
+          size_t len;
+          if (line_record_get_field (thisline, i, &str, &len))
+            fwrite (str, len, sizeof(char), stdout);
         }
       print_line_separator ();
-      free (ptrs);
     }
-  freebuffer (&lb);
+  line_record_free (&lr);
 }
 
 
@@ -744,7 +712,7 @@ free_sort_keys ()
 static void
 parse_group_spec ( char* spec )
 {
-  size_t val;
+  long int val;
   size_t idx;
   char *endptr;
 
@@ -770,12 +738,10 @@ parse_group_spec ( char* spec )
   idx=0;
   while (1)
     {
-      val = strtoul (spec, &endptr, 10);
-      if (errno != 0 || endptr == spec)
+      val = strtol (spec, &endptr, 10);
+      if (errno != 0 || endptr == spec || val<=0)
         error (EXIT_FAILURE, 0, _("invalid field value for grouping '%s'"),
                                         spec);
-      if (val==0)
-        error (EXIT_FAILURE, 0, _("invalid field value (zero) for grouping"));
 
       group_columns[idx] = val;
       idx++;

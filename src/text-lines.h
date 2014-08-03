@@ -22,18 +22,68 @@
 #ifndef __TEXT_LINES_H__
 #define __TEXT_LINES_H__
 
-/*
- Text-Line and Field-Extraction module
- */
+struct field_record_t
+{
+  size_t len;
+  const char*  buf;
+};
 
-void linebuffer_nullify (struct linebuffer *line);
+struct line_record_t
+{
+  /* buffer of the entire line, as created with gnulib's
+     readlinbuffer_delim */
+  struct linebuffer lbuf;
 
-/* Given a linebuffer textual line, returns pointer (and length) of field 'field'.
-   NOTE:
-       'line' doesn't need to be NULL-terminated,
-       and the returned _ptr will not be NULL-terminated either.
-*/
-void get_field (const struct linebuffer *line, size_t field,
-               const char** /* OUT*/ _ptr, size_t /*OUT*/ *_len);
+  /* array of fields. Each valid field is a pointer to 'lbuf' */
+  struct field_record_t *fields;
+  size_t num_fields;    /* number of fields in this line */
+  size_t alloc_fields;  /* number of fields allocated */
+};
+
+static inline size_t
+line_record_length (const struct line_record_t *lr)
+{
+  return lr->lbuf.length;
+}
+
+static inline const char*
+line_record_buffer (const struct line_record_t *lr)
+{
+  return lr->lbuf.buffer;
+}
+
+static inline size_t
+line_record_num_fields (const struct line_record_t *lr)
+{
+  return lr->num_fields;
+}
+
+static inline const struct field_record_t*
+line_record_field_unsafe (const struct line_record_t *lr, const size_t n)
+{
+  return &lr->fields[n-1];
+}
+
+static inline bool
+line_record_get_field (const struct line_record_t *lr, const size_t n,
+		       const char ** /* out */ pptr, size_t* /*out*/ plen)
+{
+  if (n==0 || line_record_num_fields (lr) < n)
+    return false;
+
+  *pptr = lr->fields[n-1].buf;
+  *plen = lr->fields[n-1].len;
+  return true;
+}
+
+void
+line_record_init (struct line_record_t* lr);
+
+bool
+line_record_fread (struct /* in/out */ line_record_t* lr,
+                   FILE *stream, char delimiter);
+
+void
+line_record_free (struct line_record_t* lr);
 
 #endif

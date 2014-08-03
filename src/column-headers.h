@@ -27,18 +27,14 @@
 */
 
 /*
-  Parses the first line of the input file, and extract header information from it.
+  Given a parsed line (representing the header line),
+  sets the column names.
 
   if 'store_names' is true, stores the name of each field as the column header.
   if 'store_names' is false, simply counts the number of fields in the input line.
-
- When parsing the fields, respects the field separator from the 'text-options' module
- (in the 'tab' variable).
-
- 'line' does not need to be NULL terminated - upto 'len' characters will be read.
-
  */
-void build_input_line_headers(const char* line, size_t len, bool store_names);
+void build_input_line_headers(const struct line_record_t *lr,
+		              bool store_names);
 
 /*
  returns the number of fields as extracted by 'build_input_line_headers()'

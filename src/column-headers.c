@@ -26,11 +26,13 @@
 
 #include "system.h"
 #include "xalloc.h"
+#include "linebuffer.h"
 #include "error.h"
 #include "ignore-value.h"
 #include "intprops.h"
 
 #include "text-options.h"
+#include "text-lines.h"
 #include "column-headers.h"
 
 #ifdef ENABLE_BUILTIN_DEBUG
@@ -38,27 +40,18 @@
 extern bool debug;
 #endif
 
-struct columnheader
-{
-        char *name;
-        struct columnheader *next;
-};
-
 static size_t num_input_column_headers = 0 ;
-static struct columnheader* input_column_headers = NULL;
+static char** input_column_headers;
 
 void free_column_headers()
 {
-  struct columnheader *p = input_column_headers;
-  while (p)
+  for (size_t i = 0; i < num_input_column_headers; ++i)
     {
-      struct columnheader *n = p->next;
-      free(p->name);
-      free(p);
-      p = n;
+      free (input_column_headers[i]);
+      input_column_headers[i] = NULL;
     }
-  input_column_headers = NULL ;
-  num_input_column_headers = 0;
+  free (input_column_headers);
+  input_column_headers = NULL;
 }
 
 size_t get_num_column_headers()
@@ -66,93 +59,43 @@ size_t get_num_column_headers()
   return num_input_column_headers;
 }
 
-static void add_named_input_column_header(const char* buffer, size_t len)
-{
-  struct columnheader *h = XZALLOC(struct columnheader);
-  h->name = xmalloc(len+1);
-  memmove(h->name,buffer,len);
-  h->name[len]=0;
-
-  if (input_column_headers != NULL)
-    {
-      struct columnheader *p = input_column_headers;
-      while (p->next != NULL)
-        p = p->next;
-      p->next = h;
-    }
-  else
-    input_column_headers = h;
-}
-
-/* Returns a pointer to the name of the field.
- * DO NOT FREE or reuse the returned buffer.
- * Might return a pointer to a static buffer - not thread safe.*/
 const char* get_input_field_name(size_t field_num)
 {
-  static char tmp[6+INT_BUFSIZE_BOUND(size_t)+1];
-  if (input_column_headers==NULL)
-    {
-       ignore_value(snprintf(tmp,sizeof(tmp),"field-%zu",field_num));
-       return tmp;
-    }
-  else
-    {
-       const struct columnheader *h = input_column_headers;
-       if (field_num > num_input_column_headers)
-         error(EXIT_FAILURE,0,_("not enough input fields (field %zu requested, input has only %zu fields)"), field_num, num_input_column_headers);
+  if (field_num > 0 && field_num <= num_input_column_headers)
+    return input_column_headers[field_num-1];
 
-       while (--field_num)
-         h = h->next;
-       return h->name;
-    }
+  return NULL;
 }
 
 void
-build_input_line_headers(const char*line, size_t len, bool store_names)
+build_input_line_headers(const struct line_record_t *lr,
+		         bool store_names)
 {
-  const char* ptr = line;
-  const char* lim = line+len;
+  char *str;
+  size_t len;
+  const size_t num_fields = line_record_num_fields (lr);
+  const size_t field_name_buf_size = 7+INT_BUFSIZE_BOUND(size_t)+1;
 
-  while (ptr<lim)
-   {
-     const char *end = ptr;
+  num_input_column_headers = num_fields;
+  input_column_headers = XNMALLOC (num_fields, char*);
 
-     /* Find the end of the input field, starting at 'ptr' */
-     if (in_tab != TAB_WHITESPACE)
-       {
-         while (end < lim && *end != in_tab)
-           ++end;
-       }
-     else
-       {
-         while (end < lim && !blanks[to_uchar (*end)])
-           ++end;
-       }
+  for (size_t i = 1; i <= num_fields; ++i)
+    {
+      if (!store_names)
+        {
+	  str = xmalloc ( field_name_buf_size );
+	  ignore_value (snprintf (str, field_name_buf_size,
+				  "field-%zu",i));
+	}
+      else
+	{
+          const char* tmp;
+          line_record_get_field (lr, i, &tmp, &len);
+	  str = xmalloc ( len+1 );
+	  memcpy (str, tmp, len);
+	  str[len] = 0;
+	}
 
-     if (store_names)
-       add_named_input_column_header(ptr, end-ptr);
-     ++num_input_column_headers;
-
-#ifdef ENABLE_BUILTIN_DEBUG
-     if (debug)
-       {
-         fprintf(stderr,"input line header = ");
-         fwrite(ptr,sizeof(char),end-ptr,stderr);
-         fputc(eolchar,stderr);
-       }
-#endif
-
-     /* Find the begining of the next field */
-     ptr = end ;
-     if (in_tab != TAB_WHITESPACE)
-       {
-         if (ptr < lim)
-           ++ptr;
-       }
-     else
-       {
-         while (ptr < lim && blanks[to_uchar (*ptr)])
-           ++ptr;
-       }
+      input_column_headers[i-1] = str;
     }
 }

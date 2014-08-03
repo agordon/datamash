@@ -309,6 +309,8 @@ field_op_collect (struct fieldop *op,
       if (errno==ERANGE || endptr==tmpbuf || endptr!=(tmpbuf+slen))
         return false;
 #else
+      if (str == NULL || slen == 0)
+	return false;
       num_value = strtold (str, &endptr);
       if (errno==ERANGE || endptr==str || endptr!=(str+slen))
         return false;
