@@ -176,6 +176,10 @@ my @Tests =
       {ERR=>"$prog: extra operands after 'transpose'\n"}],
     ['rev9', 'reverse aaa', {IN_PIPE=>''}, {EXIT=>1},
       {ERR=>"$prog: extra operands after 'reverse'\n"}],
+
+    # empty input
+    ['tr10',  'transpose', {IN_PIPE=>""}, {OUT=>""}],
+    ['rev10', 'reverse',   {IN_PIPE=>""}, {OUT=>""}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

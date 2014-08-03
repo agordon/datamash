@@ -106,6 +106,12 @@ K 6
 P 2
 EOF
 
+my $in_g5=<<'EOF';
+A 1
+AA 2
+AAA 3
+EOF
+
 my $in_hdr1=<<'EOF';
 x y z
 A 1 10
@@ -166,6 +172,13 @@ B 1
 B 2
 B 1
 B 2
+EOF
+
+my $in_cnt_uniq2=<<'EOF';
+a B
+A b
+A B
+A C
 EOF
 
 # When using whitespace, the second column is 1,2,3.
@@ -362,6 +375,8 @@ my @Tests =
 	  {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
   ['e16',  '-t" " sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
 	  {ERR=>"$prog: invalid numeric input in line 3 field 2: '3a'\n"}],
+  ['e17',  'sum 1' ,  {IN_PIPE=>"1e-20000\n"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid numeric input in line 1 field 1: '1e-20000'\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
@@ -415,6 +430,8 @@ my @Tests =
   ['g1.1', '-t" " -g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
   ['g2.1', '-t" " -g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
   ['g3.1', '-t" " -g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
+  ['g4.1', '-t" " -g1 count 2',    {IN_PIPE=>$in_g5},
+     {OUT=>"A 1\nAA 1\nAAA 1\n"}],
 
   # 3 groups, single line per group, custom delimiter
   ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
@@ -490,6 +507,11 @@ my @Tests =
      {OUT=>"A 1\nK 1\nP 1\n"}],
   ['cuq3', '-t" " --header-in -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq1},
      {OUT=>"A 2\nB 2\n"}],
+  # countunique, case-insensitive
+  ['cuq4', '-t" " -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq2},
+     {OUT=>"a 1\nA 3\n"}],
+  ['cuq5', '-i -t" " -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq2},
+     {OUT=>"a 2\n"}],
 
   # Test Tab vs White-space field separator
   ['tab1', "sum 2", {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
@@ -518,6 +540,8 @@ my @Tests =
      {OUT=>"a X,x\nA X,x\nb Y\nB Y\n"}],
   ['case4', '-t" " -i -g 1 unique 2', {IN_PIPE=>$in_case_sorted},
      {OUT=>"a X\nb Y\n"}],
+  ['case4.1', '-i -t" " -g 1 unique 2', {IN_PIPE=>$in_cnt_uniq2},
+     {OUT=>"a B,C\n"}],
 
   # Test Case-sensitivity, on non-sorted input (with 'sort' piping)
   # on both grouping and string operations.
