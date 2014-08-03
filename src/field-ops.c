@@ -797,17 +797,18 @@ get_operation_mode (const char* keyword)
 static size_t
 safe_get_field_number(enum operation op, const char* field_str)
 {
-  size_t val;
+  long int val;
   char *endptr;
   errno = 0 ;
-  val = strtoul (field_str, &endptr, 10);
+  val = strtol (field_str, &endptr, 10);
   /* NOTE: can't use xstrtol_fatal - it's too tightly-coupled
      with getopt command-line processing */
-  if (errno != 0 || endptr == field_str)
+  if (errno != 0 || endptr == field_str || val < 1
+      || endptr == NULL || *endptr != 0)
     error (EXIT_FAILURE, 0, _("invalid column '%s' for operation " \
                                "'%s'"), field_str,
                                operations[op].name);
-  return val;
+  return (size_t)val;
 }
 
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */

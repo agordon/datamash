@@ -377,6 +377,14 @@ my @Tests =
 	  {ERR=>"$prog: invalid numeric input in line 3 field 2: '3a'\n"}],
   ['e17',  'sum 1' ,  {IN_PIPE=>"1e-20000\n"}, {EXIT=>1},
 	  {ERR=>"$prog: invalid numeric input in line 1 field 1: '1e-20000'\n"}],
+  ['e18',  'sum 0' ,  {IN_PIPE=>"a"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
+  ['e19',  '-- sum -2' ,  {IN_PIPE=>"a"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid column '-2' for operation 'sum'\n"}],
+  ['e20',  'sum 2x' ,  {IN_PIPE=>"a"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid column '2x' for operation 'sum'\n"}],
+  ['e21',  'sum ""' ,  {IN_PIPE=>"a"}, {EXIT=>1},
+	  {ERR=>"$prog: invalid column '' for operation 'sum'\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
