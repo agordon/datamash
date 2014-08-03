@@ -8,6 +8,11 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+#
+# Syntax-Check rules (sc_XXX) copied from GNU Coreutils' cfg.mk file:
+# Copyright (C) 2003-2014 Free Software Foundation, Inc.
+#
+
 # Syntax-checks to skip:
 #  sc_copyright_check: requires the word 'Free' in texi after year.
 #  sc_prohibit_strings_without_use: using memset/memmove requirs <string.h>
@@ -34,3 +39,97 @@ build-deb-hard:
            LDFLAGS="$$(dpkg-buildflags --get LDFLAGS)"
 
 deb-hard: init-deb-hard build-deb-hard check
+
+# Look for lines longer than 80 characters, except omit:
+# - the help2man script copied from upstream,
+# - example files
+LINE_LEN_MAX = 80
+FILTER_LONG_LINES =						\
+  \|^[^:]*man/help2man:| d;			\
+  \|^[^:]*examples/.*| d;
+sc_long_lines:
+	@files=$$($(VC_LIST_EXCEPT))					\
+	halt='line(s) with more than $(LINE_LEN_MAX) characters; reindent'; \
+	for file in $$files; do						\
+	  expand $$file | grep -nE '^.{$(LINE_LEN_MAX)}.' |		\
+	  sed -e "s|^|$$file:|" -e '$(FILTER_LONG_LINES)';		\
+	done | grep . && { msg="$$halt" $(_sc_say_and_exit) } || :
+
+# Ensure that the end of each release's section is marked by two empty lines.
+sc_NEWS_two_empty_lines:
+	@sed -n 4,/Noteworthy/p $(srcdir)/NEWS				\
+	    | perl -n0e '/(^|\n)\n\n\* Noteworthy/ or exit 1'		\
+	  || { echo '$(ME): use two empty lines to separate NEWS sections' \
+		 1>&2; exit 1; } || :
+
+# With split lines, don't leave an operator at end of line.
+# Instead, put it on the following line, where it is more apparent.
+# Don't bother checking for "*" at end of line, since it provokes
+# far too many false positives, matching constructs like "TYPE *".
+# Similarly, omit "=" (initializers).
+binop_re_ ?= [-/+^!<>]|[-/+*^!<>=]=|&&?|\|\|?|<<=?|>>=?
+sc_prohibit_operator_at_end_of_line:
+	@prohibit='. ($(binop_re_))$$'					\
+	in_vc_files='\.[chly]$$'					\
+	halt='found operator at end of line'				\
+	  $(_sc_search_regexp)
+
+# Indent only with spaces.
+sc_prohibit_tab_based_indentation:
+	@prohibit='^ *	'						\
+	halt='TAB in indentation; use only spaces'			\
+	  $(_sc_search_regexp)
+
+# Use print_ver_ (from init.cfg), not open-coded $VERBOSE check.
+sc_prohibit_verbose_version:
+	@prohibit='test "\$$VERBOSE" = yes && .* --version'		\
+	halt='use the print_ver_ function instead...'			\
+	  $(_sc_search_regexp)
+
+# Use framework_failure_, not the old name without the trailing underscore.
+sc_prohibit_framework_failure:
+	@prohibit='\<framework_''failure\>'				\
+	halt='use framework_failure_ instead'				\
+	  $(_sc_search_regexp)
+
+# Prohibit the use of `...` in tests/.  Use $(...) instead.
+sc_prohibit_test_backticks:
+	@prohibit='`' in_vc_files='^tests/'				\
+	halt='use $$(...), not `...` in tests/'				\
+	  $(_sc_search_regexp)
+
+# Ensure that compare is used to check empty files
+# so that the unexpected contents are displayed
+sc_prohibit_test_empty:
+	@prohibit='test -s.*&&' in_vc_files='^tests/'			\
+	halt='use `compare /dev/null ...`, not `test -s ...` in tests/'	\
+	  $(_sc_search_regexp)
+
+_space_before_paren_exempt =? \\n\\$$
+_space_before_paren_exempt = \
+  (^ *\#|\\n\\$$|%s\(to %s|(date|group|character)\(s\))
+# Ensure that there is a space before each open parenthesis in C code.
+sc_space_before_open_paren:
+	@if $(VC_LIST_EXCEPT) | grep -l '\.[ch]$$' > /dev/null; then	\
+	  fail=0;							\
+	  for c in $$($(VC_LIST_EXCEPT) | grep '\.[ch]$$'); do		\
+	    sed '$(_sed_rm_comments_q)' $$c 2>/dev/null			\
+	      | grep -i '[[:alnum:]]('					\
+	      | grep -vE '$(_space_before_paren_exempt)'		\
+	      | grep . && { fail=1; echo "*** $$c"; };			\
+	  done;								\
+	  test $$fail = 1 &&						\
+	    { echo '$(ME): the above files lack a space-before-open-paren' \
+		1>&2; exit 1; } || :;					\
+	else :;								\
+	fi
+
+# Similar to the gnulib maint.mk rule for sc_prohibit_strcmp
+# Use STREQ_LEN or STRPREFIX rather than comparing strncmp == 0, or != 0.
+sc_prohibit_strncmp:
+	@grep -nE '! *str''ncmp *\(|\<str''ncmp *\(.+\) *[!=]='		\
+	    $$($(VC_LIST_EXCEPT))					\
+	  | grep -vE ':# *define STR(N?EQ_LEN|PREFIX)\(' &&		\
+	  { echo '$(ME): use STREQ_LEN or STRPREFIX instead of str''ncmp' \
+		1>&2; exit 1; } || :
+
