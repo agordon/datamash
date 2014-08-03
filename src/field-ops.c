@@ -865,6 +865,7 @@ parse_operation_mode (int argc, int start, char** argv)
       break;
 
     case UNKNOWN_MODE:
+    default:
       internal_error ("unknown mode"); /* LCOV_EXCL_LINE */
       break;
     }
