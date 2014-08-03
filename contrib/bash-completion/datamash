@@ -56,9 +56,11 @@ _datamash ()
 
   # Suggest options or operators
   case "$cur" in
-   -*) COMPREPLY=( $(compgen -W "$datamash_short_options $datamash_long_options" -- "$cur") )
+   -*) COMPREPLY=( $(compgen -W \
+                "$datamash_short_options $datamash_long_options" -- "$cur") )
        ;;
-   *)  COMPREPLY=( $(compgen -W "$datamash_modes $datamash_operations" -- "$cur") )
+   *)  COMPREPLY=( $(compgen -W \
+                "$datamash_modes $datamash_operations" -- "$cur") )
        ;;
   esac
 

@@ -28,7 +28,8 @@
 
 
 /* Given an array of doubles, return the arithmetic mean value */
-long double arithmetic_mean_value ( const long double * const values, const size_t n);
+long double
+arithmetic_mean_value ( const long double * const values, const size_t n);
 
 /*
  Given a sorted array of doubles, return the value of 'percentile'.
@@ -39,31 +40,37 @@ long double arithmetic_mean_value ( const long double * const values, const size
     0.75 = third quartile
     0.99 = 99nt percentile
 */
-long double percentile_value ( const long double * const values,
-                               const size_t n, const double percentile );
+long double
+percentile_value ( const long double * const values,
+                   const size_t n, const double percentile );
 
 /* Given a sorted array of doubles, return the value of the median */
-long double median_value ( const long double * const values, size_t n );
+long double
+median_value ( const long double * const values, size_t n );
 
 /* Given a sorted array of doubles, return the value of 1st quartile */
-static inline long double quartile1_value ( const long double * const values, size_t n )
+static inline long double
+quartile1_value ( const long double * const values, size_t n )
 {
   return percentile_value(values, n, 1.0/4.0);
 }
 
 /* Given a sorted array of doubles, return the value of 3rd quartile */
-static inline long double quartile3_value ( const long double * const values, size_t n )
+static inline long double
+quartile3_value ( const long double * const values, size_t n )
 {
   return percentile_value(values, n, 3.0/4.0);
 }
 
 /* Given a sorted array of doubles, return the MAD value
    (median absolute deviation), with scale constant 'scale' */
-long double mad_value ( const long double * const values, size_t n, double scale );
+long double
+mad_value ( const long double * const values, size_t n, double scale );
 
 
 /* Sorts (in-place) an array of long-doubles */
-void qsortfl(long double *values, size_t n);
+void
+qsortfl(long double *values, size_t n);
 
 
 enum degrees_of_freedom
@@ -76,22 +83,26 @@ enum degrees_of_freedom
  Given an array of doubles, return the variance value.
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
-long double variance_value ( const long double * const values, size_t n, int df );
+long double
+variance_value ( const long double * const values, size_t n, int df );
 
 /*
  Given an array of doubles, return the standard-deviation value.
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
-long double stdev_value ( const long double * const values, size_t n, int df );
+long double
+stdev_value ( const long double * const values, size_t n, int df );
 
 /*
  Given an array of doubles, return the skewness
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
-long double skewness_value ( const long double * const values, size_t n, int df );
+long double
+skewness_value ( const long double * const values, size_t n, int df );
 
 /* Standard error of skewness (SES), given the sample size 'n' */
-long double SES_value ( size_t n );
+long double
+SES_value ( size_t n );
 
 /* Skewness Test statistics Z = ( sample skewness / SES ) */
 long double skewnessZ_value ( const long double * const values, size_t n);
@@ -100,27 +111,32 @@ long double skewnessZ_value ( const long double * const values, size_t n);
  Given an array of doubles, return the excess kurtosis
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
-long double excess_kurtosis_value ( const long double * const values, size_t n, int df );
+long double
+excess_kurtosis_value ( const long double * const values, size_t n, int df );
 
 /* Standard error of kurtisos (SEK), given the sample size 'n' */
-long double SEK_value ( size_t n );
+long double
+SEK_value ( size_t n );
 
 /* Kurtosis Test statistics Z = ( sample kurtosis / SEK ) */
-long double kurtosisZ_value ( const long double * const values, size_t n);
+long double
+kurtosisZ_value ( const long double * const values, size_t n);
 
 /*
  Chi-Squared - Cumulative distribution function,
  for the special case of DF=2.
  Equivalent to the R function 'pchisq(x,df=2)'.
 */
-long double pchisq_df2(long double x);
+long double
+pchisq_df2(long double x);
 
 /*
  D'Agostino-Perason omnibus test for normality.
  returns the p-value,
  where the null-hypothesis is normal distribution.
 */
-long double dagostino_pearson_omnibus_pvalue( const long double * const values, size_t n);
+long double
+dagostino_pearson_omnibus_pvalue( const long double * const values, size_t n);
 
 
 
@@ -130,7 +146,8 @@ long double dagostino_pearson_omnibus_pvalue( const long double * const values, 
    http://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test
  Equivalent to R's "jarque.test()" function in the "moments" library.
  */
-long double jarque_bera_pvalue ( const long double * const values, size_t n );
+long double
+jarque_bera_pvalue ( const long double * const values, size_t n );
 
 
 enum MODETYPE
@@ -142,14 +159,20 @@ enum MODETYPE
 /*
  Given an array of doubles, return the mode/anti-mode values.
  */
-long double mode_value ( const long double * const values, size_t n, enum MODETYPE type);
+long double
+mode_value ( const long double * const values, size_t n, enum MODETYPE type);
 
 
 /*
  comparison functions, to be used with 'qsort()'
  */
-int cmpstringp(const void *p1, const void *p2);
-int cmpstringp_nocase(const void *p1, const void *p2);
-int cmp_long_double (const void *p1, const void *p2);
+int
+cmpstringp(const void *p1, const void *p2);
+
+int
+cmpstringp_nocase(const void *p1, const void *p2);
+
+int
+cmp_long_double (const void *p1, const void *p2);
 
 #endif

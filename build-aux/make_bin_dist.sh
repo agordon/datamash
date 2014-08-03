@@ -31,7 +31,8 @@ die()
 
 cd $(dirname "$0")/.. || die "failed to set directory"
 
-DATAMASHVER=$(./build-aux/git-version-gen .tarball-version) || die "can't get datamash version"
+DATAMASHVER=$(./build-aux/git-version-gen .tarball-version) ||
+  die "can't get datamash version"
 
 KERNEL=$(uname -s)   # Linux,FreeBSD,Darwin
 RELEASE=$(uname -r)  # 2.6.30, 10-RELEASE, 10.2.8
@@ -40,7 +41,8 @@ MACHINE=$(uname -m)  # x86_64, amd64, i386
 # These kernels (and by proxy, operating systems) can
 # generate static binaries.
 STATICFLAG=
-[ "$KERNEL" = "Linux" -o "$KERNEL" = "FreeBSD" ] && STATICFLAG="LDFLAGS=-static"
+[ "$KERNEL" = "Linux" -o "$KERNEL" = "FreeBSD" ] &&
+  STATICFLAG="LDFLAGS=-static"
 
 # Technically incorrect, but much friendlier to users
 [ "$KERNEL" = "Darwin" ] && KERNEL="MacOSX"
@@ -57,10 +59,12 @@ DATE=$(date -u +"%F-%H%M%S")
 NAME="datamash-${DATAMASHVER}-bin__${KERNEL}__${MACHINE}"
 mkdir -p "bin/$NAME" || die "failed to create 'bin/$NAME' directory"
 
-cp "$SRC" "bin/$NAME/datamash" || die "failed to create destination binary (bin/$NAME/datamash)"
+cp "$SRC" "bin/$NAME/datamash" ||
+  die "failed to create destination binary (bin/$NAME/datamash)"
 
 cd "bin" || die
-tar -czvf "$NAME.tar.gz" "$NAME" || die "failed to create TarBall for binary executable"
+tar -czvf "$NAME.tar.gz" "$NAME" ||
+  die "failed to create TarBall for binary executable"
 cd ".."
 
 echo "Done. File ="

@@ -90,7 +90,8 @@ Examples:
   #       PATH=/tmp/custom/bin:\$PATH ./configure &&
   #         PATH=/tmp/custom/bin:\$PATH make &&
   #           PATH=/tmp/custom/bin:\$PATH make check
-  $BASE -e 'PATH=/tmp/custom/bin:\$PATH' git://git.savannah.gnu.org/datamash.git jerry
+  $BASE -e 'PATH=/tmp/custom/bin:\$PATH' \
+               git://git.savannah.gnu.org/datamash.git jerry
 "
 exit 0
 }
@@ -116,11 +117,12 @@ do
         m)      make_params="$make_params '$OPTARG'"
                 ;;
         e)      echo "$OPT_ARG" | grep -E -q '^[A-Za-z0-9]=' ||
-			die "error: '-e $OPTARG' doesn't look like a valid environment variable"
-		env_params="$env_PARAMS $OPTARG"
+                   die "error: '-e $OPTARG' doesn't look like a " \
+                           "valid environment variable"
+                env_params="$env_PARAMS $OPTARG"
                 ;;
-	h)      show_help=y
-		;;
+        h)      show_help=y
+                ;;
         ?)      die "Try -h for help."
         esac
 done
@@ -130,8 +132,10 @@ shift $((OPTIND-1))
 
 SOURCE=$1
 TARGET_HOST=$2
-[ -z "$SOURCE" ] && die "missing SOURCE file name or URL (e.g. datamash-1.0.1.tar.gz). Try -h for help."
-[ -z "$TARGET_HOST" ] && die "missing target HOST name (e.g. fbsd). Try -h for help."
+[ -z "$SOURCE" ] && die "missing SOURCE file name or URL " \
+                            "(e.g. datamash-1.0.1.tar.gz). Try -h for help."
+[ -z "$TARGET_HOST" ] &&
+  die "missing target HOST name (e.g. fbsd). Try -h for help."
 shift 2
 
 
@@ -215,8 +219,10 @@ echo 'UNAME_MACHINE='\$(uname -m 2>/dev/null||echo unknown) ;
 echo 'UNAME_HARDWARE='\$(uname -i 2>/dev/null||echo unknown) ;
 echo 'UNAME_PROCESSOR='\$(uname -p 2>/dev/null||echo unknown) ;
 echo 'UNAME_OS='\$(uname -o 2>/dev/null||echo unknown) ;
-echo 'DISTRIBUTION='\$(lsb_release -si 2>/dev/null||uname -o 2>/dev/null||echo unknown) ;
-echo 'DISTRIBUTION_VERSION='\$(lsb_release -sr 2>/dev/null||uname -r 2>/dev/null||echo unknown) ;
+echo 'DISTRIBUTION='\$(
+           lsb_release -si 2>/dev/null||uname -o 2>/dev/null||echo unknown) ;
+echo 'DISTRIBUTION_VERSION='\$(
+           lsb_release -sr 2>/dev/null||uname -r 2>/dev/null||echo unknown) ;
 echo 'PACKAGE_BASENAME=$BASENAME' ;
 echo 'PACKAGE_SOURCE=$SOURCE' ;
 echo 'START_DATE_UTC='\$(date -u +%Y-%m-%d_%H%M%S) ;
@@ -239,7 +245,8 @@ echo '--SYSTEM-INFO-END--' ;
 ##   But few tarballs (especially alpha-stage and temporary ones send to
 ##   GNU platform-testers can might contain other sub-directory names
 ##   (e.g. 'grep-2.9.1.tar.gz' might have './grep-ss' sub directory).
-##   So use 'find' to find the first sub directory (assuming there's only one).
+##   So use 'find' to find the first sub directory
+##   (assuming there's only one).
 if test -n "$TARBALL" ; then
 SCRIPT="$SCRIPT
 cd $DIR ;

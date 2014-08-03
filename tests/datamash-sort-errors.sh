@@ -31,7 +31,7 @@ fail=0
 ## Ensure seq is useable
 ## (not installed on OpenBSD by default)
 seq 10 >/dev/null 2>/dev/null ||
-    skip_ "requires a working seq"
+  skip_ "requires a working seq"
 
 ## Cross-Compiling portability hack:
 ##  under qemu/binfmt, argv[0] (which is used to report errors) will contain
@@ -51,28 +51,33 @@ GROUPPARAM=$(seq 1000 2000 | paste -d "," -s -) ||
 
 ## The expected error message when the group parameter is too long
 ## to pass to the 'sort' pipe
-echo "$PROG_ARGV0: sort command too-long (please report this bug)" > exp_err1 ||
-	framework_failure_ "failed to create exp_err1"
+echo "$PROG_ARGV0: sort command too-long" \
+     "(please report this bug)" > exp_err1 ||
+  framework_failure_ "failed to create exp_err1"
 
 ## The expected error message when 'sort' is not found
 printf 'sh: sort: not found\ndatamash: read error (on close)' > exp_err2 ||
-	framework_failure_ "failed to create exp_err2"
+  framework_failure_ "failed to create exp_err2"
 
 ##
 ## Create a bad 'sort' executable, to simulate failed pipe/popen
 ##
-BADDIR1=$(mktemp -d bad_sort.XXXXXX) || framework_failure_ "Failed to create temp directory for bad-sort"
+BADDIR1=$(mktemp -d bad_sort.XXXXXX) ||
+  framework_failure_ "Failed to create temp directory for bad-sort"
 printf "#!/foo/bar/bad/interpreter" > "$BADDIR1/sort" ||
-    framework_failure_ "Failed to create bad-sort: $BADDIR1/sort"
-chmod a+x "$BADDIR1/sort" || framework_failure_ "failed to make bad-sort executable"
+  framework_failure_ "Failed to create bad-sort: $BADDIR1/sort"
+chmod a+x "$BADDIR1/sort" ||
+  framework_failure_ "failed to make bad-sort executable"
 ORIGPATH=$PATH
 
 ## The directory where the "datamash' executable is
 DATAMASHDIR=$(dirname $(which datamash))
-test -z "$DATAMASHDIR" && framework_failure_ "failed to find datamash's directory"
+test -z "$DATAMASHDIR" &&
+  framework_failure_ "failed to find datamash's directory"
 
 ## Create a 'sort' which will crash
-BADDIR=$(mktemp -d badsort.XXXXXX) || framework_failure_ "failed to create bad-sort-dir"
+BADDIR=$(mktemp -d badsort.XXXXXX) ||
+  framework_failure_ "failed to create bad-sort-dir"
 echo '#!/bin/sh
 read A
 echo "$A"
@@ -81,7 +86,8 @@ echo "$B"
 Z=0
 C=$((1/$Z))
 ' > "$BADDIR/sort" || framework_failure_ "failed to create $BADDIR/sort"
-chmod a+x "$BADDIR/sort" || framework_failure_ "failed to make $BADDIR/sort executable"
+chmod a+x "$BADDIR/sort" ||
+  framework_failure_ "failed to make $BADDIR/sort executable"
 
 
 ##
@@ -95,8 +101,10 @@ chmod a+x "$BADDIR/sort" || framework_failure_ "failed to make $BADDIR/sort exec
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
 echo "" | datamash --sort --group "$GROUPPARAM" sum 1 2>err1 &&
-	{ warn_ "datamash --sort (group too-long) failed to detect error" ; fail=1 ; }
-compare_ err1 exp_err1 || { warn_ "group-too-long error message is incorrect" ; fail=1 ; }
+  { warn_ "datamash --sort (group too-long) failed to detect error" ;
+    fail=1 ; }
+compare_ err1 exp_err1 ||
+  { warn_ "group-too-long error message is incorrect" ; fail=1 ; }
 
 ##
 ## Test with non-existing 'sort' executable,
@@ -105,13 +113,15 @@ compare_ err1 exp_err1 || { warn_ "group-too-long error message is incorrect" ; 
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
 seq 10 | PATH=$DATAMASHDIR datamash --sort -g 1 sum 1 &&
-	{ warn_ "datamash --sort with non existing 'sort' did not fail (it should have failed)" ; fail=1 ; }
+  { warn_ "datamash --sort with non existing 'sort' did not fail " \
+          "(it should have failed)" ; fail=1 ; }
 
 ##
 ## Test with a 'sort' that crashes
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
 seq 10 | PATH=$BADDIR:$DATAMASHDIR datamash --sort -g 1 sum 1 &&
-	{ warn_ "datamash --sort with crashing 'sort' did not fail (it should have failed)" ; fail=1 ; }
+  { warn_ "datamash --sort with crashing 'sort' did not fail " \
+          "(it should have failed)" ; fail=1 ; }
 
 Exit $fail

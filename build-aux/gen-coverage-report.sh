@@ -33,7 +33,9 @@ cd $(dirname "$0")/.. || die "failed to set directory"
 
 GCDAFILES=$(find -name "*.gcda") || die "failed to search for *.gcda files"
 GCNOFILES=$(find -name "*.gcno") || die "failed to search for *.gcno files"
-[ -z "$GCDAFILES" -o -z "$GCNOFILES" ] && die "No coverage files found (*.gcda/*.gcno) - did you rebuild with coverage instrumentation? try ./build-aux/rebuild-coverage.sh"
+[ -z "$GCDAFILES" -o -z "$GCNOFILES" ] &&
+   die "No coverage files found (*.gcda/*.gcno) - did you rebuild with " \
+       "coverage instrumentation? try ./build-aux/rebuild-coverage.sh"
 
 PROJECT=datamash
 LCOVFILE="$PROJECT.lcov"
@@ -44,7 +46,8 @@ rm -rf "./$REPORTDIR"
 
 ## Then generate the coverage report
 lcov -t "$PROJECT" -q -d src -c -o "$LCOVFILE" || die "lcov failed"
-genhtml -t "$PROJECT" --output-directory "$REPORTDIR" "$LCOVFILE" || die "genhtml failed"
+genhtml -t "$PROJECT" --output-directory "$REPORTDIR" "$LCOVFILE" ||
+  die "genhtml failed"
 
 echo
 echo

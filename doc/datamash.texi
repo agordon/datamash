@@ -72,9 +72,10 @@ which provides command-line computations on input files.
 @cindex overview
 
 The @command{datamash} program
-(@url{http://www.gnu.org/software/datamash}) performs calculation (e.g. @emph{sum,},
-@emph{count}, @emph{min}, @emph{max}, @emph{skewness}, @emph{standard deviation})
-on input files. A simple example: sum up the values in the first column of the input:
+(@url{http://www.gnu.org/software/datamash}) performs calculation (e.g.
+@emph{sum,}, @emph{count}, @emph{min}, @emph{max}, @emph{skewness},
+@emph{standard deviation}) on input files.
+A simple example: sum up the values in the first column of the input:
 
 @example
 $ seq 10 | datamash sum 1
@@ -95,8 +96,8 @@ Gabriel     Health-Medicine  100
 Tysza       Business         92
 Zackery     Engineering      54
 ...
-@exdent Sorting the input file and group by the second column (Major),
-@exdent then calculating the mean score (third column) and sample-standard-deviation:
+@exdent Sorting the input file and group by the second column (Major), then
+@exdent calculating the mean score (third column) and sample-standard-deviation:
 @cindex sorting
 @cindex grouping
 @cindex example, sorting
@@ -139,7 +140,8 @@ mean(x)   q1(x)  median(x)  q3(x)   iqr(x)  sstdev(x)  jarque(x)
 The format for running the @command{datamash} program is:
 
 @example
-datamash [@var{option}]@dots{} @var{op1} @var{column1} [@var{op2} @var{column2} @dots{}]
+datamash [@var{option}]@dots{} @var{op1} @var{column1} @
+[@var{op2} @var{column2} @dots{}]
 @end example
 
 Where @var{op1} is the operation to perform on the values in @var{column1}.
@@ -180,7 +182,8 @@ all the values in the input file.
 @itemx -f
 @opindex --full
 @opindex -f
-Print entire input line before op results (default: print only the grouped keys).
+Print entire input line before op results (default: print only the grouped
+keys).
 
 @item --group=@var{X[,Y,X]}
 @itemx -g @var{X[,Y,X]}
@@ -188,9 +191,10 @@ Print entire input line before op results (default: print only the grouped keys)
 @opindex -g
 @cindex grouping
 Group input via fields @var{X[,Y,Z]}. By default, fields are separated by TABs.
-Use @option{--field-separator} to change the delimiter character. Input file must
-be sorted by the same fields @var{X[,Y,Z]}. Use @option{--sort} to automatically
-sort the input. If @option{--group} is not specified, each operation is performed
+Use @option{--field-separator} to change the delimiter character. Input file
+must be sorted by the same fields @var{X[,Y,Z]}. Use @option{--sort}
+to automatically sort the input.
+If @option{--group} is not specified, each operation is performed
 in the entire input file.
 
 @item --header-in
@@ -422,8 +426,9 @@ p-value of the D'Agostino-Pearson Omnibus test for normality.
 @cindex statistical operations
 
 @unnumberedsec Equivalent R functions
-GNU Datamash is designed to closely follow R project's (@url{http://www.r-project.org/})
-statistical functions. See the @file{files/operators.R} file
+GNU Datamash is designed to closely follow R project's
+(@url{http://www.r-project.org/}) statistical functions.
+See the @file{files/operators.R} file
 for the R equivalent code for each of datamash's operators.
 When building @command{datamash} from source code on your local computer,
 operators are compared to known results of the equivalent R functions.

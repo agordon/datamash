@@ -31,7 +31,8 @@ die()
 
 cd $(dirname "$0")/.. || die "failed to set directory"
 
-DATAMASHVER=$(./build-aux/git-version-gen .tarball-version) || die "can't get datamash version"
+DATAMASHVER=$(./build-aux/git-version-gen .tarball-version) ||
+  die "can't get datamash version"
 
 KERNEL=cygwin
 MACHINE=win64
@@ -44,17 +45,21 @@ DATE=$(date -u +"%F-%H%M%S")
 NAME="datamash-${DATAMASHVER}-bin__${KERNEL}__${MACHINE}"
 mkdir -p "bin/$NAME" || die "failed to create 'bin/$NAME' directory"
 
-cp "$SRC" "bin/$NAME/datamash.exe" || die "failed to create destination binary (bin/$NAME/datamash)"
+cp "$SRC" "bin/$NAME/datamash.exe" ||
+  die "failed to create destination binary (bin/$NAME/datamash)"
 # Copy additional Cygwin DLLs
-DLLS=$(ldd "$SRC" | awk '{print $1}' | grep "^cyg.*\.dll") || die "Failed to detect DLLs"
+DLLS=$(ldd "$SRC" | awk '{print $1}' | grep "^cyg.*\.dll") ||
+  die "Failed to detect DLLs"
 for d in $DLLS ; do
    FULLPATH=$(which "$d") || die "Failed to find full path of DLL '$d'"
-   cp "$FULLPATH" "bin/$NAME" || die "failed to copy DLL '$FULLPATH' to 'bin/$NAME'"
+   cp "$FULLPATH" "bin/$NAME" ||
+      die "failed to copy DLL '$FULLPATH' to 'bin/$NAME'"
 done
 
 
 cd "bin" || die
-zip -r "$NAME.zip" "$NAME" || die "failed to create TarBall for binary executable"
+zip -r "$NAME.zip" "$NAME" ||
+  die "failed to create TarBall for binary executable"
 cd ".."
 
 echo "Done. File ="

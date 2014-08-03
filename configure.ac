@@ -59,7 +59,8 @@ case "$host" in
   *-cygwin) have_broken_strtold=yes ;;
 esac
 if test "x$have_broken_strtold" = "xyes" ; then
-AC_DEFINE([HAVE_BROKEN_STRTOLD],[1],[Define to 1 if strtold does not work properly (e.g. in cygwin)])
+AC_DEFINE([HAVE_BROKEN_STRTOLD],[1],
+          [Define to 1 if strtold does not work properly (e.g. in cygwin)])
 fi
 
 ##
@@ -68,7 +69,8 @@ fi
 ##  DilOS (illumos/opensolaris) does not.
 ##
 if sort -s < /dev/null > /dev/null 2>/dev/null ; then
-	AC_DEFINE([HAVE_STABLE_SORT],[1],[Define to 1 if sort on this system supports -s for stable sorting])
+  AC_DEFINE([HAVE_STABLE_SORT],[1],
+            [Define to 1 if sort on this system supports -s for stable sorting])
 fi
 
 ## Are we building from git checked-out sources?
@@ -89,7 +91,7 @@ AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT([external])
 
 AC_CONFIG_FILES([Makefile
-	po/Makefile.in
+  po/Makefile.in
 ])
 
 AC_OUTPUT

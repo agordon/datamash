@@ -318,77 +318,83 @@ my @Tests =
   # on a different architecture, would printf(%Lg) print something else?
   # Use OUT_SUBST to trim output to 1.3 digits
   ['b14', 'mean 1',     {IN_PIPE=>$in1},  {OUT => "5.454\n"},
-	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b15', 'pstdev 1',   {IN_PIPE=>$in1},  {OUT => "2.742\n"},
-	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b16', 'sstdev 1',   {IN_PIPE=>$in1},  {OUT => "2.876\n"},
-	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b17', 'pvar 1',     {IN_PIPE=>$in1},  {OUT => "7.520\n"},
-	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b18', 'svar 1',     {IN_PIPE=>$in1},  {OUT => "8.272\n"},
-	  {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b19', 'countunique 1', {IN_PIPE=>$in1}, {OUT => "10\n"}],
   ['b20', 'first 1',    {IN_PIPE=>$in1},  {OUT => "1\n"}],
   ['b21', 'last 1',     {IN_PIPE=>$in1},  {OUT => "10\n"}],
   # This test just ensures the 'rand' operation is functioning.
   # It does not verify randomness (see datamash-rand.sh test for that).
   ['b22', 'rand 1',     {IN_PIPE=>$in1},  {OUT => "\n"},
-	  {OUT_SUBST=>'s/[0-9]+//'}],
+      {OUT_SUBST=>'s/[0-9]+//'}],
 
 
 
   ## Some error checkings
   ['e1',  'sum',  {IN_PIPE=>""}, {EXIT=>1},
-	  {ERR=>"$prog: missing field number after operation 'sum'\n"}],
+      {ERR=>"$prog: missing field number after operation 'sum'\n"}],
   ['e2',  'foobar',  {IN_PIPE=>""}, {EXIT=>1},
-	  {ERR=>"$prog: invalid operation 'foobar'\n"}],
+      {ERR=>"$prog: invalid operation 'foobar'\n"}],
   ['e3',  '',  {IN_PIPE=>""}, {EXIT=>1},
-	  {ERR=>"$prog: missing operation specifiers\n" .
-		  "Try '$prog --help' for more information.\n"}],
+      {ERR=>"$prog: missing operation specifiers\n" .
+             "Try '$prog --help' for more information.\n"}],
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid numeric input in line 1 field 1: 'a'\n"}],
+      {ERR=>"$prog: invalid numeric input in line 1 field 1: 'a'\n"}],
   ['e5',  '-g 4, sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid field value for grouping ''\n"}],
+      {ERR=>"$prog: invalid field value for grouping ''\n"}],
   ['e6',  '-g 4,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid field value for grouping 'x'\n"}],
+      {ERR=>"$prog: invalid field value for grouping 'x'\n"}],
   ['e7',  '-g ,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid field value for grouping ',x'\n"}],
+      {ERR=>"$prog: invalid field value for grouping ',x'\n"}],
   ['e8',  '-g 1,0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid field value for grouping '0'\n"}],
+      {ERR=>"$prog: invalid field value for grouping '0'\n"}],
   ['e9',  '-g 1X0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid grouping parameter 'X0'\n"}],
+      {ERR=>"$prog: invalid grouping parameter 'X0'\n"}],
   ['e10',  '-g 1 -t XX sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: the delimiter must be a single character\n"}],
+      {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e11',  '--foobar' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-	  {ERR=>"$prog: unrecognized option foobar\n" .
+      {ERR=>"$prog: unrecognized option foobar\n" .
                 "Try '$prog --help' for more information.\n"},
           # This ERR_SUBST is needed because on some systems (e.g. OpenBSD),
-          # The error message from 'getopt_long' is slightly different than GNU libc's.
-          {ERR_SUBST=>'s/(unknown|unrecognized) option.*(foobar).*/unrecognized option $2/'}],
+          # The error message from 'getopt_long' is slightly
+          # different than GNU libc's.
+          {ERR_SUBST=>'s/(unknown|unrecognized) option.*(foobar).*' .
+                      '/unrecognized option $2/'}],
   ['e12',  '-t" " -H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-	  {ERR=>"$prog: invalid input: field 4 requested, line 1 has only 3 field(s)\n"}],
+      {ERR=>"$prog: invalid input: field 4 requested, " .
+            "line 1 has only 3 field(s)\n"}],
   ['e13',  '-t" " sum 6' ,  {IN_PIPE=>$in_g3}, {EXIT=>1},
-	  {ERR=>"$prog: invalid input: field 6 requested, line 1 has only 3 field(s)\n"}],
+      {ERR=>"$prog: invalid input: field 6 requested, " .
+            "line 1 has only 3 field(s)\n"}],
   ['e14',  '--header-in -t: sum 6' ,  {IN_PIPE=>$in_hdr2}, {EXIT=>1},
-	  {ERR=>"$prog: invalid input: field 6 requested, line 2 has only 3 field(s)\n"}],
+      {ERR=>"$prog: invalid input: field 6 requested, " .
+            "line 2 has only 3 field(s)\n"}],
   ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
   ['e16',  '-t" " sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
-	  {ERR=>"$prog: invalid numeric input in line 3 field 2: '3a'\n"}],
+      {ERR=>"$prog: invalid numeric input in line 3 field 2: '3a'\n"}],
   ['e17',  'sum 1' ,  {IN_PIPE=>"1e-20000\n"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid numeric input in line 1 field 1: '1e-20000'\n"}],
+      {ERR=>"$prog: invalid numeric input in line 1 field 1: '1e-20000'\n"}],
   ['e18',  'sum 0' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
   ['e19',  '-- sum -2' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid column '-2' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid column '-2' for operation 'sum'\n"}],
   ['e20',  'sum 2x' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid column '2x' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid column '2x' for operation 'sum'\n"}],
   ['e21',  'sum ""' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-	  {ERR=>"$prog: invalid column '' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid column '' for operation 'sum'\n"}],
   ['e22',  '-t" " -g 7 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-	  {ERR=>"$prog: invalid input: field 7 requested, line 2 has only 3 field(s)\n"}],
+      {ERR=>"$prog: invalid input: field 7 requested, " .
+            "line 2 has only 3 field(s)\n"}],
   ['e23',  '-t" " -g -2 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-	  {ERR=>"$prog: invalid field value for grouping '-2'\n"}],
+      {ERR=>"$prog: invalid field value for grouping '-2'\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
@@ -401,8 +407,10 @@ my @Tests =
   [ 'emp4', '--header-out count 2', {IN_PIPE=>""},{OUT=>""}],
   [ 'emp5', '--full --header-in count 2', {IN_PIPE=>""},{OUT=>""}],
   [ 'emp6', '--full --header-out count 2', {IN_PIPE=>""},{OUT=>""}],
-  [ 'emp7', '--full --header-in --header-out count 2', {IN_PIPE=>""},{OUT=>""}],
-  [ 'emp8', '-g3,4 --full --header-in --header-out count 2', {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp7', '--full --header-in --header-out count 2',
+     {IN_PIPE=>""},{OUT=>""}],
+  [ 'emp8', '-g3,4 --full --header-in --header-out count 2',
+     {IN_PIPE=>""},{OUT=>""}],
   [ 'emp9', '-g3 count 2', {IN_PIPE=>""},{OUT=>""}],
 
 
@@ -441,7 +449,8 @@ my @Tests =
   # Single group (key in column 1)
   ['g1.1', '-t" " -g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
   ['g2.1', '-t" " -g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
-  ['g3.1', '-t" " -g1 collapse 2', {IN_PIPE=>$in_g1}, {OUT=>"A 100,10,50,35\n"}],
+  ['g3.1', '-t" " -g1 collapse 2', {IN_PIPE=>$in_g1},
+     {OUT=>"A 100,10,50,35\n"}],
   ['g4.1', '-t" " -g1 count 2',    {IN_PIPE=>$in_g5},
      {OUT=>"A 1\nAA 1\nAAA 1\n"}],
 
@@ -474,7 +483,8 @@ my @Tests =
      {OUT=>"GroupBy(x) count(y)\nA 5\nB 3\nC 4\n"}],
 
   # Input and output header, with full line
-  ['hdr3', '-t" " -g 1 --full --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
+  ['hdr3', '-t" " -g 1 --full --header-in --header-out count 2',
+     {IN_PIPE=>$in_hdr1},
      {OUT=>"x y z count(y)\nA 1 10 5\nB 5 10 3\nC 8 11 4\n"}],
 
   # Output Header
@@ -483,7 +493,8 @@ my @Tests =
 
   # Output Header with --full
   ['hdr5', '-t" " -g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
-     {OUT=>"field-1 field-2 field-3 count(field-2)\nA 3 W 5\nB 17 Y 2\nC 23 Z 1\n"}],
+     {OUT=>"field-1 field-2 field-3 count(field-2)\n" .
+           "A 3 W 5\nB 17 Y 2\nC 23 Z 1\n"}],
 
   # Header without grouping
   ['hdr6', '-t" " --header-out count 2', {IN_PIPE=>$in_g3},
@@ -491,7 +502,8 @@ my @Tests =
 
   # Output Header, multiple ops
   ['hdr7', '-t" " -g 1 --header-out count 2 unique 3', {IN_PIPE=>$in_g3},
-     {OUT=>"GroupBy(field-1) count(field-2) unique(field-3)\nA 5 W,X\nB 2 Y,Z\nC 1 Z\n"}],
+     {OUT=>"GroupBy(field-1) count(field-2) unique(field-3)\n" .
+           "A 5 W,X\nB 2 Y,Z\nC 1 Z\n"}],
 
   # Headers, non white-space separator
   ['hdr8', '-g 1 -H -t: count 2 unique 3', {IN_PIPE=>$in_hdr2},
@@ -499,7 +511,8 @@ my @Tests =
 
   # Headers, non white-space separator, 3 operations
   ['hdr9', '-g 1 -H -t: count 2 unique 3 sum 2', {IN_PIPE=>$in_hdr2},
-     {OUT=>"GroupBy(x):count(y):unique(z):sum(y)\nA:5:W,X:39\nB:2:Y,Z:36\nC:1:Z:23\n"}],
+     {OUT=>"GroupBy(x):count(y):unique(z):sum(y)\n" .
+           "A:5:W,X:39\nB:2:Y,Z:36\nC:1:Z:23\n"}],
 
   # Headers, white-space separator, 3 operations
   ['hdr10', '-W -g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr3},
@@ -570,9 +583,9 @@ my @Tests =
 
   # Test --help (but don't verify the output)
   ['help1', '--help',     {IN_PIPE=>""},  {OUT => ""},
-	  {OUT_SUBST=>'s/^.*//gms'}],
+      {OUT_SUBST=>'s/^.*//gms'}],
   ['ver1', '--version',     {IN_PIPE=>""},  {OUT => ""},
-	  {OUT_SUBST=>'s/^.*//gms'}],
+      {OUT_SUBST=>'s/^.*//gms'}],
 
   # Test output precision (number of digits) for numerical operations.
   # The current precision is 14 digits (hard-coded).
@@ -620,13 +633,13 @@ my @Tests =
   ## Mixing grouping,line,transpose/reverse operators should fail
   ['mixop1', 'sum 1 md5 2', {EXIT=>1},
     {ERR=>"$prog: conflicting operation found: expecting grouping operations," .
-	        " but found line operation 'md5'\n"}],
+            " but found line operation 'md5'\n"}],
   ['mixop2', 'md5 1 sum 2', {EXIT=>1},
     {ERR=>"$prog: conflicting operation found: expecting line operations," .
-	        " but found grouping operation 'sum'\n"}],
+            " but found grouping operation 'sum'\n"}],
   ['mixop3', 'md5 1 transpose 2', {EXIT=>1},
     {ERR=>"$prog: conflicting operation found: expecting line operations," .
-	        " but found transpose operation 'transpose'\n"}],
+            " but found transpose operation 'transpose'\n"}],
 
 );
 

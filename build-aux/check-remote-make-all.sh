@@ -39,9 +39,11 @@ dict_get()
 }
 
 SOURCE=$1
-[ -z "$SOURCE" ] && die "missing SOURCE file name / URL (e.g. datamash-1.0.1.tar.gz)"
+[ -z "$SOURCE" ] &&
+  die "missing SOURCE file name / URL (e.g. datamash-1.0.1.tar.gz)"
 
-LOGDIR=$(mktemp -d -t buildlog.XXXXXX) || die "Failed to create build log directory"
+LOGDIR=$(mktemp -d -t buildlog.XXXXXX) ||
+  die "Failed to create build log directory"
 
 HOSTS=${HOSTS:="deb7 deb7clang deb732 deb732clang centos65 centos5 fbsd10
 fbsd93 fbsd84 netbsd614 dilos dilos64 hurd obsd"}

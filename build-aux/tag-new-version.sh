@@ -40,16 +40,20 @@ echo "Existing Git Tags:"
 echo
 for TAG in $(git tag) ;
 do
-	echo "  Tag:	$TAG"
-	git log --format="format:  Rev:	%H%n  Subj:	%s%n  Date:	%ad (%ar)" -n 1 "$TAG"
-	echo
+  echo "  Tag:	$TAG"
+  git log --format=\
+    "format:  Rev:	%H%n  Subj:	%s%n  Date:	%ad (%ar)" \
+       -n 1 "$TAG"
+  echo
 done
 
 ##
-## Show the current git tag, which could be something like "2.0.3-112-abcd-dirty"
+## Show the current git tag,
+##    which could be something like "3.0.3-112-abcd-dirty"
 ##
 echo "Current Git ID:"
-GITID=$(./build-aux/git-version-gen .tarball-version) || die "Failed to get git id"
+GITID=$(./build-aux/git-version-gen .tarball-version) ||
+  die "Failed to get git id"
 echo "  $GITID"
 echo
 
@@ -57,7 +61,8 @@ echo
 ## On auto-tag the 'master' branch.
 ## For more complicated releases, do them manually
 BRANCH=$(git branch | awk '/^\*/{print $2}')
-[ "$BRANCH" = "master" ] || die "Seems like this is not the 'master' branch. Aborting"
+[ "$BRANCH" = "master" ] ||
+  die "Seems like this is not the 'master' branch. Aborting"
 
 ##
 ## Ensure no un-commited changes
@@ -82,7 +87,9 @@ echo
 ##
 printf "Enter new git tag, in the form of 'vX.Y.Z' (e.g. 'v2.1.13'): "
 read NEWVERSION
-echo "$NEWVERSION" | grep -E -q '^v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "invalid version format ($NEWVERSION), expecting 'vX.Y.Z'" >&2 ; exit 1 ; }
+echo "$NEWVERSION" | grep -E -q '^v[0-9]+\.[0-9]+\.[0-9]+$' ||
+    { echo "invalid version format ($NEWVERSION), expecting 'vX.Y.Z'" >&2 ;
+      exit 1 ; }
 
 ##
 ## Add this tag to the git repository
@@ -91,8 +98,11 @@ git tag -a "$NEWVERSION" -m "New Version $NEWVERSION"
 echo
 
 ## Verify updated tag
-NEWGITID=$(./build-aux/git-version-gen .tarball-version) || die "Failed to get new git id"
-[ "v$NEWGITID" = "$NEWVERSION" ] || die "Failed to set new git ID (./build-aux/git-version-gen did not return '$NEWVERSION')"
+NEWGITID=$(./build-aux/git-version-gen .tarball-version) ||
+  die "Failed to get new git id"
+[ "v$NEWGITID" = "$NEWVERSION" ] ||
+  die "Failed to set new git ID " \
+      "(./build-aux/git-version-gen did not return '$NEWVERSION')"
 
 echo
 ## Re-generate 'configure' with the new tagged version

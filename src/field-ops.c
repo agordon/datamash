@@ -44,50 +44,89 @@
 #include "text-options.h"
 #include "field-ops.h"
 
-int field_op_output_precision = 14 ; /* In the future: allow users to
-					change this */
+/* In the future: allow users to change this */
+int field_op_output_precision = 14 ;
 
 struct operation_data operations[] =
 {
-  {"count",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_COUNT */
-  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},   /* OP_SUM */
-  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_MIN */
-  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_MAX */
-  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_ABSMIN */
-  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE}, /* OP_ABSMAX */
-  {"first",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_FIRST */
-  {"last",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_LAST */
-  {"rand",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_RAND */
-  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MEAN */
-  {"median",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MEDIAN */
-  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_QUARTILE_1 */
-  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_QUARTILE_3 */
-  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_IQR */
-  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_PSTDEV */
-  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_SSTDEV */
-  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_PVARIANCE */
-  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_SVARIANCE */
-  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MAD */
-  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MADRAW */
-  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_S_SKEWNESS */
-  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_P_SKEWNESS */
-  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_S_EXCESS_KURTOSIS */
-  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_P_EXCESS_KURTOSIS */
-  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_JARQUE_BETA */
-  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_DP_OMNIBUS */
-  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_MODE */
-  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},   /* OP_ANTIMODE */
-  {"unique",  STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_UNIQUE */
-  {"collapse",STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},   /* OP_COLLAPSE */
-  {"countunique",STRING_VECTOR, IGNORE_FIRST, GROUPING_MODE}, /* OP_COUNT_UNIQUE */
-  {"transpose",STRING_SCALAR, IGNORE_FIRST, TRANSPOSE_MODE},   /* OP_TRANSPOSE */
-  {"reverse", STRING_SCALAR, IGNORE_FIRST, REVERSE_FIELD_MODE},    /* OP_REVERSE */
-  {"base64",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_BASE64 */
-  {"debase64",STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_DEBASE64 */
-  {"md5",     STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_MD5 */
-  {"sha1",    STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_SHA1 */
-  {"sha256",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_SHA256 */
-  {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},    /* OP_SHA512 */
+  /* OP_COUNT */
+  {"count",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  /* OP_SUM */
+  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_MIN */
+  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  /* OP_MAX */
+  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  /* OP_ABSMIN */
+  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  /* OP_ABSMAX */
+  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  /* OP_FIRST */
+  {"first",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  /* OP_LAST */
+  {"last",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  /* OP_RAND */
+  {"rand",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  /* OP_MEAN */
+  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_MEDIAN */
+  {"median",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_QUARTILE_1 */
+  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_QUARTILE_3 */
+  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_IQR */
+  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_PSTDEV */
+  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_SSTDEV */
+  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_PVARIANCE */
+  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_SVARIANCE */
+  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_MAD */
+  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_MADRAW */
+  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_S_SKEWNESS */
+  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_P_SKEWNESS */
+  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_S_EXCESS_KURTOSIS */
+  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_P_EXCESS_KURTOSIS */
+  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_JARQUE_BETA */
+  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_DP_OMNIBUS */
+  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_MODE */
+  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_ANTIMODE */
+  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_UNIQUE */
+  {"unique",  STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},
+  /* OP_COLLAPSE */
+  {"collapse",STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},
+  /* OP_COUNT_UNIQUE */
+  {"countunique",STRING_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  /* OP_TRANSPOSE */
+  {"transpose",STRING_SCALAR, IGNORE_FIRST, TRANSPOSE_MODE},
+  /* OP_REVERSE */
+  {"reverse", STRING_SCALAR, IGNORE_FIRST, REVERSE_FIELD_MODE},
+  /* OP_BASE64 */
+  {"base64",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  /* OP_DEBASE64 */
+  {"debase64",STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  /* OP_MD5 */
+  {"md5",     STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  /* OP_SHA1 */
+  {"sha1",    STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  /* OP_SHA256 */
+  {"sha256",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  /* OP_SHA512 */
+  {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
   {NULL, 0, 0, UNKNOWN_MODE}
 };
 
@@ -114,7 +153,8 @@ field_op_add_value (struct fieldop *op, long double val)
   if (op->num_values >= op->alloc_values)
     {
       op->alloc_values += VALUES_BATCH_INCREMENT;
-      op->values = xnrealloc (op->values, op->alloc_values, sizeof (long double));
+      op->values = xnrealloc (op->values, op->alloc_values,
+                              sizeof (long double));
     }
   op->values[op->num_values] = val;
   op->num_values++;
@@ -187,7 +227,8 @@ field_op_replace_string (struct fieldop *op, const char* str, size_t slen)
 }
 
 /* Returns an array of string-pointers (char*),
-   each pointing to a string in the string buffer (added by field_op_add_string() ).
+   each pointing to a string in the string buffer
+   (added by field_op_add_string() ).
 
    The returned pointer must be free()'d.
 
@@ -195,7 +236,8 @@ field_op_replace_string (struct fieldop *op, const char* str, size_t slen)
    pointing to 'op->count' strings + one last NULL.
 */
 const char **
-field_op_get_string_ptrs ( struct fieldop *op, bool sort, bool sort_case_sensitive )
+field_op_get_string_ptrs ( struct fieldop *op, bool sort,
+                           bool sort_case_sensitive )
 {
   const char **ptrs = xnmalloc(op->count+1, sizeof(char*));
   char *p = op->str_buf;
@@ -237,7 +279,8 @@ new_field_op (enum operation oper, size_t field)
   op->op = oper;
   op->acc_type = operations[oper].acc_type;
   op->name = operations[oper].name;
-  op->numeric = (op->acc_type == NUMERIC_SCALAR || op->acc_type == NUMERIC_VECTOR);
+  op->numeric = (op->acc_type == NUMERIC_SCALAR
+                 || op->acc_type == NUMERIC_VECTOR);
   op->auto_first = operations[oper].auto_first;
 
   op->field = field;
@@ -284,8 +327,9 @@ field_op_collect (struct fieldop *op,
     {
       errno = 0;
 #ifdef HAVE_BROKEN_STRTOLD
-      /* On Cygwin, strtold doesn't stop at a tab character, and returns invalid
-         value. Make a copy of the input buffer and NULL-terminate it */
+      /* On Cygwin, strtold doesn't stop at a tab character,
+         and returns invalid value.
+         Make a copy of the input buffer and NULL-terminate it */
       if (slen >= sizeof(tmpbuf))
         error (EXIT_FAILURE, 0,
                 "internal error: input field too long (%zu)", slen);
@@ -581,19 +625,23 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_S_SKEWNESS:
-      numeric_result = skewness_value ( op->values, op->num_values, DF_SAMPLE );
+      numeric_result = skewness_value ( op->values, op->num_values,
+                                        DF_SAMPLE );
       break;
 
     case OP_P_SKEWNESS:
-      numeric_result = skewness_value ( op->values, op->num_values, DF_POPULATION );
+      numeric_result = skewness_value ( op->values, op->num_values,
+                                        DF_POPULATION );
       break;
 
     case OP_S_EXCESS_KURTOSIS:
-      numeric_result = excess_kurtosis_value ( op->values, op->num_values, DF_SAMPLE );
+      numeric_result = excess_kurtosis_value ( op->values, op->num_values,
+                                               DF_SAMPLE );
       break;
 
     case OP_P_EXCESS_KURTOSIS:
-      numeric_result = excess_kurtosis_value ( op->values, op->num_values, DF_POPULATION );
+      numeric_result = excess_kurtosis_value ( op->values, op->num_values,
+                                               DF_POPULATION );
       break;
 
     case OP_JARQUE_BERA:
@@ -601,7 +649,8 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_DP_OMNIBUS:
-      numeric_result = dagostino_pearson_omnibus_pvalue ( op->values, op->num_values );
+      numeric_result = dagostino_pearson_omnibus_pvalue ( op->values,
+                                                          op->num_values );
       break;
 
     case OP_MODE:

@@ -31,9 +31,11 @@ die()
 
 cd $(dirname "$0")/.. || die "failed to set directory"
 
-find "$PWD" \( -name "*.gcda" -o -name "*.gcno" \) -delete || die "deleting existing gcda/gcno files failed"
+find "$PWD" \( -name "*.gcda" -o -name "*.gcno" \) -delete ||
+  die "deleting existing gcda/gcno files failed"
 
-./configure CFLAGS="-g -fprofile-arcs -ftest-coverage" || die "./configure failed"
+./configure CFLAGS="-g -fprofile-arcs -ftest-coverage" ||
+  die "./configure failed"
 make clean || die "make clean failed"
 make || die "make failed"
 

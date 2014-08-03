@@ -34,7 +34,8 @@ if which ldd >/dev/null ; then
   ## If the system doesn't have "ldd", we can't test it, and we'll assume
   ## we can valgrind without false-positives.
   ## This is relevant for Mac OS X, where static binaries are discouraged and
-  ## difficult to create (https://developer.apple.com/library/mac/qa/qa1118/_index.html)
+  ## difficult to create
+  ## (https://developer.apple.com/library/mac/qa/qa1118/_index.html)
   ldd $(which datamash) >/dev/null 2>/dev/null ||
     skip_ "skipping valgrind test for a non-dynamic-binary datamash"
 fi
@@ -54,8 +55,10 @@ fi
 
 
 ## Prepare file with many rows, to test transpose/reverse
-seq -w 16000 | paste - - - - > in_4k_rows || framework_failure "failed to prepare 'in_4k_rows' file"
-seq -w 16000 | paste - - - - - - - - > in_2k_rows || framework_failure "failed to prepare 'in_2k_rows' file"
+seq -w 16000 | paste - - - - > in_4k_rows ||
+  framework_failure "failed to prepare 'in_4k_rows' file"
+seq -w 16000 | paste - - - - - - - - > in_2k_rows ||
+  framework_failure "failed to prepare 'in_2k_rows' file"
 
 ## Prepare file with many columns and 100 rows, to test transpose/reverse
 ( for i in $(seq 0 99) ; do
@@ -67,40 +70,51 @@ fail=0
 
 seq 10000 | valgrind --track-origins=yes  --show-reachable=yes \
                      --leak-check=full  --error-exitcode=1 \
-                 datamash unique 1 > /dev/null || { warn_ "unique 1 - failed" ; fail=1 ; }
+                 datamash unique 1 > /dev/null ||
+  { warn_ "unique 1 - failed" ; fail=1 ; }
 
 seq 10000 | sed 's/^/group /' |
      valgrind --track-origins=yes  --leak-check=full \
               --show-reachable=yes  --error-exitcode=1 \
-                 datamash -g 1 unique 1 > /dev/null || { warn_ "-g 1 unique 1 - failed" ; fail=1 ; }
+                 datamash -g 1 unique 1 > /dev/null ||
+  { warn_ "-g 1 unique 1 - failed" ; fail=1 ; }
 
 seq 10000 | valgrind --track-origins=yes  --leak-check=full \
                      --show-reachable=yes  --error-exitcode=1 \
-                 datamash countunique 1 > /dev/null || { warn_ "countunique 1 - failed" ; fail=1 ; }
+                 datamash countunique 1 > /dev/null ||
+  { warn_ "countunique 1 - failed" ; fail=1 ; }
 
 seq 10000 | valgrind --track-origins=yes  --leak-check=full  \
                      --show-reachable=yes  --error-exitcode=1 \
-                 datamash collapse 1 > /dev/null || { warn_ "collapse 1 - failed" ; fail=1 ; }
+                 datamash collapse 1 > /dev/null ||
+  { warn_ "collapse 1 - failed" ; fail=1 ; }
 
-(echo "values" ; seq 10000 ) | valgrind --track-origins=yes  --leak-check=full \
-                                        --show-reachable=yes  --error-exitcode=1 \
-                 datamash -H countunique 1 > /dev/null || { warn_ "-H collapse 1 - failed" ; fail=1 ; }
+(echo "values" ; seq 10000 ) |
+  valgrind --track-origins=yes  --leak-check=full \
+           --show-reachable=yes  --error-exitcode=1 \
+            datamash -H countunique 1 > /dev/null ||
+    { warn_ "-H collapse 1 - failed" ; fail=1 ; }
 
-(echo "values" ; seq 10000 ) | valgrind --track-origins=yes  --leak-check=full \
-                                        --show-reachable=yes  --error-exitcode=1 \
-                 datamash -g 1 -H countunique 1 > /dev/null || { warn_ "-g 1 -H collapse 1 - failed" ; fail=1 ; }
-
-cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
-                          --show-reachable=yes  --error-exitcode=1 \
-                 datamash -W first 2 > /dev/null || { warn_ "first 2" ; fail=1 ; }
-
-cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
-                          --show-reachable=yes  --error-exitcode=1 \
-                 datamash -W -g 1 first 2 > /dev/null || { warn_ "-g 1 first 2" ; fail=1 ; }
+(echo "values" ; seq 10000 ) |
+  valgrind --track-origins=yes  --leak-check=full \
+           --show-reachable=yes  --error-exitcode=1 \
+           datamash -g 1 -H countunique 1 > /dev/null ||
+    { warn_ "-g 1 -H collapse 1 - failed" ; fail=1 ; }
 
 cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
                           --show-reachable=yes  --error-exitcode=1 \
-                 datamash -W -g 1 last 2 > /dev/null || { warn_ "-g 1 last 2" ; fail=1 ; }
+                 datamash -W first 2 > /dev/null ||
+  { warn_ "first 2" ; fail=1 ; }
+
+cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
+                          --show-reachable=yes  --error-exitcode=1 \
+                 datamash -W -g 1 first 2 > /dev/null ||
+  { warn_ "-g 1 first 2" ; fail=1 ; }
+
+cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
+                          --show-reachable=yes  --error-exitcode=1 \
+                 datamash -W -g 1 last 2 > /dev/null ||
+  { warn_ "-g 1 last 2" ; fail=1 ; }
 
 ## Test transpose and reverse on multiple (medium-sized) inputs
 for INFILE in in_4k_rows in_2k_rows in_1k_cols ;
@@ -109,7 +123,8 @@ do
   do
     cat "$INFILE" | valgrind --track-origins=yes  --leak-check=full \
                              --show-reachable=yes  --error-exitcode=1 \
-                       datamash "$CMD" > /dev/null || { warn_ "$CMD failed on $INFILE" ; fail=1 ; }
+                       datamash "$CMD" > /dev/null ||
+  { warn_ "$CMD failed on $INFILE" ; fail=1 ; }
 
   done
 done

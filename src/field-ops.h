@@ -149,7 +149,8 @@ extern struct fieldop* field_ops ;
 void field_op_add_value (struct fieldop *op, long double val);
 
 /* Returns an array of string-pointers (char*),
-   each pointing to a string in the string buffer (added by field_op_add_string() ).
+   each pointing to a string in the string buffer
+   (added by field_op_add_string() ).
 
    The returned pointer must be free()'d.
 

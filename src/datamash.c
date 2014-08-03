@@ -415,8 +415,8 @@ process_file ()
       /* If asked to print the output headers,
          and the input doesn't have headers,
          then count the number of fields in first input line.
-         NOTE: 'input_header' might be false if 'sort piping' was used with header,
-                 but in that case, line_number will be 1. */
+         NOTE: 'input_header' might be false if 'sort piping' was used with
+               header, but in that case, line_number will be 1. */
       if (line_number==0 && output_header && !input_header)
         build_input_line_headers(thisline, false);
 
@@ -487,7 +487,8 @@ transpose_file ()
       if (num_lines+1 > alloc_lines)
         {
           alloc_lines += 1000;
-          lines = xnrealloc ( lines, alloc_lines, sizeof (struct line_record_t));
+          lines = xnrealloc ( lines, alloc_lines,
+                              sizeof (struct line_record_t));
         }
 
       struct line_record_t *thisline = &lines[num_lines];
@@ -617,7 +618,8 @@ open_input()
         {
           snprintf(tmp,sizeof(tmp),"-k%zu,%zu ",*key,*key);
           if (strlen(tmp)+strlen(cmd)+1 >= sizeof(cmd))
-            error(EXIT_FAILURE, 0, _("sort command too-long (please report this bug)"));
+            error(EXIT_FAILURE, 0,
+                   _("sort command too-long (please report this bug)"));
           strcat(cmd,tmp);
         }
 

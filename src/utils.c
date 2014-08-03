@@ -67,8 +67,9 @@ median_value ( const long double * const values, size_t n )
 /* This implementation follows R's summary() and quantile(type=7) functions.
    See discussion here:
    http://tolstoy.newcastle.edu.au/R/e17/help/att-1067/Quartiles_in_R.pdf */
-long double percentile_value ( const long double * const values,
-                               const size_t n, const double percentile )
+long double
+percentile_value ( const long double * const values,
+                   const size_t n, const double percentile )
 {
   const double h = ( (n-1) * percentile ) ;
   const size_t fh = floor(h);
@@ -86,7 +87,8 @@ long double percentile_value ( const long double * const values,
 
 /* Given a sorted array of doubles, return the MAD value
    (median absolute deviation), with scale constant 'scale' */
-long double mad_value ( const long double * const values, size_t n, double scale )
+long double
+mad_value ( const long double * const values, size_t n, double scale )
 {
   const long double median = median_value(values,n);
   long double *mads = xnmalloc(n,sizeof(long double));
@@ -141,7 +143,8 @@ stdev_value ( const long double * const values, size_t n, int df )
  Given an array of doubles, return the skewness
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
-long double skewness_value ( const long double * const values, size_t n, int df )
+long double
+skewness_value ( const long double * const values, size_t n, int df )
 {
   long double moment2=0;
   long double moment3=0;
@@ -175,7 +178,8 @@ long double skewness_value ( const long double * const values, size_t n, int df 
 }
 
 /* Standard error of skewness (SES), given the sample size 'n' */
-long double SES_value ( size_t n )
+long double
+SES_value ( size_t n )
 {
   if (n<=2)
     return nanl("");
@@ -184,7 +188,8 @@ long double SES_value ( size_t n )
 }
 
 /* Skewness Test statistics Z = ( sample skewness / SES ) */
-long double skewnessZ_value ( const long double * const values, size_t n)
+long double
+skewnessZ_value ( const long double * const values, size_t n)
 {
   const long double skew = skewness_value (values,n,DF_SAMPLE);
   const long double SES = SES_value (n);
@@ -198,7 +203,8 @@ long double skewnessZ_value ( const long double * const values, size_t n)
  Given an array of doubles, return the excess kurtosis
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
-long double excess_kurtosis_value ( const long double * const values, size_t n, int df )
+long double
+excess_kurtosis_value ( const long double * const values, size_t n, int df )
 {
   long double moment2=0;
   long double moment4=0;
@@ -225,15 +231,17 @@ long double excess_kurtosis_value ( const long double * const values, size_t n, 
     {
       if (n<=3)
         return nanl("");
-      excess_kurtosis = ( ((long double)n-1) / (((long double)n-2)*((long double)n-3)) ) *
-                        ( (n+1)*excess_kurtosis + 6 ) ;
+      excess_kurtosis = ( ((long double)n-1) /
+                            (((long double)n-2)*((long double)n-3)) ) *
+                          ( (n+1)*excess_kurtosis + 6 ) ;
     }
 
   return excess_kurtosis;
 }
 
 /* Standard error of kurtisos (SEK), given the sample size 'n' */
-long double SEK_value ( size_t n )
+long double
+SEK_value ( size_t n )
 {
   const long double ses = SES_value(n);
 
@@ -245,7 +253,8 @@ long double SEK_value ( size_t n )
 }
 
 /* Kurtosis Test statistics Z = ( sample kurtosis / SEK ) */
-long double kurtosisZ_value ( const long double * const values, size_t n)
+long double
+kurtosisZ_value ( const long double * const values, size_t n)
 {
   const long double kurt = excess_kurtosis_value (values,n,DF_SAMPLE);
   const long double SEK = SEK_value (n);
@@ -259,7 +268,8 @@ long double kurtosisZ_value ( const long double * const values, size_t n)
  for the special case of DF=2.
  Equivalent to the R function 'pchisq(x,df=2)'.
 */
-long double pchisq_df2(long double x)
+long double
+pchisq_df2(long double x)
 {
   return 1.0 - expl(-x/2);
 }
@@ -270,7 +280,8 @@ long double pchisq_df2(long double x)
    http://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test
  Equivalent to R's "jarque.test()" function in the "moments" library.
  */
-long double jarque_bera_pvalue ( const long double * const values, size_t n )
+long double
+jarque_bera_pvalue ( const long double * const values, size_t n )
 {
   const long double k = excess_kurtosis_value(values,n,DF_POPULATION);
   const long double s = skewness_value(values,n,DF_POPULATION);
@@ -286,7 +297,8 @@ long double jarque_bera_pvalue ( const long double * const values, size_t n )
  returns the p-value,
  where the null-hypothesis is normal distribution.
 */
-long double dagostino_pearson_omnibus_pvalue( const long double * const values, size_t n)
+long double
+dagostino_pearson_omnibus_pvalue( const long double * const values, size_t n)
 {
   const long double z_skew = skewnessZ_value (values, n);
   const long double z_kurt = kurtosisZ_value (values, n);

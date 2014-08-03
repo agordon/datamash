@@ -176,7 +176,8 @@ The datamash tests below should return the same results are thes R commands:
 
     # helper functions for skewness
     pop.skewness=skewness
-    smp.skewness=function(x) { skewness(x) * sqrt( length(x)*(length(x)-1) ) / (length(x)-2) }
+    smp.skewness=function(x) {
+            skewness(x) * sqrt( length(x)*(length(x)-1) ) / (length(x)-2) }
 
     # helper functions for excess kurtosis
     pop.excess_kurtosis=function(x) { kurtosis(x)-3 }
@@ -259,7 +260,8 @@ my @Tests =
   ['mean6', 'mean 1' ,  {IN_PIPE=>$seq12}, {OUT => "16.416\n"},],
   ['mean7', 'mean 1' ,  {IN_PIPE=>$seq11}, {OUT => "14.545\n"},],
   ['mean8', 'mean 1' ,  {IN_PIPE=>$seq12_unsorted}, {OUT => "16.416\n"},],
-  ['mean9', '--sort mean 1' ,  {IN_PIPE=>$seq12_unsorted}, {OUT => "16.416\n"},],
+  ['mean9', '--sort mean 1' ,
+     {IN_PIPE=>$seq12_unsorted}, {OUT => "16.416\n"},],
   ['mean10','mean 1' ,  {IN_PIPE=>$seq20}, {OUT => "100.06\n"},],
   ['mean11','mean 1' ,  {IN_PIPE=>$seq21}, {OUT => "45.32\n"},],
   ['mean12','mean 1' ,  {IN_PIPE=>$seq22}, {OUT => "67.45\n"},],

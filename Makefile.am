@@ -147,8 +147,9 @@ EXTRA_DIST += \
 ## Examples
 ##
 
-## These example files will be installed in the "{prefix}/share/APPNAME/examples"
-## directory (default "/usr/local/share/datamash/examples")
+## These example files will be installed in the
+## "{prefix}/share/APPNAME/examples" directory
+## (default "/usr/local/share/datamash/examples")
 examplesdir = $(pkgdatadir)/examples
 
 dist_examples_DATA = examples/readme.md \
