@@ -369,13 +369,13 @@ my @Tests =
                       '/unrecognized option $2/'}],
   ['e12',  '-t" " -H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 4 requested, " .
-            "line 1 has only 3 field(s)\n"}],
+            "line 1 has only 3 fields\n"}],
   ['e13',  '-t" " sum 6' ,  {IN_PIPE=>$in_g3}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 6 requested, " .
-            "line 1 has only 3 field(s)\n"}],
+            "line 1 has only 3 fields\n"}],
   ['e14',  '--header-in -t: sum 6' ,  {IN_PIPE=>$in_hdr2}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 6 requested, " .
-            "line 2 has only 3 field(s)\n"}],
+            "line 2 has only 3 fields\n"}],
   ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
       {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
   ['e16',  '-t" " sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
@@ -392,7 +392,7 @@ my @Tests =
       {ERR=>"$prog: invalid column '' for operation 'sum'\n"}],
   ['e22',  '-t" " -g 7 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 7 requested, " .
-            "line 2 has only 3 field(s)\n"}],
+            "line 2 has only 3 fields\n"}],
   ['e23',  '-t" " -g -2 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid field value for grouping '-2'\n"}],
 

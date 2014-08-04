@@ -230,7 +230,7 @@ static inline void
 error_not_enough_fields (const size_t needed, const size_t found)
 {
   error (EXIT_FAILURE, 0, _("invalid input: field %zu requested, " \
-        "line %zu has only %zu field(s)"),
+        "line %zu has only %zu fields"),
         needed, line_number, found);
 }
 
@@ -257,8 +257,8 @@ different (const struct line_record_t* l1, const struct line_record_t* l2)
       safe_line_record_get_field (l2, *key, &str2, &len2);
       if (len1 != len2)
         return true;
-      if ((case_sensitive && !STREQ_LEN(str1,str2,len1))
-          || (!case_sensitive && (strncasecmp(str1,str2,len1)!=0)))
+      if ((case_sensitive && !STREQ_LEN (str1,str2,len1))
+          || (!case_sensitive && (strncasecmp (str1,str2,len1)!=0)))
         return true;
     }
   return false;
@@ -278,8 +278,8 @@ process_line (const struct line_record_t *line)
       safe_line_record_get_field (line, op->field, &str, &len);
       if (!field_op_collect (op, str, len))
         {
-          char *tmp = xmalloc(len+1);
-          memcpy(tmp,str,len);
+          char *tmp = xmalloc (len+1);
+          memcpy (tmp,str,len);
           tmp[len] = 0 ;
           error (EXIT_FAILURE, 0,
               _("invalid numeric input in line %zu field %zu: '%s'"),
@@ -304,8 +304,8 @@ print_input_line (const struct line_record_t* lb)
       for (size_t i = 1; i <= line_record_num_fields (lb); ++i)
         {
           safe_line_record_get_field (lb, i, &str, &len);
-          ignore_value(fwrite (str, sizeof(char), len, stdout));
-          print_field_separator();
+          ignore_value (fwrite (str, sizeof (char), len, stdout));
+          print_field_separator ();
         }
     }
   else
@@ -313,8 +313,8 @@ print_input_line (const struct line_record_t* lb)
       for (size_t *key = group_columns; key && *key != 0 ; ++key)
         {
           safe_line_record_get_field (lb, *key, &str, &len);
-          ignore_value(fwrite(str,sizeof(char),len,stdout));
-          print_field_separator();
+          ignore_value (fwrite (str,sizeof (char),len,stdout));
+          print_field_separator ();
         }
     }
 }
@@ -331,53 +331,53 @@ print_input_line (const struct line_record_t* lb)
 
 
 static void
-print_column_headers()
+print_column_headers ()
 {
   if (print_full_line)
     {
-      for (size_t n=1; n<=get_num_column_headers(); ++n)
+      for (size_t n=1; n<=get_num_column_headers (); ++n)
         {
-          fputs(get_input_field_name(n), stdout);
-          print_field_separator();
+          fputs (get_input_field_name (n), stdout);
+          print_field_separator ();
         }
     }
   else
     {
       for (size_t *key = group_columns; key && *key != 0; ++key)
         {
-          if (*key > get_num_column_headers())
-            error_not_enough_fields(*key, get_num_column_headers());
-          printf("GroupBy(%s)",get_input_field_name(*key));
-          print_field_separator();
+          if (*key > get_num_column_headers ())
+            error_not_enough_fields (*key, get_num_column_headers ());
+          printf ("GroupBy" "(%s)",get_input_field_name (*key));
+          print_field_separator ();
         }
     }
 
   for (struct fieldop *op = field_ops; op ; op=op->next)
     {
-      if (op->field > get_num_column_headers())
-        error_not_enough_fields(op->field, get_num_column_headers());
-      printf("%s(%s)",op->name, get_input_field_name(op->field));
+      if (op->field > get_num_column_headers ())
+        error_not_enough_fields (op->field, get_num_column_headers ());
+      printf ("%s" "(%s)",op->name, get_input_field_name (op->field));
 
       if (op->next)
-        print_field_separator();
+        print_field_separator ();
     }
 
   /* print end-of-line */
-  print_line_separator();
+  print_line_separator ();
 }
 
 /*
     Process the input header line
 */
 static void
-process_input_header(FILE *stream)
+process_input_header (FILE *stream)
 {
   struct line_record_t lr;
 
   line_record_init (&lr);
   if (line_record_fread (&lr, stream, eolchar))
     {
-      build_input_line_headers(&lr, true);
+      build_input_line_headers (&lr, true);
       line_number++;
     }
   line_record_free (&lr);
@@ -402,7 +402,7 @@ process_file ()
   line_record_init (group_first_line);
 
   if (input_header)
-    process_input_header(input_stream);
+    process_input_header (input_stream);
 
   while (!feof (input_stream))
     {
@@ -417,11 +417,11 @@ process_file ()
          NOTE: 'input_header' might be false if 'sort piping' was used with
                header, but in that case, line_number will be 1. */
       if (line_number==0 && output_header && !input_header)
-        build_input_line_headers(thisline, false);
+        build_input_line_headers (thisline, false);
 
       /* Print output header, only after reading the first line */
       if (output_header && line_number==1)
-        print_column_headers();
+        print_column_headers ();
 
       line_number++;
 
@@ -516,13 +516,13 @@ transpose_file ()
       for (size_t j = 0; j < line_number; ++j)
         {
           if (j>0)
-            print_field_separator();
+            print_field_separator ();
 
           const struct line_record_t *line = &lines[j];
           const char* str;
           size_t len;
           if (line_record_get_field (line, i, &str, &len))
-            fwrite (str, len, sizeof(char), stdout);
+            fwrite (str, len, sizeof (char), stdout);
           else
             fputs (missing_field_filler, stdout);
         }
@@ -572,7 +572,7 @@ reverse_fields_in_file ()
           const char* str;
           size_t len;
           if (line_record_get_field (thisline, i, &str, &len))
-            fwrite (str, len, sizeof(char), stdout);
+            fwrite (str, len, sizeof (char), stdout);
         }
       print_line_separator ();
     }
@@ -581,48 +581,48 @@ reverse_fields_in_file ()
 
 
 static void
-open_input()
+open_input ()
 {
   if (pipe_through_sort && group_columns)
     {
-      char tmp[INT_BUFSIZE_BOUND(size_t)*2+5];
+      char tmp[INT_BUFSIZE_BOUND (size_t)*2+5];
       char cmd[1024];
-      memset(cmd,0,sizeof(cmd));
+      memset (cmd,0,sizeof (cmd));
 
       if (input_header)
         {
           /* Set no-buffering, to ensure only the first line is consumed */
-          setbuf(stdin,NULL);
+          setbuf (stdin,NULL);
           /* Read the header line from STDIN, and pass the rest of it to
              the 'sort' child-process */
-          process_input_header(stdin);
+          process_input_header (stdin);
           input_header = false;
         }
-      strcat(cmd,"LC_ALL=C sort ");
+      strcat (cmd,"LC_ALL=C sort ");
       if (!case_sensitive)
-        strcat(cmd,"-f ");
+        strcat (cmd,"-f ");
 #ifdef HAVE_STABLE_SORT
       /* stable sort (-s) is needed to support first/last operations
          (prevent sort from re-ordering lines which are not part of the group.
          '-s' is not standard POSIX, but very commonly supported, including
          on GNU coreutils, Busybox, FreeBSD, MacOSX */
-      strcat(cmd,"-s ");
+      strcat (cmd,"-s ");
 #endif
       if (in_tab != TAB_WHITESPACE)
         {
-          snprintf(tmp,sizeof(tmp),"-t '%c' ",in_tab);
-          strcat(cmd,tmp);
+          snprintf (tmp,sizeof (tmp),"-t '%c' ",in_tab);
+          strcat (cmd,tmp);
         }
       for (size_t *key = group_columns; key && *key; ++key)
         {
-          snprintf(tmp,sizeof(tmp),"-k%zu,%zu ",*key,*key);
-          if (strlen(tmp)+strlen(cmd)+1 >= sizeof(cmd))
-            error(EXIT_FAILURE, 0,
+          snprintf (tmp,sizeof (tmp),"-k%zu,%zu ",*key,*key);
+          if (strlen (tmp)+strlen (cmd)+1 >= sizeof (cmd))
+            error (EXIT_FAILURE, 0,
                    _("sort command too-long (please report this bug)"));
-          strcat(cmd,tmp);
+          strcat (cmd,tmp);
         }
 
-      input_stream = popen(cmd,"r");
+      input_stream = popen (cmd,"r");
       if (input_stream == NULL)
         error (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
     }
@@ -635,7 +635,7 @@ open_input()
 }
 
 static void
-close_input()
+close_input ()
 {
   int i;
 
@@ -643,9 +643,9 @@ close_input()
     error (EXIT_FAILURE, 0, _("read error"));
 
   if (pipe_through_sort)
-    i = pclose(input_stream);
+    i = pclose (input_stream);
   else
-    i = fclose(input_stream);
+    i = fclose (input_stream);
 
   if (i != 0)
     error (EXIT_FAILURE, 0, _("read error (on close)"));
@@ -654,7 +654,7 @@ close_input()
 static void
 free_sort_keys ()
 {
-  free(group_columns);
+  free (group_columns);
 }
 
 /* Parse the "--group=X[,Y,Z]" parameter, populating 'keylist' */
@@ -676,7 +676,7 @@ parse_group_spec ( char* spec )
     }
 
   /* Allocate the group_columns */
-  group_columns = xnmalloc(num_group_colums+1, sizeof(size_t));
+  group_columns = xnmalloc (num_group_colums+1, sizeof (size_t));
 
   errno = 0 ;
   idx=0;
@@ -700,7 +700,7 @@ parse_group_spec ( char* spec )
   group_columns[idx] = 0 ; /* marker for the last element */
 }
 
-int main(int argc, char* argv[])
+int main (int argc, char* argv[])
 {
   int optc;
   enum operation_mode op_mode;
@@ -710,8 +710,8 @@ int main(int argc, char* argv[])
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  init_blank_table();
-  init_random();
+  init_blank_table ();
+  init_random ();
 
   atexit (close_stdout);
 
@@ -790,7 +790,7 @@ int main(int argc, char* argv[])
   op_mode = parse_operation_mode (argc, optind, argv);
 
   open_input ();
-  switch(op_mode)
+  switch (op_mode)
     {
     case LINE_MODE:
       line_mode = true;

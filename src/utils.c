@@ -52,10 +52,10 @@ cmp_long_double (const void *p1, const void *p2)
 }
 
 long double
-median_value ( const long double * const values, size_t n )
+median_value (const long double * const values, size_t n)
 {
 #if 0
-  return percentile_value(values, n, 2.0/4.0);
+  return percentile_value (values, n, 2.0/4.0);
 #else
   /* Equivalent to the above, but slightly faster */
   return (n&0x01)
@@ -64,15 +64,15 @@ median_value ( const long double * const values, size_t n )
 #endif
 }
 
-/* This implementation follows R's summary() and quantile(type=7) functions.
+/* This implementation follows R's summary () and quantile (type=7) functions.
    See discussion here:
    http://tolstoy.newcastle.edu.au/R/e17/help/att-1067/Quartiles_in_R.pdf */
 long double
-percentile_value ( const long double * const values,
-                   const size_t n, const double percentile )
+percentile_value (const long double * const values,
+                  const size_t n, const double percentile)
 {
   const double h = ( (n-1) * percentile ) ;
-  const size_t fh = floor(h);
+  const size_t fh = floor (h);
 
   /* Error in the calling parameters, should not happen */
   if (n==0 || percentile<0.0 || percentile>100.0)
@@ -88,21 +88,21 @@ percentile_value ( const long double * const values,
 /* Given a sorted array of doubles, return the MAD value
    (median absolute deviation), with scale constant 'scale' */
 long double
-mad_value ( const long double * const values, size_t n, double scale )
+mad_value (const long double * const values, size_t n, double scale)
 {
-  const long double median = median_value(values,n);
-  long double *mads = xnmalloc(n,sizeof(long double));
+  const long double median = median_value (values,n);
+  long double *mads = xnmalloc (n,sizeof (long double));
   long double mad = 0 ;
   for (size_t i=0; i<n; ++i)
-    mads[i] = fabsl(median - values[i]);
-  qsortfl(mads,n);
-  mad = median_value(mads,n);
-  free(mads);
+    mads[i] = fabsl (median - values[i]);
+  qsortfl (mads,n);
+  mad = median_value (mads,n);
+  free (mads);
   return mad * scale;
 }
 
 long double
-arithmetic_mean_value ( const long double * const values, const size_t n)
+arithmetic_mean_value (const long double * const values, const size_t n)
 {
   long double sum=0;
   long double mean;
@@ -113,16 +113,16 @@ arithmetic_mean_value ( const long double * const values, const size_t n)
 }
 
 long double
-variance_value ( const long double * const values, size_t n, int df )
+variance_value (const long double * const values, size_t n, int df)
 {
   long double sum=0;
   long double mean;
   long double variance;
 
   if ( df<0 || (size_t)df == n )
-    return nanl("");
+    return nanl ("");
 
-  mean = arithmetic_mean_value(values, n);
+  mean = arithmetic_mean_value (values, n);
 
   sum = 0 ;
   for (size_t i = 0; i < n; i++)
@@ -134,7 +134,7 @@ variance_value ( const long double * const values, size_t n, int df )
 }
 
 long double
-stdev_value ( const long double * const values, size_t n, int df )
+stdev_value (const long double * const values, size_t n, int df)
 {
   return sqrtl ( variance_value ( values, n, df ) );
 }
@@ -144,7 +144,7 @@ stdev_value ( const long double * const values, size_t n, int df )
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
 long double
-skewness_value ( const long double * const values, size_t n, int df )
+skewness_value (const long double * const values, size_t n, int df)
 {
   long double moment2=0;
   long double moment3=0;
@@ -152,9 +152,9 @@ skewness_value ( const long double * const values, size_t n, int df )
   long double skewness;
 
   if (n<=1)
-    return nanl("");
+    return nanl ("");
 
-  mean = arithmetic_mean_value(values, n);
+  mean = arithmetic_mean_value (values, n);
 
   for (size_t i = 0; i < n; i++)
     {
@@ -165,13 +165,13 @@ skewness_value ( const long double * const values, size_t n, int df )
   moment2 /= n;
   moment3 /= n;
 
-  /* can't use 'powl(moment2,3.0/2.0)' - not all systems have powl */
-  skewness = moment3 / sqrtl(moment2*moment2*moment2);
+  /* can't use 'powl (moment2,3.0/2.0)' - not all systems have powl */
+  skewness = moment3 / sqrtl (moment2*moment2*moment2);
   if ( df == DF_SAMPLE )
     {
       if (n<=2)
-        return nanl("");
-      skewness = ( sqrtl(n*(n-1)) / (n-2) ) * skewness;
+        return nanl ("");
+      skewness = ( sqrtl (n*(n-1)) / (n-2) ) * skewness;
     }
 
   return skewness;
@@ -179,22 +179,22 @@ skewness_value ( const long double * const values, size_t n, int df )
 
 /* Standard error of skewness (SES), given the sample size 'n' */
 long double
-SES_value ( size_t n )
+SES_value (size_t n)
 {
   if (n<=2)
-    return nanl("");
-  return sqrtl( (long double)(6.0*n*(n-1))
+    return nanl ("");
+  return sqrtl ( (long double)(6.0*n*(n-1))
                   / ((long double)(n-2)*(n+1)*(n+3)) );
 }
 
 /* Skewness Test statistics Z = ( sample skewness / SES ) */
 long double
-skewnessZ_value ( const long double * const values, size_t n)
+skewnessZ_value (const long double * const values, size_t n)
 {
   const long double skew = skewness_value (values,n,DF_SAMPLE);
   const long double SES = SES_value (n);
-  if (isnan(skew) || isnan(SES) )
-    return nanl("");
+  if (isnan (skew) || isnan (SES) )
+    return nanl ("");
   return skew/SES;
 }
 
@@ -204,7 +204,7 @@ skewnessZ_value ( const long double * const values, size_t n)
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
 long double
-excess_kurtosis_value ( const long double * const values, size_t n, int df )
+excess_kurtosis_value (const long double * const values, size_t n, int df)
 {
   long double moment2=0;
   long double moment4=0;
@@ -212,9 +212,9 @@ excess_kurtosis_value ( const long double * const values, size_t n, int df )
   long double excess_kurtosis;
 
   if (n<=1)
-    return nanl("");
+    return nanl ("");
 
-  mean = arithmetic_mean_value(values, n);
+  mean = arithmetic_mean_value (values, n);
 
   for (size_t i = 0; i < n; i++)
     {
@@ -230,7 +230,7 @@ excess_kurtosis_value ( const long double * const values, size_t n, int df )
   if ( df == DF_SAMPLE )
     {
       if (n<=3)
-        return nanl("");
+        return nanl ("");
       excess_kurtosis = ( ((long double)n-1)
                           / (((long double)n-2)*((long double)n-3)) ) *
                           ( (n+1)*excess_kurtosis + 6 ) ;
@@ -241,54 +241,54 @@ excess_kurtosis_value ( const long double * const values, size_t n, int df )
 
 /* Standard error of kurtisos (SEK), given the sample size 'n' */
 long double
-SEK_value ( size_t n )
+SEK_value (size_t n)
 {
-  const long double ses = SES_value(n);
+  const long double ses = SES_value (n);
 
   if (n<=3)
-    return nanl("");
+    return nanl ("");
 
-   return 2 * ses * sqrtl( (long double)(n*n-1)
+   return 2 * ses * sqrtl ( (long double)(n*n-1)
                             / ((long double)((n-3)*(n+5)))  );
 }
 
 /* Kurtosis Test statistics Z = ( sample kurtosis / SEK ) */
 long double
-kurtosisZ_value ( const long double * const values, size_t n)
+kurtosisZ_value (const long double * const values, size_t n)
 {
   const long double kurt = excess_kurtosis_value (values,n,DF_SAMPLE);
   const long double SEK = SEK_value (n);
-  if (isnan(kurt) || isnan(SEK) )
-    return nanl("");
+  if (isnan (kurt) || isnan (SEK) )
+    return nanl ("");
   return kurt/SEK;
 }
 
 /*
  Chi-Squared - Cumulative distribution function,
  for the special case of DF=2.
- Equivalent to the R function 'pchisq(x,df=2)'.
+ Equivalent to the R function 'pchisq (x,df=2)'.
 */
 long double
-pchisq_df2(long double x)
+pchisq_df2 (long double x)
 {
-  return 1.0 - expl(-x/2);
+  return 1.0 - expl (-x/2);
 }
 
 /*
  Given an array of doubles, return the p-Value
  Of the Jarque-Bera Test for normality
    http://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test
- Equivalent to R's "jarque.test()" function in the "moments" library.
+ Equivalent to R's "jarque.test ()" function in the "moments" library.
  */
 long double
-jarque_bera_pvalue ( const long double * const values, size_t n )
+jarque_bera_pvalue (const long double * const values, size_t n )
 {
-  const long double k = excess_kurtosis_value(values,n,DF_POPULATION);
-  const long double s = skewness_value(values,n,DF_POPULATION);
+  const long double k = excess_kurtosis_value (values,n,DF_POPULATION);
+  const long double s = skewness_value (values,n,DF_POPULATION);
   const long double jb = (long double)(n*(s*s + k*k/4))/6.0 ;
-  const long double pval = 1.0 - pchisq_df2(jb);
-  if (n<=1 || isnan(k) || isnan(s))
-    return nanl("");
+  const long double pval = 1.0 - pchisq_df2 (jb);
+  if (n<=1 || isnan (k) || isnan (s))
+    return nanl ("");
   return pval;
 }
 
@@ -298,15 +298,15 @@ jarque_bera_pvalue ( const long double * const values, size_t n )
  where the null-hypothesis is normal distribution.
 */
 long double
-dagostino_pearson_omnibus_pvalue( const long double * const values, size_t n)
+dagostino_pearson_omnibus_pvalue (const long double * const values, size_t n)
 {
   const long double z_skew = skewnessZ_value (values, n);
   const long double z_kurt = kurtosisZ_value (values, n);
   const long double DP = z_skew*z_skew + z_kurt*z_kurt;
-  const long double pval = 1.0 - pchisq_df2( DP );
+  const long double pval = 1.0 - pchisq_df2 (DP);
 
-  if (isnan(z_skew) || isnan(z_kurt))
-    return nanl("");
+  if (isnan (z_skew) || isnan (z_kurt))
+    return nanl ("");
   return pval;
 }
 
@@ -323,7 +323,7 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
 
   for (size_t i=1; i<n; i++)
     {
-      bool eq = (cmp_long_double(&values[i],&last_value)==0);
+      bool eq = (cmp_long_double (&values[i],&last_value)==0);
 
       if (eq)
         seq_size++;
@@ -344,25 +344,25 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
 }
 
 int
-cmpstringp(const void *p1, const void *p2)
+cmpstringp (const void *p1, const void *p2)
 {
   /* The actual arguments to this function are "pointers to
-   * pointers to char", but strcmp(3) arguments are "pointers
+   * pointers to char", but strcmp (3) arguments are "pointers
    * to char", hence the following cast plus dereference */
-  return strcmp(* (char * const *) p1, * (char * const *) p2);
+  return strcmp (* (char * const *) p1, * (char * const *) p2);
 }
 
 int
-cmpstringp_nocase(const void *p1, const void *p2)
+cmpstringp_nocase (const void *p1, const void *p2)
 {
   /* The actual arguments to this function are "pointers to
-   * pointers to char", but strcmp(3) arguments are "pointers
+   * pointers to char", but strcmp (3) arguments are "pointers
    * to char", hence the following cast plus dereference */
-  return strcasecmp(* (char * const *) p1, * (char * const *) p2);
+  return strcasecmp (* (char * const *) p1, * (char * const *) p2);
 }
 
 /* Sorts (in-place) an array of long-doubles */
-void qsortfl(long double *values, size_t n)
+void qsortfl (long double *values, size_t n)
 {
   qsort (values, n, sizeof (long double), cmp_long_double);
 }

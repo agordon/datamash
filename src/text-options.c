@@ -57,5 +57,5 @@ init_blank_table (void)
 /* Force generation of these inline'd symbols, needed to avoid
    "undefined reference" when compiling with coverage instrumentation.
    See: http://stackoverflow.com/a/16245669 */
-void print_field_separator();
-void print_line_separator();
+void print_field_separator ();
+void print_line_separator ();

@@ -46,16 +46,19 @@ extern bool case_sensitive ;
 extern bool blanks[UCHAR_LIM];
 
 /* Initializes the 'blanks' table. */
-void init_blank_table (void);
+void
+init_blank_table (void);
 
-static inline void print_field_separator()
+static inline void
+print_field_separator ()
 {
-  putchar( out_tab  );
+  putchar (out_tab);
 }
 
-static inline void print_line_separator()
+static inline void
+print_line_separator ()
 {
-  putchar( eolchar );
+  putchar (eolchar);
 }
 
 #endif

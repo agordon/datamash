@@ -37,7 +37,7 @@
 static size_t num_input_column_headers = 0 ;
 static char** input_column_headers;
 
-void free_column_headers()
+void free_column_headers ()
 {
   for (size_t i = 0; i < num_input_column_headers; ++i)
     {
@@ -48,12 +48,12 @@ void free_column_headers()
   input_column_headers = NULL;
 }
 
-size_t get_num_column_headers()
+size_t get_num_column_headers ()
 {
   return num_input_column_headers;
 }
 
-const char* get_input_field_name(size_t field_num)
+const char* get_input_field_name (size_t field_num)
 {
   if (field_num > 0 && field_num <= num_input_column_headers)
     return input_column_headers[field_num-1];
@@ -62,13 +62,13 @@ const char* get_input_field_name(size_t field_num)
 }
 
 void
-build_input_line_headers(const struct line_record_t *lr,
+build_input_line_headers (const struct line_record_t *lr,
 		         bool store_names)
 {
   char *str;
   size_t len;
   const size_t num_fields = line_record_num_fields (lr);
-  const size_t field_name_buf_size = 7+INT_BUFSIZE_BOUND(size_t)+1;
+  const size_t field_name_buf_size = 7+INT_BUFSIZE_BOUND (size_t)+1;
 
   num_input_column_headers = num_fields;
   input_column_headers = XNMALLOC (num_fields, char*);
@@ -78,8 +78,7 @@ build_input_line_headers(const struct line_record_t *lr,
       if (!store_names)
         {
 	  str = xmalloc ( field_name_buf_size );
-	  ignore_value (snprintf (str, field_name_buf_size,
-				  "field-%zu",i));
+	  ignore_value (snprintf (str, field_name_buf_size, "field-%zu",i));
 	}
       else
 	{

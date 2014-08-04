@@ -150,9 +150,9 @@ void field_op_add_value (struct fieldop *op, long double val);
 
 /* Returns an array of string-pointers (char*),
    each pointing to a string in the string buffer
-   (added by field_op_add_string() ).
+   (added by field_op_add_string ).
 
-   The returned pointer must be free()'d.
+   The returned pointer must be free'd.
 
    The returned pointer will have 'op->count+1' elements,
    pointing to 'op->count' strings + one last NULL.
@@ -226,10 +226,10 @@ parse_operations (enum operation_mode mode,
 enum operation_mode
 parse_operation_mode (int argc, int start, char** argv);
 
-/* Output precision, to be used with "printf("%.*Lg",)" */
+/* Output precision, to be used with "printf ("%.*Lg",)" */
 extern int field_op_output_precision;
 
 /* Initialize random number source */
-void init_random();
+void init_random (void);
 
 #endif

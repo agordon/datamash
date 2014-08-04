@@ -35,13 +35,13 @@
   if 'store_names' is false,
       simply counts the number of fields in the input line.
  */
-void build_input_line_headers(const struct line_record_t *lr,
+void build_input_line_headers (const struct line_record_t *lr,
                               bool store_names);
 
 /*
- returns the number of fields as extracted by 'build_input_line_headers()'
+ returns the number of fields as extracted by 'build_input_line_headers ()'
  */
-size_t get_num_column_headers();
+size_t get_num_column_headers ();
 
 /*
  returns the name of column 'field_num'.
@@ -50,10 +50,10 @@ size_t get_num_column_headers();
     appeared in the first input line.
  If 'store_names' (above) was false, returns 'field-X'.
 
- The returned string must not be modified (or free()'d).
+ The returned string must not be modified (or free'd).
 */
-const char* get_input_field_name(size_t field_num);
+const char* get_input_field_name (size_t field_num);
 
-void free_column_headers();
+void free_column_headers ();
 
 #endif

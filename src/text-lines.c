@@ -38,34 +38,34 @@ line_record_init (struct line_record_t* lr)
   initbuffer (&lr->lbuf);
   lr->alloc_fields = 10 ;
   lr->num_fields = 0;
-  lr->fields = XNMALLOC(lr->alloc_fields, struct field_record_t);
+  lr->fields = XNMALLOC (lr->alloc_fields, struct field_record_t);
 }
 
 #if 0
 static void
 line_record_debug_print_fields (const struct line_record_t *lr)
 {
-  fputs("line_record_t = {\n",stderr);
-  fprintf(stderr, "  linebuffer.length = %zu\n", lr->lbuf.length);
-  fputs("  linebuffer.buffer = '",stderr);
-    fwrite(lr->lbuf.buffer,lr->lbuf.length,sizeof(char),stderr);
-  fputs("'\n",stderr);
+  fputs ("line_record_t = {\n",stderr);
+  fprintf (stderr, "  linebuffer.length = %zu\n", lr->lbuf.length);
+  fputs ("  linebuffer.buffer = '",stderr);
+    fwrite (lr->lbuf.buffer,lr->lbuf.length,sizeof (char),stderr);
+  fputs ("'\n",stderr);
 
-  fprintf(stderr, "  num_fields = %zu\n", lr->num_fields);
-  fprintf(stderr, "  alloc_fields = %zu\n", lr->alloc_fields);
+  fprintf (stderr, "  num_fields = %zu\n", lr->num_fields);
+  fprintf (stderr, "  alloc_fields = %zu\n", lr->alloc_fields);
 
   for (size_t i=0; i<lr->num_fields; ++i)
     {
-	    fprintf(stderr, "  field[%zu] = '", i);
-	    fwrite(lr->fields[i].buf,lr->fields[i].len,sizeof(char),stderr);
-	    fprintf(stderr, "' (len = %zu)\n", lr->fields[i].len);
+	    fprintf (stderr, "  field[%zu] = '", i);
+	    fwrite (lr->fields[i].buf,lr->fields[i].len,sizeof (char),stderr);
+	    fprintf (stderr, "' (len = %zu)\n", lr->fields[i].len);
     }
-  fputs("}\n", stderr);
+  fputs ("}\n", stderr);
 }
 #endif
 
 /* Force NUL-termination of the string in the linebuffer struct.
-   gnulib's readlinebuffer_delim() ALWAYS adds a delimiter to the buffer.
+   gnulib's readlinebuffer_delim () ALWAYS adds a delimiter to the buffer.
    Change the delimiter into a NUL.
 */
 static void
@@ -82,7 +82,7 @@ line_record_reserve_fields (struct line_record_t* lr, const size_t n)
 {
   if (lr->alloc_fields < n)
     {
-      lr->alloc_fields = MAX(n,lr->alloc_fields)*2;
+      lr->alloc_fields = MAX (n,lr->alloc_fields)*2;
       lr->fields = xnrealloc (lr->fields, lr->alloc_fields,
 		                sizeof (struct field_record_t));
     }
@@ -93,8 +93,8 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
 {
   size_t num_fields = 0;
   size_t pos = 0;
-  const size_t buflen = line_record_length(lr);
-  const char* fptr = line_record_buffer(lr);
+  const size_t buflen = line_record_length (lr);
+  const char* fptr = line_record_buffer (lr);
 
   /* Move 'fptr' to point to the beginning of 'field' */
   if (field_delim != TAB_WHITESPACE)
@@ -133,7 +133,7 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
       while (pos<buflen)
         {
           /* Skip leading whitespace */
-          while ( (pos<buflen) && blanks[to_uchar(*fptr)])
+          while ( (pos<buflen) && blanks[to_uchar (*fptr)])
             {
               ++fptr;
               ++pos;
@@ -142,7 +142,7 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
 	  /* Scan buffer until next whitespace */
           const char* field_beg = fptr;
           size_t flen = 0;
-          while ( (pos<buflen) && !blanks[to_uchar(*fptr)])
+          while ( (pos<buflen) && !blanks[to_uchar (*fptr)])
             {
               ++fptr;
               ++pos;

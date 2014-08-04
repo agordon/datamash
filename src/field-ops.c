@@ -199,7 +199,7 @@ field_op_add_string (struct fieldop *op, const char* str, size_t slen)
 {
   if (op->str_buf_used + slen+1 >= op->str_buf_alloc)
     {
-      op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,slen+1);
+      op->str_buf_alloc += MAX (VALUES_BATCH_INCREMENT,slen+1);
       op->str_buf = xrealloc (op->str_buf, op->str_buf_alloc);
     }
 
@@ -216,7 +216,7 @@ field_op_replace_string (struct fieldop *op, const char* str, size_t slen)
 {
   if (slen+1 >= op->str_buf_alloc)
     {
-      op->str_buf_alloc += MAX(VALUES_BATCH_INCREMENT,slen+1);
+      op->str_buf_alloc += MAX (VALUES_BATCH_INCREMENT,slen+1);
       op->str_buf = xrealloc (op->str_buf, op->str_buf_alloc);
     }
 
@@ -228,9 +228,9 @@ field_op_replace_string (struct fieldop *op, const char* str, size_t slen)
 
 /* Returns an array of string-pointers (char*),
    each pointing to a string in the string buffer
-   (added by field_op_add_string() ).
+   (added by field_op_add_string () ).
 
-   The returned pointer must be free()'d.
+   The returned pointer must be free'd.
 
    The returned pointer will have 'op->count+1' elements,
    pointing to 'op->count' strings + one last NULL.
@@ -239,7 +239,7 @@ const char **
 field_op_get_string_ptrs ( struct fieldop *op, bool sort,
                            bool sort_case_sensitive )
 {
-  const char **ptrs = xnmalloc(op->count+1, sizeof(char*));
+  const char **ptrs = xnmalloc (op->count+1, sizeof (char*));
   char *p = op->str_buf;
   const char* pend = op->str_buf + op->str_buf_used;
   size_t idx=0;
@@ -255,7 +255,7 @@ field_op_get_string_ptrs ( struct fieldop *op, bool sort,
   if (sort)
     {
       /* Sort the string pointers */
-      qsort ( ptrs, op->count, sizeof(char*), sort_case_sensitive
+      qsort ( ptrs, op->count, sizeof (char*), sort_case_sensitive
                                             ?cmpstringp
                                             :cmpstringp_nocase);
     }
@@ -274,7 +274,7 @@ field_op_sort_values (struct fieldop *op)
 struct fieldop *
 new_field_op (enum operation oper, size_t field)
 {
-  struct fieldop *op = XZALLOC(struct fieldop);
+  struct fieldop *op = XZALLOC (struct fieldop);
 
   op->op = oper;
   op->acc_type = operations[oper].acc_type;
@@ -330,10 +330,10 @@ field_op_collect (struct fieldop *op,
       /* On Cygwin, strtold doesn't stop at a tab character,
          and returns invalid value.
          Make a copy of the input buffer and NULL-terminate it */
-      if (slen >= sizeof(tmpbuf))
+      if (slen >= sizeof (tmpbuf))
         error (EXIT_FAILURE, 0,
                 "internal error: input field too long (%zu)", slen);
-      memcpy(tmpbuf,str,slen);
+      memcpy (tmpbuf,str,slen);
       tmpbuf[slen]=0;
       num_value = strtold (tmpbuf, &endptr);
       if (errno==ERANGE || endptr==tmpbuf || endptr!=(tmpbuf+slen))
@@ -376,14 +376,14 @@ field_op_collect (struct fieldop *op,
       break;
 
     case OP_ABSMIN:
-      if (fabsl(num_value) < fabsl(op->value))
+      if (fabsl (num_value) < fabsl (op->value))
         {
           op->value = num_value;
         }
       break;
 
     case OP_ABSMAX:
-      if (fabsl(num_value) > fabsl(op->value))
+      if (fabsl (num_value) > fabsl (op->value))
         {
           op->value = num_value;
         }
@@ -391,7 +391,7 @@ field_op_collect (struct fieldop *op,
 
     case OP_FIRST:
       if (op->first)
-        field_op_replace_string(op, str, slen);
+        field_op_replace_string (op, str, slen);
       break;
 
     case OP_DEBASE64:
@@ -402,16 +402,16 @@ field_op_collect (struct fieldop *op,
     case OP_SHA512:
     case OP_LAST:
       /* Replace the 'current' string with the latest one */
-      field_op_replace_string(op, str, slen);
+      field_op_replace_string (op, str, slen);
       break;
 
     case OP_RAND:
       {
         /* Reservoir sampling,
            With a simpler case were "k=1" */
-        unsigned long i = random()%op->count;
+        unsigned long i = random ()%op->count;
         if (op->first || i==0)
-          field_op_replace_string(op, str, slen);
+          field_op_replace_string (op, str, slen);
       }
       break;
 
@@ -446,7 +446,7 @@ field_op_collect (struct fieldop *op,
     case OP_REVERSE:
     default:
       /* Should never happen */
-      internal_error("bad op");     /* LCOV_EXCL_LINE */
+      internal_error ("bad op");     /* LCOV_EXCL_LINE */
     }
 
   if (op->first)
@@ -456,7 +456,7 @@ field_op_collect (struct fieldop *op,
 }
 
 /* Returns a nul-terimated string, composed of the unique values
-   of the input strings. The return string must be free()'d. */
+   of the input strings. The return string must be free'd. */
 void
 unique_value ( struct fieldop *op, bool case_sensitive )
 {
@@ -472,24 +472,24 @@ unique_value ( struct fieldop *op, bool case_sensitive )
   /* Copy the first string */
   last_str = ptrs[0];
   strcpy (pos, ptrs[0]);
-  pos += strlen(ptrs[0]);
+  pos += strlen (ptrs[0]);
 
   /* Copy the following strings, if they are different from the previous one */
   for (size_t i = 1; i < op->count; ++i)
     {
       const char *newstr = ptrs[i];
 
-      if ((case_sensitive && (!STREQ(newstr, last_str)))
-          || (!case_sensitive && (strcasecmp(newstr, last_str)!=0)))
+      if ((case_sensitive && (!STREQ (newstr, last_str)))
+          || (!case_sensitive && (strcasecmp (newstr, last_str)!=0)))
         {
           *pos++ = collapse_separator ;
           strcpy (pos, newstr);
-          pos += strlen(newstr);
+          pos += strlen (newstr);
         }
       last_str = newstr;
     }
 
-  free(ptrs);
+  free (ptrs);
 }
 
 /* Returns the number of unique string values in the given field operation */
@@ -509,8 +509,8 @@ count_unique_values ( struct fieldop *op, bool case_sensitive )
   /* Copy the following strings, if they are different from the previous one */
   while ( *cur_str != 0 )
     {
-      if ((case_sensitive && (!STREQ(*cur_str, last_str)))
-          || (!case_sensitive && (strcasecmp(*cur_str, last_str)!=0)))
+      if ((case_sensitive && (!STREQ (*cur_str, last_str)))
+          || (!case_sensitive && (strcasecmp (*cur_str, last_str)!=0)))
         {
           ++count;
         }
@@ -518,13 +518,13 @@ count_unique_values ( struct fieldop *op, bool case_sensitive )
       ++cur_str;
     }
 
-  free(ptrs);
+  free (ptrs);
 
   return count;
 }
 
 /* Returns a nul-terimated string, composed of all the values
-   of the input strings. The return string must be free()'d. */
+   of the input strings. The return string must be free'd. */
 void
 collapse_value ( struct fieldop *op )
 {
@@ -669,7 +669,7 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_COUNT_UNIQUE:
-      numeric_result = count_unique_values(op,case_sensitive);
+      numeric_result = count_unique_values (op,case_sensitive);
       break;
 
     case OP_BASE64:
@@ -719,7 +719,7 @@ field_op_summarize (struct fieldop *op)
     case OP_REVERSE:   /* not handled here */
     default:
       /* Should never happen */
-      internal_error("bad op");     /* LCOV_EXCL_LINE */
+      internal_error ("bad op");     /* LCOV_EXCL_LINE */
     }
 
   if (print_numeric_result)
@@ -768,7 +768,7 @@ free_field_op (struct fieldop *op)
   op->out_buf_alloc = 0;
   op->out_buf_used = 0;
 
-  free(op);
+  free (op);
 }
 
 void
@@ -778,7 +778,7 @@ free_field_ops ()
   while (p)
     {
       struct fieldop *n = p->next;
-      free_field_op(p);
+      free_field_op (p);
       p = n;
     }
 }
@@ -789,28 +789,17 @@ enum operation
 get_operation (const char* keyword)
 {
   for (size_t i = 0; operations[i].name ; i++)
-      if ( STREQ(operations[i].name, keyword) )
+      if ( STREQ (operations[i].name, keyword) )
         return (enum operation)i;
 
   error (EXIT_FAILURE, 0, _("invalid operation '%s'"), keyword);
   return 0; /* never reached LCOV_EXCL_LINE */
 }
 
-/*
-enum operation_mode
-get_operation_mode (const char* keyword)
-{
-  for (size_t i = 0; operations[i].name ; i++)
-      if ( STREQ(operations[i].name, keyword) )
-        return operations[i].mode;;
-  return UNKNOWN_MODE;
-}
-*/
-
 /* Converts a string to number (field number).
    Exits with an error message (using 'op') on invalid field number. */
 static size_t
-safe_get_field_number(enum operation op, const char* field_str)
+safe_get_field_number (enum operation op, const char* field_str)
 {
   long int val;
   char *endptr;
@@ -844,7 +833,7 @@ parse_operations (enum operation_mode mode,
 		"expecting %s operations, but found %s operation %s"),
 		operation_mode_name[mode],
 		operation_mode_name[operations[op].mode],
-		quote(operations[op].name));
+		quote (operations[op].name));
 
       i++;
       if ( i >= argc )
@@ -908,7 +897,7 @@ summarize_field_ops ()
    Robert Jenkins' 96 bit Mix Function
    http://burtleburtle.net/bob/hash/doobs.html */
 static unsigned long
-mix(unsigned long a, unsigned long b, unsigned long c)
+mix (unsigned long a, unsigned long b, unsigned long c)
 {
     a=a-b;  a=a-c;  a=a^(c >> 13);
     b=b-c;  b=b-a;  b=b^(a << 8);
@@ -923,8 +912,8 @@ mix(unsigned long a, unsigned long b, unsigned long c)
 }
 
 void
-init_random()
+init_random (void)
 {
-  unsigned long seed = mix(clock(), time(NULL), getpid());
-  srandom(seed);
+  unsigned long seed = mix (clock (), time (NULL), getpid ());
+  srandom (seed);
 }
