@@ -40,6 +40,13 @@ build-deb-hard:
 
 deb-hard: init-deb-hard build-deb-hard check
 
+# Coverage - clean 'gcda/gcno' files when initializing coverage.
+# (NOTE: 'init-coverage' is defined in 'maint.mk'.
+#        Here another clean step is added to this target)
+init-coverage: clean-coverage-files
+clean-coverage-files:
+	 find $$PWD -name '*.gcno' -o -name '*.gcda' | xargs rm -f --
+
 # Look for lines longer than 80 characters, except omit:
 # - the help2man script copied from upstream,
 # - example files
