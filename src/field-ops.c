@@ -50,84 +50,84 @@ int field_op_output_precision = 14 ;
 struct operation_data operations[] =
 {
   /* OP_COUNT */
-  {"count",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  {"count",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_SUM */
-  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},
+  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_MIN */
-  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_MAX */
-  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_ABSMIN */
-  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_ABSMAX */
-  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE},
+  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_FIRST */
-  {"first",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  {"first",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
   /* OP_LAST */
-  {"last",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  {"last",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
   /* OP_RAND */
-  {"rand",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE},
+  {"rand",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
   /* OP_MEAN */
-  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE},
+  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_MEDIAN */
-  {"median",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"median",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_QUARTILE_1 */
-  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_QUARTILE_3 */
-  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_IQR */
-  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_PSTDEV */
-  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_SSTDEV */
-  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_PVARIANCE */
-  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_SVARIANCE */
-  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_MAD */
-  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_MADRAW */
-  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_S_SKEWNESS */
-  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_P_SKEWNESS */
-  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_S_EXCESS_KURTOSIS */
-  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_P_EXCESS_KURTOSIS */
-  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_JARQUE_BETA */
-  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_DP_OMNIBUS */
-  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_MODE */
-  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_ANTIMODE */
-  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_UNIQUE */
-  {"unique",  STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},
+  {"unique",  STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
   /* OP_COLLAPSE */
-  {"collapse",STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE},
+  {"collapse",STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
   /* OP_COUNT_UNIQUE */
-  {"countunique",STRING_VECTOR, IGNORE_FIRST, GROUPING_MODE},
+  {"countunique",STRING_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
   /* OP_TRANSPOSE */
-  {"transpose",STRING_SCALAR, IGNORE_FIRST, TRANSPOSE_MODE},
+  {"transpose",STRING_SCALAR, IGNORE_FIRST, TRANSPOSE_MODE, STRING_RESULT},
   /* OP_REVERSE */
-  {"reverse", STRING_SCALAR, IGNORE_FIRST, REVERSE_FIELD_MODE},
+  {"reverse", STRING_SCALAR, IGNORE_FIRST, REVERSE_FIELD_MODE, STRING_RESULT},
   /* OP_BASE64 */
-  {"base64",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  {"base64",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
   /* OP_DEBASE64 */
-  {"debase64",STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  {"debase64",STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
   /* OP_MD5 */
-  {"md5",     STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  {"md5",     STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
   /* OP_SHA1 */
-  {"sha1",    STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  {"sha1",    STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
   /* OP_SHA256 */
-  {"sha256",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
+  {"sha256",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
   /* OP_SHA512 */
-  {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE},
-  {NULL, 0, 0, UNKNOWN_MODE}
+  {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
+  {NULL, 0, 0, UNKNOWN_MODE, NUMERIC_RESULT}
 };
 
 const char* operation_mode_name[] = {
@@ -278,6 +278,7 @@ new_field_op (enum operation oper, size_t field)
 
   op->op = oper;
   op->acc_type = operations[oper].acc_type;
+  op->res_type = operations[oper].res_type;
   op->name = operations[oper].name;
   op->numeric = (op->acc_type == NUMERIC_SCALAR
                  || op->acc_type == NUMERIC_VECTOR);
@@ -544,7 +545,6 @@ collapse_value ( struct fieldop *op )
 void
 field_op_summarize (struct fieldop *op)
 {
-  bool print_numeric_result = true;
   long double numeric_result = 0 ;
   char tmpbuf[64]; /* 64 bytes - enough to hold sha512 */
 
@@ -568,7 +568,6 @@ field_op_summarize (struct fieldop *op)
     case OP_LAST:
     case OP_RAND:
       /* Only one string is returned in the buffer, return it */
-      print_numeric_result = false;
       field_op_reserve_out_buf (op, op->str_buf_used);
       memcpy (op->out_buf, op->str_buf, op->str_buf_used);
       break;
@@ -659,12 +658,10 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_UNIQUE:
-      print_numeric_result = false;
       unique_value (op, case_sensitive);
       break;
 
     case OP_COLLAPSE:
-      print_numeric_result = false;
       collapse_value (op);
       break;
 
@@ -676,7 +673,6 @@ field_op_summarize (struct fieldop *op)
       field_op_reserve_out_buf (op, BASE64_LENGTH (op->str_buf_used-1)+1 ) ;
       base64_encode ( op->str_buf, op->str_buf_used-1,
 		      op->out_buf, BASE64_LENGTH (op->str_buf_used-1)+1 );
-      print_numeric_result = false;
       break;
 
     case OP_DEBASE64:
@@ -687,32 +683,27 @@ field_op_summarize (struct fieldop *op)
 			op->out_buf, &decoded_size ))
 		error (EXIT_FAILURE, 0, _("base64 decoding failed"));
 	op->out_buf[decoded_size]=0;
-	print_numeric_result = false;
       }
       break;
 
     case OP_MD5:
       md5_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
       field_op_to_hex (op, tmpbuf, 16);
-      print_numeric_result = false;
       break;
 
     case OP_SHA1:
       sha1_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
       field_op_to_hex (op, tmpbuf, 20);
-      print_numeric_result = false;
       break;
 
     case OP_SHA256:
       sha256_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
       field_op_to_hex (op, tmpbuf, 32);
-      print_numeric_result = false;
       break;
 
     case OP_SHA512:
       sha512_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
       field_op_to_hex (op, tmpbuf, 64);
-      print_numeric_result = false;
       break;
 
     case OP_TRANSPOSE: /* not handled here */
@@ -722,7 +713,7 @@ field_op_summarize (struct fieldop *op)
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
     }
 
-  if (print_numeric_result)
+  if (op->res_type==NUMERIC_RESULT)
     printf ("%.*Lg", field_op_output_precision, numeric_result);
   else
     printf ("%s", op->out_buf);

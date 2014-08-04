@@ -78,6 +78,12 @@ enum accumulation_type
   STRING_VECTOR
 };
 
+enum operation_result_type
+{
+  NUMERIC_RESULT = 0,
+  STRING_RESULT
+};
+
 enum operation_first_value
 {
   AUTO_SET_FIRST = true,
@@ -100,6 +106,7 @@ struct operation_data
   enum accumulation_type acc_type;
   enum operation_first_value auto_first;
   enum operation_mode mode;
+  enum operation_result_type res_type;
 };
 
 extern struct operation_data operations[];
@@ -110,6 +117,7 @@ struct fieldop
     /* operation 'class' information */
   enum operation op;
   enum accumulation_type acc_type;
+  enum operation_result_type res_type;
   const char* name;
   bool numeric;
   bool auto_first; /* if true, automatically set 'value' if 'first' */
