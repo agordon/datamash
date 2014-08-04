@@ -140,22 +140,26 @@ compare_ out10 exp_sort_headers_full ||
 ## Check sort-piping with empty input - should always produce empty output
 printf "" | datamash -t ' ' --sort unique 3 > emp1 ||
   framework_failure_ "datamash failed"
-test -s "emp1" && { warn_ "sort on empty file failed" ; fail=1; }
+compare_ /dev/null "emp1" || { warn_ "sort on empty file failed" ; fail=1; }
 
 printf "" | datamash -t ' ' --sort --header-in unique 3 > emp2 ||
   framework_failure_ "datamash failed"
-test -s "emp2" && { warn_ "sort+header-in on empty file failed" ; fail=1; }
+compare_ /dev/null "emp2" ||
+  { warn_ "sort+header-in on empty file failed" ; fail=1; }
 
 printf "" | datamash -t ' ' --sort --header-out unique 3 > emp3 ||
   framework_failure_ "datamash failed"
-test -s "emp3" && { warn_ "sort+header-out on empty file failed" ; fail=1; }
+compare_ /dev/null "emp3" ||
+  { warn_ "sort+header-out on empty file failed" ; fail=1; }
 
 printf "" | datamash -t ' ' --sort --headers unique 3 > emp4 ||
   framework_failure_ "datamash failed"
-test -s "emp4" && { warn_ "sort+headers on empty file failed" ; fail=1; }
+compare_ /dev/null "emp4" ||
+  { warn_ "sort+headers on empty file failed" ; fail=1; }
 
 printf "" | datamash -t ' ' --sort --full unique 3 > emp5 ||
   framework_failure_ "datamash failed"
-test -s "emp5" && { warn_ "sort+full on empty file failed" ; fail=1; }
+compare_ /dev/null "emp5" ||
+  { warn_ "sort+full on empty file failed" ; fail=1; }
 
 Exit $fail

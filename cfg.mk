@@ -75,6 +75,11 @@ sc_prohibit_operator_at_end_of_line:
 	  $(_sc_search_regexp)
 
 # Indent only with spaces.
+tbi_1 = ^tests/pr/|(^gl/lib/reg.*\.c\.diff|\.mk|^man/help2man)$$
+tbi_2 = ^scripts/git-hooks/(pre-commit|pre-applypatch|applypatch-msg)$$
+tbi_3 = (GNU)?[Mm]akefile(\.am)?$$|$(_ll)
+exclude_file_name_regexp--sc_prohibit_tab_based_indentation = \
+  $(tbi_1)|$(tbi_2)|$(tbi_3)
 sc_prohibit_tab_based_indentation:
 	@prohibit='^ *	'						\
 	halt='TAB in indentation; use only spaces'			\
@@ -93,6 +98,8 @@ sc_prohibit_framework_failure:
 	  $(_sc_search_regexp)
 
 # Prohibit the use of `...` in tests/.  Use $(...) instead.
+exclude_file_name_regexp--sc_prohibit_test_backticks = \
+  ^tests/(local\.mk|(init|misc/stdbuf|factor/create-test)\.sh|[a-z\-]*\.pl)$$
 sc_prohibit_test_backticks:
 	@prohibit='`' in_vc_files='^tests/'				\
 	halt='use $$(...), not `...` in tests/'				\
@@ -132,4 +139,3 @@ sc_prohibit_strncmp:
 	  | grep -vE ':# *define STR(N?EQ_LEN|PREFIX)\(' &&		\
 	  { echo '$(ME): use STREQ_LEN or STRPREFIX instead of str''ncmp' \
 		1>&2; exit 1; } || :
-

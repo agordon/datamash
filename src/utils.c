@@ -183,8 +183,8 @@ SES_value ( size_t n )
 {
   if (n<=2)
     return nanl("");
-  return sqrtl( (long double)(6.0*n*(n-1)) /
-                  ((long double)(n-2)*(n+1)*(n+3)) );
+  return sqrtl( (long double)(6.0*n*(n-1))
+                  / ((long double)(n-2)*(n+1)*(n+3)) );
 }
 
 /* Skewness Test statistics Z = ( sample skewness / SES ) */
@@ -231,8 +231,8 @@ excess_kurtosis_value ( const long double * const values, size_t n, int df )
     {
       if (n<=3)
         return nanl("");
-      excess_kurtosis = ( ((long double)n-1) /
-                            (((long double)n-2)*((long double)n-3)) ) *
+      excess_kurtosis = ( ((long double)n-1)
+                          / (((long double)n-2)*((long double)n-3)) ) *
                           ( (n+1)*excess_kurtosis + 6 ) ;
     }
 
@@ -248,8 +248,8 @@ SEK_value ( size_t n )
   if (n<=3)
     return nanl("");
 
-   return 2 * ses * sqrtl( (long double)(n*n-1) /
-                            ((long double)((n-3)*(n+5)))  );
+   return 2 * ses * sqrtl( (long double)(n*n-1)
+                            / ((long double)((n-3)*(n+5)))  );
 }
 
 /* Kurtosis Test statistics Z = ( sample kurtosis / SEK ) */
@@ -329,8 +329,7 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
         seq_size++;
 
       if ( ((type==MODE) && (seq_size > best_seq_size))
-           ||
-           ((type==ANTIMODE) && (seq_size < best_seq_size)))
+           || ((type==ANTIMODE) && (seq_size < best_seq_size)))
         {
           best_seq_size = seq_size;
           best_value = last_value;

@@ -257,9 +257,8 @@ different (const struct line_record_t* l1, const struct line_record_t* l2)
       safe_line_record_get_field (l2, *key, &str2, &len2);
       if (len1 != len2)
         return true;
-      if ((case_sensitive && (strncmp(str1,str2,len1)!=0))
-          ||
-          (!case_sensitive && (strncasecmp(str1,str2,len1)!=0)))
+      if ((case_sensitive && !STREQ_LEN(str1,str2,len1))
+          || (!case_sensitive && (strncasecmp(str1,str2,len1)!=0)))
         return true;
     }
   return false;

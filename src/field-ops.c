@@ -480,8 +480,7 @@ unique_value ( struct fieldop *op, bool case_sensitive )
       const char *newstr = ptrs[i];
 
       if ((case_sensitive && (!STREQ(newstr, last_str)))
-          ||
-          (!case_sensitive && (strcasecmp(newstr, last_str)!=0)))
+          || (!case_sensitive && (strcasecmp(newstr, last_str)!=0)))
         {
           *pos++ = collapse_separator ;
           strcpy (pos, newstr);
@@ -511,10 +510,9 @@ count_unique_values ( struct fieldop *op, bool case_sensitive )
   while ( *cur_str != 0 )
     {
       if ((case_sensitive && (!STREQ(*cur_str, last_str)))
-          ||
-          (!case_sensitive && (strcasecmp(*cur_str, last_str)!=0)))
+          || (!case_sensitive && (strcasecmp(*cur_str, last_str)!=0)))
         {
-                ++count;
+          ++count;
         }
       last_str = *cur_str;
       ++cur_str;
@@ -592,8 +590,8 @@ field_op_summarize (struct fieldop *op)
 
     case OP_IQR:
       field_op_sort_values (op);
-      numeric_result = quartile3_value ( op->values, op->num_values ) -
-                       quartile1_value ( op->values, op->num_values );
+      numeric_result = quartile3_value ( op->values, op->num_values )
+                       - quartile1_value ( op->values, op->num_values );
       break;
 
     case OP_PSTDEV:

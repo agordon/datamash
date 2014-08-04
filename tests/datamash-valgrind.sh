@@ -51,20 +51,20 @@ fi
   printf "B " ; seq 2000 | paste -s -d "" ;
   printf "B " ; seq 3000 | paste -s -d "" ;
   printf "B " ; seq 100 | paste -s -d "" ;
-) > in_first || framework_failure "failed to prepare 'in_first' file"
+) > in_first || framework_failure_ "failed to prepare 'in_first' file"
 
 
 ## Prepare file with many rows, to test transpose/reverse
 seq -w 16000 | paste - - - - > in_4k_rows ||
-  framework_failure "failed to prepare 'in_4k_rows' file"
+  framework_failure_ "failed to prepare 'in_4k_rows' file"
 seq -w 16000 | paste - - - - - - - - > in_2k_rows ||
-  framework_failure "failed to prepare 'in_2k_rows' file"
+  framework_failure_ "failed to prepare 'in_2k_rows' file"
 
 ## Prepare file with many columns and 100 rows, to test transpose/reverse
 ( for i in $(seq 0 99) ; do
     seq $((i*1000)) $((i*1000+999)) | paste -s
   done
-) > in_1k_cols || framework_failure "failed to prepare 'in_1k_cols' file"
+) > in_1k_cols || framework_failure_ "failed to prepare 'in_1k_cols' file"
 
 fail=0
 

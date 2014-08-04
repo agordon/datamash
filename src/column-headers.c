@@ -27,7 +27,6 @@
 #include "system.h"
 #include "xalloc.h"
 #include "linebuffer.h"
-#include "error.h"
 #include "ignore-value.h"
 #include "intprops.h"
 
