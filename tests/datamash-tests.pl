@@ -267,6 +267,21 @@ my $out_large_buffer_last =
 "A " . "FooBar" x 200 . "\n" .
 "B " . "FooBar" x 400 . "\n" ;
 
+# Input with variable (and large) number of fields
+my $in_wide1 =
+"A " x 10 . "x\n" .
+"A " x 21 . "x\n" .
+"A " x 99 . "x\n" .
+"A " x 1000 . "x\n" .
+"A " x 2 . "x\n" ;
+
+
+my $in_empty1=<<'EOF';
+A::2
+B::3
+B::4
+EOF
+
 =pod
   Example:
   my $data = "a 1\nb 2\n";
@@ -395,6 +410,10 @@ my @Tests =
             "line 2 has only 3 fields\n"}],
   ['e23',  '-t" " -g -2 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid field value for grouping '-2'\n"}],
+  ['e24',  '-t" " --header-out -g 5 count 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+      {ERR=>"$prog: invalid input: field 5 requested, " .
+            "line 1 has only 3 fields\n"}],
+
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
@@ -412,7 +431,6 @@ my @Tests =
   [ 'emp8', '-g3,4 --full --header-in --header-out count 2',
      {IN_PIPE=>""},{OUT=>""}],
   [ 'emp9', '-g3 count 2', {IN_PIPE=>""},{OUT=>""}],
-
 
   ## Field extraction
   ['f1', '-W sum 1', {IN_PIPE=>$in2}, {OUT=>"5\n"}],
@@ -435,6 +453,18 @@ my @Tests =
   ['f16', '-W collapse 2', {IN_PIPE=>$in3}, {OUT=>"2,5\n"}],
   ['f17', '-W collapse 3', {IN_PIPE=>$in3}, {OUT=>"3,6\n"}],
 
+  # Empty fields (2 is the empty field in 'in_empty1')
+  ['f18', '-t: -g1 count 3', {IN_PIPE=>$in_empty1}, {OUT=>"A:1\nB:2\n"}],
+  # String operations on an empty field should work
+  ['f19', '-t: -g1 count 2',       {IN_PIPE=>$in_empty1}, {OUT=>"A:1\nB:2\n"}],
+  ['f20', '-t: -g1 countunique 2', {IN_PIPE=>$in_empty1}, {OUT=>"A:1\nB:1\n"}],
+  #TODO: should collapsing two empty string result in a single comma?
+  ['f21', '-t: -g1 collapse 2',    {IN_PIPE=>$in_empty1}, {OUT=>"A:\nB:,\n"}],
+  ['f22', '-t: -g1 unique 2',      {IN_PIPE=>$in_empty1}, {OUT=>"A:\nB:\n"}],
+  # Numeric operation on an empty field should not work
+  ['f23', '-t: -g1 sum 2', {IN_PIPE=>$in_empty1}, {EXIT=>1},
+    {ERR=>"$prog: invalid numeric input in line 1 field 2: ''\n"}],
+
 
   # Test Absolute min/max
   ['mm1', 'min 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
@@ -453,6 +483,9 @@ my @Tests =
      {OUT=>"A 100,10,50,35\n"}],
   ['g4.1', '-t" " -g1 count 2',    {IN_PIPE=>$in_g5},
      {OUT=>"A 1\nAA 1\nAAA 1\n"}],
+  # Group on the last column
+  ['grp5', '-t" " -g3 count 1',    {IN_PIPE=>$in_hdr1},
+     {OUT=>"z 1\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
 
   # 3 groups, single line per group, custom delimiter
   ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
@@ -517,6 +550,17 @@ my @Tests =
   # Headers, white-space separator, 3 operations
   ['hdr10', '-W -g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr3},
      {OUT=>"GroupBy(x)\tcount(y)\nA\t5\nB\t3\nC\t4\n"}],
+
+  # Group + output headers on the last column
+  ['hdr11', '-t" " --header-out -g3 count 1',    {IN_PIPE=>$in_hdr1},
+     {OUT=>"GroupBy(field-3) count(field-1)\n" .
+           "z 1\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
+  # Group + input headers on last column
+  ['hdr12', '-t" " --header-in -g3 count 1',    {IN_PIPE=>$in_hdr1},
+     {OUT=>"10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
+  # Group + input/output headers on last column
+  ['hdr13', '-t" " -H -g3 count 1',    {IN_PIPE=>$in_hdr1},
+     {OUT=>"GroupBy(z) count(x)\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
 
 
   # Test single line per group
@@ -640,6 +684,9 @@ my @Tests =
   ['mixop3', 'md5 1 transpose 2', {EXIT=>1},
     {ERR=>"$prog: conflicting operation found: expecting line operations," .
             " but found transpose operation 'transpose'\n"}],
+
+  # Test large (and increasing) number of fields
+  ['wide1', '-t" " -g 1 countunique 2', {IN_PIPE=>$in_wide1}, {OUT=>"A 1\n"}],
 
 );
 
