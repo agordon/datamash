@@ -20,6 +20,7 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
+#include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
@@ -75,8 +76,7 @@ percentile_value (const long double * const values,
   const size_t fh = floor (h);
 
   /* Error in the calling parameters, should not happen */
-  if (n==0 || percentile<0.0 || percentile>100.0)
-    return 0; /* LCOV_EXCL_LINE */
+  assert (n>0 && percentile>=0.0 && percentile<=100.0); /* LCOV_EXCL_LINE */
 
   if (n==1)
     return values[0];
@@ -119,7 +119,8 @@ variance_value (const long double * const values, size_t n, int df)
   long double mean;
   long double variance;
 
-  if ( df<0 || (size_t)df == n )
+  assert (df>=0); /* LCOV_EXCL_LINE */
+  if ( (size_t)df == n )
     return nanl ("");
 
   mean = arithmetic_mean_value (values, n);

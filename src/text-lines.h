@@ -68,7 +68,8 @@ static inline bool
 line_record_get_field (const struct line_record_t *lr, const size_t n,
 		       const char ** /* out */ pptr, size_t* /*out*/ plen)
 {
-  if (n==0 || line_record_num_fields (lr) < n)
+  assert (n!=0); /* LCOV_EXCL_LINE */
+  if (line_record_num_fields (lr) < n)
     return false;
 
   *pptr = lr->fields[n-1].buf;

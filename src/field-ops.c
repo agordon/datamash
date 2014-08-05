@@ -20,6 +20,7 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
+#include <assert.h>
 #include <ctype.h>
 #include <locale.h>
 #include <math.h>
@@ -322,6 +323,8 @@ field_op_collect (struct fieldop *op,
   char tmpbuf[512];
 #endif
 
+  assert (str != NULL); /* LCOV_EXCL_LINE */
+
   op->count++;
 
   if (op->numeric)
@@ -340,8 +343,8 @@ field_op_collect (struct fieldop *op,
       if (errno==ERANGE || endptr==tmpbuf || endptr!=(tmpbuf+slen))
         return false;
 #else
-      if (str == NULL || slen == 0)
-	return false;
+      if (slen == 0)
+        return false;
       num_value = strtold (str, &endptr);
       if (errno==ERANGE || endptr==str || endptr!=(str+slen))
         return false;
@@ -440,11 +443,11 @@ field_op_collect (struct fieldop *op,
     case OP_UNIQUE:
     case OP_COLLAPSE:
     case OP_COUNT_UNIQUE:
-    case OP_TRANSPOSE:
       field_op_add_string (op, str, slen);
       break;
 
     case OP_REVERSE:
+    case OP_TRANSPOSE:
     default:
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
@@ -809,7 +812,7 @@ safe_get_field_number (enum operation op, const char* field_str)
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
 void
 parse_operations (enum operation_mode mode,
-		  int argc, int start, char **argv)
+	int argc, int start, char **argv)
 {
   int i = start;	/* Index into ARGV. */
   size_t field;
@@ -840,8 +843,7 @@ parse_operations (enum operation_mode mode,
 enum operation_mode
 parse_operation_mode (int argc, int start, char** argv)
 {
-  if (start >= argc)
-    internal_error ("prase op mode"); /* LCOV_EXCL_LINE */
+  assert (start < argc); /* LCOV_EXCL_LINE */
 
   const enum operation op = get_operation ( argv[start] );
   const enum operation_mode om = operations[op].mode;
@@ -862,7 +864,6 @@ parse_operation_mode (int argc, int start, char** argv)
     case UNKNOWN_MODE:
     default:
       internal_error ("unknown mode"); /* LCOV_EXCL_LINE */
-      break;
     }
 
   return om;

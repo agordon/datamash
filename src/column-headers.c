@@ -20,6 +20,7 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
+#include <assert.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <strings.h>
@@ -55,10 +56,9 @@ size_t get_num_column_headers ()
 
 const char* get_input_field_name (size_t field_num)
 {
-  if (field_num > 0 && field_num <= num_input_column_headers)
-    return input_column_headers[field_num-1];
-
-  return NULL;
+  assert (field_num > 0                              /* LCOV_EXCL_LINE */
+          && field_num <= num_input_column_headers); /* LCOV_EXCL_LINE */
+  return input_column_headers[field_num-1];
 }
 
 void
@@ -66,7 +66,7 @@ build_input_line_headers (const struct line_record_t *lr,
 		         bool store_names)
 {
   char *str;
-  size_t len;
+  size_t len = 0;
   const size_t num_fields = line_record_num_fields (lr);
   const size_t field_name_buf_size = 7+INT_BUFSIZE_BOUND (size_t)+1;
 

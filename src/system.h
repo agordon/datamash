@@ -152,10 +152,6 @@ select_plural (uintmax_t n)
 #define __STRX__(x) #x
 #define __STR__(x) __STRX__(x)
 #define __STR_LINE__ __STR__(__LINE__)
-#define internal_error(x) \
-  do { \
-    error (EXIT_FAILURE, 0, \
-        "internal error at " __FILE__ ":" __STR_LINE__ " (" #x ")" ); \
-  } while (0)
+#define internal_error(x) assert(!#x)
 
 #endif /* CALC_SYSTEM_H */

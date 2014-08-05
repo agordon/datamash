@@ -21,6 +21,7 @@
 /* Written by Assaf Gordon */
 #include <config.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
 
@@ -71,8 +72,7 @@ line_record_debug_print_fields (const struct line_record_t *lr)
 static void
 linebuffer_nullify (struct linebuffer *line)
 {
-  if (line->length==0)
-    return; /* LCOV_EXCL_LINE */
+  assert (line->length > 0); /* LCOV_EXCL_LINE */
   line->buffer[line->length-1] = 0; /* make it NUL terminated */
   --line->length;
 }

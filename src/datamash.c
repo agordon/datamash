@@ -21,6 +21,7 @@
 /* Written by Assaf Gordon */
 #include <config.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <locale.h>
@@ -35,6 +36,7 @@
 #include "error.h"
 #include "lib/intprops.h"
 #include "ignore-value.h"
+#include "stdnoreturn.h"
 #include "linebuffer.h"
 #define Version VERSION
 #include "version-etc.h"
@@ -226,12 +228,13 @@ For grouping,per-line operations 'col' is the input field to use.\
   exit (status);
 }
 
-static inline void
+static inline noreturn void
 error_not_enough_fields (const size_t needed, const size_t found)
 {
-  error (EXIT_FAILURE, 0, _("invalid input: field %zu requested, " \
+  error (0, 0, _("invalid input: field %zu requested, " \
         "line %zu has only %zu fields"),
         needed, line_number, found);
+  exit (EXIT_FAILURE);
 }
 
 
@@ -249,7 +252,8 @@ safe_line_record_get_field (const struct line_record_t *lr, const size_t n,
 static bool
 different (const struct line_record_t* l1, const struct line_record_t* l2)
 {
-  for (size_t *key = group_columns; key && *key ; ++key )
+  assert (group_columns != NULL); /* LCOV_EXCL_LINE */
+  for (size_t *key = group_columns; *key ; ++key )
     {
       const char *str1=NULL,*str2=NULL;
       size_t len1=0,len2=0;
@@ -404,7 +408,7 @@ process_file ()
   if (input_header)
     process_input_header (input_stream);
 
-  while (!feof (input_stream))
+  while (true)
     {
       bool new_group = false;
 
@@ -481,7 +485,7 @@ transpose_file ()
 
   /* Read all input lines - but instead of reusing line_record_t,
      keep all lines in memory. */
-  while (!feof (input_stream))
+  while (true)
     {
       if (num_lines+1 > alloc_lines)
         {
@@ -548,7 +552,7 @@ reverse_fields_in_file ()
   thisline = &lr;
   line_record_init (thisline);
 
-  while (!feof (input_stream))
+  while (true)
     {
       if (!line_record_fread (thisline, input_stream, eolchar))
         break;
@@ -569,10 +573,10 @@ reverse_fields_in_file ()
           if (i < num_fields)
             print_field_separator ();
 
-          const char* str;
-          size_t len;
-          if (line_record_get_field (thisline, i, &str, &len))
-            fwrite (str, len, sizeof (char), stdout);
+          const char* str = NULL;
+          size_t len = 0 ;
+          ignore_value (line_record_get_field (thisline, i, &str, &len));
+          fwrite (str, len, sizeof (char), stdout);
         }
       print_line_separator ();
     }
@@ -613,7 +617,7 @@ open_input ()
           snprintf (tmp,sizeof (tmp),"-t '%c' ",in_tab);
           strcat (cmd,tmp);
         }
-      for (size_t *key = group_columns; key && *key; ++key)
+      for (size_t *key = group_columns; *key; ++key)
         {
           snprintf (tmp,sizeof (tmp),"-k%zu,%zu ",*key,*key);
           if (strlen (tmp)+strlen (cmd)+1 >= sizeof (cmd))
@@ -640,7 +644,7 @@ close_input ()
   int i;
 
   if (ferror (input_stream))
-    error (EXIT_FAILURE, 0, _("read error"));
+    error (EXIT_FAILURE, errno, _("read error"));
 
   if (pipe_through_sort)
     i = pclose (input_stream);
@@ -648,7 +652,7 @@ close_input ()
     i = fclose (input_stream);
 
   if (i != 0)
-    error (EXIT_FAILURE, 0, _("read error (on close)"));
+    error (EXIT_FAILURE, errno, _("read error (on close)"));
 }
 
 static void
