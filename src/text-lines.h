@@ -66,7 +66,7 @@ line_record_field_unsafe (const struct line_record_t *lr, const size_t n)
 
 static inline bool
 line_record_get_field (const struct line_record_t *lr, const size_t n,
-		       const char ** /* out */ pptr, size_t* /*out*/ plen)
+                       const char ** /* out */ pptr, size_t* /*out*/ plen)
 {
   assert (n!=0); /* LCOV_EXCL_LINE */
   if (line_record_num_fields (lr) < n)

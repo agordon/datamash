@@ -92,11 +92,11 @@ enum operation_first_value
 
 enum operation_mode
 {
-	UNKNOWN_MODE = 0,
-	GROUPING_MODE,
-	TRANSPOSE_MODE,
-	REVERSE_FIELD_MODE,
-	LINE_MODE
+  UNKNOWN_MODE = 0,
+  GROUPING_MODE,
+  TRANSPOSE_MODE,
+  REVERSE_FIELD_MODE,
+  LINE_MODE
 };
 
 
@@ -166,7 +166,7 @@ void field_op_add_value (struct fieldop *op, long double val);
    pointing to 'op->count' strings + one last NULL.
 */
 const char ** field_op_get_string_ptrs ( struct fieldop *op,
-			bool sort, bool sort_case_sensitive );
+                                         bool sort, bool sort_case_sensitive );
 
 /* Sort the numeric values vector in a fieldop structure */
 void field_op_sort_values (struct fieldop *op);
@@ -217,8 +217,7 @@ get_operation (const char* keyword);
    Requires all operation to be of 'mode' - otherwise exits with an error.
  */
 void
-parse_operations (enum operation_mode mode,
-		  int argc, int start, char **argv);
+parse_operations (enum operation_mode mode, int argc, int start, char **argv);
 
 /* Extract the operation mode based on the first keyword.
    Possible modes are:

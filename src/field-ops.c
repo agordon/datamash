@@ -675,17 +675,17 @@ field_op_summarize (struct fieldop *op)
     case OP_BASE64:
       field_op_reserve_out_buf (op, BASE64_LENGTH (op->str_buf_used-1)+1 ) ;
       base64_encode ( op->str_buf, op->str_buf_used-1,
-		      op->out_buf, BASE64_LENGTH (op->str_buf_used-1)+1 );
+      op->out_buf, BASE64_LENGTH (op->str_buf_used-1)+1 );
       break;
 
     case OP_DEBASE64:
       {
-	size_t decoded_size = op->str_buf_used ;
+        size_t decoded_size = op->str_buf_used ;
         field_op_reserve_out_buf (op, decoded_size);
-	if (!base64_decode ( op->str_buf, op->str_buf_used-1,
-			op->out_buf, &decoded_size ))
-		error (EXIT_FAILURE, 0, _("base64 decoding failed"));
-	op->out_buf[decoded_size]=0;
+        if (!base64_decode ( op->str_buf, op->str_buf_used-1,
+                             op->out_buf, &decoded_size ))
+          error (EXIT_FAILURE, 0, _("base64 decoding failed"));
+        op->out_buf[decoded_size]=0;
       }
       break;
 
@@ -811,10 +811,9 @@ safe_get_field_number (enum operation op, const char* field_str)
 
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
 void
-parse_operations (enum operation_mode mode,
-	int argc, int start, char **argv)
+parse_operations (enum operation_mode mode, int argc, int start, char **argv)
 {
-  int i = start;	/* Index into ARGV. */
+  int i = start; /* Index into ARGV. */
   size_t field;
   enum operation op;
 
@@ -823,11 +822,11 @@ parse_operations (enum operation_mode mode,
     {
       op = get_operation (argv[i]);
       if (operations[op].mode != mode)
-	error (EXIT_FAILURE, 0, _("conflicting operation found: "\
-		"expecting %s operations, but found %s operation %s"),
-		operation_mode_name[mode],
-		operation_mode_name[operations[op].mode],
-		quote (operations[op].name));
+        error (EXIT_FAILURE, 0, _("conflicting operation found: "\
+               "expecting %s operations, but found %s operation %s"),
+               operation_mode_name[mode],
+               operation_mode_name[operations[op].mode],
+               quote (operations[op].name));
 
       i++;
       if ( i >= argc )
@@ -852,7 +851,7 @@ parse_operation_mode (int argc, int start, char** argv)
     case TRANSPOSE_MODE:
     case REVERSE_FIELD_MODE:
       if ( start+1 < argc )
-	error (EXIT_FAILURE, 0, _("extra operands after '%s'"), argv[start]);
+        error (EXIT_FAILURE, 0, _("extra operands after '%s'"), argv[start]);
       break;
 
     case LINE_MODE:

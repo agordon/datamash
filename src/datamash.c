@@ -240,7 +240,7 @@ error_not_enough_fields (const size_t needed, const size_t found)
 
 static inline void
 safe_line_record_get_field (const struct line_record_t *lr, const size_t n,
-		       const char ** /* out */ pptr, size_t* /*out*/ plen)
+                            const char ** /* out */ pptr, size_t* /*out*/ plen)
 {
   if (!line_record_get_field (lr, n, pptr, plen))
     error_not_enough_fields (n, line_record_num_fields (lr));

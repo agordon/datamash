@@ -62,8 +62,7 @@ const char* get_input_field_name (size_t field_num)
 }
 
 void
-build_input_line_headers (const struct line_record_t *lr,
-		         bool store_names)
+build_input_line_headers (const struct line_record_t *lr, bool store_names)
 {
   char *str;
   size_t len = 0;
@@ -77,17 +76,17 @@ build_input_line_headers (const struct line_record_t *lr,
     {
       if (!store_names)
         {
-	  str = xmalloc ( field_name_buf_size );
-	  ignore_value (snprintf (str, field_name_buf_size, "field-%zu",i));
-	}
+          str = xmalloc ( field_name_buf_size );
+          ignore_value (snprintf (str, field_name_buf_size, "field-%zu",i));
+        }
       else
-	{
+        {
           const char* tmp;
           line_record_get_field (lr, i, &tmp, &len);
-	  str = xmalloc ( len+1 );
-	  memcpy (str, tmp, len);
-	  str[len] = 0;
-	}
+          str = xmalloc ( len+1 );
+          memcpy (str, tmp, len);
+          str[len] = 0;
+        }
 
       input_column_headers[i-1] = str;
     }
