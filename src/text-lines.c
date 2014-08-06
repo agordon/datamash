@@ -80,7 +80,7 @@ linebuffer_nullify (struct linebuffer *line)
 static inline void
 line_record_reserve_fields (struct line_record_t* lr, const size_t n)
 {
-  if (lr->alloc_fields < n)
+  if (lr->alloc_fields <= n)
     {
       lr->alloc_fields = MAX (n,lr->alloc_fields)*2;
       lr->fields = xnrealloc (lr->fields, lr->alloc_fields,
@@ -103,28 +103,23 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
         {
           /* scan buffer until next delimiter */
           const char* field_beg = fptr;
-          size_t flen = 0;
           while ( (pos<buflen) && (*fptr != field_delim))
             {
               ++fptr;
-              ++flen;
               ++pos;
             }
 
           /* Add new field */
-          ++num_fields;
           line_record_reserve_fields (lr, num_fields);
-          lr->num_fields = num_fields;
-          lr->fields[num_fields-1].buf = field_beg;
-          lr->fields[num_fields-1].len = flen;
+          lr->fields[num_fields].buf = field_beg;
+          lr->fields[num_fields].len = fptr - field_beg;
+          ++num_fields;
 
           /* Skip the delimiter */
-          if (pos<buflen)
-            {
-              ++pos;
-              ++fptr;
-            }
+          ++pos;
+          ++fptr;
         }
+        lr->num_fields = num_fields;
     }
   else
     {
