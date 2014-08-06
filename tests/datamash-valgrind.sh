@@ -66,6 +66,13 @@ seq -w 16000 | paste - - - - - - - - > in_2k_rows ||
   done
 ) > in_1k_cols || framework_failure_ "failed to prepare 'in_1k_cols' file"
 
+## Prepare large file
+seq -w 1000000 > 1M || framework_failure_ "failed to prepare '1M' file"
+( shuf 1M ; shuf 1M ;
+  shuf 1M ; shuf 1M ;
+  seq -w 999000 1001000 ) > 4M ||
+    framework_failure_ "failed to prepare '5m' file"
+
 fail=0
 
 seq 10000 | valgrind --track-origins=yes  --show-reachable=yes \
@@ -104,17 +111,17 @@ seq 10000 | valgrind --track-origins=yes  --leak-check=full  \
 cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
                           --show-reachable=yes  --error-exitcode=1 \
                  datamash -W first 2 > /dev/null ||
-  { warn_ "first 2" ; fail=1 ; }
+  { warn_ "first 2 - failed" ; fail=1 ; }
 
 cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
                           --show-reachable=yes  --error-exitcode=1 \
                  datamash -W -g 1 first 2 > /dev/null ||
-  { warn_ "-g 1 first 2" ; fail=1 ; }
+  { warn_ "-g 1 first 2 - failed" ; fail=1 ; }
 
 cat "in_first" | valgrind --track-origins=yes  --leak-check=full \
                           --show-reachable=yes  --error-exitcode=1 \
                  datamash -W -g 1 last 2 > /dev/null ||
-  { warn_ "-g 1 last 2" ; fail=1 ; }
+  { warn_ "-g 1 last 2 - failed" ; fail=1 ; }
 
 ## Test transpose and reverse on multiple (medium-sized) inputs
 for INFILE in in_4k_rows in_2k_rows in_1k_cols ;
@@ -128,5 +135,12 @@ do
 
   done
 done
+
+## Test remove-duplicates (using gnulib's hash)
+cat 4M | valgrind --track-origins=yes  --leak-check=full \
+                  --show-reachable=yes  --error-exitcode=1 \
+                  datamash rmdup 1 > /dev/null ||
+  { warn_ "rmdup failed on 4M" ; fail=1 ; }
+
 
 Exit $fail

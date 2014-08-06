@@ -175,4 +175,7 @@ cmpstringp_nocase (const void *p1, const void *p2);
 int
 cmp_long_double (const void *p1, const void *p2);
 
+bool
+hash_compare_strings (void const *x, void const *y);
+
 #endif

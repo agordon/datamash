@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "system.h"
 #include "xalloc.h"
 #include "size_max.h"
 
@@ -366,4 +367,11 @@ cmpstringp_nocase (const void *p1, const void *p2)
 void qsortfl (long double *values, size_t n)
 {
   qsort (values, n, sizeof (long double), cmp_long_double);
+}
+
+bool
+hash_compare_strings (void const *x, void const *y)
+{
+  assert (x != y); /* LCOV_EXCL_LINE */
+  return STREQ (x, y) ? true : false;
 }

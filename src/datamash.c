@@ -33,6 +33,8 @@
 #include "system.h"
 
 #include "closeout.h"
+#include "hash.h"
+#include "hash-pjw.h"
 #include "error.h"
 #include "lib/intprops.h"
 #include "ignore-value.h"
@@ -46,6 +48,7 @@
 #include "text-lines.h"
 #include "column-headers.h"
 #include "field-ops.h"
+#include "utils.h"
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "datamash"
@@ -135,6 +138,9 @@ For grouping,per-line operations 'col' is the input field to use.\
       fputs ("\n\n", stdout);
       fputs (_("File operations:\n"),stdout);
       fputs ("  transpose, reverse\n",stdout);
+
+      fputs (_("Line-Filtering operations:\n"),stdout);
+      fputs ("  rmdup\n",stdout);
 
       fputs (_("Per-Line operations:\n"),stdout);
       fputs ("  base64, debase64, md5, sha1, sha256, sha512\n",stdout);
@@ -548,7 +554,6 @@ reverse_fields_in_file ()
   struct line_record_t lr;
   struct line_record_t *thisline;
   size_t prev_num_fields = 0;
-
   thisline = &lr;
   line_record_init (thisline);
 
@@ -581,6 +586,122 @@ reverse_fields_in_file ()
       print_line_separator ();
     }
   line_record_free (&lr);
+}
+
+/*
+   read, parse, print file - without any additional operations
+ */
+static void
+noop_file ()
+{
+  struct line_record_t lr;
+  struct line_record_t *thisline;
+
+  thisline = &lr;
+  line_record_init (thisline);
+  while (true)
+    {
+      if (!line_record_fread (thisline, input_stream, eolchar))
+        break;
+      line_number++;
+
+      if (print_full_line)
+        {
+          ignore_value (fwrite (line_record_buffer (thisline),
+                                line_record_length (thisline), sizeof (char),
+                                stdout));
+          print_line_separator ();
+        }
+    }
+  line_record_free (&lr);
+}
+
+/*
+    Remove lines with duplicates keys from a file
+ */
+static void
+remove_dups_in_file ()
+{
+  const char* str = NULL;
+  size_t len = 0;
+  struct line_record_t lr;
+  struct line_record_t *thisline;
+  const size_t key_col = field_ops->field;
+  Hash_table *ht;
+  const size_t init_table_size = 100000;
+
+  char* keys_buffer = NULL;
+  size_t keys_buffer_alloc = 0;
+  size_t next_key_pos = 0;
+
+  char** buffer_list = NULL;
+  size_t buffer_list_alloc = 0;
+  size_t buffer_list_size = 0;
+
+  assert (field_ops != NULL); /* LCOV_EXCL_LINE */
+
+  thisline = &lr;
+  line_record_init (thisline);
+  ht = hash_initialize (init_table_size, NULL,
+                        hash_pjw, hash_compare_strings, NULL);
+
+  /* Allocate keys buffer */
+  keys_buffer_alloc = 1000000 ;
+  keys_buffer = xmalloc ( keys_buffer_alloc );
+
+  /* List of allocated key-buffers */
+  buffer_list_alloc = 1000 ;
+  buffer_list = xnmalloc (buffer_list_alloc, sizeof (char*));
+  buffer_list[0] = keys_buffer;
+  buffer_list_size = 1 ;
+
+  while (true)
+    {
+      if (!line_record_fread (thisline, input_stream, eolchar))
+        break;
+      line_number++;
+
+       if (!line_record_get_field (thisline, key_col, &str, &len))
+         error_not_enough_fields (key_col, line_record_num_fields (thisline));
+
+       /* Add key to the key buffer */
+       if (next_key_pos + len + 1 > keys_buffer_alloc)
+         {
+           keys_buffer = xmalloc ( keys_buffer_alloc ) ;
+           next_key_pos = 0;
+           /* Add new key-buffer to the list */
+           if (buffer_list_size >= buffer_list_alloc)
+             {
+               buffer_list_alloc += 1000 ;
+               buffer_list = xnrealloc (buffer_list, buffer_list_alloc,
+                                        sizeof (char*));
+             }
+           buffer_list[buffer_list_size++] = keys_buffer;
+         }
+       char *next_key = keys_buffer+next_key_pos;
+       memcpy (next_key, str, len);
+       next_key[len] = 0;
+
+       /* Add key to buffer (if not found) */
+       const int i = hash_insert_if_absent (ht, next_key, NULL);
+       if ( i == -1 )
+         error (EXIT_FAILURE, errno, _("hash memory allocation error"));
+
+       if ( i == 1 )
+         {
+           /* This string was not found in the hash - new key */
+           next_key_pos += len+1;
+           ignore_value (fwrite (line_record_buffer (thisline),
+                                 line_record_length (thisline), sizeof (char),
+                                 stdout));
+           print_line_separator ();
+         }
+    }
+  line_record_free (&lr);
+  hash_free (ht);
+  for (size_t i = 0 ; i < buffer_list_size; ++i)
+    free (buffer_list[i]);
+  free (buffer_list);
 }
 
 
@@ -803,12 +924,20 @@ int main (int argc, char* argv[])
       process_file ();
       break;
 
+    case NOOP_MODE:
+      noop_file ();
+      break;
+
     case TRANSPOSE_MODE:
       transpose_file ();
       break;
 
     case REVERSE_FIELD_MODE:
       reverse_fields_in_file ();
+      break;
+
+    case REMOVE_DUPS_MODE:
+      remove_dups_in_file ();
       break;
 
     case UNKNOWN_MODE:

@@ -13,6 +13,11 @@ transpose rows, columns of the input file
 .B reverse
 reverse field order in each line
 .PP
+.SS Line-Filtering operations:
+.TP "\w'\fBcountunique\fR'u+1n"
+.B rmdup
+remove lines with duplicated key value
+.PP
 .SS Per-Line operations:
 .TP "\w'\fBcountunique\fR'u+1n"
 .B base64
@@ -239,12 +244,36 @@ $ seq 6 | paste \- \- | \fBdatamash\fR transpose
 .RE
 .fi
 .PP
-Calculate the sha256 hash value of each TXT file,
-after calculating the sha256 value of each file's content:
+Remove lines with duplicate key value from column 1
+(Unlike \fBfirst\fR,\fBlast\fR operations, \fBrmdup\fR is much faster and
+does not require sorting the file with \-s):
 .PP
 .nf
 .RS
-$ sha1sum *.txt | datamash -Wf sha256 2
+# Given a list of files and sample IDs:
+$ cat INPUT
+SampleID  File
+2         cc.txt
+3         dd.txt
+1         ab.txt
+2         ee.txt
+3         ff.txt
+
+# Remove lines with duplicated Sample-ID (column 1):
+$ \fBdatamash\fR rmdup 1 < INPUT
+SampleID  File
+2         cc.txt
+3         dd.txt
+1         ab.txt
+.RE
+.fi
+.PP
+Calculate the sha1 hash value of each TXT file,
+after calculating the sha1 value of each file's content:
+.PP
+.nf
+.RS
+$ sha1sum *.txt | datamash -Wf sha1 2
 .RE
 .fi
 .PP

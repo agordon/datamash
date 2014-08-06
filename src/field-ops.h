@@ -68,6 +68,8 @@ enum operation
   OP_SHA1,          /* Calculate SHA1 of a field */
   OP_SHA256,        /* Calculate SHA256 of a field */
   OP_SHA512,        /* Calculate SHA512 of a field */
+  OP_REMOVE_DUPS,   /* Remove duplicated keys from a file */
+  OP_NOOP           /* Do nothing. Used for testing and profiling */
 };
 
 enum accumulation_type
@@ -95,8 +97,10 @@ enum operation_mode
   UNKNOWN_MODE = 0,
   GROUPING_MODE,
   TRANSPOSE_MODE,
+  REMOVE_DUPS_MODE,
   REVERSE_FIELD_MODE,
-  LINE_MODE
+  LINE_MODE,
+  NOOP_MODE
 };
 
 

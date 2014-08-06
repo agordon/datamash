@@ -128,6 +128,10 @@ struct operation_data operations[] =
   {"sha256",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
   /* OP_SHA512 */
   {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
+  /* OP_REMOVE_DUPS */
+  {"rmdup",   STRING_SCALAR, IGNORE_FIRST, REMOVE_DUPS_MODE, STRING_RESULT},
+  /* OP_NOOP */
+  {"noop",    STRING_SCALAR, IGNORE_FIRST, NOOP_MODE, STRING_RESULT},
   {NULL, 0, 0, UNKNOWN_MODE, NUMERIC_RESULT}
 };
 
@@ -135,8 +139,10 @@ const char* operation_mode_name[] = {
   "(unknown)",   /* UNKNOWN_MODE */
   "grouping",    /* GROUPING_MODE */
   "transpose",   /* TRANSPOSE_MODE */
+  "line",        /* REMOVE-DUPS MODE - shown as 'line' mode */
   "reverse",     /* REVERSE_FIELD_MODE */
-  "line"         /* LINE_MODE */
+  "line",        /* LINE_MODE */
+  "no-op",       /* NO-OP MODE - for testing */
 };
 
 struct fieldop* field_ops = NULL;
@@ -448,6 +454,8 @@ field_op_collect (struct fieldop *op,
 
     case OP_REVERSE:
     case OP_TRANSPOSE:
+    case OP_REMOVE_DUPS:
+    case OP_NOOP:
     default:
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
@@ -711,6 +719,8 @@ field_op_summarize (struct fieldop *op)
 
     case OP_TRANSPOSE: /* not handled here */
     case OP_REVERSE:   /* not handled here */
+    case OP_REMOVE_DUPS:
+    case OP_NOOP:
     default:
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
@@ -850,10 +860,12 @@ parse_operation_mode (int argc, int start, char** argv)
     {
     case TRANSPOSE_MODE:
     case REVERSE_FIELD_MODE:
+    case NOOP_MODE:
       if ( start+1 < argc )
         error (EXIT_FAILURE, 0, _("extra operands after '%s'"), argv[start]);
       break;
 
+    case REMOVE_DUPS_MODE:
     case LINE_MODE:
     case GROUPING_MODE:
       /* parse individual operations */
