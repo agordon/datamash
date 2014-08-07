@@ -127,13 +127,16 @@ EXTRA_DIST += \
 	init.cfg \
 	$(TESTS)
 
+# Note: the "9>&2" redirection is part of Automake's parallel-tests.
+#       see also stderr_fileno in 'init.cfg'
 TESTS_ENVIRONMENT = \
   top_srcdir=$(abs_top_srcdir) \
   PERL5LIB='$(abs_top_srcdir)/tests$(PATH_SEPARATOR)'"$$PERL5LIB" \
   PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
   DATAMASH=`echo datamash | sed '$(transform)'` \
   test_dir='$(abs_top_srcdir)/tests' ; \
-  export top_srcdir PERL5LIB PATH DATAMASH test_dir ;
+  export top_srcdir PERL5LIB PATH DATAMASH test_dir ; \
+  9>&2
 
 ##
 ## For 'make syntax-check'
