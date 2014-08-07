@@ -281,18 +281,21 @@ process_line (const struct line_record_t *line)
 {
   const char *str = NULL;
   size_t len = 0;
+  enum FIELD_OP_COLLECT_RESULT flocr;
 
   struct fieldop *op = field_ops;
   while (op)
     {
       safe_line_record_get_field (line, op->field, &str, &len);
-      if (!field_op_collect (op, str, len))
+      flocr = field_op_collect (op, str, len);
+      if (flocr != FLOCR_OK)
         {
           char *tmp = xmalloc (len+1);
           memcpy (tmp,str,len);
           tmp[len] = 0 ;
           error (EXIT_FAILURE, 0,
-              _("invalid numeric input in line %zu field %zu: '%s'"),
+              _("%s in line %zu field %zu: '%s'"),
+              field_op_collect_result_name (flocr),
               line_number, op->field, tmp);
         }
 

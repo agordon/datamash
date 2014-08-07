@@ -319,7 +319,7 @@ new_field_op (enum operation oper, size_t field)
 }
 
 /* Add a value (from input) to the current field operation. */
-bool
+enum FIELD_OP_COLLECT_RESULT
 field_op_collect (struct fieldop *op,
                   const char* str, size_t slen)
 {
@@ -347,13 +347,13 @@ field_op_collect (struct fieldop *op,
       tmpbuf[slen]=0;
       num_value = strtold (tmpbuf, &endptr);
       if (errno==ERANGE || endptr==tmpbuf || endptr!=(tmpbuf+slen))
-        return false;
+        return FLOCR_INVALID_NUMBER;
 #else
       if (slen == 0)
-        return false;
+        return FLOCR_INVALID_NUMBER;
       num_value = strtold (str, &endptr);
       if (errno==ERANGE || endptr==str || endptr!=(str+slen))
-        return false;
+        return FLOCR_INVALID_NUMBER;
 #endif
     }
 
@@ -405,6 +405,18 @@ field_op_collect (struct fieldop *op,
       break;
 
     case OP_DEBASE64:
+      /* Base64 decoding is a special case: we decode during collection,
+         and report any errors back to the caller. */
+      {
+        /* safe to assume decoded base64 is never larger than encoded base64 */
+        size_t decoded_size = slen;
+        field_op_reserve_out_buf (op, decoded_size);
+        if (!base64_decode ( str, slen, op->out_buf, &decoded_size ))
+          return FLOCR_INVALID_BASE64;
+        op->out_buf[decoded_size]=0;
+      }
+      break;
+
     case OP_BASE64:
     case OP_MD5:
     case OP_SHA1:
@@ -461,10 +473,9 @@ field_op_collect (struct fieldop *op,
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
     }
 
-  if (op->first)
-    op->first = false;
+  op->first = false;
 
-  return true;
+  return FLOCR_OK;
 }
 
 /* Returns a nul-terimated string, composed of the unique values
@@ -687,14 +698,9 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_DEBASE64:
-      {
-        size_t decoded_size = op->str_buf_used ;
-        field_op_reserve_out_buf (op, decoded_size);
-        if (!base64_decode ( op->str_buf, op->str_buf_used-1,
-                             op->out_buf, &decoded_size ))
-          error (EXIT_FAILURE, 0, _("base64 decoding failed"));
-        op->out_buf[decoded_size]=0;
-      }
+      /* Decoding base64 is a special case: decoding (and error checking) was
+         done in field_op_collect.  op->out_buf already contains the decoded
+         value. */
       break;
 
     case OP_MD5:
@@ -919,4 +925,19 @@ init_random (void)
 {
   unsigned long seed = mix (clock (), time (NULL), getpid ());
   srandom (seed);
+}
+
+const char*
+field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
+{
+  switch (flocr)
+   {
+   case FLOCR_INVALID_NUMBER:
+     return _("invalid numeric value");
+   case FLOCR_INVALID_BASE64:
+     return _("invalid base64 value");
+   case FLOCR_OK:        /* LCOV_EXCL_LINE */
+   default:              /* LCOV_EXCL_LINE */
+     assert (false);     /* LCOV_EXCL_LINE */
+   }
 }

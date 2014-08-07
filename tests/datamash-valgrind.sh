@@ -71,7 +71,14 @@ seq -w 1000000 > 1M || framework_failure_ "failed to prepare '1M' file"
 ( shuf 1M ; shuf 1M ;
   shuf 1M ; shuf 1M ;
   seq -w 999000 1001000 ) > 4M ||
-    framework_failure_ "failed to prepare '5m' file"
+    framework_failure_ "failed to prepare '4M' file"
+
+## Prepare a file with very wide fields
+for i in $(seq 1 193 2000) $(seq 500 -7 100);
+do
+  seq $i | paste -s -d "" - ;
+done > wide ||
+    framework_failure_ "failed to prepare 'wide' file"
 
 fail=0
 
@@ -142,5 +149,18 @@ cat 4M | valgrind --track-origins=yes  --leak-check=full \
                   datamash rmdup 1 > /dev/null ||
   { warn_ "rmdup failed on 4M" ; fail=1 ; }
 
+## Test Base64 encode/decode
+cat wide | valgrind --track-origins=yes  --leak-check=full \
+                  --show-reachable=yes  --error-exitcode=1 \
+                  datamash base64 1 > wide_base64 ||
+  { warn_ "base64 failed on wide" ; fail=1 ; }
+cat wide_base64 | valgrind --track-origins=yes  --leak-check=full \
+                           --show-reachable=yes  --error-exitcode=1 \
+                       datamash debase64 1 > wide_orig ||
+  { warn_ "debase64 failed on wide_base64" ; fail=1 ; }
+
+cmp wide wide_orig ||
+  { warn_ "base64 decoding failed (decoded output does not match original)";
+    fail=1 ; }
 
 Exit $fail

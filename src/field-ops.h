@@ -103,6 +103,15 @@ enum operation_mode
   NOOP_MODE
 };
 
+enum FIELD_OP_COLLECT_RESULT
+{
+  FLOCR_OK = 0,
+  FLOCR_INVALID_NUMBER,
+  FLOCR_INVALID_BASE64
+};
+
+const char*
+field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr);
 
 struct operation_data
 {
@@ -186,8 +195,8 @@ new_field_op (enum operation oper, size_t field);
   Returns true if the operation was successful.
   Returns false if the input was invalid numeric value.
 */
-bool field_op_collect (struct fieldop *op,
-                  const char* str, size_t slen);
+enum FIELD_OP_COLLECT_RESULT
+field_op_collect (struct fieldop *op, const char* str, size_t slen);
 
 
 /* creates a list of unique strings from op->str_buf .

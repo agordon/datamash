@@ -361,7 +361,7 @@ my @Tests =
       {ERR=>"$prog: missing operation specifiers\n" .
              "Try '$prog --help' for more information.\n"}],
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric input in line 1 field 1: 'a'\n"}],
+      {ERR=>"$prog: invalid numeric value in line 1 field 1: 'a'\n"}],
   ['e5',  '-g 4, sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: invalid field value for grouping ''\n"}],
   ['e6',  '-g 4,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
@@ -394,9 +394,9 @@ my @Tests =
   ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
       {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
   ['e16',  '-t" " sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric input in line 3 field 2: '3a'\n"}],
+      {ERR=>"$prog: invalid numeric value in line 3 field 2: '3a'\n"}],
   ['e17',  'sum 1' ,  {IN_PIPE=>"1e-20000\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric input in line 1 field 1: '1e-20000'\n"}],
+      {ERR=>"$prog: invalid numeric value in line 1 field 1: '1e-20000'\n"}],
   ['e18',  'sum 0' ,  {IN_PIPE=>"a"}, {EXIT=>1},
       {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
   ['e19',  '-- sum -2' ,  {IN_PIPE=>"a"}, {EXIT=>1},
@@ -463,7 +463,7 @@ my @Tests =
   ['f22', '-t: -g1 unique 2',      {IN_PIPE=>$in_empty1}, {OUT=>"A:\nB:\n"}],
   # Numeric operation on an empty field should not work
   ['f23', '-t: -g1 sum 2', {IN_PIPE=>$in_empty1}, {EXIT=>1},
-    {ERR=>"$prog: invalid numeric input in line 1 field 2: ''\n"}],
+    {ERR=>"$prog: invalid numeric value in line 1 field 2: ''\n"}],
 
 
   # Test Absolute min/max
@@ -673,6 +673,9 @@ my @Tests =
   ['base64-1','-W base64 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_base64}],
   ['debase64-1','-W debase64 1', {IN_PIPE=>$out_g1_base64},
     {OUT=>$out_g1_debase64}],
+  # Test invalid base64 input
+  ['debase64-2', '-W debase64 1', {IN_PIPE=>$in_g1}, {EXIT=>1},
+    {ERR=>"$prog: invalid base64 value in line 1 field 1: 'A'\n"}],
 
   ## Mixing grouping,line,transpose/reverse operators should fail
   ['mixop1', 'sum 1 md5 2', {EXIT=>1},
