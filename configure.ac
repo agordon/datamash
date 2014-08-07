@@ -51,6 +51,34 @@ gl_WARN_ADD([-Wswitch-default])
 gl_WARN_ADD([-Wformat-nonliteral])
 gl_WARN_ADD([-Wunused-parameter])
 gl_WARN_ADD([-Wfloat-equal])
+gl_WARN_ADD([-fdiagnostics-show-option])
+gl_WARN_ADD([-funit-at-a-time])
+gl_WARN_ADD([-Wmissing-format-attribute])
+gl_WARN_ADD([-Wstrict-overflow])
+gl_WARN_ADD([-Wsuggest-attribute=const])
+gl_WARN_ADD([-Wsuggest-attribute=pure])
+AC_SUBST([WARN_CFLAGS])
+
+## Add --enable-werror option to ./configure,
+## To enable/disable treating compiler warnings as errors.
+## If not specified AND we're compiling from .git repository,
+## enable this automatically.
+AC_ARG_ENABLE([werror],
+  [AS_HELP_STRING([--enable-werror],
+     [treat compiler warnings as errors (for developers)])],
+  [case $enableval in
+     yes|no) ;;
+     *)      AC_MSG_ERROR([bad value $enableval for werror option]) ;;
+   esac
+   werror=$enableval],
+   [test -d "$srcdir"/.git \
+     && ! test -f "$srcdir"/.tarball-version \
+     && werror=yes]
+)
+if test "$werror" = yes; then
+  gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
+  AC_SUBST([WERROR_CFLAGS])
+fi
 
 ## Test for CygWin hosts - these have a broken 'strtold()' implementation:
 ##  calling strtold("4\t5",NULL) returns "e+9999",

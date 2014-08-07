@@ -38,7 +38,7 @@ datamash_SOURCES = src/system.h \
 	       src/field-ops.c src/field-ops.h \
 	       src/datamash.c
 
-datamash_CFLAGS = $(WARN_CFLAGS)
+datamash_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 datamash_LDADD = \
        $(top_builddir)/lib/lib$(PACKAGE).a \
        $(EXP_LIBM) \
