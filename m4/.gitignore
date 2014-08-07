@@ -147,3 +147,4 @@
 /sha256.m4
 /sha512.m4
 /stdalign.m4
+/unlocked-io.m4
