@@ -49,12 +49,14 @@ void free_column_headers ()
   input_column_headers = NULL;
 }
 
-size_t get_num_column_headers ()
+size_t _GL_ATTRIBUTE_PURE
+get_num_column_headers ()
 {
   return num_input_column_headers;
 }
 
-const char* get_input_field_name (size_t field_num)
+const char* _GL_ATTRIBUTE_PURE
+get_input_field_name (size_t field_num)
 {
   assert (field_num > 0                              /* LCOV_EXCL_LINE */
           && field_num <= num_input_column_headers); /* LCOV_EXCL_LINE */
@@ -81,7 +83,7 @@ build_input_line_headers (const struct line_record_t *lr, bool store_names)
         }
       else
         {
-          const char* tmp;
+          const char* tmp = NULL;
           line_record_get_field (lr, i, &tmp, &len);
           str = xmalloc ( len+1 );
           memcpy (str, tmp, len);

@@ -45,7 +45,7 @@
 /* Compare two flowting-point variables, while avoiding '==' .
 see:
 http://www.gnu.org/software/libc/manual/html_node/Comparison-Functions.html */
-int
+int _GL_ATTRIBUTE_PURE
 cmp_long_double (const void *p1, const void *p2)
 {
   const long double *a = (const long double *)p1;
@@ -53,7 +53,7 @@ cmp_long_double (const void *p1, const void *p2)
   return ( *a > *b ) - (*a < *b);
 }
 
-long double
+long double _GL_ATTRIBUTE_PURE
 median_value (const long double * const values, size_t n)
 {
 #if 0
@@ -69,7 +69,7 @@ median_value (const long double * const values, size_t n)
 /* This implementation follows R's summary () and quantile (type=7) functions.
    See discussion here:
    http://tolstoy.newcastle.edu.au/R/e17/help/att-1067/Quartiles_in_R.pdf */
-long double
+long double _GL_ATTRIBUTE_PURE
 percentile_value (const long double * const values,
                   const size_t n, const double percentile)
 {
@@ -88,7 +88,7 @@ percentile_value (const long double * const values,
 
 /* Given a sorted array of doubles, return the MAD value
    (median absolute deviation), with scale constant 'scale' */
-long double
+long double _GL_ATTRIBUTE_PURE
 mad_value (const long double * const values, size_t n, double scale)
 {
   const long double median = median_value (values,n);
@@ -102,7 +102,7 @@ mad_value (const long double * const values, size_t n, double scale)
   return mad * scale;
 }
 
-long double
+long double _GL_ATTRIBUTE_PURE
 arithmetic_mean_value (const long double * const values, const size_t n)
 {
   long double sum=0;
@@ -113,7 +113,7 @@ arithmetic_mean_value (const long double * const values, const size_t n)
   return mean;
 }
 
-long double
+long double _GL_ATTRIBUTE_PURE
 variance_value (const long double * const values, size_t n, int df)
 {
   long double sum=0;
@@ -205,7 +205,7 @@ skewnessZ_value (const long double * const values, size_t n)
  Given an array of doubles, return the excess kurtosis
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */
-long double
+long double _GL_ATTRIBUTE_PURE
 excess_kurtosis_value (const long double * const values, size_t n, int df)
 {
   long double moment2=0;
@@ -313,7 +313,7 @@ dagostino_pearson_omnibus_pvalue (const long double * const values, size_t n)
 }
 
 
-long double
+long double _GL_ATTRIBUTE_PURE
 mode_value ( const long double * const values, size_t n, enum MODETYPE type)
 {
   /* not ideal implementation but simple enough */
@@ -345,7 +345,7 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
   return best_value;
 }
 
-int
+int _GL_ATTRIBUTE_PURE
 cmpstringp (const void *p1, const void *p2)
 {
   /* The actual arguments to this function are "pointers to
@@ -354,7 +354,7 @@ cmpstringp (const void *p1, const void *p2)
   return strcmp (* (char * const *) p1, * (char * const *) p2);
 }
 
-int
+int _GL_ATTRIBUTE_PURE
 cmpstringp_nocase (const void *p1, const void *p2)
 {
   /* The actual arguments to this function are "pointers to
@@ -369,7 +369,7 @@ void qsortfl (long double *values, size_t n)
   qsort (values, n, sizeof (long double), cmp_long_double);
 }
 
-bool
+bool _GL_ATTRIBUTE_PURE
 hash_compare_strings (void const *x, void const *y)
 {
   assert (x != y); /* LCOV_EXCL_LINE */
