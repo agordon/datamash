@@ -61,15 +61,5 @@ TARBALL="${PACKAGE}-${VER}.tar.gz"
           die "check-remote-make-all.sh $TARBALL failed"
 ./build-aux/check-remote-make-extra.sh "$TARBALL" ||
           die "check-remote-make-extra.sh $TARBALL failed"
-
-##
-## Push the current repository to a temporary branch,
-## and check building from clean git repository on two systems.
-git push gnu :prerelease_test  # ignore failure
-git push gnu HEAD:prerelease_test || die "failed to git-push :prerelease_test"
-
-for HOST in deb7 fbsd10 ; do
-   ./build-aux/check-remote-make.sh -b prerelease_test \
-          git://git.savannah.gnu.org/$PACKAGE.git $HOST ||
-             die "failed to build from git on $HOST"
-done
+./build-aux/check-remote-make-git.sh ||
+          die "check-remote-make-git.sh failed"

@@ -38,15 +38,40 @@ dict_get()
   eval "echo \$__data__$key"
 }
 
+## parse parameterse
+show_help=
+pass_params=
+while getopts b:c:m:e:h name
+do
+        case $name in
+        b|c|m|e) pass_params="$pass_params -$name '$OPTARG'"
+                 ;;
+        h)       show_help=y
+                 ;;
+        ?)       die "Try -h for help."
+        esac
+done
+[ ! -z "$show_help" ] && show_help_and_exit;
+
+shift $((OPTIND-1))
+
+## First non-option parameter: the source to build
 SOURCE=$1
 [ -z "$SOURCE" ] &&
   die "missing SOURCE file name / URL (e.g. datamash-1.0.1.tar.gz)"
+shift 1
+
+## Any remaining non-option parameters: hosts
+if [ $# -eq 0 ] ; then
+  # No hosts given - use default list
+  HOSTS="deb7 deb7clang deb732 deb732clang centos65 centos5 fbsd10
+fbsd93 fbsd84 netbsd614 dilos dilos64 hurd obsd"
+else
+  HOSTS="$@"
+fi
 
 LOGDIR=$(mktemp -d -t buildlog.XXXXXX) ||
   die "Failed to create build log directory"
-
-HOSTS=${HOSTS:="deb7 deb7clang deb732 deb732clang centos65 centos5 fbsd10
-fbsd93 fbsd84 netbsd614 dilos dilos64 hurd obsd"}
 
 ##
 ## Start build on all hosts
@@ -56,7 +81,9 @@ for host in $HOSTS ;
 do
     LOGFILE=$LOGDIR/$host.log
     echo "Starting remote build on $host (log = $LOGFILE ) ..."
-    ./build-aux/check-remote-make.sh "$SOURCE" "$host" 1>$LOGFILE 2>&1 &
+    ./build-aux/check-remote-make.sh \
+        $pass_params \
+        "$SOURCE" "$host" 1>$LOGFILE 2>&1 &
     pid=$!
     dict_set $host $pid
     ALLLOGFILES="$ALLLOGFILES $LOGFILE"
