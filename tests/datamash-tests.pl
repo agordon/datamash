@@ -282,6 +282,14 @@ B::3
 B::4
 EOF
 
+my $in_dup1=<<'EOF';
+X:Y
+1:a
+2:b
+3:a
+2:c
+EOF
+
 =pod
   Example:
   my $data = "a 1\nb 2\n";
@@ -691,6 +699,22 @@ my @Tests =
   # Test large (and increasing) number of fields
   ['wide1', '-t" " -g 1 countunique 2', {IN_PIPE=>$in_wide1}, {OUT=>"A 1\n"}],
 
+  # Test rmdup operation
+  ['rmdp1', '-t: rmdup 1', {IN_PIPE=>""}, {OUT=>""}],
+  ['rmdp2', '-t: rmdup 1', {IN_PIPE=>$in_dup1},
+    {OUT=>"X:Y\n1:a\n2:b\n3:a\n"}],
+  ['rmdp3', '-t: rmdup 2', {IN_PIPE=>$in_dup1},
+    {OUT=>"X:Y\n1:a\n2:b\n2:c\n"}],
+  # in+out header: same as no header at all (assuming the header is unique)
+  ['rmdp4', '-t: -H rmdup 1', {IN_PIPE=>$in_dup1},
+    {OUT=>"X:Y\n1:a\n2:b\n3:a\n"}],
+  ['rmdp5', '-t: --header-in rmdup 1', {IN_PIPE=>$in_dup1},
+    {OUT=>"1:a\n2:b\n3:a\n"}],
+
+  # Test noop operation
+  ['noop1', 'noop', {IN_PIPE=>""}, {OUT=>""}],
+  ['noop2', 'noop', {IN_PIPE=>$in_dup1}, {OUT=>""}],
+  ['noop3', '--full noop', {IN_PIPE=>$in_dup1}, {OUT=>$in_dup1}],
 );
 
 if ($have_stable_sort) {

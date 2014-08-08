@@ -576,6 +576,31 @@ reverse_fields_in_file ()
 
       prev_num_fields = num_fields;
 
+      /* Special handling for header line */
+      if (line_number == 1)
+        {
+          /* If there is an header line (first line), and the user did not
+             request printing the header, skip it */
+          if (input_header && !output_header)
+            continue;
+
+          /* There is no input header line (first line already contains data),
+             and the user requested to generate output header line.
+             Print dummy header lines. */
+          if (!input_header && output_header)
+            {
+              build_input_line_headers (thisline, false);
+              for (size_t i = num_fields; i > 0; --i)
+                {
+                  if (i < num_fields)
+                    print_field_separator ();
+                  fputs (get_input_field_name (i), stdout);
+                }
+              print_line_separator ();
+            }
+        }
+
+      /* Print the line, reversing field order */
       for (size_t i = num_fields; i > 0; --i)
         {
           if (i < num_fields)
@@ -657,6 +682,23 @@ remove_dups_in_file ()
   buffer_list = xnmalloc (buffer_list_alloc, sizeof (char*));
   buffer_list[0] = keys_buffer;
   buffer_list_size = 1 ;
+
+  if (input_header)
+    {
+      if (line_record_fread (thisline, input_stream, eolchar))
+        {
+          line_number++;
+          if (output_header)
+            {
+              ignore_value (fwrite (line_record_buffer (thisline),
+                                    line_record_length (thisline),
+                                    sizeof (char), stdout));
+              print_line_separator ();
+            }
+        }
+    }
+  /* TODO: handle (output_header && !input_header) by generating dummy headers
+           after the first line is read, and the number of fields is known. */
 
   while (true)
     {

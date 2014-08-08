@@ -128,6 +128,13 @@ my $out3_filler_tr = perl_transpose ("\t", "xxx", $in3 ) ;
 my $out4_tr = perl_transpose ("\t", "N/A", $in4 ) ;
 my $out5_tr = perl_transpose ("\t", "N/A", $in5 ) ;
 
+my $in_hdr1=<<'EOF';
+X:Y
+1:a
+2:b
+EOF
+
+
 my @Tests =
 (
     # Simple transpose and reverse
@@ -180,6 +187,20 @@ my @Tests =
     # empty input
     ['tr10',  'transpose', {IN_PIPE=>""}, {OUT=>""}],
     ['rev10', 'reverse',   {IN_PIPE=>""}, {OUT=>""}],
+
+    # Reverse with header combinations
+    ['rev-hdr1','-H reverse', {IN_PIPE=>""}, {OUT=>""}],
+    ['rev-hdr2','--header-in reverse', {IN_PIPE=>""}, {OUT=>""}],
+    ['rev-hdr3','-t: reverse', {IN_PIPE=>$in_hdr1},
+       {OUT=>"Y:X\na:1\nb:2\n"}],
+    ['rev-hdr4','-t: -H reverse', {IN_PIPE=>$in_hdr1},
+       {OUT=>"Y:X\na:1\nb:2\n"}],
+    # first line is header line, discard it (there's no --header-out).
+    ['rev-hdr5','-t: --header-in reverse', {IN_PIPE=>$in_hdr1},
+       {OUT=>"a:1\nb:2\n"}],
+    # Generate a new header, assuming the first line is a NOT header line.
+    ['rev-hdr6','-t: --header-out reverse', {IN_PIPE=>$in_hdr1},
+       {OUT=>"field-2:field-1\nY:X\na:1\nb:2\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
