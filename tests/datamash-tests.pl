@@ -593,6 +593,8 @@ my @Tests =
      {OUT=>$in_hdr_only}],
   ['hdr22', '-t: --header-in rmdup 1', {IN_PIPE=>$in_hdr_only},
      {OUT=>""}],
+  ['hdr23', '-t: --header-in rmdup 1', {IN_PIPE=>""}, {OUT=>""}],
+  ['hdr24', '-t: -H rmdup 1', {IN_PIPE=>""}, {OUT=>""}],
 
 
   # Test single line per group
@@ -734,6 +736,9 @@ my @Tests =
     {OUT=>"X:Y\n1:a\n2:b\n3:a\n"}],
   ['rmdp5', '-t: --header-in rmdup 1', {IN_PIPE=>$in_dup1},
     {OUT=>"1:a\n2:b\n3:a\n"}],
+  ['rmdp6', '-t: rmdup 4', {IN_PIPE=>$in_dup1}, {EXIT=>1},
+      {ERR=>"$prog: invalid input: field 4 requested, " .
+            "line 1 has only 2 fields\n"}],
 
   # Test noop operation
   ['noop1', 'noop', {IN_PIPE=>""}, {OUT=>""}],
