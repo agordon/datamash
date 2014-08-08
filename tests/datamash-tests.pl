@@ -290,6 +290,10 @@ X:Y
 2:c
 EOF
 
+my $in_hdr_only=<<'EOF';
+X:Y:Z
+EOF
+
 =pod
   Example:
   my $data = "a 1\nb 2\n";
@@ -569,6 +573,26 @@ my @Tests =
   # Group + input/output headers on last column
   ['hdr13', '-t" " -H -g3 count 1',    {IN_PIPE=>$in_hdr1},
      {OUT=>"GroupBy(z) count(x)\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
+  # Input has only one header line (no data lines), and the user requested
+  # header-in and header-out => header line should be printed
+  ['hdr14', '-t: -H sum 1', {IN_PIPE=>$in_hdr_only},
+     {OUT=>"sum(X)\n"}],
+  ['hdr15', '-t: --full -H sum 1', {IN_PIPE=>$in_hdr_only},
+     {OUT=>"X:Y:Z:sum(X)\n"}],
+  ['hdr16', '-t: -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
+     {OUT=>"GroupBy(X):sum(Y)\n"}],
+  ['hdr17', '-t: --full -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
+     {OUT=>"X:Y:Z:sum(Y)\n"}],
+  ['hdr18', '-t: --header-in sum 1', {IN_PIPE=>$in_hdr_only},
+     {OUT=>""}],
+  ['hdr19', '-t: -H reverse', {IN_PIPE=>$in_hdr_only},
+     {OUT=>"Z:Y:X\n"}],
+  ['hdr20', '-t: --header-in reverse', {IN_PIPE=>$in_hdr_only},
+     {OUT=>""}],
+  ['hdr21', '-t: -H rmdup 1', {IN_PIPE=>$in_hdr_only},
+     {OUT=>$in_hdr_only}],
+  ['hdr22', '-t: --header-in rmdup 1', {IN_PIPE=>$in_hdr_only},
+     {OUT=>""}],
 
 
   # Test single line per group

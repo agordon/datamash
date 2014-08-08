@@ -414,8 +414,14 @@ process_file ()
   line_record_init (thisline);
   line_record_init (group_first_line);
 
-  if (input_header)
+  /* If there is an input header line, and it wasn't read already
+     in 'open_input' - read it now */
+  if (input_header && line_number==0)
     process_input_header (input_stream);
+  /* If there is an input header line, and the user requested an output
+     header line, and the input line was read successfully, print headers */
+  if (input_header && output_header && line_number==1)
+    print_column_headers ();
 
   while (true)
     {
@@ -423,20 +429,17 @@ process_file ()
 
       if (!line_record_fread (thisline, input_stream, eolchar))
         break;
-
-      /* If asked to print the output headers,
-         and the input doesn't have headers,
-         then count the number of fields in first input line.
-         NOTE: 'input_header' might be false if 'sort piping' was used with
-               header, but in that case, line_number will be 1. */
-      if (line_number==0 && output_header && !input_header)
-        build_input_line_headers (thisline, false);
-
-      /* Print output header, only after reading the first line */
-      if (output_header && line_number==1)
-        print_column_headers ();
-
       line_number++;
+
+      /* If there's no input header line, and the user requested an output
+         header line, then generate output header line based on the number
+         of fields in the first (data, non-header) input line */
+      if (line_number==1 && output_header && !input_header)
+        {
+          build_input_line_headers (thisline, false);
+          print_column_headers ();
+        }
+
 
       /* If no keys are given, the entire input is considered one group */
       if (num_group_colums || line_mode)
@@ -766,7 +769,6 @@ open_input ()
           /* Read the header line from STDIN, and pass the rest of it to
              the 'sort' child-process */
           process_input_header (stdin);
-          input_header = false;
         }
       strcat (cmd,"LC_ALL=C sort ");
       if (!case_sensitive)
