@@ -46,6 +46,9 @@ deb-hard: init-deb-hard build-deb-hard check
 init-coverage: clean-coverage-files
 clean-coverage-files:
 	 find $$PWD -name '*.gcno' -o -name '*.gcda' | xargs rm -f --
+# Generate coverage information, including expensive tests for better coverage
+coverage-expensive:
+	$(MAKE) RUN_EXPENSIVE_TESTS=yes coverage
 
 # Look for lines longer than 80 characters, except omit:
 # - the help2man script copied from upstream,
