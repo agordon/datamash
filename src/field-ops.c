@@ -130,6 +130,8 @@ struct operation_data operations[] =
   {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
   /* OP_REMOVE_DUPS */
   {"rmdup",   STRING_SCALAR, IGNORE_FIRST, REMOVE_DUPS_MODE, STRING_RESULT},
+  /* OP_DESCRIBE */
+  {"descr",   STRING_SCALAR, IGNORE_FIRST, DESCRIBE_MODE, STRING_RESULT},
   /* OP_NOOP */
   {"noop",    STRING_SCALAR, IGNORE_FIRST, NOOP_MODE, STRING_RESULT},
   {NULL, 0, 0, UNKNOWN_MODE, NUMERIC_RESULT}
@@ -464,6 +466,9 @@ field_op_collect (struct fieldop *op,
       field_op_add_string (op, str, slen);
       break;
 
+    case OP_DESCRIBE:
+      break;
+
     case OP_REVERSE:
     case OP_TRANSPOSE:
     case OP_REMOVE_DUPS:
@@ -723,6 +728,9 @@ field_op_summarize (struct fieldop *op)
       field_op_to_hex (op, tmpbuf, 64);
       break;
 
+    case OP_DESCRIBE:
+      break;
+
     case OP_TRANSPOSE: /* not handled here */
     case OP_REVERSE:   /* not handled here */
     case OP_REMOVE_DUPS:
@@ -866,6 +874,7 @@ parse_operation_mode (int argc, int start, char** argv)
     {
     case TRANSPOSE_MODE:
     case REVERSE_FIELD_MODE:
+    case DESCRIBE_MODE:
     case NOOP_MODE:
       if ( start+1 < argc )
         error (EXIT_FAILURE, 0, _("extra operands after '%s'"), argv[start]);

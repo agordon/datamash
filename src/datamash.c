@@ -752,6 +752,34 @@ remove_dups_in_file ()
   free (buffer_list);
 }
 
+/*
+Analyze field types in a file
+*/
+static void
+describe_file ()
+{
+  struct line_record_t lr;
+  struct line_record_t *thisline;
+
+  thisline = &lr;
+  line_record_init (thisline);
+  while (true)
+    {
+      if (!line_record_fread (thisline, input_stream, eolchar))
+        break;
+      line_number++;
+
+      if (print_full_line)
+        {
+          ignore_value (fwrite (line_record_buffer (thisline),
+                                line_record_length (thisline), sizeof (char),
+                                stdout));
+          print_line_separator ();
+        }
+    }
+  line_record_free (&lr);
+}
+
 
 static void
 open_input ()
@@ -985,6 +1013,10 @@ int main (int argc, char* argv[])
 
     case REMOVE_DUPS_MODE:
       remove_dups_in_file ();
+      break;
+
+    case DESCRIBE_MODE:
+      describe_file ();
       break;
 
     case UNKNOWN_MODE:
