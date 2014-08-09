@@ -760,6 +760,10 @@ describe_file ()
 {
   struct line_record_t lr;
   struct line_record_t *thisline;
+  size_t prev_num_fields = 0 ;
+  size_t num_fields = 0 ;
+  size_t fields_alloc = 0 ;
+  struct fieldop **fields = NULL;
 
   thisline = &lr;
   line_record_init (thisline);
@@ -769,13 +773,46 @@ describe_file ()
         break;
       line_number++;
 
-      if (print_full_line)
+      num_fields = line_record_num_fields (thisline);
+
+      /* First lne - figure out number of fields, and setup field-ops */
+      if (line_number==1)
         {
-          ignore_value (fwrite (line_record_buffer (thisline),
-                                line_record_length (thisline), sizeof (char),
-                                stdout));
-          print_line_separator ();
+          fields_alloc = num_fields;
+          if (fields_alloc == 0)
+            error (EXIT_FAILURE, 0, _("empty line on line %zu"), line_number);
+          fields = XNMALLOC (fields_alloc, struct fieldop*);
+          for (size_t i = 0; i < num_fields; ++i)
+            fields[i] = new_field_op ( OP_DESCRIBE, i+1);
+          prev_num_fields = num_fields;
         }
+
+      if (prev_num_fields != num_fields && strict)
+        error (EXIT_FAILURE, 0, _("describe input error: line %zu has " \
+                       "%zu fields (previous lines had %zu);\n" \
+                       "see --help to disable strict mode"),
+                        line_number, num_fields, prev_num_fields);
+
+      /* TODO: Handle non-strict mode */
+      if (prev_num_fields != num_fields && !strict)
+        assert (!"not implemented yet");
+
+
+      /* Analyze each field in the line */
+      for (size_t i = 0; i < num_fields; ++i)
+        {
+          const char* str = NULL;
+          size_t len = 0 ;
+          line_record_get_field (thisline, i+1, &str, &len);
+          field_op_collect ( fields[i], str, len);
+        }
+    }
+
+  /* Print a summary for each field */
+  for (size_t i = 0 ; i < fields_alloc; ++i)
+    {
+      field_op_summarize (fields[i]);
+      print_line_separator ();
     }
   line_record_free (&lr);
 }
