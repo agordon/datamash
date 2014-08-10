@@ -29,9 +29,6 @@ enum FIELD_CONTENT_FLAGS
   FCF_NOT_VALID
 };
 
-#define LOMASK_CHAR(ch) (((ch)<64)?((uint64_t)1<<((uint8_t)ch)):0)
-#define HIMASK_CHAR(ch) (((ch)>=64&&((ch)<128)?((uint64_t)1<<(((uint8_t)ch)-64)):0)
-
 struct field_content_type_t
 {
   /* one bit for each octect seen in 8bit ASCII */
@@ -58,6 +55,10 @@ struct field_content_type_t
   long double float_min_value;
   long double float_max_value;
 
+  char sample_value[15];
+  char character_set[100];
+  char extra_info[100];
+
   /* TODO, in the future:
   URL
   PATH
@@ -82,7 +83,6 @@ update_field_content_type (struct field_content_type_t *fct,
 		           const char* str, const size_t len);
 
 void
-report_field_content_type (struct field_content_type_t *fct,
-		           char* /*OUTPUT*/ str, const size_t maxlen);
+determine_field_content_type (struct field_content_type_t *fct);
 
 #endif

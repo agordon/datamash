@@ -810,9 +810,32 @@ describe_file ()
     }
 
   /* Print a summary for each field */
+  int len_field_max = (fields_alloc>99)?(3):((fields_alloc>9)?2:1);
+  int len_sample_value = 0;
+  int len_character_set = 0;
+  int len_extra_info = 0;
   for (size_t i = 0 ; i < fields_alloc; ++i)
     {
-      field_op_summarize (fields[i]);
+      struct field_content_type_t* fct = &fields[i]->field_content_type;
+      determine_field_content_type (fct);
+
+      if (strlen(fct->sample_value) > (size_t)len_sample_value)
+        len_sample_value = strlen(fct->sample_value);
+      if (strlen(fct->character_set) > (size_t)len_character_set)
+        len_character_set = strlen(fct->character_set);
+      if (strlen(fct->extra_info) > (size_t)len_extra_info)
+        len_extra_info = strlen(fct->extra_info);
+    }
+  for (size_t i = 0 ; i < fields_alloc; ++i)
+    {
+      int len_field_num = (i>98)?(3):((i>8)?2:1);
+      int field_spacing = len_field_max - len_field_num;
+      struct field_content_type_t* fct = &fields[i]->field_content_type;
+      printf ("%zu.%*s  %*s  %*s  %*s",
+               i+1, field_spacing, "",
+               -(len_sample_value), fct->sample_value,
+               -(len_character_set), fct->character_set,
+               -(len_extra_info), fct->extra_info);
       print_line_separator ();
     }
   line_record_free (&lr);

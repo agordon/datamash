@@ -733,8 +733,6 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_DESCRIBE:
-      field_op_reserve_out_buf (op, 1024);
-      report_field_content_type (&op->field_content_type, op->out_buf, 1024);
       break;
 
     case OP_TRANSPOSE: /* not handled here */

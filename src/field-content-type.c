@@ -30,6 +30,7 @@
 #include "system.h"
 #include "intprops.h"
 
+#include "utils.h"
 #include "field-content-type.h"
 
 /*
@@ -63,6 +64,9 @@ $ seq 0 9 |
 #define BITS_PUNCT_LO (0xfc00fffe00000000L)
 #define BITS_PUNCT_HI (0x78000001f8000001L)
 
+#define LOMASK_CHAR(ch) (((ch)<64)?((uint64_t)1<<((uint8_t)ch)):0)
+#define HIMASK_CHAR(ch) (((ch)>=64&&((ch)<128)?((uint64_t)1<<(((uint8_t)ch)-64)):0)
+
 /* Punctuation characters, EXCEPT the main six:
        period, comma, minus, underscore, colon, semicolon */
 #define BITS_PUNCT_EXTRA_LO (BITS_PUNCT_LO & \
@@ -73,8 +77,8 @@ $ seq 0 9 |
 		              CHAR_TO_BITS_LO(';')))
 #define BITS_PUNCT_EXTRA_HI (BITS_PUNCT_HI & ~(CHAR_TO_BITS_HI('_')))
 
-/* Control characters, \x00 to \x1F */
-#define BITS_CNTRL_LO (0x00000000FFFFFFFFL)
+/* Control characters, \x00 to \x1F EXCEPT tab .*/
+#define BITS_CNTRL_LO (0x00000000FFFFFEFFL)
 
 #define CHAR_TO_BITS_LO(ch) ((uint64_t)1<<((uint8_t)ch))
 #define CHAR_TO_BITS_HI(ch) ((uint64_t)1<<(((uint8_t)ch)-64))
@@ -149,6 +153,10 @@ update_field_content_type (struct field_content_type_t *fct,
     {
       fct->text_max_length = len;
       fct->text_min_length = len;
+
+      /* NOTE: str is NOT null-terminated, so copy at most 'len' chars */
+      strncpy (fct->sample_value, str,
+	        MIN(len,sizeof (fct->sample_value)-1));
     }
 
   if (len > fct->text_max_length)
@@ -220,75 +228,90 @@ update_field_content_type (struct field_content_type_t *fct,
   fct->first = false;
 }
 
-void
-report_field_content_type (struct field_content_type_t *fct,
-		           char* /*OUTPUT*/ str, const size_t maxlen)
+static inline void
+set_extra_info_int_range (struct field_content_type_t *fct)
 {
-  //fprintf (stderr, "hi = 0x%016lx\n", fct->seen_bits_hi);
-  //fprintf (stderr, "lo = 0x%016lx\n", fct->seen_bits_lo);
+  if (fct->integer_min_value != fct->integer_max_value)
+    {
+      snprintf (fct->extra_info, sizeof (fct->extra_info),
+                "(values: %zd -> %zd)",
+	        fct->integer_min_value, fct->integer_max_value);
+    }
+  else
+    {
+      snprintf (fct->extra_info, sizeof (fct->extra_info),
+                "(values: all %zd)",
+	        fct->integer_min_value);
+    }
+}
+
+static inline void
+set_extra_info_float_range (struct field_content_type_t *fct)
+{
+  if (cmp_long_double(&fct->integer_min_value,&fct->integer_max_value)!=0)
+    {
+      snprintf (fct->extra_info, sizeof (fct->extra_info),
+               "(values: %Lf -> %Lf)",
+	       fct->float_min_value, fct->float_max_value);
+    }
+  else
+    {
+      snprintf (fct->extra_info, sizeof (fct->extra_info),
+               "(values: all %Lf)",
+	       fct->float_min_value);
+    }
+}
+
+static inline void
+set_extra_info_text_length (struct field_content_type_t *fct)
+{
+  if (fct->text_min_length != fct->text_max_length)
+    {
+      snprintf (fct->extra_info, sizeof (fct->extra_info),
+                "(len: %zu -> %zu chars)",
+                fct->text_min_length, fct->text_max_length);
+    }
+  else
+    {
+      snprintf (fct->extra_info, sizeof (fct->extra_info),
+                "(len: %zu chars)",
+                fct->text_min_length);
+    }
+}
+
+static inline void
+add_charset_info (struct field_content_type_t* fct,
+		  const char* charset)
+{
+ strncat (fct->character_set, charset,
+          sizeof (fct->character_set) - strlen(fct->character_set) -1);
+}
+
+void
+determine_field_content_type (struct field_content_type_t *fct)
+{
+  strcpy (fct->character_set, "");
+
   if (fct->high_ascii_bit)
     {
-      snprintf (str, maxlen, "mixed-characters");
+      add_charset_info (fct,".");
+      set_extra_info_text_length (fct);
       return ;
     }
 
   /* Report detected types, starting from the stricter possibilities */
   if (fct->fcf_integer==FCF_VALID)
     {
-      snprintf (str,maxlen, "integer (%zd -> %zd)",
-		   fct->integer_min_value, fct->integer_max_value);
+      add_charset_info (fct,"integer");
+      set_extra_info_int_range (fct);
       return;
     }
 
   if (fct->fcf_float==FCF_VALID)
     {
-      snprintf (str,maxlen, "decimal value (%Lf -> %Lf)",
-		   fct->float_min_value, fct->float_max_value);
+      add_charset_info (fct,"decimal");
+      set_extra_info_float_range (fct);
       return;
-    }
-
-#define ADD_LENGTH() \
-    do { \
-	 snprintf (str+strlen(str), maxlen-strlen(str), \
-	           " (length: %zu -> %zu characters)", \
-		   fct->text_min_length, \
-		   fct->text_max_length); \
-    } while (0)
-
-
-  /* If not a specific type, give description based on seen characters */
-  if (CHECK_EXCLUSIVE_BITS(fct,BITS_XDIGITS_LO,BITS_XDIGITS_HI))
-    {
-      snprintf (str, maxlen, "hex value");
-      ADD_LENGTH();
-      return ;
-    }
-
-  if (CHECK_EXCLUSIVE_BITS(fct,0,BITS_ALPHA_UPPERCASE_HI))
-    {
-      snprintf (str, maxlen, "Upper-case alphabet");
-      ADD_LENGTH();
-      return ;
-    }
-
-  if (CHECK_EXCLUSIVE_BITS(fct,0,BITS_ALPHA_LOWERCASE_HI))
-    {
-      snprintf (str, maxlen, "Lower-case alphabet");
-      ADD_LENGTH();
-      return ;
-    }
-
-  if (CHECK_EXCLUSIVE_BITS(fct,0,BITS_ALPHA_LOWERCASE_HI|BITS_ALPHA_UPPERCASE_HI))
-    {
-      snprintf (str, maxlen, "alphabet");
-      ADD_LENGTH();
-      return ;
-    }
-  if (CHECK_EXCLUSIVE_BITS(fct,BITS_DIGITS_LO,
-		BITS_ALPHA_LOWERCASE_HI|BITS_ALPHA_UPPERCASE_HI))
-    {
-      snprintf (str, maxlen, "alpha-numeric");
-      return ;
     }
 
   /* Not a clear-cut - mix of different catagories.
@@ -297,67 +320,41 @@ report_field_content_type (struct field_content_type_t *fct,
 	  CHECK_HAVE_BITS(fct,0,BITS_ALPHA_UPPERCASE_HI);
   const bool lowercase_alpha =
 	  CHECK_HAVE_BITS(fct,0,BITS_ALPHA_LOWERCASE_HI);
-  const bool alpha = uppercase_alpha || lowercase_alpha;
   const bool digits =
 	  CHECK_HAVE_BITS(fct,BITS_DIGITS_LO,0);
   const bool cntrl =
 	  CHECK_HAVE_BITS(fct,BITS_CNTRL_LO,0);
-  const bool whitespace =
-	  CHECK_HAVE_BITS(fct,BITS_WHITESPACE_LO,0);
 
-  const bool period =
-	  CHECK_HAVE_BITS(fct,CHAR_TO_BITS_LO('.'),0);
-  const bool comma =
-	  CHECK_HAVE_BITS(fct,CHAR_TO_BITS_LO(','),0);
-  const bool underscore =
-	  CHECK_HAVE_BITS(fct,0,CHAR_TO_BITS_HI('_'));
-  const bool minus =
-	  CHECK_HAVE_BITS(fct,CHAR_TO_BITS_LO('-'),0);
-  const bool colon =
-	  CHECK_HAVE_BITS(fct,CHAR_TO_BITS_LO(':'),0);
-  const bool semicolon =
-	  CHECK_HAVE_BITS(fct,CHAR_TO_BITS_LO(';'),0);
-  const bool punct_any =
-	  CHECK_HAVE_BITS(fct,BITS_PUNCT_LO,BITS_PUNCT_HI);
-  const bool punct_extra =
-          CHECK_HAVE_BITS(fct,BITS_PUNCT_EXTRA_LO,BITS_PUNCT_EXTRA_HI);
+  if (uppercase_alpha)
+    add_charset_info (fct, "A-Z");
+  if (lowercase_alpha)
+    add_charset_info (fct, "a-z");
+  if (digits)
+    add_charset_info (fct, "0-9");
 
-  strcpy(str,"");
-  /* "main" content */
-  if (alpha && digits)
-    strncat (str, "alpha-numeric", maxlen-1-strlen(str));
-  else if (alpha)
-    strncat (str, "alphabet", maxlen-1-strlen(str));
-  else if (digits)
-    strncat (str, "digits", maxlen-1-strlen(str));
-
-#define CONDITIONAL_ADD(cond,name) \
-   do { \
-      if (cond) \
-        { \
-	  if (strlen(str)>0) \
-	    strncat (str, ",", maxlen-1-strlen(str)); \
-          strncat (str, name, maxlen-1-strlen(str)); \
-	} \
-  } while(0)
-
-
-  /* Extra content */
-  if (!punct_extra)
+  static const char *punct_chars = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+  for (size_t i = 0 ; i < strlen(punct_chars); ++i)
     {
-      CONDITIONAL_ADD(comma,"comma");
-      CONDITIONAL_ADD(period,"period");
-      CONDITIONAL_ADD(minus,"minus");
-      CONDITIONAL_ADD(underscore,"underscore");
-      CONDITIONAL_ADD(colon,"colon");
-      CONDITIONAL_ADD(semicolon,"semicolon");
+      const char ch = punct_chars[i];
+      const uint64_t lo = (ch<64)?CHAR_TO_BITS_LO(ch):0;
+      const uint64_t hi = (ch>=64)?CHAR_TO_BITS_HI(ch):0;
+      const bool have_char = CHECK_HAVE_BITS(fct,lo,hi);
+      char buf[5];
+      buf[0] = ch;
+      buf[1] = 0;
+      /* TODO: escape if needed? */
+      if (have_char)
+	add_charset_info (fct, buf);
     }
-  else CONDITIONAL_ADD(punct_any,"punctuation");
 
-  CONDITIONAL_ADD(whitespace,"whitespace");
-  CONDITIONAL_ADD(cntrl,"control-characters");
+  /* TODO: Escape <space> in a better way */
+  if (CHECK_HAVE_BITS (fct,CHAR_TO_BITS_LO(' '),0))
+    add_charset_info (fct, "\\ ");
+  if (CHECK_HAVE_BITS (fct,CHAR_TO_BITS_LO('\t'),0))
+    add_charset_info (fct, "\\t");
 
-  ADD_LENGTH();
+  if (cntrl)
+    add_charset_info (fct, "\x00-\x1F");
 
-//  snprintf (str, maxlen, "mixed-characters");
+  set_extra_info_text_length (fct);
 }
