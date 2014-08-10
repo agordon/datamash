@@ -37,6 +37,10 @@ struct field_content_type_t
   /* one bit for each octect seen in 8bit ASCII */
   uint64_t seen_bits_lo, seen_bits_hi;
   bool high_ascii_bit;
+  bool first;
+
+  size_t text_min_length;
+  size_t text_max_length;
 
   /* Decimal Integer accepted by strtol */
   enum FIELD_CONTENT_FLAGS fcf_integer;

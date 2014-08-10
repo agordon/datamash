@@ -130,7 +130,8 @@ return lo1 && hi1 && ( lo2 || hi2 );
 void
 init_field_content_type (struct field_content_type_t* fct)
 {
-	memset (fct, 0, sizeof(*fct));
+  memset (fct, 0, sizeof(*fct));
+  fct->first = true;
 }
 
 void
@@ -143,6 +144,17 @@ update_field_content_type (struct field_content_type_t *fct,
 
   if (len==0)
     return;
+
+  if (fct->first)
+    {
+      fct->text_max_length = len;
+      fct->text_min_length = len;
+    }
+
+  if (len > fct->text_max_length)
+    fct->text_max_length = len;
+  if (len < fct->text_min_length)
+    fct->text_min_length = len;
 
   /* Update the array of seen character values */
   for (size_t i = 0; i < len; ++i)
@@ -204,6 +216,8 @@ update_field_content_type (struct field_content_type_t *fct,
             fct->float_min_value = floatval;
 	}
     }
+
+  fct->first = false;
 }
 
 void
@@ -233,29 +247,41 @@ report_field_content_type (struct field_content_type_t *fct,
       return;
     }
 
+#define ADD_LENGTH() \
+    do { \
+	 snprintf (str+strlen(str), maxlen-strlen(str), \
+	           " (length: %zu -> %zu characters)", \
+		   fct->text_min_length, \
+		   fct->text_max_length); \
+    } while (0)
+
 
   /* If not a specific type, give description based on seen characters */
   if (CHECK_EXCLUSIVE_BITS(fct,BITS_XDIGITS_LO,BITS_XDIGITS_HI))
     {
       snprintf (str, maxlen, "hex value");
+      ADD_LENGTH();
       return ;
     }
 
   if (CHECK_EXCLUSIVE_BITS(fct,0,BITS_ALPHA_UPPERCASE_HI))
     {
       snprintf (str, maxlen, "Upper-case alphabet");
+      ADD_LENGTH();
       return ;
     }
 
   if (CHECK_EXCLUSIVE_BITS(fct,0,BITS_ALPHA_LOWERCASE_HI))
     {
       snprintf (str, maxlen, "Lower-case alphabet");
+      ADD_LENGTH();
       return ;
     }
 
   if (CHECK_EXCLUSIVE_BITS(fct,0,BITS_ALPHA_LOWERCASE_HI|BITS_ALPHA_UPPERCASE_HI))
     {
       snprintf (str, maxlen, "alphabet");
+      ADD_LENGTH();
       return ;
     }
   if (CHECK_EXCLUSIVE_BITS(fct,BITS_DIGITS_LO,
@@ -330,6 +356,8 @@ report_field_content_type (struct field_content_type_t *fct,
 
   CONDITIONAL_ADD(whitespace,"whitespace");
   CONDITIONAL_ADD(cntrl,"control-characters");
+
+  ADD_LENGTH();
 
 //  snprintf (str, maxlen, "mixed-characters");
 }
