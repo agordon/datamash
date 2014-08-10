@@ -36,6 +36,7 @@ datamash_SOURCES = src/system.h \
 	       src/text-lines.c src/text-lines.h \
 	       src/column-headers.c src/column-headers.h \
 	       src/field-ops.c src/field-ops.h \
+	       src/field-content-type.h src/field-content-type.c \
 	       src/datamash.c
 
 datamash_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)

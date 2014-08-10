@@ -47,6 +47,7 @@
 #include "text-options.h"
 #include "text-lines.h"
 #include "column-headers.h"
+#include "field-content-type.h"
 #include "field-ops.h"
 #include "utils.h"
 

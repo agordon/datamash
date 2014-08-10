@@ -163,6 +163,8 @@ struct fieldop
   size_t out_buf_used;
   size_t out_buf_alloc;
 
+  struct field_content_type_t field_content_type;
+
   struct fieldop *next;
 };
 

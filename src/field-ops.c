@@ -43,6 +43,7 @@
 
 #include "utils.h"
 #include "text-options.h"
+#include "field-content-type.h"
 #include "field-ops.h"
 
 /* In the future: allow users to change this */
@@ -307,6 +308,8 @@ new_field_op (enum operation oper, size_t field)
     }
   op->out_buf_used = 0 ;
 
+  init_field_content_type (&op->field_content_type);
+
   if (field_ops != NULL)
     {
       struct fieldop *p = field_ops;
@@ -467,6 +470,7 @@ field_op_collect (struct fieldop *op,
       break;
 
     case OP_DESCRIBE:
+      update_field_content_type (&op->field_content_type, str, slen);
       break;
 
     case OP_REVERSE:
@@ -729,6 +733,8 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_DESCRIBE:
+      field_op_reserve_out_buf (op, 1024);
+      report_field_content_type (&op->field_content_type, op->out_buf, 1024);
       break;
 
     case OP_TRANSPOSE: /* not handled here */
