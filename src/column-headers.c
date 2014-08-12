@@ -63,6 +63,19 @@ get_input_field_name (size_t field_num)
   return input_column_headers[field_num-1];
 }
 
+size_t _GL_ATTRIBUTE_PURE
+get_input_field_number (const char* field_name)
+{
+  assert (field_name != NULL); /* LCOV_EXCL_LINE */
+  assert (*field_name != 0);   /* LCOV_EXCL_LINE */
+  for (size_t i = 0 ; i < num_input_column_headers ; ++i)
+    {
+      if (STREQ (field_name,input_column_headers[i]))
+        return i+1;
+    }
+  return 0;
+}
+
 void
 build_input_line_headers (const struct line_record_t *lr, bool store_names)
 {

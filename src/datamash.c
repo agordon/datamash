@@ -37,11 +37,13 @@
 #include "hash-pjw.h"
 #include "error.h"
 #include "lib/intprops.h"
+#include "quote.h"
 #include "ignore-value.h"
 #include "stdnoreturn.h"
 #include "linebuffer.h"
 #define Version VERSION
 #include "version-etc.h"
+#include "xstrndup.h"
 #include "xalloc.h"
 
 #include "text-options.h"
@@ -73,8 +75,17 @@ static bool input_header = false;
 /* If true, print the entire input line. Otherwise, print only the key fields */
 static bool print_full_line = false;
 
-static size_t *group_columns = NULL;
-static size_t num_group_colums = 0;
+struct group_column_t
+{
+  size_t col_number;    /* 1 = first field */
+  bool   col_by_name;   /* true if the user gave a column name */
+  char*  col_name;      /* column name - to be converted to number after
+                           header line is read */
+};
+static bool   group_column_have_names = false;
+static size_t num_group_columns = 0;
+static struct group_column_t *group_columns = NULL;
+
 static bool line_mode = false; /* if TRUE, handle each line as a group */
 
 static bool pipe_through_sort = false;
@@ -119,6 +130,25 @@ static struct option const long_options[] =
 };
 
 void
+group_columns_find_named_columns ()
+{
+  for (size_t i = 0; i < num_group_columns; ++i)
+    {
+      struct group_column_t *p = &group_columns[i];
+
+      if (!p->col_by_name)
+        continue;
+
+      p->col_number = get_input_field_number (p->col_name);
+      if (p->col_number == 0)
+        error (EXIT_FAILURE, 0,
+                _("column name %s not found in input file"),
+                quote (p->col_name));
+      p->col_by_name = false;
+    }
+}
+
+void
 usage (int status)
 {
   if (status != EXIT_SUCCESS)
@@ -133,7 +163,9 @@ usage (int status)
       fputs ("\n\n", stdout);
       fputs (_("'op' is the operation to perform;\n"), stdout);
       fputs (_("\
-For grouping,per-line operations 'col' is the input field to use.\
+For grouping,per-line operations 'col' is the input field to use;\n\
+'col' can be a number (1=first field), or a column name when using\n\
+-H or --header-in options.\n\
 "), stdout);
       fputs ("\n\n", stdout);
       fputs (_("File operations:\n"),stdout);
@@ -258,13 +290,13 @@ safe_line_record_get_field (const struct line_record_t *lr, const size_t n,
 static bool
 different (const struct line_record_t* l1, const struct line_record_t* l2)
 {
-  assert (group_columns != NULL); /* LCOV_EXCL_LINE */
-  for (size_t *key = group_columns; *key ; ++key )
+  for (size_t i = 0; i < num_group_columns; ++i)
     {
+      const size_t col_num = group_columns[i].col_number;
       const char *str1=NULL,*str2=NULL;
       size_t len1=0,len2=0;
-      safe_line_record_get_field (l1, *key, &str1, &len1);
-      safe_line_record_get_field (l2, *key, &str2, &len2);
+      safe_line_record_get_field (l1, col_num, &str1, &len1);
+      safe_line_record_get_field (l2, col_num, &str2, &len2);
       if (len1 != len2)
         return true;
       if ((case_sensitive && !STREQ_LEN (str1,str2,len1))
@@ -323,9 +355,10 @@ print_input_line (const struct line_record_t* lb)
     }
   else
     {
-      for (size_t *key = group_columns; key && *key != 0 ; ++key)
+      for (size_t i = 0; i < num_group_columns; ++i)
         {
-          safe_line_record_get_field (lb, *key, &str, &len);
+          const size_t col_num = group_columns[i].col_number;
+          safe_line_record_get_field (lb, col_num, &str, &len);
           ignore_value (fwrite (str,sizeof (char),len,stdout));
           print_field_separator ();
         }
@@ -356,11 +389,12 @@ print_column_headers ()
     }
   else
     {
-      for (size_t *key = group_columns; key && *key != 0; ++key)
+      for (size_t i = 0; i < num_group_columns; ++i)
         {
-          if (*key > get_num_column_headers ())
-            error_not_enough_fields (*key, get_num_column_headers ());
-          printf ("GroupBy" "(%s)",get_input_field_name (*key));
+          const size_t col_num = group_columns[i].col_number;
+          if (col_num > get_num_column_headers ())
+            error_not_enough_fields (col_num, get_num_column_headers ());
+          printf ("GroupBy" "(%s)",get_input_field_name (col_num));
           print_field_separator ();
         }
     }
@@ -392,6 +426,12 @@ process_input_header (FILE *stream)
     {
       build_input_line_headers (&lr, true);
       line_number++;
+      /* If using named-columns, find the column numbers after reading the
+         header line. */
+      if (field_op_have_named_fields ())
+        field_op_find_named_columns ();
+      if (group_column_have_names)
+        group_columns_find_named_columns ();
     }
   line_record_free (&lr);
 }
@@ -418,10 +458,16 @@ process_file ()
      in 'open_input' - read it now */
   if (input_header && line_number==0)
     process_input_header (input_stream);
+  /* If using named-columns, but no input header - abort */
+  if ((field_op_have_named_fields () || group_column_have_names)
+      && !input_header)
+    error (EXIT_FAILURE, 0,
+           _("-H or --header-in must be used with named columns"));
   /* If there is an input header line, and the user requested an output
      header line, and the input line was read successfully, print headers */
   if (input_header && output_header && line_number==1)
     print_column_headers ();
+
 
   while (true)
     {
@@ -442,7 +488,7 @@ process_file ()
 
 
       /* If no keys are given, the entire input is considered one group */
-      if (num_group_colums || line_mode)
+      if (num_group_columns || line_mode)
         {
           new_group = (group_first_line->lbuf.length == 0 || line_mode
                        || different (thisline, group_first_line));
@@ -657,7 +703,6 @@ remove_dups_in_file ()
   size_t len = 0;
   struct line_record_t lr;
   struct line_record_t *thisline;
-  const size_t key_col = field_ops->field;
   Hash_table *ht;
   const size_t init_table_size = 100000;
 
@@ -691,6 +736,15 @@ remove_dups_in_file ()
       if (line_record_fread (thisline, input_stream, eolchar))
         {
           line_number++;
+
+          /* If using named-columns, find the column numbers after reading the
+             header line. */
+          if (field_op_have_named_fields ())
+            {
+              build_input_line_headers (&lr, true);
+              field_op_find_named_columns ();
+            }
+
           if (output_header)
             {
               ignore_value (fwrite (line_record_buffer (thisline),
@@ -700,6 +754,11 @@ remove_dups_in_file ()
             }
         }
     }
+  if (!input_header && field_op_have_named_fields ())
+    error (EXIT_FAILURE, 0,
+           _("-H or --header-in must be used with named columns"));
+  const size_t key_col = field_ops->field;
+
   /* TODO: handle (output_header && !input_header) by generating dummy headers
            after the first line is read, and the number of fields is known. */
 
@@ -756,7 +815,7 @@ remove_dups_in_file ()
 static void
 open_input ()
 {
-  if (pipe_through_sort && group_columns)
+  if (pipe_through_sort && num_group_columns>0)
     {
       char tmp[INT_BUFSIZE_BOUND (size_t)*2+5];
       char cmd[1024];
@@ -785,9 +844,10 @@ open_input ()
           snprintf (tmp,sizeof (tmp),"-t '%c' ",in_tab);
           strcat (cmd,tmp);
         }
-      for (size_t *key = group_columns; *key; ++key)
+      for (size_t i = 0; i < num_group_columns; ++i)
         {
-          snprintf (tmp,sizeof (tmp),"-k%zu,%zu ",*key,*key);
+          const size_t col_num = group_columns[i].col_number;
+          snprintf (tmp,sizeof (tmp),"-k%zu,%zu ",col_num,col_num);
           if (strlen (tmp)+strlen (cmd)+1 >= sizeof (cmd))
             error (EXIT_FAILURE, 0,
                    _("sort command too-long (please report this bug)"));
@@ -838,38 +898,58 @@ parse_group_spec ( char* spec )
   char *endptr;
 
   /* Count number of groups parameters, by number of commas */
-  num_group_colums = 1;
+  num_group_columns = 1;
   endptr = spec;
   while ( *endptr != '\0' )
     {
       if (*endptr == ',')
-        num_group_colums++;
+        num_group_columns++;
       ++endptr;
     }
 
   /* Allocate the group_columns */
-  group_columns = xnmalloc (num_group_colums+1, sizeof (size_t));
+  group_columns = xnmalloc (num_group_columns, sizeof (struct group_column_t));
 
-  errno = 0 ;
   idx=0;
   while (1)
     {
+      /* delimiter here means an empty field */
+      if (*spec == ',')
+        error (EXIT_FAILURE, 0, _("invalid grouping parameter %s"),
+                                        quote (spec));
+      errno = 0 ;
       val = strtol (spec, &endptr, 10);
-      if (errno != 0 || endptr == spec || val<=0)
-        error (EXIT_FAILURE, 0, _("invalid field value for grouping '%s'"),
-                                        spec);
-
-      group_columns[idx] = val;
-      idx++;
+      /* If the conversion to a number succeeded, and it ended at the
+         next delimiter or end-of-string, assume it's a valid field number. */
+      if (errno == 0 && (*endptr == ',' || *endptr == 0))
+        {
+          if (val<1)
+            error (EXIT_FAILURE, 0, _("invalid grouping parameter %s"),
+                                        quote (spec));
+          group_columns[idx].col_number = val;
+          group_columns[idx].col_by_name = false;
+          group_columns[idx].col_name = NULL;
+        }
+      else
+        {
+          /* Not a valid number, assume it's a field name,
+             keep the name and convert it to a number after the header line
+             is read. */
+          endptr = strchr (spec,',');
+          if (endptr == NULL)
+              group_columns[idx].col_name = xstrdup (spec);
+          else
+              group_columns[idx].col_name = xstrndup (spec,endptr-spec);
+          group_columns[idx].col_number = 0;
+          group_columns[idx].col_by_name = true;
+          group_column_have_names = true;
+        }
 
       if (endptr==NULL || *endptr==0)
         break;
-      if (*endptr != ',')
-        error (EXIT_FAILURE, 0, _("invalid grouping parameter '%s'"), endptr);
-      endptr++;
-      spec = endptr;
+      spec = endptr+1; /* skip delimiter and continue */
+      idx++;
     }
-  group_columns[idx] = 0 ; /* marker for the last element */
 }
 
 int main (int argc, char* argv[])

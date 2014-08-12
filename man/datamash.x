@@ -213,6 +213,8 @@ Derek          Arts             60
 $ \fBdatamash\fR \-\-sort \-\-headers \-\-group 2 mean 3 pstdev 3 < scores_h.txt
  (or use short form)
 $ \fBdatamash\fR \-sH \-g2 mean 3 pstdev 3 < scores_h.txt
+ (or use named columns)
+$ \fBdatamash\fR \-sH \-g Major mean Score pstdev Score < scores_h.txt
 GroupBy(Major)    mean(Score)   pstdev(Score)
 Arts              68.9          10.1
 Business          87.3           4.9
@@ -261,6 +263,8 @@ SampleID  File
 
 # Remove lines with duplicated Sample-ID (column 1):
 $ \fBdatamash\fR rmdup 1 < INPUT
+   (or used named column)
+$ \fBdatamash\fR \-H rmdup SampleID < INPUT
 SampleID  File
 2         cc.txt
 3         dd.txt

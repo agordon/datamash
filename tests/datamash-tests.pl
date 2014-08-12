@@ -375,15 +375,15 @@ my @Tests =
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: invalid numeric value in line 1 field 1: 'a'\n"}],
   ['e5',  '-g 4, sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid field value for grouping ''\n"}],
+      {ERR=>"$prog: invalid grouping parameter ''\n"}],
   ['e6',  '-g 4,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid field value for grouping 'x'\n"}],
+      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e7',  '-g ,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid field value for grouping ',x'\n"}],
+      {ERR=>"$prog: invalid grouping parameter ',x'\n"}],
   ['e8',  '-g 1,0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid field value for grouping '0'\n"}],
+      {ERR=>"$prog: invalid grouping parameter '0'\n"}],
   ['e9',  '-g 1X0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid grouping parameter 'X0'\n"}],
+      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e10',  '-g 1 -t XX sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e11',  '--foobar' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
@@ -404,7 +404,7 @@ my @Tests =
       {ERR=>"$prog: invalid input: field 6 requested, " .
             "line 2 has only 3 fields\n"}],
   ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: invalid column 'foo' for operation 'sum'\n"}],
+      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e16',  '-t" " sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
       {ERR=>"$prog: invalid numeric value in line 3 field 2: '3a'\n"}],
   ['e17',  'sum 1' ,  {IN_PIPE=>"1e-20000\n"}, {EXIT=>1},
@@ -413,19 +413,16 @@ my @Tests =
       {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
   ['e19',  '-- sum -2' ,  {IN_PIPE=>"a"}, {EXIT=>1},
       {ERR=>"$prog: invalid column '-2' for operation 'sum'\n"}],
-  ['e20',  'sum 2x' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: invalid column '2x' for operation 'sum'\n"}],
   ['e21',  'sum ""' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: invalid column '' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid empty column for operation 'sum'\n"}],
   ['e22',  '-t" " -g 7 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 7 requested, " .
             "line 2 has only 3 fields\n"}],
   ['e23',  '-t" " -g -2 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-      {ERR=>"$prog: invalid field value for grouping '-2'\n"}],
+      {ERR=>"$prog: invalid grouping parameter '-2'\n"}],
   ['e24',  '-t" " --header-out -g 5 count 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 5 requested, " .
             "line 1 has only 3 fields\n"}],
-
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
@@ -739,11 +736,71 @@ my @Tests =
   ['rmdp6', '-t: rmdup 4', {IN_PIPE=>$in_dup1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 4 requested, " .
             "line 1 has only 2 fields\n"}],
+  ## rmdup with named columns
+  ['rmdp7', '-t: -H rmdup X', {IN_PIPE=>$in_dup1},
+    {OUT=>"X:Y\n1:a\n2:b\n3:a\n"}],
+  ['rmdp8', '-t: rmdup X', {IN_PIPE=>$in_dup1}, {EXIT=>1},
+     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
 
   # Test noop operation
   ['noop1', 'noop', {IN_PIPE=>""}, {OUT=>""}],
   ['noop2', 'noop', {IN_PIPE=>$in_dup1}, {OUT=>""}],
   ['noop3', '--full noop', {IN_PIPE=>$in_dup1}, {OUT=>$in_dup1}],
+
+
+  # Test named columns - for operations
+  ## with empty input, invalid column name is not an error
+  ['nc2',   '-H sum foo', {IN_PIPE=>""}, {OUT=>""}],
+  ['nc3',   '--header-in sum foo', {IN_PIPE=>""}, {OUT=>""}],
+  ## with named columns, -H or --header-in are required.
+  ['nc1',   'sum foo', {IN_PIPE=>""}, {EXIT=>1},
+     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+  ['nc4',   'sum foo', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+  ## Invalid column name
+  ['nc5',   '--header-in sum foo', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+  ['nc6',   '-H sum foo', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+  ## Valid column names, and identical column number
+  ['nc7',   '-t" " -H sum y sum 2', {IN_PIPE=>$in_hdr1},
+     {OUT=>"sum(y) sum(y)\n52 52\n"}],
+  ## Valid column names + sorting
+  ['nc8',   '-s -g 1 -t" " -H sum y', {IN_PIPE=>$in_hdr1},
+     {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
+
+  # Test named columns - for grouping
+  ## with empty input, invalid column name is not an error
+  ['ng1',   '-H -g foo sum 1', {IN_PIPE=>""}, {OUT=>""}],
+  ['ng2',   '--header-in -g foo sum foo', {IN_PIPE=>""}, {OUT=>""}],
+  ## with named columns, -H or --header-in are required
+  ['ng3',   '-g foo count 1', {IN_PIPE=>""}, {EXIT=>1},
+     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+  ['ng4',   '-g foo count 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+  ## Invalid column name
+  ['ng5',   '--header-in -g foo sum 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+  ['ng6',   '-H -g foo sum 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
+     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+  ## Valid column names in grouping
+  ['ng7',   '-t" " -H -g x sum 2', {IN_PIPE=>$in_hdr1},
+     {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
+  ## group by name+number
+  ['ng8',   '-t":" -H -g x,3 sum 2', {IN_PIPE=>$in_hdr2},
+     {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
+	   "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
+  ## group by name+name
+  ['ng9',   '-t":" -H -g x,z sum 2', {IN_PIPE=>$in_hdr2},
+     {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
+	   "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
+  ## group by number+name
+  ['ng10',  '-t":" -H -g 1,z sum 2', {IN_PIPE=>$in_hdr2},
+     {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
+	   "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
+  ## group by name + sorting
+  ['ng11',   '-s -t" " -H -g x sum 2', {IN_PIPE=>$in_hdr1},
+     {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
 );
 
 if ($have_stable_sort) {

@@ -32,6 +32,7 @@
 
 #include "error.h"
 #include "minmax.h"
+#include "linebuffer.h"
 #include "quote.h"
 #include "system.h"
 #include "md5.h"
@@ -43,6 +44,8 @@
 
 #include "utils.h"
 #include "text-options.h"
+#include "text-lines.h"
+#include "column-headers.h"
 #include "field-ops.h"
 
 /* In the future: allow users to change this */
@@ -276,10 +279,37 @@ field_op_sort_values (struct fieldop *op)
   qsortfl (op->values, op->num_values);
 }
 
+/* Converts a string to number (field number).
+   Exits with an error message (using 'op') on invalid field number. */
+static size_t
+try_get_field_number (enum operation op, const char* field_str)
+{
+  long int val;
+  char *endptr;
+  if (strlen (field_str)==0)
+    error (EXIT_FAILURE, 0, _("invalid empty column for operation %s"),
+                               quote (operations[op].name));
+
+  errno = 0 ;
+  val = strtol (field_str, &endptr, 10);
+  /* If conversion to a number failed, assume this is a named column,
+     which will require a header line - defer error detection for later,
+     after we read the first line of the file. */
+  if (errno != 0 || endptr == field_str
+      || endptr == NULL || *endptr != 0)
+    return 0;
+
+  if (val<1)
+    error (EXIT_FAILURE, 0, _("invalid column '%s' for operation %s"),
+                               field_str,quote (operations[op].name));
+  return (size_t)val;
+}
+
+
 /* Allocate a new fieldop, initialize it based on 'oper',
    and add it to the linked-list of operations */
 struct fieldop *
-new_field_op (enum operation oper, size_t field)
+new_field_op (enum operation oper, const char* field_name)
 {
   struct fieldop *op = XZALLOC (struct fieldop);
 
@@ -291,7 +321,17 @@ new_field_op (enum operation oper, size_t field)
                  || op->acc_type == NUMERIC_VECTOR);
   op->auto_first = operations[oper].auto_first;
 
-  op->field = field;
+  op->field = try_get_field_number (oper, field_name);
+  if (op->field == 0)
+    {
+      op->field_by_name = true;
+      op->field_name = xstrdup (field_name);
+    }
+  else
+    {
+      op->field_by_name = false;
+      op->field_name = NULL;
+    }
   op->first = true;
   op->value = 0;
   op->count = 0;
@@ -316,6 +356,36 @@ new_field_op (enum operation oper, size_t field)
     field_ops = op;
 
   return op;
+}
+
+/* returns TRUE if any of the configured fields was using
+   a named column, therefore requiring a header line. */
+bool _GL_ATTRIBUTE_PURE
+field_op_have_named_fields ()
+{
+  for (struct fieldop *p = field_ops; p ; p=p->next)
+    {
+      if (p->field_by_name)
+	return true;
+    }
+  return false;
+}
+
+void
+field_op_find_named_columns ()
+{
+  for (struct fieldop *p = field_ops; p ; p=p->next)
+    {
+      if (!p->field_by_name)
+        continue;
+
+      p->field = get_input_field_number (p->field_name);
+      if (p->field == 0)
+        error (EXIT_FAILURE, 0,
+                _("column name %s not found in input file"),
+                quote (p->field_name));
+      p->field_by_name = false;
+    }
 }
 
 /* Add a value (from input) to the current field operation. */
@@ -778,6 +848,9 @@ free_field_op (struct fieldop *op)
   op->out_buf_alloc = 0;
   op->out_buf_used = 0;
 
+  free (op->field_name);
+  op->field_name = NULL;
+
   free (op);
 }
 
@@ -806,31 +879,11 @@ get_operation (const char* keyword)
   return 0; /* never reached LCOV_EXCL_LINE */
 }
 
-/* Converts a string to number (field number).
-   Exits with an error message (using 'op') on invalid field number. */
-static size_t
-safe_get_field_number (enum operation op, const char* field_str)
-{
-  long int val;
-  char *endptr;
-  errno = 0 ;
-  val = strtol (field_str, &endptr, 10);
-  /* NOTE: can't use xstrtol_fatal - it's too tightly-coupled
-     with getopt command-line processing */
-  if (errno != 0 || endptr == field_str || val < 1
-      || endptr == NULL || *endptr != 0)
-    error (EXIT_FAILURE, 0, _("invalid column '%s' for operation " \
-                               "'%s'"), field_str,
-                               operations[op].name);
-  return (size_t)val;
-}
-
 /* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
 void
 parse_operations (enum operation_mode mode, int argc, int start, char **argv)
 {
   int i = start; /* Index into ARGV. */
-  size_t field;
   enum operation op;
 
   /* From here on, by default we assume it's a "groupby" operation */
@@ -848,10 +901,8 @@ parse_operations (enum operation_mode mode, int argc, int start, char **argv)
       if ( i >= argc )
         error (EXIT_FAILURE, 0, _("missing field number after " \
                                   "operation '%s'"), argv[i-1] );
-      field = safe_get_field_number (op, argv[i]);
+      new_field_op (op, argv[i]);
       i++;
-
-      new_field_op (op, field);
     }
 }
 

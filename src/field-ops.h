@@ -137,6 +137,11 @@ struct fieldop
 
   /* Instance information */
   size_t field; /* field number.  1 = first field in input file. */
+  bool   field_by_name; /* if true, user gave field name (instead of number),
+			   which needs to be resolved AFTER the header line
+			   is loaded */
+  char* field_name;
+
 
   /* Collected Data */
   bool first;   /* true if this is the first item in a new group */
@@ -187,7 +192,7 @@ void field_op_sort_values (struct fieldop *op);
 /* Allocate a new fieldop, initialize it based on 'oper',
    and add it to the linked-list of operations */
 struct fieldop *
-new_field_op (enum operation oper, size_t field);
+new_field_op (enum operation oper, const char* field_name);
 
 /* Add a value (from input) to the current field operation.
    'str' does not need to be null-terminated.
@@ -210,19 +215,22 @@ field_op_to_hex ( struct fieldop *op, const char *buffer, const size_t inlen );
 
 /* Prints to stdout the result of the field operation,
    based on collected values */
-void field_op_summarize (struct fieldop *op);
+void
+field_op_summarize (struct fieldop *op);
 
-void summarize_field_ops ();
+void
+summarize_field_ops ();
 
-void reset_field_ops ();
+void
+reset_field_ops ();
 
-void free_field_ops ();
+void
+free_field_ops ();
 
 /*
 enum operation_mode
 get_operation_mode (const char* keyword);
 */
-
 enum operation
 get_operation (const char* keyword);
 
@@ -250,6 +258,19 @@ parse_operation_mode (int argc, int start, char** argv);
 extern int field_op_output_precision;
 
 /* Initialize random number source */
-void init_random (void);
+void
+init_random (void);
+
+
+/* returns TRUE if any of the configured fields was using
+   a named column, therefore requiring a header line. */
+bool
+field_op_have_named_fields ();
+
+/* Tries to find the column number for operations using
+   a named column (instead of a number) */
+void
+field_op_find_named_columns ();
+
 
 #endif
