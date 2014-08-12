@@ -38,4 +38,3 @@ git push gnu HEAD:prerelease_test || die "failed to git-push :prerelease_test"
 ./build-aux/check-remote-make-all.sh -b prerelease_test \
           git://git.savannah.gnu.org/$PACKAGE.git \
           $HOSTS
-

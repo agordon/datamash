@@ -26,9 +26,11 @@ exit 1
 }
 
 SOURCE=$1
-[ -z "$SOURCE" ] && die "missing SOURCE file name / URL (e.g. datamash-1.0.1.tar.gz)"
+[ -z "$SOURCE" ] &&
+  die "missing SOURCE file name / URL (e.g. datamash-1.0.1.tar.gz)"
 
-LOGDIR=$(mktemp -d -t buildlog.XXXXXX) || die "Failed to create build log directory"
+LOGDIR=$(mktemp -d -t buildlog.XXXXXX) ||
+  die "Failed to create build log directory"
 
 # Default virtual machine with these compilers
 HOST=${HOST:-deb7}
@@ -55,4 +57,3 @@ for config in \
     fi
     NUM=$((NUM+1))
 done
-
