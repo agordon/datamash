@@ -50,7 +50,6 @@ clean-coverage-files:
 coverage-expensive:
 	$(MAKE) RUN_EXPENSIVE_TESTS=yes coverage
 
-
 # Exclude markdown (*.md) files from no-trailing-blanks rule.
 # The exclusion list is initially defined in ./gnulib/cfg.mk ,
 #   and is overridden here.
@@ -58,6 +57,24 @@ coverage-expensive:
 #    (which is auto-generated from gnulib).
 exclude_file_name_regexp--sc_trailing_blank = \
   ^(.*\.md)$$
+
+
+# Scan-Build: use clang's static analysis tool
+static-analysis-have-prog:
+	which scan-build 1>/dev/null 2>&1 || \
+	    { echo "scan-build program not found" >&2 ; exit 1 ;}
+
+static-analysis-configure: static-analysis-have-prog
+	test -x ./configure || \
+	    { echo "./configure script not found" >&2 ; exit 1 ;}
+	scan-build ./configure
+
+static-analysis-make: static-analysis-have-prog
+	$(MAKE) clean
+	scan-build make
+
+static-analysis: static-analysis-configure static-analysis-make
+
 
 # Look for lines longer than 80 characters, except omit:
 # - the help2man script copied from upstream,
