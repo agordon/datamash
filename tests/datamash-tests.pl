@@ -222,6 +222,20 @@ A x 5
 B Y 6
 EOF
 
+my $in_sort_quote1=<<"EOF";
+A'1
+B'2
+A'3
+B'4
+EOF
+
+my $in_sort_quote2=<<'EOF';
+A"1
+B"2
+A"3
+B"4
+EOF
+
 ## NUL as end-of-line character
 my $in_nul1="A 1\x00A 2\x00B 3\x00B 4\x00";
 
@@ -385,6 +399,8 @@ my @Tests =
   ['e9',  '-g 1X0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e10',  '-g 1 -t XX sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+      {ERR=>"$prog: the delimiter must be a single character\n"}],
+  ['e10.1',  '-g 1 -t "" sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e11',  '--foobar' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: unrecognized option foobar\n" .
@@ -630,6 +646,17 @@ my @Tests =
   # because the input is not sorted.
   ['sort3', '-g 2 unique 3', {IN_PIPE=>$in_sort1},
      {OUT=>"x\t1\nk\t2\nj\t3\nx\t5\nj\t4\ng\t6\n"}],
+  ['sort4', '-s -g 1 sum 2 -t "\'" ', {IN_PIPE=>$in_sort_quote1},
+     {OUT=>"A'4\nB'6\n"}],
+  ['sort5', '-s -g 1 sum 2 -t "\"" ', {IN_PIPE=>$in_sort_quote2},
+     {OUT=>"A\"4\nB\"6\n"}],
+
+#my $in_sort_quote1=<<"EOF";
+#A'1
+#B'2
+#A'3
+#B'4
+#EOF
 
 
   # Test Case-sensitivity, on sorted input (no 'sort' piping)

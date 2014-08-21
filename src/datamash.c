@@ -842,7 +842,10 @@ open_input ()
 #endif
       if (in_tab != TAB_WHITESPACE)
         {
-          snprintf (tmp,sizeof (tmp),"-t '%c' ",in_tab);
+          /* If the delimiter is a single-quote character, use
+             double-quote to prevent shell quoting problems. */
+          const char qc = (in_tab=='\'')?'"':'\'';
+          snprintf (tmp,sizeof (tmp),"-t %c%c%c ",qc,in_tab,qc);
           strcat (cmd,tmp);
         }
       for (size_t i = 0; i < num_group_columns; ++i)
@@ -994,7 +997,7 @@ int main (int argc, char* argv[])
           break;
 
         case 't':
-          if (optarg[0] != '\0' && optarg[1] != '\0')
+          if (optarg[0] == '\0' || optarg[1] != '\0')
             error (EXIT_FAILURE, 0,
                    _("the delimiter must be a single character"));
           in_tab = out_tab = optarg[0];
