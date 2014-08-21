@@ -46,6 +46,7 @@
 #include "xstrndup.h"
 #include "xalloc.h"
 
+#include "strcnt.h"
 #include "text-options.h"
 #include "text-lines.h"
 #include "column-headers.h"
@@ -895,59 +896,39 @@ parse_group_spec ( char* spec )
 {
   long int val;
   size_t idx;
-  char *endptr;
+  char *tok, *endptr;
 
   /* Count number of groups parameters, by number of commas */
-  num_group_columns = 1;
-  endptr = spec;
-  while ( *endptr != '\0' )
-    {
-      if (*endptr == ',')
-        num_group_columns++;
-      ++endptr;
-    }
+  num_group_columns = strcnt (spec, ',')+1;
 
   /* Allocate the group_columns */
   group_columns = xnmalloc (num_group_columns, sizeof (struct group_column_t));
 
   idx=0;
-  while (1)
+  while ( (tok = strsep (&spec, ",")) != NULL)
     {
-      /* delimiter here means an empty field */
-      if (*spec == ',')
-        error (EXIT_FAILURE, 0, _("invalid grouping parameter %s"),
-                                        quote (spec));
+      if (strlen (tok) == 0)
+        error (EXIT_FAILURE, 0, _("invalid empty grouping parameter"));
       errno = 0 ;
-      val = strtol (spec, &endptr, 10);
-      /* If the conversion to a number succeeded, and it ended at the
-         next delimiter or end-of-string, assume it's a valid field number. */
-      if (errno == 0 && (*endptr == ',' || *endptr == 0))
+      val = strtol (tok, &endptr, 10);
+      if (errno == 0 && endptr != tok && *endptr == 0)
         {
+          /* If strtol succeeded, it's a valid number. */
           if (val<1)
             error (EXIT_FAILURE, 0, _("invalid grouping parameter %s"),
-                                        quote (spec));
+                                        quote (tok));
           group_columns[idx].col_number = val;
           group_columns[idx].col_by_name = false;
           group_columns[idx].col_name = NULL;
         }
       else
         {
-          /* Not a valid number, assume it's a field name,
-             keep the name and convert it to a number after the header line
-             is read. */
-          endptr = strchr (spec,',');
-          if (endptr == NULL)
-              group_columns[idx].col_name = xstrdup (spec);
-          else
-              group_columns[idx].col_name = xstrndup (spec,endptr-spec);
+          /* If strrol failed, assume it's a named column - resolve it later. */
+          group_columns[idx].col_name = xstrdup (tok);
           group_columns[idx].col_number = 0;
           group_columns[idx].col_by_name = true;
           group_column_have_names = true;
         }
-
-      if (endptr==NULL || *endptr==0)
-        break;
-      spec = endptr+1; /* skip delimiter and continue */
       idx++;
     }
 }

@@ -375,11 +375,11 @@ my @Tests =
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: invalid numeric value in line 1 field 1: 'a'\n"}],
   ['e5',  '-g 4, sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid grouping parameter ''\n"}],
+      {ERR=>"$prog: invalid empty grouping parameter\n"}],
   ['e6',  '-g 4,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e7',  '-g ,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid grouping parameter ',x'\n"}],
+      {ERR=>"$prog: invalid empty grouping parameter\n"}],
   ['e8',  '-g 1,0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: invalid grouping parameter '0'\n"}],
   ['e9',  '-g 1X0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
@@ -423,6 +423,8 @@ my @Tests =
   ['e24',  '-t" " --header-out -g 5 count 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 5 requested, " .
             "line 1 has only 3 fields\n"}],
+  ['e25',  '-g 1,,2 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
+      {ERR=>"$prog: invalid empty grouping parameter\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
