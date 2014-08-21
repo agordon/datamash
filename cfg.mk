@@ -50,13 +50,24 @@ clean-coverage-files:
 coverage-expensive:
 	$(MAKE) RUN_EXPENSIVE_TESTS=yes coverage
 
+
+# Exclude markdown (*.md) files from no-trailing-blanks rule.
+# The exclusion list is initially defined in ./gnulib/cfg.mk ,
+#   and is overridden here.
+# The 'sc_trailing_blank' rule is defined in ./maint.mk
+#    (which is auto-generated from gnulib).
+exclude_file_name_regexp--sc_trailing_blank = \
+  ^(.*\.md)$$
+
 # Look for lines longer than 80 characters, except omit:
 # - the help2man script copied from upstream,
 # - example files
+# - Markdown files
 LINE_LEN_MAX = 80
 FILTER_LONG_LINES =						\
   \|^[^:]*man/help2man:| d;			\
-  \|^[^:]*examples/.*| d;
+  \|^[^:]*examples/.*| d;			\
+  \|^HACKING\.md| d;
 sc_long_lines:
 	@files=$$($(VC_LIST_EXCEPT))					\
 	halt='line(s) with more than $(LINE_LEN_MAX) characters; reindent'; \
