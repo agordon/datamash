@@ -148,3 +148,6 @@
 /sha512.m4
 /stdalign.m4
 /unlocked-io.m4
+/random.m4
+/random_r.m4
+/strsep.m4
