@@ -188,3 +188,20 @@ The generated `Makefile` makes use of the following files:
 
 * `maint.mk` - maintenance targets, from gnulib.
 * `cfg.mk` - custom targets and configurations for datamash.
+
+## Portability
+
+### Windows using mingw
+
+Compilation for windows using MinGW compilers requires the following CFLAGS:
+
+    CFLAGS="-D__USE_MINGW_ANSI_STDIO=1"
+
+`./configure` supports an option `--enable-mingw` which sets up the correct flags.
+This option should be automatically detected correctly when using cross-compilation,
+such as:
+
+    ./configure --host=x86_64-w64-mingw32
+
+Compilation under Cygwin does not require this flag.  
+See related discussion: <http://lists.gnu.org/archive/html/bug-gnulib/2014-09/msg00052.html>

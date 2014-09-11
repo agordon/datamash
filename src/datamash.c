@@ -53,6 +53,20 @@
 #include "field-ops.h"
 #include "utils.h"
 
+/* The Printf-type for printing "size_t".
+   On all unixes and Cygwin "%zu" works.
+   On Mingw the type is "%Iu" (ms's printf doesn't support "z").
+   NOTE: This hack is needed for gnulib's error.
+         printf is already 'fixed' by adding '__USE_MINGW_ANSI_STDIO=1'
+         in 'configure.ac'.
+   NOTE: lowercase used to avoid 'sc_error_message_uppercase` syntax-check
+         rule failure. */
+#ifdef USE_MINGW
+#define priszt "Iu"
+#else
+#define priszt "zu"
+#endif
+
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "datamash"
 
@@ -270,8 +284,8 @@ For grouping,per-line operations 'col' is the input field to use;\n\
 static inline noreturn void
 error_not_enough_fields (const size_t needed, const size_t found)
 {
-  error (0, 0, _("invalid input: field %zu requested, " \
-        "line %zu has only %zu fields"),
+  error (0, 0, _("invalid input: field %"priszt" requested, " \
+        "line %"priszt" has only %"priszt" fields"),
         needed, line_number, found);
   exit (EXIT_FAILURE);
 }
@@ -327,7 +341,7 @@ process_line (const struct line_record_t *line)
           memcpy (tmp,str,len);
           tmp[len] = 0 ;
           error (EXIT_FAILURE, 0,
-              _("%s in line %zu field %zu: '%s'"),
+              _("%s in line %"priszt" field %"priszt": '%s'"),
               field_op_collect_result_name (flocr),
               line_number, op->field, tmp);
         }
@@ -564,10 +578,10 @@ transpose_file ()
       const size_t num_fields = line_record_num_fields (thisline);
 
       if (strict && line_number>1 && num_fields != prev_num_fields)
-          error (EXIT_FAILURE, 0, _("transpose input error: line %zu has " \
-                       "%zu fields (previous lines had %zu);\n" \
-                       "see --help to disable strict mode"),
-                        line_number, num_fields, prev_num_fields);
+          error (EXIT_FAILURE, 0, _("transpose input error: line %"priszt" " \
+                    "has %"priszt" fields (previous lines had %"priszt");\n" \
+                    "see --help to disable strict mode"),
+                    line_number, num_fields, prev_num_fields);
 
       prev_num_fields = num_fields;
 
@@ -619,8 +633,9 @@ reverse_fields_in_file ()
       const size_t num_fields = line_record_num_fields (thisline);
 
       if (strict && line_number>1 && num_fields != prev_num_fields)
-          error (EXIT_FAILURE, 0, _("reverse-field input error: line %zu has " \
-                       "%zu fields (previous lines had %zu);\n" \
+          error (EXIT_FAILURE, 0, _("reverse-field input error: line " \
+                       "%"priszt" has %"priszt" fields (previous lines had " \
+                       "%"priszt");\n" \
                        "see --help to disable strict mode"),
                          line_number, num_fields, prev_num_fields);
 

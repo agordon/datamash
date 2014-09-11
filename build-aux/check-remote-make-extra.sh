@@ -43,6 +43,8 @@ for config in \
   "-c --host=arm-linux-gnueabi" \
   "-c --host=mips-linux-gnu" \
   "-c --host=powerpc-linux-gnu" \
+  "-c --host=x86_64-w64-mingw32" \
+  "-c --host=i686-w64-mingw32" \
   "-c CC=tcc" \
 ; do
     LOGFILE=$LOGDIR/$NUM.log
