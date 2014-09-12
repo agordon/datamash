@@ -175,7 +175,7 @@ Which genes have more than 5 isoforms?
 
 Using `datamash` we can quickly explore the dataset and answer simple question, such as:
 
-How many genes are transcribes from both strands (that is, they have isoforms with both positive and negative strands.
+How many genes are transcribed from both strands (that is, they have isoforms with both positive and negative strands.
 strand column is number 4):
 
     $ cat genes.txt | datamash -s -g 13 countunique 4 | awk '$2>1'
@@ -186,7 +186,7 @@ strand column is number 4):
     BMS1P18      2
     ...
 
-Which genes are transcribes from multiple chromosomes (that is, they have isoforms from multiple chromosomes.
+Which genes are transcribed from multiple chromosomes (that is, they have isoforms from multiple chromosomes.
 Chromosome column is number 3):
 
     $ cat genes.txt | datamash -s -g 13 countunique 2 unique 2 | awk '$2>1'
