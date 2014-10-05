@@ -398,6 +398,7 @@ field_op_collect (struct fieldop *op,
 #ifdef HAVE_BROKEN_STRTOLD
   char tmpbuf[512];
 #endif
+  enum FIELD_OP_COLLECT_RESULT rc = FLOCR_OK;
 
   assert (str != NULL); /* LCOV_EXCL_LINE */
 
@@ -445,6 +446,7 @@ field_op_collect (struct fieldop *op,
       if (num_value < op->value)
         {
           op->value = num_value;
+          rc = FLOCR_OK_KEEP_LINE;
         }
       break;
 
@@ -452,6 +454,7 @@ field_op_collect (struct fieldop *op,
       if (num_value > op->value)
         {
           op->value = num_value;
+          rc = FLOCR_OK_KEEP_LINE;
         }
       break;
 
@@ -459,6 +462,7 @@ field_op_collect (struct fieldop *op,
       if (fabsl (num_value) < fabsl (op->value))
         {
           op->value = num_value;
+          rc = FLOCR_OK_KEEP_LINE;
         }
       break;
 
@@ -466,12 +470,22 @@ field_op_collect (struct fieldop *op,
       if (fabsl (num_value) > fabsl (op->value))
         {
           op->value = num_value;
+          rc = FLOCR_OK_KEEP_LINE;
         }
       break;
 
     case OP_FIRST:
       if (op->first)
-        field_op_replace_string (op, str, slen);
+        {
+          field_op_replace_string (op, str, slen);
+          rc = FLOCR_OK_KEEP_LINE;
+        }
+      break;
+
+    case OP_LAST:
+      /* Replace the 'current' string with the latest one */
+      field_op_replace_string (op, str, slen);
+      rc = FLOCR_OK_KEEP_LINE;
       break;
 
     case OP_DEBASE64:
@@ -492,7 +506,6 @@ field_op_collect (struct fieldop *op,
     case OP_SHA1:
     case OP_SHA256:
     case OP_SHA512:
-    case OP_LAST:
       /* Replace the 'current' string with the latest one */
       field_op_replace_string (op, str, slen);
       break;
@@ -503,7 +516,10 @@ field_op_collect (struct fieldop *op,
            With a simpler case were "k=1" */
         unsigned long i = random ()%op->count;
         if (op->first || i==0)
-          field_op_replace_string (op, str, slen);
+          {
+            field_op_replace_string (op, str, slen);
+            rc = FLOCR_OK_KEEP_LINE;
+          }
       }
       break;
 
@@ -545,7 +561,7 @@ field_op_collect (struct fieldop *op,
 
   op->first = false;
 
-  return FLOCR_OK;
+  return rc;
 }
 
 /* Returns a nul-terimated string, composed of the unique values
@@ -987,8 +1003,9 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
      return _("invalid numeric value");
    case FLOCR_INVALID_BASE64:
      return _("invalid base64 value");
-   case FLOCR_OK:        /* LCOV_EXCL_LINE */
-   default:              /* LCOV_EXCL_LINE */
-     assert (false);     /* LCOV_EXCL_LINE */
+   case FLOCR_OK:           /* LCOV_EXCL_LINE */
+   case FLOCR_OK_KEEP_LINE: /* LCOV_EXCL_LINE */
+   default:                 /* LCOV_EXCL_LINE */
+     assert (false);        /* LCOV_EXCL_LINE */
    }
 }

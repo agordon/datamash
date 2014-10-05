@@ -323,19 +323,20 @@ different (const struct line_record_t* l1, const struct line_record_t* l2)
 
 /* For a given line, extract all requested fields and process the associated
    operations on them */
-static void
+static bool
 process_line (const struct line_record_t *line)
 {
   const char *str = NULL;
   size_t len = 0;
   enum FIELD_OP_COLLECT_RESULT flocr;
+  bool keep_line = false;
 
   struct fieldop *op = field_ops;
   while (op)
     {
       safe_line_record_get_field (line, op->field, &str, &len);
       flocr = field_op_collect (op, str, len);
-      if (flocr != FLOCR_OK)
+      if (flocr != FLOCR_OK && flocr != FLOCR_OK_KEEP_LINE)
         {
           char *tmp = xmalloc (len+1);
           memcpy (tmp,str,len);
@@ -345,9 +346,11 @@ process_line (const struct line_record_t *line)
               field_op_collect_result_name (flocr),
               line_number, op->field, tmp);
         }
+      keep_line = keep_line || (flocr==FLOCR_OK_KEEP_LINE);
 
       op = op->next;
     }
+  return keep_line;
 }
 
 /* Print the input line representing the summarized group.
@@ -524,9 +527,9 @@ process_file ()
         }
 
       lines_in_group++;
-      process_line (thisline);
+      bool keep_line = process_line (thisline);
 
-      if (new_group)
+      if (new_group || keep_line)
         {
           SWAP_LINES (group_first_line, thisline);
         }

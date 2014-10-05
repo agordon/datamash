@@ -838,7 +838,7 @@ if ($have_stable_sort) {
     ['lst7',   '-t" " --sort -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
        {OUT=>"A 5\nB 6\na 3\nb 4\n"}],
     ['lst8',   '-t" " --sort -i -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
-       {OUT=>"a 5\nb 6\n"}],
+       {OUT=>"A 5\nB 6\n"}],
     # First with sort, test the 'stable' sort
     ['fst7',   '-t" " --sort -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
        {OUT=>"A 2\nB 6\na 1\nb 4\n"}],
