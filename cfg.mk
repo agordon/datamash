@@ -137,7 +137,7 @@ sc_prohibit_framework_failure:
 
 # Prohibit the use of `...` in tests/.  Use $(...) instead.
 exclude_file_name_regexp--sc_prohibit_test_backticks = \
-  ^tests/(local\.mk|(init|misc/stdbuf|factor/create-test)\.sh|[a-z\-]*\.pl)$$
+  ^tests/(local\.mk|init\.sh|[a-z0-9\-]*\.pl)$$
 sc_prohibit_test_backticks:
 	@prohibit='`' in_vc_files='^tests/'				\
 	halt='use $$(...), not `...` in tests/'				\
