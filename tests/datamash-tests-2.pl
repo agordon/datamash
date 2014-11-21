@@ -80,6 +80,90 @@ B 0 i6
 B 3 i7
 EOF
 
+# Test various combinations of N/A, NaN values
+my $na1=<<'EOF';
+1
+2
+NA
+3
+EOF
+
+my $na2=<<'EOF';
+1
+2
+nA
+3
+EOF
+
+my $na3=<<'EOF';
+1
+2
+N/A
+3
+EOF
+
+my $na4=<<'EOF';
+1
+2
+NaN
+3
+EOF
+
+my $na5=<<'EOF';
+1
+2
+nan
+3
+EOF
+
+# This is not a valid input, should not be detected as "NA"
+my $not_na1=<<'EOF';
+1
+2
+NAK
+3
+EOF
+
+# This is not a valid input, should not be detected as "NAN"
+my $not_na2=<<'EOF';
+1
+2
+NANA
+3
+EOF
+
+my $na_first=<<'EOF';
+NaN
+2
+5
+8
+EOF
+
+my $na_last=<<'EOF';
+NaN
+2
+5
+11
+EOF
+
+my $na_mid1=<<'EOF';
+1:2:3
+4:NA:6
+7:8:9
+EOF
+
+my $na_last1=<<'EOF';
+1:2:3
+4:5:6
+7:8:NaN
+EOF
+
+my $na_all=<<'EOF';
+NA
+NA
+NaN
+EOF
+
 my @Tests =
 (
   # Test 'min' + --full
@@ -117,6 +201,133 @@ my @Tests =
   ['slct10', '-t" " -f -g1 last 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 5 i3 5\nB 3 i7 3\n"}],
   # more --full with --sort => see test 'sortslct2' below
+
+
+  # Test --narm - ignoring NaN/NA values
+
+  ## Test with 'NA'
+  ['narm1', '--narm sum 1',  {IN_PIPE=>$na1}, {OUT=>"6\n"}],
+  ['narm2', '--narm mean 1', {IN_PIPE=>$na1}, {OUT=>"2\n"}],
+  # without --narm, these should fail with invalid input
+  ['narm3', 'sum 1',         {IN_PIPE=>$na1}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NA'\n"}],
+
+  ## Test with 'nA'
+  ['narm4', '--narm sum 1',  {IN_PIPE=>$na2}, {OUT=>"6\n"}],
+  ['narm5', '--narm mean 1', {IN_PIPE=>$na2}, {OUT=>"2\n"}],
+  # without --narm, these should fail with invalid input
+  ['narm6', 'sum 1',         {IN_PIPE=>$na2}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'nA'\n"}],
+
+  ## Test with 'N/A'
+  ['narm7', '--narm sum 1',  {IN_PIPE=>$na3}, {OUT=>"6\n"}],
+  ['narm8', '--narm mean 1', {IN_PIPE=>$na3}, {OUT=>"2\n"}],
+  # without --narm, these should fail with invalid input
+  ['narm9', 'sum 1',         {IN_PIPE=>$na3}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'N/A'\n"}],
+
+  ## Test with 'NaN'
+  ['narm10', '--narm sum 1',  {IN_PIPE=>$na4}, {OUT=>"6\n"}],
+  ['narm11', '--narm mean 1', {IN_PIPE=>$na4}, {OUT=>"2\n"}],
+  # without --narm, 'nan' should be processed, not skipped
+  ['narm12', 'sum 1',         {IN_PIPE=>$na4}, {OUT=>"nan\n"}],
+
+  ## Test with 'nan'
+  ['narm13', '--narm sum 1',  {IN_PIPE=>$na5}, {OUT=>"6\n"}],
+  ['narm14', '--narm mean 1', {IN_PIPE=>$na5}, {OUT=>"2\n"}],
+  # without --narm, 'nan' should be processed, not skipped
+  ['narm15', 'sum 1',         {IN_PIPE=>$na5}, {OUT=>"nan\n"}],
+
+  # These input have strings starting with 'NA' or 'NAN' but should not
+  # be mistaken for them.
+  ['narm16', '--narm sum 1',         {IN_PIPE=>$not_na1}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NAK'\n"}],
+  ['narm17', '--narm sum 1',         {IN_PIPE=>$not_na2}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NANA'\n"}],
+
+  ## NA value as first/last line
+  ['narm18', '--narm mean 1',  {IN_PIPE=>$na_first}, {OUT=>"5\n"}],
+  ['narm19', '--narm mean 1', {IN_PIPE=>$na_last}, {OUT=>"6\n"}],
+
+  ## NA in the middle of the line
+  ['narm20', '-t: --narm sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1},
+    {OUT=>"12:10:18\n"}],
+  ['narm21', '-t:        sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value in line 2 field 2: 'NA'\n"}],
+
+  ## NA as the last field
+  ['narm22', '-t: --narm sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1},
+    {OUT=>"12:10:18\n"}],
+  ['narm23', '-t:        sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value in line 2 field 2: 'NA'\n"}],
+
+  # N/A affect counts
+  ['narm24', '-t: count 1 count 2 count 3', {IN_PIPE=>$na_last1},
+    {OUT=>"3:3:3\n"}],
+  ['narm25', '-t: --narm count 1 count 2 count 3', {IN_PIPE=>$na_last1},
+    {OUT=>"3:3:2\n"}],
+  ['narm26', '-t: --narm sum 1 sum 2 sum 3', {IN_PIPE=>$na_last1},
+    {OUT=>"12:15:9\n"}],
+
+  # Check NA with string operations
+  ['narm27', '-t: --narm unique 2', {IN_PIPE=>$na_mid1},
+    {OUT=>"2,8\n"}],
+  ['narm28', '-t: unique 2', {IN_PIPE=>$na_mid1},
+    {OUT=>"2,8,NA\n"}],
+
+  # Data of all NAs
+  ['narm29', '--narm count 1', {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
+  ['narm30', '       count 1', {IN_PIPE=>$na_all}, {OUT=>"3\n"}],
+
+  ['narm31', '--narm sum 1', {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
+
+  ['narm32', '--narm mean 1', {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+
+  # Test all NA input with all operations
+  # tested to comply with R code of 'a = C(NA,NA,NA)'
+  # Try to be as consistent with R as possible.
+  # The tested function is mainly 'field_op_summarize_empty()'
+  ['narm40', '--narm count 1',   {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
+  ['narm41', '--narm sum 1',     {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
+  ['narm42', '--narm min 1',     {IN_PIPE=>$na_all}, {OUT=>"-inf\n"}],
+  ['narm43', '--narm max 1',     {IN_PIPE=>$na_all}, {OUT=>"inf\n"}],
+  ['narm44', '--narm absmin 1',  {IN_PIPE=>$na_all}, {OUT=>"-inf\n"}],
+  ['narm45', '--narm absmax 1',  {IN_PIPE=>$na_all}, {OUT=>"inf\n"}],
+  ['narm46', '--narm first 1',   {IN_PIPE=>$na_all}, {OUT=>"N/A\n"}],
+  ['narm47', '--narm last 1',    {IN_PIPE=>$na_all}, {OUT=>"N/A\n"}],
+  ['narm48', '--narm rand 1',    {IN_PIPE=>$na_all}, {OUT=>"N/A\n"}],
+  ['narm49', '--narm mean 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm51', '--narm median 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm52', '--narm q1 1',      {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm53', '--narm q3 1',      {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm54', '--narm iqr 1',     {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm55', '--narm pstdev 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm56', '--narm sstdev 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm57', '--narm pvar 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm58', '--narm svar 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm59', '--narm mad 1',     {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm60', '--narm madraw 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm61', '--narm sskew 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm62', '--narm pskew 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm63', '--narm skurt 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm64', '--narm pkurt 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm65', '--narm jarque 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm66', '--narm dpo 1',     {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm67', '--narm mode 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm68', '--narm antimode 1',{IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm69', '--narm unique 1',  {IN_PIPE=>$na_all}, {OUT=>"\n"}],
+  ['narm70', '--narm collapse 1',{IN_PIPE=>$na_all}, {OUT=>"\n"}],
+  ['narm71', '--narm countunique 1', {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
+
+  ['narm72', '--narm base64 1',  {IN_PIPE=>$na_all}, {OUT=>"\n\n\n"}],
+  ['narm73', '--narm md5 1',     {IN_PIPE=>$na_all}, {OUT=>"\n\n\n"}],
+  ['narm74', '--narm sha1 1',    {IN_PIPE=>$na_all}, {OUT=>"\n\n\n"}],
+  ['narm75', '--narm sha256 1',  {IN_PIPE=>$na_all}, {OUT=>"\n\n\n"}],
+  ['narm76', '--narm sha512 1',  {IN_PIPE=>$na_all}, {OUT=>"\n\n\n"}],
+  ['narm77', '--narm rmdup 1',   {IN_PIPE=>$na_all}, {OUT=>"NA\nNaN\n"}],
+  ['narm78', '--narm reverse',   {IN_PIPE=>$na_all}, {OUT=>"NA\nNA\nNaN\n"}],
+  ['narm79', '--narm transpose',   {IN_PIPE=>$na_all}, {OUT=>"NA\tNA\tNaN\n"}],
+
 );
 
 if ($have_stable_sort) {

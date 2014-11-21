@@ -267,6 +267,10 @@ value.
 @opindex -t
 Use character @var{X} instead of TAB as field delimiter.
 
+@item --narm
+@opindex --narm
+Skip @var{NA} or @var{NaN} values.
+
 @item --whitespace
 @itemx -W
 @opindex --whitespace

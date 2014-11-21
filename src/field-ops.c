@@ -51,6 +51,9 @@
 /* In the future: allow users to change this */
 int field_op_output_precision = 14 ;
 
+/* Should NA/NaN/empty values be silengtly ignored? */
+extern bool remove_na_values;
+
 struct operation_data operations[] =
 {
   /* OP_COUNT */
@@ -402,7 +405,8 @@ field_op_collect (struct fieldop *op,
 
   assert (str != NULL); /* LCOV_EXCL_LINE */
 
-  op->count++;
+  if (remove_na_values && is_na (str,slen))
+    return FLOCR_OK_SKIPPED;
 
   if (op->numeric)
     {
@@ -427,6 +431,8 @@ field_op_collect (struct fieldop *op,
         return FLOCR_INVALID_NUMBER;
 #endif
     }
+
+  op->count++;
 
   if (op->first && op->auto_first && op->numeric)
       op->value = num_value;
@@ -648,6 +654,86 @@ collapse_value ( struct fieldop *op )
         buf[i] = collapse_separator ;
 }
 
+void
+field_op_summarize_empty (struct fieldop *op)
+{
+  long double numeric_result = 0 ;
+
+  switch (op->op)
+    {
+    case OP_MEAN:
+    case OP_S_SKEWNESS:
+    case OP_P_SKEWNESS:
+    case OP_S_EXCESS_KURTOSIS:
+    case OP_P_EXCESS_KURTOSIS:
+    case OP_JARQUE_BERA:
+    case OP_DP_OMNIBUS:
+    case OP_MEDIAN:
+    case OP_QUARTILE_1:
+    case OP_QUARTILE_3:
+    case OP_IQR:
+    case OP_MAD:
+    case OP_MADRAW:
+    case OP_PSTDEV:
+    case OP_SSTDEV:
+    case OP_PVARIANCE:
+    case OP_SVARIANCE:
+    case OP_MODE:
+    case OP_ANTIMODE:
+      numeric_result = nanl ("");
+      break;
+
+    case OP_SUM:
+    case OP_COUNT:
+    case OP_COUNT_UNIQUE:
+      numeric_result = 0;
+      break;
+
+    case OP_MIN:
+    case OP_ABSMIN:
+      numeric_result = -HUGE_VALL;
+      break;
+
+    case OP_MAX:
+    case OP_ABSMAX:
+      numeric_result = HUGE_VALL;
+      break;
+
+    case OP_FIRST:
+    case OP_LAST:
+    case OP_RAND:
+      field_op_reserve_out_buf (op, 4);
+      strcpy (op->out_buf, "N/A");
+      break;
+
+    case OP_UNIQUE:
+    case OP_COLLAPSE:
+    case OP_BASE64:
+    case OP_DEBASE64:
+    case OP_MD5:
+    case OP_SHA1:
+    case OP_SHA256:
+    case OP_SHA512:
+      field_op_reserve_out_buf (op, 1);
+      strcpy (op->out_buf, "");
+      break;
+
+
+    case OP_TRANSPOSE: /* not handled here */
+    case OP_REVERSE:   /* not handled here */
+    case OP_REMOVE_DUPS:
+    case OP_NOOP:
+    default:
+      /* Should never happen */
+      internal_error ("bad op");     /* LCOV_EXCL_LINE */
+    }
+
+  if (op->res_type==NUMERIC_RESULT)
+    printf ("%.*Lg", field_op_output_precision, numeric_result);
+  else
+    printf ("%s", op->out_buf);
+}
+
 /* Prints to stdout the result of the field operation,
    based on collected values */
 void
@@ -655,6 +741,11 @@ field_op_summarize (struct fieldop *op)
 {
   long double numeric_result = 0 ;
   char tmpbuf[64]; /* 64 bytes - enough to hold sha512 */
+
+  /* In case of no values, each operation returns a specific result.
+     'no values' can happen with '--narm' and input of all N/As. */
+  if (op->count==0)
+    return field_op_summarize_empty (op);
 
   switch (op->op)
     {
@@ -1005,6 +1096,7 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
      return _("invalid base64 value");
    case FLOCR_OK:           /* LCOV_EXCL_LINE */
    case FLOCR_OK_KEEP_LINE: /* LCOV_EXCL_LINE */
+   case FLOCR_OK_SKIPPED:   /* LCOV_EXCL_LINE */
    default:                 /* LCOV_EXCL_LINE */
      assert (false);        /* LCOV_EXCL_LINE */
    }

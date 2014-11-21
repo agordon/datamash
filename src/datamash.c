@@ -115,12 +115,17 @@ static bool strict = true;
    will be filled with this value */
 static char* missing_field_filler = "N/A";
 
+/* If true, N/A, NaN and empty cells in numeric operations will be silently
+   ignored instead of triggering an error. Akin to R's "na.rm=TRUE" option. */
+bool remove_na_values = false;
+
 
 enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
   OUTPUT_HEADER_OPTION,
-  NO_STRICT_OPTION
+  NO_STRICT_OPTION,
+  REMOVE_NA_VALUES_OPTION
 };
 
 static char const short_options[] = "sfF:izg:t:HW";
@@ -139,6 +144,7 @@ static struct option const long_options[] =
   {"filler", required_argument, NULL, 'F'},
   {"sort", no_argument, NULL, 's'},
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
+  {"narm", no_argument, NULL, REMOVE_NA_VALUES_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0},
@@ -247,6 +253,9 @@ For grouping,per-line operations 'col' is the input field to use;\n\
   -t, --field-separator=X   use X instead of TAB as field delimiter\n\
 "), stdout);
       fputs (_("\
+      --narm                skip NA/NaN values\n\
+"), stdout);
+      fputs (_("\
   -W, --whitespace          use whitespace (one or more spaces and/or tabs)\n\
                               for field delimiters\n\
 "), stdout);
@@ -336,7 +345,7 @@ process_line (const struct line_record_t *line)
     {
       safe_line_record_get_field (line, op->field, &str, &len);
       flocr = field_op_collect (op, str, len);
-      if (flocr != FLOCR_OK && flocr != FLOCR_OK_KEEP_LINE)
+      if (!field_op_ok (flocr))
         {
           char *tmp = xmalloc (len+1);
           memcpy (tmp,str,len);
@@ -1012,6 +1021,10 @@ int main (int argc, char* argv[])
 
         case NO_STRICT_OPTION:
           strict = false;
+          break;
+
+        case REMOVE_NA_VALUES_OPTION:
+          remove_na_values = true;
           break;
 
         case 't':

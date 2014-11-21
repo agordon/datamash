@@ -34,12 +34,14 @@
 
 #include "utils.h"
 
-/* On some systems (e.g. Cygwin) nanl is not defined,
-   and gnulib does not yet provide a replacment
-   (though it does provide 'isnanl' replacement) */
-#ifndef nanl
-  #define nanl nan
-#endif
+bool _GL_ATTRIBUTE_PURE
+is_na (const char* value, const size_t len)
+{
+  assert (value != NULL); /* LCOV_EXCL_LINE */
+  return (len==2 && (strncasecmp (value,"NA",2)==0))
+          || (len==3 && (strncasecmp (value,"N/A",3)==0))
+          || (len==3 && (strncasecmp (value,"NAN",3)==0));
+}
 
 
 /* Compare two flowting-point variables, while avoiding '==' .

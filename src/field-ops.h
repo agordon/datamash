@@ -107,9 +107,13 @@ enum FIELD_OP_COLLECT_RESULT
 {
   FLOCR_OK = 0,
   FLOCR_OK_KEEP_LINE,
+  FLOCR_OK_SKIPPED,
   FLOCR_INVALID_NUMBER,
   FLOCR_INVALID_BASE64
 };
+
+#define field_op_ok(X) \
+  (((X)==FLOCR_OK)||((X)==FLOCR_OK_KEEP_LINE)||((X)==FLOCR_OK_SKIPPED))
 
 const char*
 field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr);
@@ -218,6 +222,13 @@ field_op_to_hex ( struct fieldop *op, const char *buffer, const size_t inlen );
    based on collected values */
 void
 field_op_summarize (struct fieldop *op);
+
+/* Prints to stdout the result of the field operation
+   when there are no input values.
+   'no values' can happen with '--narm' and input of all N/As.
+   The printed results are consistent as much as possible with R */
+void
+field_op_summarize_empty (struct fieldop *op);
 
 void
 summarize_field_ops ();

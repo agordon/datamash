@@ -26,6 +26,11 @@
  Generate Utility Functions module.
  */
 
+/* Returns true if 'value' can be considered a valid N/A.
+    'NA', 'N/A', 'NaN' and empty cells are valid N/As. */
+bool
+is_na (const char* value, const size_t len);
+
 
 /* Given an array of doubles, return the arithmetic mean value */
 long double
@@ -177,5 +182,13 @@ cmp_long_double (const void *p1, const void *p2);
 
 bool
 hash_compare_strings (void const *x, void const *y);
+
+/* On some systems (e.g. Cygwin) nanl is not defined,
+   and gnulib does not yet provide a replacment
+   (though it does provide 'isnanl' replacement) */
+#ifndef nanl
+  #define nanl nan
+#endif
+
 
 #endif
