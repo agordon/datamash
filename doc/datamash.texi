@@ -285,17 +285,13 @@ TAB character will be used as output field separator.
 end lines with 0 byte, not newline
 
 @item --help
-@itemx -h
 @opindex --help
-@opindex -h
 Print an informative help message on standard output and exit
 successfully.
 
 @item --version
-@itemx -v
 @opindex --version
-@opindex -v
-Print the version number and licensing information of Hello on
+Print the version number and licensing information of Datamash on
 standard output and then exit successfully.
 
 @end table
