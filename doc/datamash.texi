@@ -241,7 +241,7 @@ $ cat FILE | datamash --sort --group 1 sum 1
 
 @end table
 
-@exdent File Operation Options:
+@exdent File Operation options:
 
 @table @option
 
@@ -279,10 +279,10 @@ Use whitespace (one or more spaces and/or tabs) for field delimiters.
 TAB character will be used as output field separator.
 
 @item --zero-terminated
-@item -z
+@itemx -z
 @opindex --zero-terminated
 @opindex -z
-end lines with 0 byte, not newline
+End lines with a 0 byte, not newline.
 
 @item --help
 @opindex --help
