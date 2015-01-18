@@ -68,6 +68,10 @@ po/stamp-po
 po/POTFILES
 po/Rules-quot
 po/remove-potcdate.sed
+po/*.po
+po/*.gmo
+po/LINGUAS
+po/.reference
 
 test-suite.log
 
