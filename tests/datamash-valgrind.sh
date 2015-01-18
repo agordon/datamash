@@ -2,7 +2,7 @@
 
 #   Unit Tests for GNU Datamash - perform simple calculation on input data
 
-#    Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
+#    Copyright (C) 2014-2015 Assaf Gordon <assafgordon@gmail.com>
 #
 #    This file is part of GNU Datamash.
 #

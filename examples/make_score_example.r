@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-## Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
+## Copyright (C) 2014-2015 Assaf Gordon <assafgordon@gmail.com>
 ##
 ## This file is part of Compute.
 ##

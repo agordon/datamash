@@ -10,9 +10,6 @@ short scripts.
 
 Home page: http://www.gnu.org/software/datamash
 
-License: GPL Version 3 (or later).
-
-
 
 Usage
 =====
@@ -83,3 +80,13 @@ Questions and Bug Reports
 - Please send questions and bug reports to bug-datamash@gnu.org .
 - Searchable archive at http://lists.gnu.org/archive/html/bug-datamash .
 - Subscribe at https://lists.gnu.org/mailman/listinfo/bug-datamash .
+
+
+Copyright and License
+=====================
+Copyright (C) 2013-2015 Assaf Gordon <assafgordon@gmail.com>
+
+License: GPL Version 3 (or later).
+
+For any copyright year range specified as YYYY-ZZZZ in this package
+note that the range specifies every single year in that closed interval.

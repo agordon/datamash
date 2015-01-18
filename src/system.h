@@ -6,6 +6,9 @@
    system-dependent definitions for coreutils
    Copyright (C) 1989-2013 Free Software Foundation, Inc.
 
+   Modifications for GNU Datamash are
+   Copyright (C) 2014-2015 Assaf Gordon <assafgordon@gmail.com>
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
