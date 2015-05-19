@@ -45,13 +45,13 @@ my $prog = 'datamash';
 
 ##
 ## Portability hack:
-## find the exact wording of 'nan' (not-a-number).
-## It's lower case in GNU/Linux,FreeBSD,OpenBSD, but is "NaN" on DilOS.
-my $nan = `echo "1" | $prog sskew 1`;
-chomp $nan;
-if ($nan !~ m/^nan$/i) {
-  die "Failed to detect wording of 'nan' (got '$nan')";
-}
+## find the exact wording of 'nan' and inf (not-a-number).
+## It's lower case in GNU/Linux,FreeBSD,OpenBSD,
+## but is "NaN" on Illumos/OpenSolaris
+my $nan = `$prog ---print-nan`;
+die "test infrastructure failed: can't determine 'nan' string" unless $nan;
+my $inf = `$prog ---print-inf`;
+die "test infrastructure failed: can't determine 'inf' string" unless $inf;
 
 =pod
 Helper function, given a list of items,

@@ -125,7 +125,10 @@ enum
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
   OUTPUT_HEADER_OPTION,
   NO_STRICT_OPTION,
-  REMOVE_NA_VALUES_OPTION
+  REMOVE_NA_VALUES_OPTION,
+  UNDOC_PRINT_INF_OPTION,
+  UNDOC_PRINT_NAN_OPTION,
+  UNDOC_PRINT_PROGNAME_OPTION
 };
 
 static char const short_options[] = "sfF:izg:t:HW";
@@ -147,6 +150,10 @@ static struct option const long_options[] =
   {"narm", no_argument, NULL, REMOVE_NA_VALUES_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
+  /* Undocumented options */
+  {"-print-inf", no_argument, NULL, UNDOC_PRINT_INF_OPTION},
+  {"-print-nan", no_argument, NULL, UNDOC_PRINT_NAN_OPTION},
+  {"-print-progname", no_argument, NULL, UNDOC_PRINT_PROGNAME_OPTION},
   {NULL, 0, NULL, 0},
 };
 
@@ -1037,6 +1044,22 @@ int main (int argc, char* argv[])
         case 'W':
           in_tab = TAB_WHITESPACE;
           out_tab = '\t';
+          break;
+
+        case UNDOC_PRINT_INF_OPTION:
+        case UNDOC_PRINT_NAN_OPTION:
+          {
+            struct fieldop op;
+            op.op = (optc==UNDOC_PRINT_INF_OPTION)?OP_MAX:OP_MEAN;
+            op.res_type = NUMERIC_RESULT;
+            field_op_summarize_empty (&op);
+          }
+          exit (EXIT_SUCCESS);
+          break;
+
+        case UNDOC_PRINT_PROGNAME_OPTION:
+          printf ("%s", program_name);
+          exit (EXIT_SUCCESS);
           break;
 
         case_GETOPT_HELP_CHAR;

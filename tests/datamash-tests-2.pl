@@ -45,9 +45,17 @@ my $prog_bin = 'datamash';
 ##  the full path of the binary, if the binary is on the $PATH.
 ##  So we try to detect what is the actual returned value of the program
 ##  in case of an error.
-my $prog = `$prog_bin --foobar 2>&1 | head -n 1 | cut -f1 -d:`;
-chomp $prog if $prog;
+my $prog = `$prog_bin ---print-progname`;
 $prog = $prog_bin unless $prog;
+
+## Portability hack:
+## find the exact wording of 'nan' and inf (not-a-number).
+## It's lower case in GNU/Linux,FreeBSD,OpenBSD,
+## but is "NaN" on Illumos/OpenSolaris
+my $nan = `$prog_bin ---print-nan`;
+die "test infrastructure failed: can't determine 'nan' string" unless $nan;
+my $inf = `$prog_bin ---print-inf`;
+die "test infrastructure failed: can't determine 'inf' string" unless $inf;
 
 ## Portability hack
 ## Check if the system's sort supports stable sorting ('-s').
@@ -230,13 +238,13 @@ my @Tests =
   ['narm10', '--narm sum 1',  {IN_PIPE=>$na4}, {OUT=>"6\n"}],
   ['narm11', '--narm mean 1', {IN_PIPE=>$na4}, {OUT=>"2\n"}],
   # without --narm, 'nan' should be processed, not skipped
-  ['narm12', 'sum 1',         {IN_PIPE=>$na4}, {OUT=>"nan\n"}],
+  ['narm12', 'sum 1',         {IN_PIPE=>$na4}, {OUT=>"$nan\n"}],
 
   ## Test with 'nan'
   ['narm13', '--narm sum 1',  {IN_PIPE=>$na5}, {OUT=>"6\n"}],
   ['narm14', '--narm mean 1', {IN_PIPE=>$na5}, {OUT=>"2\n"}],
   # without --narm, 'nan' should be processed, not skipped
-  ['narm15', 'sum 1',         {IN_PIPE=>$na5}, {OUT=>"nan\n"}],
+  ['narm15', 'sum 1',         {IN_PIPE=>$na5}, {OUT=>"$nan\n"}],
 
   # These input have strings starting with 'NA' or 'NAN' but should not
   # be mistaken for them.
@@ -281,7 +289,7 @@ my @Tests =
 
   ['narm31', '--narm sum 1', {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
 
-  ['narm32', '--narm mean 1', {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm32', '--narm mean 1', {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
 
   # Test all NA input with all operations
   # tested to comply with R code of 'a = C(NA,NA,NA)'
@@ -289,32 +297,32 @@ my @Tests =
   # The tested function is mainly 'field_op_summarize_empty()'
   ['narm40', '--narm count 1',   {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
   ['narm41', '--narm sum 1',     {IN_PIPE=>$na_all}, {OUT=>"0\n"}],
-  ['narm42', '--narm min 1',     {IN_PIPE=>$na_all}, {OUT=>"-inf\n"}],
-  ['narm43', '--narm max 1',     {IN_PIPE=>$na_all}, {OUT=>"inf\n"}],
-  ['narm44', '--narm absmin 1',  {IN_PIPE=>$na_all}, {OUT=>"-inf\n"}],
-  ['narm45', '--narm absmax 1',  {IN_PIPE=>$na_all}, {OUT=>"inf\n"}],
+  ['narm42', '--narm min 1',     {IN_PIPE=>$na_all}, {OUT=>"-$inf\n"}],
+  ['narm43', '--narm max 1',     {IN_PIPE=>$na_all}, {OUT=>"$inf\n"}],
+  ['narm44', '--narm absmin 1',  {IN_PIPE=>$na_all}, {OUT=>"-$inf\n"}],
+  ['narm45', '--narm absmax 1',  {IN_PIPE=>$na_all}, {OUT=>"$inf\n"}],
   ['narm46', '--narm first 1',   {IN_PIPE=>$na_all}, {OUT=>"N/A\n"}],
   ['narm47', '--narm last 1',    {IN_PIPE=>$na_all}, {OUT=>"N/A\n"}],
   ['narm48', '--narm rand 1',    {IN_PIPE=>$na_all}, {OUT=>"N/A\n"}],
-  ['narm49', '--narm mean 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm51', '--narm median 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm52', '--narm q1 1',      {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm53', '--narm q3 1',      {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm54', '--narm iqr 1',     {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm55', '--narm pstdev 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm56', '--narm sstdev 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm57', '--narm pvar 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm58', '--narm svar 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm59', '--narm mad 1',     {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm60', '--narm madraw 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm61', '--narm sskew 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm62', '--narm pskew 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm63', '--narm skurt 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm64', '--narm pkurt 1',   {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm65', '--narm jarque 1',  {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm66', '--narm dpo 1',     {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm67', '--narm mode 1',    {IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
-  ['narm68', '--narm antimode 1',{IN_PIPE=>$na_all}, {OUT=>"nan\n"}],
+  ['narm49', '--narm mean 1',    {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm51', '--narm median 1',  {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm52', '--narm q1 1',      {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm53', '--narm q3 1',      {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm54', '--narm iqr 1',     {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm55', '--narm pstdev 1',  {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm56', '--narm sstdev 1',  {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm57', '--narm pvar 1',    {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm58', '--narm svar 1',    {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm59', '--narm mad 1',     {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm60', '--narm madraw 1',  {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm61', '--narm sskew 1',   {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm62', '--narm pskew 1',   {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm63', '--narm skurt 1',   {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm64', '--narm pkurt 1',   {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm65', '--narm jarque 1',  {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm66', '--narm dpo 1',     {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm67', '--narm mode 1',    {IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
+  ['narm68', '--narm antimode 1',{IN_PIPE=>$na_all}, {OUT=>"$nan\n"}],
   ['narm69', '--narm unique 1',  {IN_PIPE=>$na_all}, {OUT=>"\n"}],
   ['narm70', '--narm collapse 1',{IN_PIPE=>$na_all}, {OUT=>"\n"}],
   ['narm71', '--narm countunique 1', {IN_PIPE=>$na_all}, {OUT=>"0\n"}],

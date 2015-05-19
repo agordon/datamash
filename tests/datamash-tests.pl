@@ -40,8 +40,7 @@ my $prog_bin = 'datamash';
 ##  the full path of the binary, if the binary is on the $PATH.
 ##  So we try to detect what is the actual returned value of the program
 ##  in case of an error.
-my $prog = `$prog_bin --foobar 2>&1 | head -n 1 | cut -f1 -d:`;
-chomp $prog if $prog;
+my $prog = `$prog_bin ---print-progname`;
 $prog = $prog_bin unless $prog;
 
 ## Portability hack
