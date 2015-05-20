@@ -34,7 +34,6 @@ use warnings;
 use Coreutils;
 use CuSkip;
 use CuTmpdir qw(datamash);
-use Digest::MD5 qw(md5_hex);
 use MIME::Base64 ;
 
 (my $program_name = $0) =~ s|.*/||;

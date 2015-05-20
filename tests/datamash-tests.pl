@@ -29,7 +29,6 @@ use warnings;
 use Coreutils;
 use CuSkip;
 use CuTmpdir qw(datamash);
-use Digest::MD5 qw(md5_hex);
 use MIME::Base64 ;
 
 (my $program_name = $0) =~ s|.*/||;
@@ -331,11 +330,6 @@ sub single_line_base64($)
 	my $in = shift;
 	return encode_base64($in,'');
 }
-
-
-# md5 of the second column of '$in_g1'
-# NOTE: sha1/256/512 are tested in a separate file.
-my $out_g1_md5 = transform_column ($in_g1, 2, \&md5_hex);
 
 my $out_g1_base64 = transform_column ($in_g1, 2, \&single_line_base64);
 my $out_g1_debase64 = transform_column ($out_g1_base64, 1, \&decode_base64);
@@ -723,10 +717,18 @@ my @Tests =
   ['lst6',   '-t" " -g 1 last 2', {IN_PIPE=>$in_large_buffer2},
             {OUT=>$out_large_buffer_last}],
 
-
-  ## Test md5 operation
-  # NOTE: sha1/256/512 are tested in a separate file.
-  ['md5-1',   '-W md5 2',    {IN_PIPE=>$in_g1}, {OUT=>$out_g1_md5}],
+  ## Test md5/sha1/sha256/sha512 operations.
+  ## NOTE: this just ensures the operations don't fail, and produces the
+  ##       expected length of output strings.
+  ##       validation of the calculation is tested in datamash-{md5,sha}.pl.
+  ['md5-1',   '-W md5 2',    {IN_PIPE=>$in_g1},
+      {OUT_SUBST=>'s/^[a-f0-9]{32}$//'}, {OUT=>"\n\n\n\n"}],
+  ['sha1-1',   '-W sha1 2',    {IN_PIPE=>$in_g1},
+      {OUT_SUBST=>'s/^[a-f0-9]{40}$//'}, {OUT=>"\n\n\n\n"}],
+  ['sha256-1',   '-W sha256 2',    {IN_PIPE=>$in_g1},
+      {OUT_SUBST=>'s/^[a-f0-9]{64}$//'}, {OUT=>"\n\n\n\n"}],
+  ['sha512-1',   '-W sha512 2',    {IN_PIPE=>$in_g1},
+      {OUT_SUBST=>'s/^[a-f0-9]{128}$//'}, {OUT=>"\n\n\n\n"}],
 
   ## Test Base64
   ['base64-1','-W base64 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_base64}],
