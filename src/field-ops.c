@@ -1099,5 +1099,6 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
    case FLOCR_OK_SKIPPED:   /* LCOV_EXCL_LINE */
    default:                 /* LCOV_EXCL_LINE */
      assert (false);        /* LCOV_EXCL_LINE */
+     return "";             /* LCOV_EXCL_LINE */
    }
 }
