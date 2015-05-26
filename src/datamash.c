@@ -28,6 +28,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <strings.h>
 
 #include "system.h"
@@ -52,20 +54,6 @@
 #include "column-headers.h"
 #include "field-ops.h"
 #include "utils.h"
-
-/* The Printf-type for printing "size_t".
-   On all unixes and Cygwin "%zu" works.
-   On Mingw the type is "%Iu" (ms's printf doesn't support "z").
-   NOTE: This hack is needed for gnulib's error.
-         printf is already 'fixed' by adding '__USE_MINGW_ANSI_STDIO=1'
-         in 'configure.ac'.
-   NOTE: lowercase used to avoid 'sc_error_message_uppercase` syntax-check
-         rule failure. */
-#ifdef USE_MINGW
-#define priszt "Iu"
-#else
-#define priszt "zu"
-#endif
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "datamash"
@@ -300,9 +288,9 @@ For grouping,per-line operations 'col' is the input field to use;\n\
 static inline noreturn void
 error_not_enough_fields (const size_t needed, const size_t found)
 {
-  error (0, 0, _("invalid input: field %"priszt" requested, " \
-        "line %"priszt" has only %"priszt" fields"),
-        needed, line_number, found);
+  error (0, 0, _("invalid input: field %"PRIuMAX" requested, " \
+        "line %"PRIuMAX" has only %"PRIuMAX" fields"),
+        (uintmax_t)needed, (uintmax_t)line_number, (uintmax_t)found);
   exit (EXIT_FAILURE);
 }
 
@@ -358,9 +346,9 @@ process_line (const struct line_record_t *line)
           memcpy (tmp,str,len);
           tmp[len] = 0 ;
           error (EXIT_FAILURE, 0,
-              _("%s in line %"priszt" field %"priszt": '%s'"),
+              _("%s in line %"PRIuMAX" field %"PRIuMAX": '%s'"),
               field_op_collect_result_name (flocr),
-              line_number, op->field, tmp);
+              (uintmax_t)line_number, (uintmax_t)op->field, tmp);
         }
       keep_line = keep_line || (flocr==FLOCR_OK_KEEP_LINE);
 
@@ -597,10 +585,11 @@ transpose_file ()
       const size_t num_fields = line_record_num_fields (thisline);
 
       if (strict && line_number>1 && num_fields != prev_num_fields)
-          error (EXIT_FAILURE, 0, _("transpose input error: line %"priszt" " \
-                    "has %"priszt" fields (previous lines had %"priszt");\n" \
+          error (EXIT_FAILURE, 0, _("transpose input error: line %"PRIuMAX" " \
+                    "has %"PRIuMAX" fields (previous lines had %"PRIuMAX");\n" \
                     "see --help to disable strict mode"),
-                    line_number, num_fields, prev_num_fields);
+                    (uintmax_t)line_number, (uintmax_t)num_fields,
+                    (uintmax_t)prev_num_fields);
 
       prev_num_fields = num_fields;
 
@@ -653,10 +642,11 @@ reverse_fields_in_file ()
 
       if (strict && line_number>1 && num_fields != prev_num_fields)
           error (EXIT_FAILURE, 0, _("reverse-field input error: line " \
-                       "%"priszt" has %"priszt" fields (previous lines had " \
-                       "%"priszt");\n" \
+                       "%"PRIuMAX" has %"PRIuMAX" fields (previous lines had " \
+                       "%"PRIuMAX");\n" \
                        "see --help to disable strict mode"),
-                         line_number, num_fields, prev_num_fields);
+                        (uintmax_t)line_number, (uintmax_t)num_fields,
+                        (uintmax_t)prev_num_fields);
 
       prev_num_fields = num_fields;
 
@@ -885,7 +875,8 @@ open_input ()
       for (size_t i = 0; i < num_group_columns; ++i)
         {
           const size_t col_num = group_columns[i].col_number;
-          snprintf (tmp,sizeof (tmp),"-k%zu,%zu ",col_num,col_num);
+          snprintf (tmp,sizeof (tmp),"-k%"PRIuMAX",%"PRIuMAX" ",
+                    (uintmax_t)col_num,(uintmax_t)col_num);
           if (strlen (tmp)+strlen (cmd)+1 >= sizeof (cmd))
             error (EXIT_FAILURE, 0,
                    _("sort command too-long (please report this bug)"));

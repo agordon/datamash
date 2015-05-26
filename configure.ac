@@ -80,31 +80,6 @@ if test "$werror" = yes; then
   AC_SUBST([WERROR_CFLAGS])
 fi
 
-## Add --enable-mingw option to ./configure,
-## To enable/disable special handling required for Cross-Compiling
-## Windows binaries with MingW.
-## If the option is not specified, try to auto-detect mingw.
-AC_ARG_ENABLE([mingw],
-  [AS_HELP_STRING([--enable-mingw],
-     [enable options for cross-compilation with mingw])],
-  [case $enableval in
-     yes|no) ;;
-     *)      AC_MSG_ERROR([bad value $enableval for mingw option]) ;;
-   esac
-   mingw=$enableval],
-   [case "$host_os" in
-    mingw*) mingw=yes ;;
-    *) mingw=no ;;
-    esac]
-)
-if test "x$mingw" = xyes; then
-AC_DEFINE([USE_MINGW],[1],
-          [Define to 1 if to enable special printf processing under mingw])
-MINGW_CFLAGS="-D__USE_MINGW_ANSI_STDIO=1"
-AC_SUBST([MINGW_CFLAGS])
-AC_MSG_NOTICE([Enabling MingW compilation flags])
-fi
-
 ## Test for CygWin hosts - these have a broken 'strtold()' implementation:
 ##  calling strtold("4\t5",NULL) returns "e+9999",
 ## whereas every other (sane) system returns "4" and stops at the whitespace.
