@@ -115,7 +115,7 @@ AC_SUBST([PERL])
 AM_CONDITIONAL([PERL_FOUND],[test -n "$PERL"])
 
 # i18n support from GNU gettext.
-AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT_VERSION([0.19.4])
 AM_GNU_GETTEXT([external])
 
 AC_CONFIG_FILES([Makefile
