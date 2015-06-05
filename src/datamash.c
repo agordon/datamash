@@ -168,18 +168,15 @@ usage (int status)
           stdout);
       fputs ("\n\n", stdout);
       fputs (_("\
-'op' is the operation to perform; If a primary operation is used, it\n\
-must be listed first, optionally followed by other operations.\n"), stdout);
+'op' is the operation to perform.  If a primary operation is used,\n\
+it must be listed first, optionally followed by other operations.\n"), stdout);
       fputs (_("\
-'fld' is the input field to use;\n\
-'fld' can be a number (1=first field), or a field name when using\n\
--H or --header-in options.\n\
-"), stdout);
+'fld' is the input field to use.  'fld' can be a number (1=first field),\n\
+or a field name when using the -H or --header-in options.\n"), stdout);
       fputs (_("\
-multiple fields can be listed with comma (e.g. 1,6,8). range of fields\n\
-can be listed with a dash (e.g 2-8). Use colons for operations which\n\
-require a pair of fields (e.g. 'pcov 2:6').\n\
-"), stdout);
+Multiple fields can be listed with a comma (e.g. 1,6,8).  A range of\n\
+fields can be listed with a dash (e.g. 2-8).  Use colons for operations\n\
+which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs ("\n\n", stdout);
       fputs (_("Primary operations:\n"),stdout);
       fputs ("  groupby, crosstab, transpose, reverse, check\n",stdout);
