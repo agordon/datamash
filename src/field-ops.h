@@ -284,5 +284,10 @@ field_op_have_named_fields ();
 void
 field_op_find_named_columns ();
 
+/* Helper function to print to stdout the 'empty value' of a numeric
+   operation (e.g. what's printed by 'OP_MEAN' with empty input).
+   Used in some of the tests. */
+void
+field_op_print_empty_value (enum operation_mode mode);
 
 #endif

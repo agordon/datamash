@@ -1102,3 +1102,12 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
      return "";             /* LCOV_EXCL_LINE */
    }
 }
+
+void
+field_op_print_empty_value (enum operation_mode mode)
+{
+  struct fieldop op;
+  op.op = mode;
+  op.res_type = NUMERIC_RESULT;
+  field_op_summarize_empty (&op);
+}

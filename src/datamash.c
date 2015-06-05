@@ -1039,12 +1039,8 @@ int main (int argc, char* argv[])
 
         case UNDOC_PRINT_INF_OPTION:
         case UNDOC_PRINT_NAN_OPTION:
-          {
-            struct fieldop op;
-            op.op = (optc==UNDOC_PRINT_INF_OPTION)?OP_MAX:OP_MEAN;
-            op.res_type = NUMERIC_RESULT;
-            field_op_summarize_empty (&op);
-          }
+          field_op_print_empty_value ( (optc==UNDOC_PRINT_INF_OPTION)
+                                       ?OP_MAX:OP_MEAN );
           exit (EXIT_SUCCESS);
           break;
 
