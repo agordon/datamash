@@ -458,6 +458,20 @@ process_input_header (FILE *stream)
   line_record_free (&lr);
 }
 
+/* Process a completed group of data lines
+   (all with the same 'group by' keys). */
+static void
+process_group (const struct line_record_t* line)
+{
+  if (lines_in_group>0)
+    {
+      print_input_line (line);
+      summarize_field_ops ();
+    }
+  lines_in_group = 0;
+  reset_field_ops ();
+}
+
 /*
     Process each line in the input.
 
@@ -515,12 +529,9 @@ process_file ()
           new_group = (group_first_line->lbuf.length == 0 || line_mode
                        || different (thisline, group_first_line));
 
-          if (new_group && lines_in_group>0)
+          if (new_group)
             {
-              print_input_line (group_first_line);
-              summarize_field_ops ();
-              reset_field_ops ();
-              lines_in_group = 0 ;
+              process_group (group_first_line);
               group_first_line->lbuf.length = 0;
             }
         }
@@ -540,12 +551,7 @@ process_file ()
     }
 
   /* summarize last group */
-  if (lines_in_group)
-    {
-      print_input_line (group_first_line);
-      summarize_field_ops ();
-      reset_field_ops ();
-    }
+  process_group (group_first_line);
 
   line_record_free (&lb1);
   line_record_free (&lb2);
