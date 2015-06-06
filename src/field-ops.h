@@ -166,7 +166,9 @@ struct fieldop
   size_t str_buf_used; /* number of bytes used in the buffer */
   size_t str_buf_alloc; /* number of bytes allocated in the buffer */
 
-  /* Output buffer for line operations (md5/sha1/256/512/base64) */
+  /* Output buffer containing the final results of an operation,
+     set by 'summarize' functions.
+     also used for line operations (md5/sha1/256/512/base64). */
   char *out_buf;
   size_t out_buf_used;
   size_t out_buf_alloc;

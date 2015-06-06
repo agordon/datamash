@@ -729,9 +729,11 @@ field_op_summarize_empty (struct fieldop *op)
     }
 
   if (op->res_type==NUMERIC_RESULT)
-    printf ("%.*Lg", field_op_output_precision, numeric_result);
-  else
-    printf ("%s", op->out_buf);
+    {
+      field_op_reserve_out_buf (op, field_op_output_precision*2);
+      snprintf (op->out_buf, op->out_buf_alloc,
+                "%.*Lg", field_op_output_precision, numeric_result);
+    }
 }
 
 /* Prints to stdout the result of the field operation,
@@ -745,7 +747,10 @@ field_op_summarize (struct fieldop *op)
   /* In case of no values, each operation returns a specific result.
      'no values' can happen with '--narm' and input of all N/As. */
   if (op->count==0)
-    return field_op_summarize_empty (op);
+    {
+      field_op_summarize_empty (op);
+      return ;
+    }
 
   switch (op->op)
     {
@@ -910,9 +915,11 @@ field_op_summarize (struct fieldop *op)
     }
 
   if (op->res_type==NUMERIC_RESULT)
-    printf ("%.*Lg", field_op_output_precision, numeric_result);
-  else
-    printf ("%s", op->out_buf);
+    {
+      field_op_reserve_out_buf (op, field_op_output_precision*2);
+      snprintf (op->out_buf, op->out_buf_alloc,
+                "%.*Lg", field_op_output_precision, numeric_result);
+    }
 }
 
 /* reset operation values for next group */
@@ -1050,6 +1057,7 @@ summarize_field_ops ()
   for (struct fieldop *p = field_ops; p ; p=p->next)
     {
       field_op_summarize (p);
+      fputs (p->out_buf, stdout);
 
       /* print field separator */
       if (p->next)
@@ -1106,8 +1114,9 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
 void
 field_op_print_empty_value (enum operation_mode mode)
 {
-  struct fieldop op;
+  struct fieldop op = {0};
   op.op = mode;
   op.res_type = NUMERIC_RESULT;
   field_op_summarize_empty (&op);
+  fputs (op.out_buf, stdout);
 }
