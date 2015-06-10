@@ -746,8 +746,7 @@ my @Tests =
     {ERR=>"$prog: conflicting operation found: expecting line operations," .
             " but found grouping operation 'sum'\n"}],
   ['mixop3', 'md5 1 transpose 2', {EXIT=>1},
-    {ERR=>"$prog: conflicting operation found: expecting line operations," .
-            " but found transpose operation 'transpose'\n"}],
+    {ERR=>"$prog: conflicting operation 'transpose'\n"}],
 
   # Test large (and increasing) number of fields
   ['wide1', '-t" " -g 1 countunique 2', {IN_PIPE=>$in_wide1}, {OUT=>"A 1\n"}],

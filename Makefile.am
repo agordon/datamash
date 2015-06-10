@@ -35,6 +35,8 @@ datamash_SOURCES = src/system.h \
 	       src/utils.c src/utils.h \
 	       src/text-lines.c src/text-lines.h \
 	       src/column-headers.c src/column-headers.h \
+	       src/op-defs.c src/op-defs.h \
+	       src/op-parser.c src/op-parser.h \
 	       src/field-ops.c src/field-ops.h \
 	       src/strcnt.c src/strcnt.h \
 	       src/datamash.c

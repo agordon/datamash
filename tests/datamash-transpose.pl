@@ -180,9 +180,9 @@ my @Tests =
 
     # Extra operands
     ['tr9',  'transpose aaa', {IN_PIPE=>''}, {EXIT=>1},
-      {ERR=>"$prog: extra operands after 'transpose'\n"}],
+      {ERR=>"$prog: extra operand 'aaa'\n"}],
     ['rev9', 'reverse aaa', {IN_PIPE=>''}, {EXIT=>1},
-      {ERR=>"$prog: extra operands after 'reverse'\n"}],
+      {ERR=>"$prog: extra operand 'aaa'\n"}],
 
     # empty input
     ['tr10',  'transpose', {IN_PIPE=>""}, {OUT=>""}],

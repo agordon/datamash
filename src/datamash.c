@@ -52,6 +52,8 @@
 #include "text-options.h"
 #include "text-lines.h"
 #include "column-headers.h"
+#include "op-defs.h"
+#include "op-parser.h"
 #include "field-ops.h"
 #include "utils.h"
 
@@ -78,16 +80,8 @@ static bool input_header = false;
 /* If true, print the entire input line. Otherwise, print only the key fields */
 static bool print_full_line = false;
 
-struct group_column_t
-{
-  size_t col_number;    /* 1 = first field */
-  bool   col_by_name;   /* true if the user gave a column name */
-  char*  col_name;      /* column name - to be converted to number after
-                           header line is read */
-};
-static bool   group_column_have_names = false;
-static size_t num_group_columns = 0;
-static struct group_column_t *group_columns = NULL;
+/* processing mode, group fields, field operations */
+static struct datamash_ops *dm = NULL;
 
 static bool line_mode = false; /* if TRUE, handle each line as a group */
 
@@ -148,19 +142,19 @@ static struct option const long_options[] =
 void
 group_columns_find_named_columns ()
 {
-  for (size_t i = 0; i < num_group_columns; ++i)
+  for (size_t i = 0; i < dm->num_grps; ++i)
     {
-      struct group_column_t *p = &group_columns[i];
+      struct group_column_t *p = &dm->grps[i];
 
-      if (!p->col_by_name)
+      if (!p->by_name)
         continue;
 
-      p->col_number = get_input_field_number (p->col_name);
-      if (p->col_number == 0)
+      p->num = get_input_field_number (p->name);
+      if (p->num == 0)
         error (EXIT_FAILURE, 0,
                 _("column name %s not found in input file"),
-                quote (p->col_name));
-      p->col_by_name = false;
+                quote (p->name));
+      p->by_name = false;
     }
 }
 
@@ -309,9 +303,9 @@ safe_line_record_get_field (const struct line_record_t *lr, const size_t n,
 static bool
 different (const struct line_record_t* l1, const struct line_record_t* l2)
 {
-  for (size_t i = 0; i < num_group_columns; ++i)
+  for (size_t i = 0; i < dm->num_grps; ++i)
     {
-      const size_t col_num = group_columns[i].col_number;
+      const size_t col_num = dm->grps[i].num;
       const char *str1=NULL,*str2=NULL;
       size_t len1=0,len2=0;
       safe_line_record_get_field (l1, col_num, &str1, &len1);
@@ -377,9 +371,9 @@ print_input_line (const struct line_record_t* lb)
     }
   else
     {
-      for (size_t i = 0; i < num_group_columns; ++i)
+      for (size_t i = 0; i < dm->num_grps; ++i)
         {
-          const size_t col_num = group_columns[i].col_number;
+          const size_t col_num = dm->grps[i].num;
           safe_line_record_get_field (lb, col_num, &str, &len);
           ignore_value (fwrite (str,sizeof (char),len,stdout));
           print_field_separator ();
@@ -403,6 +397,7 @@ print_column_headers ()
 {
   if (print_full_line)
     {
+      /* Print the headers of all the input fields */
       for (size_t n=1; n<=get_num_column_headers (); ++n)
         {
           fputs (get_input_field_name (n), stdout);
@@ -411,9 +406,12 @@ print_column_headers ()
     }
   else
     {
-      for (size_t i = 0; i < num_group_columns; ++i)
+      /* print only the headers of the group-by fields, e.g
+        'GroupBy(field-3)'  (without input headers), or
+        'GroupBy(NAME)'     (with input headers)           */
+      for (size_t i = 0; i < dm->num_grps; ++i)
         {
-          const size_t col_num = group_columns[i].col_number;
+          const size_t col_num = dm->grps[i].num;
           if (col_num > get_num_column_headers ())
             error_not_enough_fields (col_num, get_num_column_headers ());
           printf ("GroupBy" "(%s)",get_input_field_name (col_num));
@@ -421,11 +419,15 @@ print_column_headers ()
         }
     }
 
+  /* add headers of the operations, e.g.
+        'sum(field-3)'  (without input headers), or
+        'sum(NAME)'     (with input headers)           */
   for (struct fieldop *op = field_ops; op ; op=op->next)
     {
       if (op->field > get_num_column_headers ())
         error_not_enough_fields (op->field, get_num_column_headers ());
-      printf ("%s" "(%s)",op->name, get_input_field_name (op->field));
+      printf ("%s" "(%s)",get_field_operation_name (op->op),
+                          get_input_field_name (op->field));
 
       if (op->next)
         print_field_separator ();
@@ -452,8 +454,7 @@ process_input_header (FILE *stream)
          header line. */
       if (field_op_have_named_fields ())
         field_op_find_named_columns ();
-      if (group_column_have_names)
-        group_columns_find_named_columns ();
+      group_columns_find_named_columns ();
     }
   line_record_free (&lr);
 }
@@ -494,11 +495,7 @@ process_file ()
      in 'open_input' - read it now */
   if (input_header && line_number==0)
     process_input_header (input_stream);
-  /* If using named-columns, but no input header - abort */
-  if ((field_op_have_named_fields () || group_column_have_names)
-      && !input_header)
-    error (EXIT_FAILURE, 0,
-           _("-H or --header-in must be used with named columns"));
+
   /* If there is an input header line, and the user requested an output
      header line, and the input line was read successfully, print headers */
   if (input_header && output_header && line_number==1)
@@ -524,7 +521,7 @@ process_file ()
 
 
       /* If no keys are given, the entire input is considered one group */
-      if (num_group_columns || line_mode)
+      if (dm->num_grps || line_mode)
         {
           new_group = (group_first_line->lbuf.length == 0 || line_mode
                        || different (thisline, group_first_line));
@@ -627,7 +624,7 @@ transpose_file ()
 }
 
 /*
-    Revers the fields in each line of the input file
+    Reverse the fields in each line of the input file
  */
 static void
 reverse_fields_in_file ()
@@ -745,8 +742,6 @@ remove_dups_in_file ()
   size_t buffer_list_alloc = 0;
   size_t buffer_list_size = 0;
 
-  assert (field_ops != NULL); /* LCOV_EXCL_LINE */
-
   thisline = &lr;
   line_record_init (thisline);
   ht = hash_initialize (init_table_size, NULL,
@@ -770,10 +765,10 @@ remove_dups_in_file ()
 
           /* If using named-columns, find the column numbers after reading the
              header line. */
-          if (field_op_have_named_fields ())
+          if (dm->header_required)
             {
               build_input_line_headers (&lr, true);
-              field_op_find_named_columns ();
+              group_columns_find_named_columns ();
             }
 
           if (output_header)
@@ -785,10 +780,9 @@ remove_dups_in_file ()
             }
         }
     }
-  if (!input_header && field_op_have_named_fields ())
-    error (EXIT_FAILURE, 0,
-           _("-H or --header-in must be used with named columns"));
-  const size_t key_col = field_ops->field;
+
+  assert (dm->num_grps==1); /* LCOV_EXCL_LINE */
+  const size_t key_col = dm->grps[0].num;
 
   /* TODO: handle (output_header && !input_header) by generating dummy headers
            after the first line is read, and the number of fields is known. */
@@ -846,7 +840,7 @@ remove_dups_in_file ()
 static void
 open_input ()
 {
-  if (pipe_through_sort && num_group_columns>0)
+  if (pipe_through_sort && dm->num_grps>0)
     {
       char tmp[INT_BUFSIZE_BOUND (size_t)*2+5];
       char cmd[1024];
@@ -878,9 +872,9 @@ open_input ()
           snprintf (tmp,sizeof (tmp),"-t %c%c%c ",qc,in_tab,qc);
           strcat (cmd,tmp);
         }
-      for (size_t i = 0; i < num_group_columns; ++i)
+      for (size_t i = 0; i < dm->num_grps; ++i)
         {
-          const size_t col_num = group_columns[i].col_number;
+          const size_t col_num = dm->grps[i].num;
           snprintf (tmp,sizeof (tmp),"-k%"PRIuMAX",%"PRIuMAX" ",
                     (uintmax_t)col_num,(uintmax_t)col_num);
           if (strlen (tmp)+strlen (cmd)+1 >= sizeof (cmd))
@@ -918,59 +912,11 @@ close_input ()
     error (EXIT_FAILURE, errno, _("read error (on close)"));
 }
 
-static void
-free_sort_keys ()
-{
-  free (group_columns);
-}
-
-/* Parse the "--group=X[,Y,Z]" parameter, populating 'keylist' */
-static void
-parse_group_spec ( char* spec )
-{
-  long int val;
-  size_t idx;
-  char *tok, *endptr;
-
-  /* Count number of groups parameters, by number of commas */
-  num_group_columns = strcnt (spec, ',')+1;
-
-  /* Allocate the group_columns */
-  group_columns = xnmalloc (num_group_columns, sizeof (struct group_column_t));
-
-  idx=0;
-  while ( (tok = strsep (&spec, ",")) != NULL)
-    {
-      if (strlen (tok) == 0)
-        error (EXIT_FAILURE, 0, _("invalid empty grouping parameter"));
-      errno = 0 ;
-      val = strtol (tok, &endptr, 10);
-      if (errno == 0 && endptr != tok && *endptr == 0)
-        {
-          /* If strtol succeeded, it's a valid number. */
-          if (val<1)
-            error (EXIT_FAILURE, 0, _("invalid grouping parameter %s"),
-                                        quote (tok));
-          group_columns[idx].col_number = val;
-          group_columns[idx].col_by_name = false;
-          group_columns[idx].col_name = NULL;
-        }
-      else
-        {
-          /* If strrol failed, assume it's a named column - resolve it later. */
-          group_columns[idx].col_name = xstrdup (tok);
-          group_columns[idx].col_number = 0;
-          group_columns[idx].col_by_name = true;
-          group_column_have_names = true;
-        }
-      idx++;
-    }
-}
-
 int main (int argc, char* argv[])
 {
   int optc;
-  enum operation_mode op_mode;
+  enum processing_mode premode = MODE_INVALID;
+  const char* premode_group_spec = NULL;
   set_program_name (argv[0]);
 
   setlocale (LC_ALL, "");
@@ -996,7 +942,8 @@ int main (int argc, char* argv[])
           break;
 
         case 'g':
-          parse_group_spec (optarg);
+          premode = MODE_GROUPBY;
+          premode_group_spec = optarg;
           break;
 
         case 'i':
@@ -1064,48 +1011,65 @@ int main (int argc, char* argv[])
         }
     }
 
+
   if (argc <= optind)
     {
       error (0, 0, _("missing operation specifiers"));
       usage (EXIT_FAILURE);
     }
 
-  op_mode = parse_operation_mode (argc, optind, argv);
+  /* The rest of the parameters are the operations */
+  if (premode == MODE_INVALID)
+    dm = datamash_ops_parse (argc - optind, (const char**)argv+optind);
+  else
+    dm = datamash_ops_parse_premode (premode, premode_group_spec,
+                            argc - optind, (const char**)argv+optind);
+
+  /* If using named-columns, but no input header - abort */
+  if (dm->header_required && !input_header)
+    error (EXIT_FAILURE, 0,
+           _("-H or --header-in must be used with named columns"));
+
+  /* Create field-ops based on parsed command-line */
+  for (size_t i=0;i<dm->num_ops;++i)
+    new_field_op (dm->ops[i].op, dm->ops[i].by_name,
+                  dm->ops[i].num,dm->ops[i].name);
+
 
   open_input ();
-  switch (op_mode)
+  switch (dm->mode)
     {
-    case LINE_MODE:
+    case MODE_PER_LINE:
       line_mode = true;
       /* fall through */
-    case GROUPING_MODE:
+    case MODE_GROUPBY:
       process_file ();
       break;
 
-    case NOOP_MODE:
+    case MODE_NOOP:
       noop_file ();
       break;
 
-    case TRANSPOSE_MODE:
+    case MODE_TRANSPOSE:
       transpose_file ();
       break;
 
-    case REVERSE_FIELD_MODE:
+    case MODE_REVERSE:
       reverse_fields_in_file ();
       break;
 
-    case REMOVE_DUPS_MODE:
+    case MODE_REMOVE_DUPS:
       remove_dups_in_file ();
       break;
 
-    case UNKNOWN_MODE:
+    case MODE_INVALID:
     default:
       internal_error ("op mode"); /* LCOV_EXCL_LINE */
     }
   free_field_ops ();
-  free_sort_keys ();
   free_column_headers ();
   close_input ();
+  datamash_ops_free (dm);
 
   return EXIT_SUCCESS;
 }

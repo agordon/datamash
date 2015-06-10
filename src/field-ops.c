@@ -46,6 +46,7 @@
 #include "text-options.h"
 #include "text-lines.h"
 #include "column-headers.h"
+#include "op-defs.h"
 #include "field-ops.h"
 
 /* In the future: allow users to change this */
@@ -57,98 +58,80 @@ extern bool remove_na_values;
 struct operation_data operations[] =
 {
   /* OP_COUNT */
-  {"count",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {STRING_SCALAR,  IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_SUM */
-  {"sum",     NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_MIN */
-  {"min",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_SCALAR, AUTO_SET_FIRST, NUMERIC_RESULT},
   /* OP_MAX */
-  {"max",     NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_SCALAR, AUTO_SET_FIRST, NUMERIC_RESULT},
   /* OP_ABSMIN */
-  {"absmin",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_SCALAR, AUTO_SET_FIRST, NUMERIC_RESULT},
   /* OP_ABSMAX */
-  {"absmax",  NUMERIC_SCALAR, AUTO_SET_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_SCALAR, AUTO_SET_FIRST, NUMERIC_RESULT},
   /* OP_FIRST */
-  {"first",   STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
+  {STRING_SCALAR,  IGNORE_FIRST, STRING_RESULT},
   /* OP_LAST */
-  {"last",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
+  {STRING_SCALAR,  IGNORE_FIRST, STRING_RESULT},
   /* OP_RAND */
-  {"rand",    STRING_SCALAR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
+  {STRING_SCALAR,  IGNORE_FIRST, STRING_RESULT},
   /* OP_MEAN */
-  {"mean",    NUMERIC_SCALAR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_MEDIAN */
-  {"median",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_QUARTILE_1 */
-  {"q1",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_QUARTILE_3 */
-  {"q3",      NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_IQR */
-  {"iqr",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_PSTDEV */
-  {"pstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_SSTDEV */
-  {"sstdev",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_PVARIANCE */
-  {"pvar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_SVARIANCE */
-  {"svar",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_MAD */
-  {"mad",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_MADRAW */
-  {"madraw",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_S_SKEWNESS */
-  {"sskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_P_SKEWNESS */
-  {"pskew",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_S_EXCESS_KURTOSIS */
-  {"skurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_P_EXCESS_KURTOSIS */
-  {"pkurt",   NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_JARQUE_BETA */
-  {"jarque",  NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_DP_OMNIBUS */
-  {"dpo",     NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_MODE */
-  {"mode",    NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_ANTIMODE */
-  {"antimode",NUMERIC_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_UNIQUE */
-  {"unique",  STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
+  {STRING_VECTOR,  IGNORE_FIRST, STRING_RESULT},
   /* OP_COLLAPSE */
-  {"collapse",STRING_VECTOR,  IGNORE_FIRST, GROUPING_MODE, STRING_RESULT},
+  {STRING_VECTOR,  IGNORE_FIRST, STRING_RESULT},
   /* OP_COUNT_UNIQUE */
-  {"countunique",STRING_VECTOR, IGNORE_FIRST, GROUPING_MODE, NUMERIC_RESULT},
-  /* OP_TRANSPOSE */
-  {"transpose",STRING_SCALAR, IGNORE_FIRST, TRANSPOSE_MODE, STRING_RESULT},
-  /* OP_REVERSE */
-  {"reverse", STRING_SCALAR, IGNORE_FIRST, REVERSE_FIELD_MODE, STRING_RESULT},
+  {STRING_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_BASE64 */
-  {"base64",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_DEBASE64 */
-  {"debase64",STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_MD5 */
-  {"md5",     STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_SHA1 */
-  {"sha1",    STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_SHA256 */
-  {"sha256",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_SHA512 */
-  {"sha512",  STRING_SCALAR, IGNORE_FIRST, LINE_MODE, STRING_RESULT},
-  /* OP_REMOVE_DUPS */
-  {"rmdup",   STRING_SCALAR, IGNORE_FIRST, REMOVE_DUPS_MODE, STRING_RESULT},
-  /* OP_NOOP */
-  {"noop",    STRING_SCALAR, IGNORE_FIRST, NOOP_MODE, STRING_RESULT},
-  {NULL, 0, 0, UNKNOWN_MODE, NUMERIC_RESULT}
-};
-
-const char* operation_mode_name[] = {
-  "(unknown)",   /* UNKNOWN_MODE */
-  "grouping",    /* GROUPING_MODE */
-  "transpose",   /* TRANSPOSE_MODE */
-  "line",        /* REMOVE-DUPS MODE - shown as 'line' mode */
-  "reverse",     /* REVERSE_FIELD_MODE */
-  "line",        /* LINE_MODE */
-  "no-op",       /* NO-OP MODE - for testing */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  {0, 0, NUMERIC_RESULT}
 };
 
 struct fieldop* field_ops = NULL;
@@ -282,59 +265,23 @@ field_op_sort_values (struct fieldop *op)
   qsortfl (op->values, op->num_values);
 }
 
-/* Converts a string to number (field number).
-   Exits with an error message (using 'op') on invalid field number. */
-static size_t
-try_get_field_number (enum operation op, const char* field_str)
-{
-  long int val;
-  char *endptr;
-  if (strlen (field_str)==0)
-    error (EXIT_FAILURE, 0, _("invalid empty column for operation %s"),
-                               quote (operations[op].name));
-
-  errno = 0 ;
-  val = strtol (field_str, &endptr, 10);
-  /* If conversion to a number failed, assume this is a named column,
-     which will require a header line - defer error detection for later,
-     after we read the first line of the file. */
-  if (errno != 0 || endptr == field_str
-      || endptr == NULL || *endptr != 0)
-    return 0;
-
-  if (val<1)
-    error (EXIT_FAILURE, 0, _("invalid column '%s' for operation %s"),
-                               field_str,quote (operations[op].name));
-  return (size_t)val;
-}
-
-
 /* Allocate a new fieldop, initialize it based on 'oper',
    and add it to the linked-list of operations */
 struct fieldop *
-new_field_op (enum operation oper, const char* field_name)
+new_field_op (enum field_operation oper, bool by_name, size_t num, const char* name)
 {
   struct fieldop *op = XZALLOC (struct fieldop);
 
   op->op = oper;
   op->acc_type = operations[oper].acc_type;
   op->res_type = operations[oper].res_type;
-  op->name = operations[oper].name;
   op->numeric = (op->acc_type == NUMERIC_SCALAR
                  || op->acc_type == NUMERIC_VECTOR);
   op->auto_first = operations[oper].auto_first;
 
-  op->field = try_get_field_number (oper, field_name);
-  if (op->field == 0)
-    {
-      op->field_by_name = true;
-      op->field_name = xstrdup (field_name);
-    }
-  else
-    {
-      op->field_by_name = false;
-      op->field_name = NULL;
-    }
+  op->field = num;
+  op->field_by_name = by_name;
+  op->field_name = (by_name)?xstrdup (name):NULL;
   op->first = true;
   op->value = 0;
   op->count = 0;
@@ -556,10 +503,7 @@ field_op_collect (struct fieldop *op,
       field_op_add_string (op, str, slen);
       break;
 
-    case OP_REVERSE:
-    case OP_TRANSPOSE:
-    case OP_REMOVE_DUPS:
-    case OP_NOOP:
+    case OP_INVALID:
     default:
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
@@ -718,11 +662,7 @@ field_op_summarize_empty (struct fieldop *op)
       strcpy (op->out_buf, "");
       break;
 
-
-    case OP_TRANSPOSE: /* not handled here */
-    case OP_REVERSE:   /* not handled here */
-    case OP_REMOVE_DUPS:
-    case OP_NOOP:
+    case OP_INVALID:
     default:
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
@@ -905,10 +845,7 @@ field_op_summarize (struct fieldop *op)
       field_op_to_hex (op, tmpbuf, 64);
       break;
 
-    case OP_TRANSPOSE: /* not handled here */
-    case OP_REVERSE:   /* not handled here */
-    case OP_REMOVE_DUPS:
-    case OP_NOOP:
+    case OP_INVALID:
     default:
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
@@ -980,77 +917,6 @@ free_field_ops ()
     }
 }
 
-/* Given a string with operation name, returns the operation enum.
-   exits with an error message if the string is not a valid/known operation. */
-enum operation
-get_operation (const char* keyword)
-{
-  for (size_t i = 0; operations[i].name ; i++)
-      if ( STREQ (operations[i].name, keyword) )
-        return (enum operation)i;
-
-  error (EXIT_FAILURE, 0, _("invalid operation '%s'"), keyword);
-  return 0; /* never reached LCOV_EXCL_LINE */
-}
-
-/* Extract the operation patterns from args START through ARGC - 1 of ARGV. */
-void
-parse_operations (enum operation_mode mode, int argc, int start, char **argv)
-{
-  int i = start; /* Index into ARGV. */
-  enum operation op;
-
-  /* From here on, by default we assume it's a "groupby" operation */
-  while ( i < argc )
-    {
-      op = get_operation (argv[i]);
-      if (operations[op].mode != mode)
-        error (EXIT_FAILURE, 0, _("conflicting operation found: "\
-               "expecting %s operations, but found %s operation %s"),
-               operation_mode_name[mode],
-               operation_mode_name[operations[op].mode],
-               quote (operations[op].name));
-
-      i++;
-      if ( i >= argc )
-        error (EXIT_FAILURE, 0, _("missing field number after " \
-                                  "operation '%s'"), argv[i-1] );
-      new_field_op (op, argv[i]);
-      i++;
-    }
-}
-
-enum operation_mode
-parse_operation_mode (int argc, int start, char** argv)
-{
-  assert (start < argc); /* LCOV_EXCL_LINE */
-
-  const enum operation op = get_operation ( argv[start] );
-  const enum operation_mode om = operations[op].mode;
-  switch (om)
-    {
-    case TRANSPOSE_MODE:
-    case REVERSE_FIELD_MODE:
-    case NOOP_MODE:
-      if ( start+1 < argc )
-        error (EXIT_FAILURE, 0, _("extra operands after '%s'"), argv[start]);
-      break;
-
-    case REMOVE_DUPS_MODE:
-    case LINE_MODE:
-    case GROUPING_MODE:
-      /* parse individual operations */
-      parse_operations (om, argc, start, argv);
-      break;
-
-    case UNKNOWN_MODE:
-    default:
-      internal_error ("unknown mode"); /* LCOV_EXCL_LINE */
-    }
-
-  return om;
-}
-
 void
 summarize_field_ops ()
 {
@@ -1112,7 +978,7 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
 }
 
 void
-field_op_print_empty_value (enum operation_mode mode)
+field_op_print_empty_value (enum field_operation mode)
 {
   struct fieldop op = {0};
   op.op = mode;

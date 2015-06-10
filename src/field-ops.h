@@ -26,52 +26,6 @@
  Operations Module
  */
 
-enum operation
-{
-  OP_COUNT = 0,
-  OP_SUM,
-  OP_MIN,
-  OP_MAX,
-  OP_ABSMIN,
-  OP_ABSMAX,
-  OP_FIRST,
-  OP_LAST,
-  OP_RAND,
-  OP_MEAN,
-  OP_MEDIAN,
-  OP_QUARTILE_1,
-  OP_QUARTILE_3,
-  OP_IQR,       /* Inter-quartile range */
-  OP_PSTDEV,    /* Population Standard Deviation */
-  OP_SSTDEV,    /* Sample Standard Deviation */
-  OP_PVARIANCE, /* Population Variance */
-  OP_SVARIANCE, /* Sample Variance */
-  OP_MAD,       /* MAD - Median Absolute Deviation, with adjustment constant of
-                   1.4826 for normal distribution */
-  OP_MADRAW,    /* MAD (same as above), with constant=1 */
-  OP_S_SKEWNESS,/* Sample Skewness */
-  OP_P_SKEWNESS,/* Population Skewness */
-  OP_S_EXCESS_KURTOSIS, /* Sample Excess Kurtosis */
-  OP_P_EXCESS_KURTOSIS, /* Population Excess Kurtosis */
-  OP_JARQUE_BERA,   /* Jarque-Bera test of normality */
-  OP_DP_OMNIBUS,    /* D'Agostino-Pearson omnibus test of normality */
-  OP_MODE,
-  OP_ANTIMODE,
-  OP_UNIQUE,        /* Collapse Unique string into comma separated values */
-  OP_COLLAPSE,      /* Collapse strings into comma separated values */
-  OP_COUNT_UNIQUE,  /* count number of unique values */
-  OP_TRANSPOSE,     /* transpose */
-  OP_REVERSE,       /* reverse fields in each line */
-  OP_BASE64,        /* Encode Field to Base64 */
-  OP_DEBASE64,      /* Decode Base64 field */
-  OP_MD5,           /* Calculate MD5 of a field */
-  OP_SHA1,          /* Calculate SHA1 of a field */
-  OP_SHA256,        /* Calculate SHA256 of a field */
-  OP_SHA512,        /* Calculate SHA512 of a field */
-  OP_REMOVE_DUPS,   /* Remove duplicated keys from a file */
-  OP_NOOP           /* Do nothing. Used for testing and profiling */
-};
-
 enum accumulation_type
 {
   NUMERIC_SCALAR = 0,
@@ -92,17 +46,6 @@ enum operation_first_value
   IGNORE_FIRST = false
 };
 
-enum operation_mode
-{
-  UNKNOWN_MODE = 0,
-  GROUPING_MODE,
-  TRANSPOSE_MODE,
-  REMOVE_DUPS_MODE,
-  REVERSE_FIELD_MODE,
-  LINE_MODE,
-  NOOP_MODE
-};
-
 enum FIELD_OP_COLLECT_RESULT
 {
   FLOCR_OK = 0,
@@ -112,6 +55,7 @@ enum FIELD_OP_COLLECT_RESULT
   FLOCR_INVALID_BASE64
 };
 
+
 #define field_op_ok(X) \
   (((X)==FLOCR_OK)||((X)==FLOCR_OK_KEEP_LINE)||((X)==FLOCR_OK_SKIPPED))
 
@@ -120,10 +64,9 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr);
 
 struct operation_data
 {
-  const char* name;
   enum accumulation_type acc_type;
   enum operation_first_value auto_first;
-  enum operation_mode mode;
+  //enum operation_mode mode;
   enum operation_result_type res_type;
 };
 
@@ -133,10 +76,9 @@ extern struct operation_data operations[];
 struct fieldop
 {
     /* operation 'class' information */
-  enum operation op;
+  enum field_operation op;
   enum accumulation_type acc_type;
   enum operation_result_type res_type;
-  const char* name;
   bool numeric;
   bool auto_first; /* if true, automatically set 'value' if 'first' */
 
@@ -199,7 +141,7 @@ void field_op_sort_values (struct fieldop *op);
 /* Allocate a new fieldop, initialize it based on 'oper',
    and add it to the linked-list of operations */
 struct fieldop *
-new_field_op (enum operation oper, const char* field_name);
+new_field_op (enum field_operation oper, bool by_name, size_t num, const char* name);
 
 /* Add a value (from input) to the current field operation.
    'str' does not need to be null-terminated.
@@ -241,33 +183,6 @@ reset_field_ops ();
 void
 free_field_ops ();
 
-/*
-enum operation_mode
-get_operation_mode (const char* keyword);
-*/
-enum operation
-get_operation (const char* keyword);
-
-/* Extract the operation patterns from args START through ARGC - 1 of ARGV.
-   Requires all operation to be of 'mode' - otherwise exits with an error.
- */
-void
-parse_operations (enum operation_mode mode, int argc, int start, char **argv);
-
-/* Extract the operation mode based on the first keyword.
-   Possible modes are:
-     transpose
-     reverse (reverse fields)
-     line mode
-     grouping
-   depending on the 'operation_mode' of the first operation keyword
-   found.
-
-  In grouping/line modes,
-  calls 'parse_operations' to set the indivudual operaitons. */
-enum operation_mode
-parse_operation_mode (int argc, int start, char** argv);
-
 /* Output precision, to be used with "printf ("%.*Lg",)" */
 extern int field_op_output_precision;
 
@@ -290,6 +205,6 @@ field_op_find_named_columns ();
    operation (e.g. what's printed by 'OP_MEAN' with empty input).
    Used in some of the tests. */
 void
-field_op_print_empty_value (enum operation_mode mode);
+field_op_print_empty_value (enum field_operation mode);
 
 #endif
