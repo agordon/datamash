@@ -329,9 +329,9 @@ process_line (const struct line_record_t *line)
   enum FIELD_OP_COLLECT_RESULT flocr;
   bool keep_line = false;
 
-  struct fieldop *op = field_ops;
-  while (op)
+  for (size_t i=0; i<dm->num_ops; ++i)
     {
+      struct fieldop *op = &dm->ops[i];
       safe_line_record_get_field (line, op->field, &str, &len);
       flocr = field_op_collect (op, str, len);
       if (!field_op_ok (flocr))
@@ -345,8 +345,6 @@ process_line (const struct line_record_t *line)
               (uintmax_t)line_number, (uintmax_t)op->field, tmp);
         }
       keep_line = keep_line || (flocr==FLOCR_OK_KEEP_LINE);
-
-      op = op->next;
     }
   return keep_line;
 }
@@ -422,19 +420,38 @@ print_column_headers ()
   /* add headers of the operations, e.g.
         'sum(field-3)'  (without input headers), or
         'sum(NAME)'     (with input headers)           */
-  for (struct fieldop *op = field_ops; op ; op=op->next)
+  for (size_t i=0; i<dm->num_ops; ++i)
     {
+      struct fieldop *op = &dm->ops[i];
+
       if (op->field > get_num_column_headers ())
         error_not_enough_fields (op->field, get_num_column_headers ());
       printf ("%s" "(%s)",get_field_operation_name (op->op),
                           get_input_field_name (op->field));
 
-      if (op->next)
+      if (i != dm->num_ops-1)
         print_field_separator ();
     }
 
   /* print end-of-line */
   print_line_separator ();
+}
+
+void
+field_op_find_named_columns ()
+{
+  for (size_t i=0; i<dm->num_ops; ++i)
+    {
+      struct fieldop *p = &dm->ops[i];
+      if (!p->field_by_name)
+        continue;
+      p->field = get_input_field_number (p->field_name);
+      if (p->field == 0)
+        error (EXIT_FAILURE, 0,
+                _("column name %s not found in input file"),
+                quote (p->field_name));
+      p->field_by_name = false;
+    }
 }
 
 /*
@@ -452,11 +469,35 @@ process_input_header (FILE *stream)
       line_number++;
       /* If using named-columns, find the column numbers after reading the
          header line. */
-      if (field_op_have_named_fields ())
-        field_op_find_named_columns ();
+      field_op_find_named_columns ();
       group_columns_find_named_columns ();
     }
   line_record_free (&lr);
+}
+
+void
+summarize_field_ops ()
+{
+  for (size_t i=0;i<dm->num_ops;++i)
+    {
+      struct fieldop *p = &dm->ops[i];
+      field_op_summarize (p);
+      fputs (p->out_buf, stdout);
+
+      /* print field separator */
+      if (i != dm->num_ops-1)
+        print_field_separator ();
+    }
+
+  /* print end-of-line */
+  print_line_separator ();
+}
+
+void
+reset_field_ops ()
+{
+  for (size_t i=0;i<dm->num_ops;++i)
+    field_op_reset (&dm->ops[i]);
 }
 
 /* Process a completed group of data lines
@@ -1031,9 +1072,9 @@ int main (int argc, char* argv[])
            _("-H or --header-in must be used with named columns"));
 
   /* Create field-ops based on parsed command-line */
-  for (size_t i=0;i<dm->num_ops;++i)
-    new_field_op (dm->ops[i].op, dm->ops[i].by_name,
-                  dm->ops[i].num,dm->ops[i].name);
+//  for (size_t i=0;i<dm->num_ops;++i)
+//    new_field_op (dm->ops[i].op, dm->ops[i].by_name,
+//                  dm->ops[i].num,dm->ops[i].name);
 
 
   open_input ();
@@ -1066,7 +1107,6 @@ int main (int argc, char* argv[])
     default:
       internal_error ("op mode"); /* LCOV_EXCL_LINE */
     }
-  free_field_ops ();
   free_column_headers ();
   close_input ();
   datamash_ops_free (dm);

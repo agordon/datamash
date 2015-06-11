@@ -34,6 +34,7 @@
 
 #include "op-defs.h"
 #include "op-parser.h"
+#include "field-ops.h"
 
 static struct datamash_ops *dm= NULL;
 
@@ -66,17 +67,12 @@ add_op (enum field_operation op, bool by_name, size_t num, const char* name)
 {
   if (dm->num_ops == dm->alloc_ops)
     dm->ops = x2nrealloc (dm->ops, &dm->alloc_ops, sizeof *dm->ops);
-  struct op_column_t *p = &dm->ops[dm->num_ops++];
+  struct fieldop *p = &dm->ops[dm->num_ops++];
 
-  p->num = num;
-  p->op = op;
-  p->name = NULL;
-  p->by_name = by_name;
   if (by_name)
-    {
-      p->name = xstrdup (name);
-      dm->header_required = true;
-    }
+    dm->header_required = true;
+
+  field_op_init (p, op, by_name, num, name);
 }
 
 static void
@@ -322,13 +318,13 @@ datamash_ops_debug_print ( const struct datamash_ops* p )
 
   for (size_t i=0; i<p->num_ops; ++i)
     {
-      struct op_column_t *o = &p->ops[i];
-      if (o->by_name)
+      struct fieldop *o = &p->ops[i];
+      if (o->field_by_name)
         fprintf(stderr,"  operation '%s' on named column '%s'\n",
-                        get_field_operation_name (o->op), o->name);
+                        get_field_operation_name (o->op), o->field_name);
       else
         fprintf(stderr,"  operation '%s' on numeric column %zu\n",
-                        get_field_operation_name (o->op), o->num);
+                        get_field_operation_name (o->op), o->field);
     }
 }
 
@@ -342,7 +338,7 @@ datamash_ops_free ( struct datamash_ops* p )
   p->grps = NULL;
 
   for (size_t i=0; i<p->num_ops; ++i)
-    free (p->ops[i].name);
+    field_op_free (&p->ops[i]);
   free (p->ops);
   p->ops = NULL;
 

@@ -134,7 +134,7 @@ struct operation_data operations[] =
   {0, 0, NUMERIC_RESULT}
 };
 
-struct fieldop* field_ops = NULL;
+//struct fieldop* field_ops = NULL;
 
 enum { VALUES_BATCH_INCREMENT = 1024 };
 
@@ -143,7 +143,7 @@ static char collapse_separator = ',';
 
 
 /* Add a numeric value to the values vector, allocating memory as needed */
-void
+static void
 field_op_add_value (struct fieldop *op, long double val)
 {
   if (op->num_values >= op->alloc_values)
@@ -166,7 +166,8 @@ field_op_reserve_out_buf (struct fieldop *op, const size_t minsize)
     }
 }
 
-void
+/* stores the hexadecimal representation of 'buffer' in op->out_buf */
+static void
 field_op_to_hex ( struct fieldop* op, const char *buffer, const size_t inlen )
 {
   static const char hex_digits[] =
@@ -231,7 +232,7 @@ field_op_replace_string (struct fieldop *op, const char* str, size_t slen)
    The returned pointer will have 'op->count+1' elements,
    pointing to 'op->count' strings + one last NULL.
 */
-const char **
+static const char **
 field_op_get_string_ptrs ( struct fieldop *op, bool sort,
                            bool sort_case_sensitive )
 {
@@ -259,18 +260,19 @@ field_op_get_string_ptrs ( struct fieldop *op, bool sort,
 }
 
 /* Sort the numeric values vector in a fieldop structure */
-void
+static void
 field_op_sort_values (struct fieldop *op)
 {
   qsortfl (op->values, op->num_values);
 }
 
-/* Allocate a new fieldop, initialize it based on 'oper',
-   and add it to the linked-list of operations */
-struct fieldop *
-new_field_op (enum field_operation oper, bool by_name, size_t num, const char* name)
+void
+field_op_init (struct fieldop* /*out*/ op,
+               enum field_operation oper,
+               bool by_name, size_t num, const char* name)
 {
-  struct fieldop *op = XZALLOC (struct fieldop);
+  assert (op != NULL); /* LCOV_EXCL_LINE */
+  memset (op, 0, sizeof *op);
 
   op->op = oper;
   op->acc_type = operations[oper].acc_type;
@@ -283,58 +285,10 @@ new_field_op (enum field_operation oper, bool by_name, size_t num, const char* n
   op->field_by_name = by_name;
   op->field_name = (by_name)?xstrdup (name):NULL;
   op->first = true;
-  op->value = 0;
-  op->count = 0;
-
-  op->next = NULL;
-
   if (op->res_type == STRING_RESULT)
     {
       op->out_buf_alloc = 1024;
       op->out_buf = xmalloc (op->out_buf_alloc);
-    }
-  op->out_buf_used = 0 ;
-
-  if (field_ops != NULL)
-    {
-      struct fieldop *p = field_ops;
-      while (p->next != NULL)
-        p = p->next;
-      p->next = op;
-    }
-  else
-    field_ops = op;
-
-  return op;
-}
-
-/* returns TRUE if any of the configured fields was using
-   a named column, therefore requiring a header line. */
-bool _GL_ATTRIBUTE_PURE
-field_op_have_named_fields ()
-{
-  for (struct fieldop *p = field_ops; p ; p=p->next)
-    {
-      if (p->field_by_name)
-	return true;
-    }
-  return false;
-}
-
-void
-field_op_find_named_columns ()
-{
-  for (struct fieldop *p = field_ops; p ; p=p->next)
-    {
-      if (!p->field_by_name)
-        continue;
-
-      p->field = get_input_field_number (p->field_name);
-      if (p->field == 0)
-        error (EXIT_FAILURE, 0,
-                _("column name %s not found in input file"),
-                quote (p->field_name));
-      p->field_by_name = false;
     }
 }
 
@@ -514,9 +468,9 @@ field_op_collect (struct fieldop *op,
   return rc;
 }
 
-/* Returns a nul-terimated string, composed of the unique values
-   of the input strings. The return string must be free'd. */
-void
+/* creates a list of unique strings from op->str_buf .
+   results are stored in op->out_buf. */
+static void
 unique_value ( struct fieldop *op, bool case_sensitive )
 {
   const char *last_str;
@@ -598,7 +552,11 @@ collapse_value ( struct fieldop *op )
         buf[i] = collapse_separator ;
 }
 
-void
+/* stores in op->out_buf the result of the field operation
+   when there are no input values.
+   'no values' can happen with '--narm' and input of all N/As.
+   The printed results are consistent as much as possible with R */
+static void
 field_op_summarize_empty (struct fieldop *op)
 {
   long double numeric_result = 0 ;
@@ -861,7 +819,7 @@ field_op_summarize (struct fieldop *op)
 
 /* reset operation values for next group */
 void
-reset_field_op (struct fieldop *op)
+field_op_reset (struct fieldop *op)
 {
   op->first = true;
   op->count = 0 ;
@@ -872,18 +830,8 @@ reset_field_op (struct fieldop *op)
   /* note: op->str_buf and op->str_alloc are not free'd, and reused */
 }
 
-/* reset all field operations, for next group */
 void
-reset_field_ops ()
-{
-  for (struct fieldop *p = field_ops; p ; p = p->next)
-    reset_field_op (p);
-}
-
-/* Frees all memory associated with a field operation struct.
-   returns the 'next' field operation, or NULL */
-static void
-free_field_op (struct fieldop *op)
+field_op_free (struct fieldop* op)
 {
   free (op->values);
   op->num_values = 0 ;
@@ -901,37 +849,6 @@ free_field_op (struct fieldop *op)
 
   free (op->field_name);
   op->field_name = NULL;
-
-  free (op);
-}
-
-void
-free_field_ops ()
-{
-  struct fieldop *p = field_ops;
-  while (p)
-    {
-      struct fieldop *n = p->next;
-      free_field_op (p);
-      p = n;
-    }
-}
-
-void
-summarize_field_ops ()
-{
-  for (struct fieldop *p = field_ops; p ; p=p->next)
-    {
-      field_op_summarize (p);
-      fputs (p->out_buf, stdout);
-
-      /* print field separator */
-      if (p->next)
-        print_field_separator ();
-    }
-
-  /* print end-of-line */
-  print_line_separator ();
 }
 
 /* long mix function, from:

@@ -55,22 +55,12 @@ enum FIELD_OP_COLLECT_RESULT
   FLOCR_INVALID_BASE64
 };
 
-
-#define field_op_ok(X) \
-  (((X)==FLOCR_OK)||((X)==FLOCR_OK_KEEP_LINE)||((X)==FLOCR_OK_SKIPPED))
-
-const char*
-field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr);
-
 struct operation_data
 {
   enum accumulation_type acc_type;
   enum operation_first_value auto_first;
-  //enum operation_mode mode;
   enum operation_result_type res_type;
 };
-
-extern struct operation_data operations[];
 
 /* Operation on a field */
 struct fieldop
@@ -114,34 +104,18 @@ struct fieldop
   char *out_buf;
   size_t out_buf_used;
   size_t out_buf_alloc;
-
-  struct fieldop *next;
 };
 
-extern struct fieldop* field_ops ;
+/* Initializes a new field-op, using an *existing* (pre-allocated) struct. */
+void
+field_op_init (struct fieldop* /*in-out*/ op,
+               enum field_operation oper,
+               bool by_name, size_t num, const char* name);
 
-/* Add a numeric value to the values vector, allocating memory as needed */
-void field_op_add_value (struct fieldop *op, long double val);
-
-/* Returns an array of string-pointers (char*),
-   each pointing to a string in the string buffer
-   (added by field_op_add_string ).
-
-   The returned pointer must be free'd.
-
-   The returned pointer will have 'op->count+1' elements,
-   pointing to 'op->count' strings + one last NULL.
-*/
-const char ** field_op_get_string_ptrs ( struct fieldop *op,
-                                         bool sort, bool sort_case_sensitive );
-
-/* Sort the numeric values vector in a fieldop structure */
-void field_op_sort_values (struct fieldop *op);
-
-/* Allocate a new fieldop, initialize it based on 'oper',
-   and add it to the linked-list of operations */
-struct fieldop *
-new_field_op (enum field_operation oper, bool by_name, size_t num, const char* name);
+/* Frees the internal structures in the field-op.
+   Does *not* free 'op' itself */
+void
+field_op_free (struct fieldop* op);
 
 /* Add a value (from input) to the current field operation.
    'str' does not need to be null-terminated.
@@ -152,36 +126,29 @@ new_field_op (enum field_operation oper, bool by_name, size_t num, const char* n
 enum FIELD_OP_COLLECT_RESULT
 field_op_collect (struct fieldop *op, const char* str, size_t slen);
 
+/* Evaluates to true/false depending if the value returned from
+   field_op_collect() represents a successful operation. */
+#define field_op_ok(X) \
+  (((X)==FLOCR_OK)||((X)==FLOCR_OK_KEEP_LINE)||((X)==FLOCR_OK_SKIPPED))
 
-/* creates a list of unique strings from op->str_buf .
-   results are stored in op->out_buf. */
-void
-unique_value ( struct fieldop *op, bool case_sensitive );
+/* If field_op_ok() returned false, this function will return a textual
+   error message of the error. The returned value is a static string,
+   do not free() it. */
+const char*
+field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr);
 
-/* stores the hexadecimal representation of 'buffer' in op->out_buf */
-void
-field_op_to_hex ( struct fieldop *op, const char *buffer, const size_t inlen );
 
-/* Prints to stdout the result of the field operation,
-   based on collected values */
+/* Called after all values in a group are collected in a field-op,
+   to perform any (optional) finalizing steps
+   (e.g. in OP_MEAN, calculate the mean).
+   Result will be stored in op->out_buf. */
 void
 field_op_summarize (struct fieldop *op);
 
-/* Prints to stdout the result of the field operation
-   when there are no input values.
-   'no values' can happen with '--narm' and input of all N/As.
-   The printed results are consistent as much as possible with R */
+/* resets internal variables, should be called when starting a new
+   group of values. */
 void
-field_op_summarize_empty (struct fieldop *op);
-
-void
-summarize_field_ops ();
-
-void
-reset_field_ops ();
-
-void
-free_field_ops ();
+field_op_reset (struct fieldop *op);
 
 /* Output precision, to be used with "printf ("%.*Lg",)" */
 extern int field_op_output_precision;
@@ -189,17 +156,6 @@ extern int field_op_output_precision;
 /* Initialize random number source */
 void
 init_random (void);
-
-
-/* returns TRUE if any of the configured fields was using
-   a named column, therefore requiring a header line. */
-bool
-field_op_have_named_fields ();
-
-/* Tries to find the column number for operations using
-   a named column (instead of a number) */
-void
-field_op_find_named_columns ();
 
 /* Helper function to print to stdout the 'empty value' of a numeric
    operation (e.g. what's printed by 'OP_MEAN' with empty input).

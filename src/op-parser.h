@@ -49,7 +49,7 @@ struct datamash_ops
   size_t num_grps;
   size_t alloc_grps;
 
-  struct op_column_t    *ops;  /* field operations */
+  struct fieldop    *ops;  /* field operations */
   size_t num_ops;
   size_t alloc_ops;
 };
