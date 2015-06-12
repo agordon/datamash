@@ -49,12 +49,6 @@
 #include "op-defs.h"
 #include "field-ops.h"
 
-/* In the future: allow users to change this */
-int field_op_output_precision = 14 ;
-
-/* Should NA/NaN/empty values be silengtly ignored? */
-extern bool remove_na_values;
-
 struct operation_data operations[] =
 {
   /* OP_COUNT */
@@ -137,10 +131,6 @@ struct operation_data operations[] =
 //struct fieldop* field_ops = NULL;
 
 enum { VALUES_BATCH_INCREMENT = 1024 };
-
-/* The character used to separate collapsed/uniqued strings */
-static char collapse_separator = ',';
-
 
 /* Add a numeric value to the values vector, allocating memory as needed */
 static void
@@ -628,9 +618,9 @@ field_op_summarize_empty (struct fieldop *op)
 
   if (op->res_type==NUMERIC_RESULT)
     {
-      field_op_reserve_out_buf (op, field_op_output_precision*2);
+      field_op_reserve_out_buf (op, numeric_output_precision*2);
       snprintf (op->out_buf, op->out_buf_alloc,
-                "%.*Lg", field_op_output_precision, numeric_result);
+                "%.*Lg", numeric_output_precision, numeric_result);
     }
 }
 
@@ -811,9 +801,9 @@ field_op_summarize (struct fieldop *op)
 
   if (op->res_type==NUMERIC_RESULT)
     {
-      field_op_reserve_out_buf (op, field_op_output_precision*2);
+      field_op_reserve_out_buf (op, numeric_output_precision*2);
       snprintf (op->out_buf, op->out_buf_alloc,
-                "%.*Lg", field_op_output_precision, numeric_result);
+                "%.*Lg", numeric_output_precision, numeric_result);
     }
 }
 

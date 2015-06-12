@@ -42,6 +42,24 @@ extern int out_tab ;
 /* Global case-sensitivity option. Defaults to 'true' . */
 extern bool case_sensitive ;
 
+/* precision used with printf "%.*Lg" */
+extern int numeric_output_precision;
+
+/* The character used to separate collapsed/uniqued strings */
+extern char collapse_separator;
+
+/* Should NA/NaN/empty values be silengtly ignored? */
+extern bool remove_na_values;
+
+/* if true, 'transpose' and 'reverse' require every line to have
+   the exact same number of fields. Otherwise, the program
+   will fail with non-zero exit code. */
+extern bool strict;
+
+/* if 'strict' is false, lines with fewer-than-expected fields
+   will be filled with this value */
+extern char* missing_field_filler;
+
 #define UCHAR_LIM (UCHAR_MAX + 1)
 extern bool blanks[UCHAR_LIM];
 

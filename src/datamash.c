@@ -88,20 +88,6 @@ static bool line_mode = false; /* if TRUE, handle each line as a group */
 static bool pipe_through_sort = false;
 static FILE* input_stream = NULL;
 
-/* if true, 'transpose' and 'reverse' require every line to have
-   the exact same number of fields. Otherwise, the program
-   will fail with non-zero exit code. */
-static bool strict = true;
-
-/* if 'strict' is false, lines with fewer-than-expected fields
-   will be filled with this value */
-static char* missing_field_filler = "N/A";
-
-/* If true, N/A, NaN and empty cells in numeric operations will be silently
-   ignored instead of triggering an error. Akin to R's "na.rm=TRUE" option. */
-bool remove_na_values = false;
-
-
 enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,

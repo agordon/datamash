@@ -40,6 +40,25 @@ int out_tab= '\t';
 /* Global case-sensitivity option. Defaults to 'true' . */
 bool case_sensitive = true;
 
+/* In the future: allow users to change this */
+int numeric_output_precision = 14;
+
+/* The character used to separate collapsed/uniqued strings */
+/* In the future: allow users to change this */
+char collapse_separator = ',';
+
+/* Should NA/NaN/empty values be silengtly ignored? */
+bool remove_na_values = false;
+
+/* if true, 'transpose' and 'reverse' require every line to have
+   the exact same number of fields. Otherwise, the program
+   will fail with non-zero exit code. */
+bool strict = true;
+
+/* if 'strict' is false, lines with fewer-than-expected fields
+   will be filled with this value */
+char* missing_field_filler = "N/A";
+
 #define UCHAR_LIM (UCHAR_MAX + 1)
 bool blanks[UCHAR_LIM];
 
