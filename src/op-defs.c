@@ -88,7 +88,7 @@ const struct processing_mode_definition processing_modes[] =
   {"invalid",  MODE_INVALID},
   {"grouping", MODE_GROUPBY},
   {"groupby",  MODE_GROUPBY},
-  {"grp" ,     MODE_GROUPBY},
+  {"gb" ,      MODE_GROUPBY},
   {"transpose",MODE_TRANSPOSE},
   {"reverse",  MODE_REVERSE},
   {"line",     MODE_PER_LINE},

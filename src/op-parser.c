@@ -38,6 +38,37 @@
 
 static struct datamash_ops *dm= NULL;
 
+static const char**  tokens = NULL;
+static int     tokind = 0;
+static int     tokcount = 0;
+
+static void
+set_tokens (int count, const char** _tokens)
+{
+  tokind = 0;
+  tokcount = count;
+  tokens = _tokens;
+}
+
+static inline bool
+have_more_tokens ()
+{
+  return tokind < tokcount;
+}
+
+static inline const char*
+tok_peek ()
+{
+  assert (have_more_tokens ());                  /* LCOV_EXCL_LINE */
+  return tokens[tokind];
+}
+
+static inline void
+tok_consume ()
+{
+  ++tokind;
+}
+
 static void
 _alloc_ops ()
 {
@@ -45,6 +76,8 @@ _alloc_ops ()
   dm->mode = MODE_INVALID;
 }
 
+#define ADD_NAMED_GROUP(name)  (add_group_col (true,0,(name)))
+#define ADD_NUMERIC_GROUP(num) (add_group_col (false,num,NULL))
 static void
 add_group_col (bool by_name, size_t num, const char* name)
 {
@@ -62,6 +95,8 @@ add_group_col (bool by_name, size_t num, const char* name)
     }
 }
 
+#define ADD_NAMED_OP(op,name)   (add_op (op,true,0,(name)))
+#define ADD_NUMERIC_OP(op,num)  (add_op (op,false,num,NULL))
 static void
 add_op (enum field_operation op, bool by_name, size_t num, const char* name)
 {
@@ -75,78 +110,69 @@ add_op (enum field_operation op, bool by_name, size_t num, const char* name)
   field_op_init (p, op, by_name, num, name);
 }
 
+static inline bool
+strtol_valid (const char* s, long int /*out*/ *val)
+{
+  assert (val != NULL);                          /* LCOV_EXCL_LINE */
+  char *endptr;
+  errno = 0 ;
+  *val = strtol (s, &endptr, 10);
+  return (errno == 0 && endptr != s && *endptr == 0);
+}
+
 static void
-parse_mode_columns ( const char* s )
+add_processing_mode_columns ( const char* s )
 {
   long int val;
-  size_t idx;
-  char *tok, *endptr;
+  char *tok;
   char *spec = xstrdup (s);
   char *copy = spec;
 
-  /* Count number of groups parameters, by number of commas */
-
-  idx=0;
   while ( (tok = strsep (&spec, ",")) != NULL)
     {
       if (strlen (tok) == 0)
         error (EXIT_FAILURE, 0, _("invalid empty grouping parameter"));
-      errno = 0 ;
-      val = strtol (tok, &endptr, 10);
-      if (errno == 0 && endptr != tok && *endptr == 0)
+      if (strtol_valid (tok, &val))
         {
-          /* If strtol succeeded, it's a valid number. */
           if (val<1)
             error (EXIT_FAILURE, 0, _("invalid grouping parameter %s"),
                                     quote (tok));
-          add_group_col (false, val, NULL);
+          ADD_NUMERIC_GROUP (val);
         }
       else
         {
-          /* If strrol failed, assume it's a named column - resolve it later. */
-          add_group_col (true, 0, tok);
+          ADD_NAMED_GROUP (tok);
         }
-      idx++;
     }
 
   free (copy);
 }
 
 static void
-parse_operation_columns ( const char* s, enum field_operation op )
+add_field_operation_columns ( const char* s, enum field_operation op )
 {
   long int val;
-  size_t idx;
-  char *tok, *endptr;
+  char *tok;
   char *spec = xstrdup (s);
   char *copy = spec;
 
-  /* Count number of groups parameters, by number of commas */
-//  int num_group_columns = strcnt (spec, ',')+1;
-
-  idx=0;
   while ( (tok = strsep (&spec, ",")) != NULL)
     {
       if (strlen (tok) == 0)
         error (EXIT_FAILURE, 0, _("invalid empty column for operation %s"),
                                   quote (get_field_operation_name (op)));
-      errno = 0 ;
-      val = strtol (tok, &endptr, 10);
-      if (errno == 0 && endptr != tok && *endptr == 0)
+      if (strtol_valid (tok, &val))
         {
-          /* If strtol succeeded, it's a valid number. */
           if (val<1)
             error (EXIT_FAILURE, 0, _("invalid column %s for operation '%s'"),
                                     quote (tok),
                                     get_field_operation_name (op));
-          add_op (op, false, val, NULL);
+          ADD_NUMERIC_OP (op, val);
         }
       else
         {
-          /* If strrol failed, assume it's a named column - resolve it later. */
-          add_op (op, true, 0, tok);
+          ADD_NAMED_OP (op, tok);
         }
-      idx++;
     }
 
   free (copy);
@@ -159,68 +185,79 @@ compatible_operation_modes (enum processing_mode current,
   return (current==added);
 }
 
-
-void
-parse_field_operations (enum processing_mode mode,
-                        int argc, const char* argv[])
+static void
+parse_operation (enum processing_mode pm)
 {
   enum processing_mode newmode;
-
-  if (argc<=0)
-    error (EXIT_FAILURE,0, _("missing operation. See --help for help"));
-
-  enum field_operation fop = get_field_operation (argv[0], &newmode);
+  enum field_operation fop = get_field_operation (tok_peek (), &newmode);
   if (fop==OP_INVALID)
     {
       /* detect mix-up of modes and operations, and give a friendly message */
-      if (get_processing_mode (argv[0]) != MODE_INVALID)
-        error (EXIT_FAILURE,0, _("conflicting operation %s"), quote (argv[0]));
+      if (get_processing_mode (tok_peek ()) != MODE_INVALID)
+        error (EXIT_FAILURE,0, _("conflicting operation %s"),
+                               quote (tok_peek ()));
 
-      error (EXIT_FAILURE,0, _("invalid operation %s"), quote (argv[0]));
+      error (EXIT_FAILURE,0, _("invalid operation %s"), quote (tok_peek ()));
     }
 
-  if (!compatible_operation_modes (mode,newmode))
+  if (!compatible_operation_modes (pm,newmode))
     error (EXIT_FAILURE, 0, _("conflicting operation found: "\
            "expecting %s operations, but found %s operation %s"),
-           get_processing_mode_name (mode),
+           get_processing_mode_name (pm),
            get_processing_mode_name (newmode),
-           quote (argv[0]));
+           quote (tok_peek ()));
+  tok_consume ();
 
-  if (argc<=1)
+  if (!have_more_tokens ())
     error (EXIT_FAILURE,0, _("missing field number after operation %s"),
-                          quote (argv[0]));
+                          quote (get_field_operation_name (fop)));
 
-  parse_operation_columns (argv[1], fop);
+  add_field_operation_columns (tok_peek (), fop);
+  tok_consume ();
+}
+
+static void
+parse_operations (enum processing_mode pm)
+{
+  while (have_more_tokens ())
+    parse_operation (pm);
+}
+
+static void
+parse_processing_mode_column ()
+{
+  if (!have_more_tokens ())
+        error (EXIT_FAILURE,0, _("missing field number"));
+  add_processing_mode_columns (tok_peek ());
+  tok_consume ();
 }
 
 void
-parse_mode (int argc, const char* argv[])
+parse_mode ()
 {
-  bool allow_operations = true;
+  assert (have_more_tokens ());                    /* LCOV_EXCL_LINE */
   enum field_operation fop;
-  if (argc<=0)
-    error (EXIT_FAILURE,0, _("missing operation. See --help for help"));
-  enum processing_mode pm = get_processing_mode (argv[0]);
-  switch (pm)
+  enum processing_mode pm = get_processing_mode (tok_peek ());
+  dm->mode = pm;
+  if (pm != MODE_INVALID)
+    tok_consume ();
+
+  switch (pm)                                    /* LCOV_EXCL_BR_LINE */
   {
   case MODE_TRANSPOSE:
   case MODE_NOOP:
   case MODE_REVERSE:
-      allow_operations = false;
-      --argc;
-      ++argv;
-      break;
+    break;
 
   case MODE_REMOVE_DUPS:
-    allow_operations = false;
-    /* fall through to get the group-by column */
+    parse_processing_mode_column ();
+    break;
 
   case MODE_GROUPBY:
-    if (argc<=1)
-      error (EXIT_FAILURE,0, _("missing field number for %s"), quote (argv[0]));
-    parse_mode_columns (argv[1]);
-    argc -= 2;
-    argv += 2;
+    parse_processing_mode_column ();
+    parse_operations (pm);
+    if (dm->num_ops==0)
+      error (EXIT_FAILURE,0, _("missing operation"));
     break;
 
   case MODE_PER_LINE:
@@ -229,33 +266,28 @@ parse_mode (int argc, const char* argv[])
 
   /* Implicit mode, determine by operation (e.g. 'sum' => groupby mode) */
   case MODE_INVALID:
-    fop = get_field_operation (argv[0], &pm);
+    fop = get_field_operation (tok_peek (), &pm);
     if (fop==OP_INVALID)
-      error (EXIT_FAILURE,0, _("invalid operation '%s'"), argv[0]);
+      error (EXIT_FAILURE,0, _("invalid operation %s"), quote (tok_peek ()));
+    dm->mode = pm;
+    parse_operations (pm);
     break;
 
   default:
     internal_error ("invalid processing mode"); /* LCOV_EXCL_LINE */
     break;
   }
-  dm->mode = pm;
 
-  while (allow_operations && argc>0)
-    {
-      parse_field_operations (pm, argc, argv);
-      argc -= 2;
-      argv += 2;
-    }
-
-  if (argc>0)
-    error (EXIT_FAILURE,0,_("extra operand %s"), quote (argv[0]));
+  if (have_more_tokens ())
+    error (EXIT_FAILURE,0,_("extra operand %s"), quote (tok_peek ()));
 }
 
 struct datamash_ops*
 datamash_ops_parse ( int argc, const char* argv[] )
 {
   _alloc_ops ();
-  parse_mode (argc, argv);
+  set_tokens (argc, argv);
+  parse_mode ();
   return dm;
 }
 
@@ -265,32 +297,12 @@ datamash_ops_parse_premode ( enum processing_mode pm,
                              int argc, const char* argv[] )
 {
   _alloc_ops ();
-  switch (pm)
-  {
-  case MODE_GROUPBY:
-    parse_mode_columns (grouping);
-    break;
-
-  case MODE_REMOVE_DUPS:
-  case MODE_PER_LINE:
-  case MODE_TRANSPOSE:
-  case MODE_NOOP:
-  case MODE_REVERSE:
-  case MODE_INVALID:
-  default:
-    internal_error ("foo"); /* LCOV_EXCL_LINE */
-    break;
-  }
+  assert (argc > 0);                             /* LCOV_EXCL_LINE */
+  set_tokens (argc, argv);
+  assert (pm == MODE_GROUPBY);                   /* LCOV_EXCL_LINE */
   dm->mode = pm;
-
-  while (argc>0)
-    {
-      parse_field_operations (pm, argc, argv);
-      argc -= 2;
-      argv += 2;
-    }
-  if (argc>0)
-    error (EXIT_FAILURE,0,_("extra operand %s"), quote (argv[0]));
+  add_processing_mode_columns (grouping);
+  parse_operations (pm);
   return dm;
 }
 

@@ -1057,12 +1057,6 @@ int main (int argc, char* argv[])
     error (EXIT_FAILURE, 0,
            _("-H or --header-in must be used with named columns"));
 
-  /* Create field-ops based on parsed command-line */
-//  for (size_t i=0;i<dm->num_ops;++i)
-//    new_field_op (dm->ops[i].op, dm->ops[i].by_name,
-//                  dm->ops[i].num,dm->ops[i].name);
-
-
   open_input ();
   switch (dm->mode)
     {
