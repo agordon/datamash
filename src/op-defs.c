@@ -119,14 +119,14 @@ const char*
 get_field_operation_name (enum field_operation op)
 {
   const struct field_operation_definition* fod = field_operations;
-  while (fod->name)
+  while (fod->name)                              /* LCOV_EXCL_BR_LINE */
     {
       if (fod->op == op)
         return fod->name;
       ++fod;
     }
-  internal_error ("invalid op value"); /* LCOV_EXCL_LINE */
-  return NULL; /* LCOV_EXCL_LINE */
+  internal_error ("invalid op value");            /* LCOV_EXCL_LINE */
+  return NULL;                                    /* LCOV_EXCL_LINE */
 }
 
 enum processing_mode
@@ -146,14 +146,14 @@ const char*
 get_processing_mode_name (enum processing_mode m)
 {
   const struct processing_mode_definition* pmd = processing_modes;
-  while (pmd->name)
+  while (pmd->name)                               /* LCOV_EXCL_BR_LINE */
     {
       if (pmd->mode == m)
         return pmd->name;
       ++pmd;
     }
-  internal_error ("invalid mode value"); /* LCOV_EXCL_LINE */
-  return NULL; /* LCOV_EXCL_LINE */
+  internal_error ("invalid mode value");          /* LCOV_EXCL_LINE */
+  return NULL;                                    /* LCOV_EXCL_LINE */
 }
 
 /* vim: set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1: */

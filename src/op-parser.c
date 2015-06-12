@@ -305,6 +305,7 @@ datamash_ops_parse_premode ( enum processing_mode pm,
 }
 
 
+/* LCOV_EXCL_START */
 void
 datamash_ops_debug_print ( const struct datamash_ops* p )
 {
@@ -337,11 +338,12 @@ datamash_ops_debug_print ( const struct datamash_ops* p )
                         get_field_operation_name (o->op), o->field);
     }
 }
+/* LCOV_EXCL_STOP */
 
 void
 datamash_ops_free ( struct datamash_ops* p )
 {
-  assert (p != NULL);
+  assert (p != NULL);                            /* LCOV_EXCL_LINE */
   for (size_t i=0; i<p->num_grps; ++i)
     free (p->grps[i].name);
   free (p->grps);

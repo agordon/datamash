@@ -327,7 +327,7 @@ field_op_collect (struct fieldop *op,
   if (op->first && op->auto_first && op->numeric)
       op->value = num_value;
 
-  switch (op->op)
+  switch (op->op)                                /* LCOV_EXCL_BR_LINE */
     {
     case OP_SUM:
     case OP_MEAN:
@@ -550,7 +550,7 @@ field_op_summarize_empty (struct fieldop *op)
 {
   long double numeric_result = 0 ;
 
-  switch (op->op)
+  switch (op->op)                                /* LCOV_EXCL_BR_LINE */
     {
     case OP_MEAN:
     case OP_S_SKEWNESS:
@@ -639,7 +639,7 @@ field_op_summarize (struct fieldop *op)
       return ;
     }
 
-  switch (op->op)
+  switch (op->op)                                /* LCOV_EXCL_BR_LINE */
     {
     case OP_MEAN:
       numeric_result = op->value / op->count;
@@ -868,18 +868,18 @@ init_random (void)
 const char*
 field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
 {
-  switch (flocr)
+  switch (flocr)                                 /* LCOV_EXCL_BR_LINE */
    {
    case FLOCR_INVALID_NUMBER:
      return _("invalid numeric value");
    case FLOCR_INVALID_BASE64:
      return _("invalid base64 value");
-   case FLOCR_OK:           /* LCOV_EXCL_LINE */
-   case FLOCR_OK_KEEP_LINE: /* LCOV_EXCL_LINE */
-   case FLOCR_OK_SKIPPED:   /* LCOV_EXCL_LINE */
-   default:                 /* LCOV_EXCL_LINE */
-     assert (false);        /* LCOV_EXCL_LINE */
-     return "";             /* LCOV_EXCL_LINE */
+   case FLOCR_OK:
+   case FLOCR_OK_KEEP_LINE:
+   case FLOCR_OK_SKIPPED:
+   default:
+     internal_error ("op_collect_result_name");  /* LCOV_EXCL_LINE */
+     return "";                                  /* LCOV_EXCL_LINE */
    }
 }
 

@@ -1057,7 +1057,7 @@ int main (int argc, char* argv[])
            _("-H or --header-in must be used with named columns"));
 
   open_input ();
-  switch (dm->mode)
+  switch (dm->mode)                              /* LCOV_EXCL_BR_LINE */
     {
     case MODE_PER_LINE:
       line_mode = true;
@@ -1084,7 +1084,7 @@ int main (int argc, char* argv[])
 
     case MODE_INVALID:
     default:
-      internal_error ("op mode"); /* LCOV_EXCL_LINE */
+      internal_error ("op mode");                /* LCOV_EXCL_LINE */
     }
   free_column_headers ();
   close_input ();
