@@ -897,7 +897,8 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
 void
 field_op_print_empty_value (enum field_operation mode)
 {
-  struct fieldop op = {0};
+  struct fieldop op;
+  memset (&op, 0, sizeof op);
   op.op = mode;
   op.res_type = NUMERIC_RESULT;
   field_op_summarize_empty (&op);
