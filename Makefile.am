@@ -38,7 +38,6 @@ datamash_SOURCES = src/system.h \
 	       src/op-defs.c src/op-defs.h \
 	       src/op-parser.c src/op-parser.h \
 	       src/field-ops.c src/field-ops.h \
-	       src/strcnt.c src/strcnt.h \
 	       src/datamash.c
 
 datamash_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)

@@ -48,7 +48,6 @@
 #include "xstrndup.h"
 #include "xalloc.h"
 
-#include "strcnt.h"
 #include "text-options.h"
 #include "text-lines.h"
 #include "column-headers.h"

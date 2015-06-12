@@ -30,8 +30,6 @@
 #include "quote.h"
 #include "error.h"
 
-#include "strcnt.h"
-
 #include "op-defs.h"
 #include "op-parser.h"
 #include "field-ops.h"
