@@ -8,4 +8,5 @@ lib/xalloc-die.c
 lib/xstrtol-error.c
 src/datamash.c
 src/field-ops.c
+src/op-parser.c
 src/system.h

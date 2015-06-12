@@ -127,13 +127,13 @@ enum FIELD_OP_COLLECT_RESULT
 field_op_collect (struct fieldop *op, const char* str, size_t slen);
 
 /* Evaluates to true/false depending if the value returned from
-   field_op_collect() represents a successful operation. */
+   field_op_collect represents a successful operation. */
 #define field_op_ok(X) \
   (((X)==FLOCR_OK)||((X)==FLOCR_OK_KEEP_LINE)||((X)==FLOCR_OK_SKIPPED))
 
-/* If field_op_ok() returned false, this function will return a textual
+/* If field_op_ok returned false, this function will return a textual
    error message of the error. The returned value is a static string,
-   do not free() it. */
+   do not free it. */
 const char*
 field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr);
 

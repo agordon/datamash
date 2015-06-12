@@ -41,7 +41,7 @@ static struct datamash_ops *dm= NULL;
 static void
 _alloc_ops ()
 {
-  dm = XZALLOC(struct datamash_ops);
+  dm = XZALLOC (struct datamash_ops);
   dm->mode = MODE_INVALID;
 }
 
@@ -81,7 +81,7 @@ parse_mode_columns ( const char* s )
   long int val;
   size_t idx;
   char *tok, *endptr;
-  char *spec = xstrdup(s);
+  char *spec = xstrdup (s);
   char *copy = spec;
 
   /* Count number of groups parameters, by number of commas */
@@ -118,7 +118,7 @@ parse_operation_columns ( const char* s, enum field_operation op )
   long int val;
   size_t idx;
   char *tok, *endptr;
-  char *spec = xstrdup(s);
+  char *spec = xstrdup (s);
   char *copy = spec;
 
   /* Count number of groups parameters, by number of commas */
@@ -161,22 +161,22 @@ compatible_operation_modes (enum processing_mode current,
 
 
 void
-parse_field_operations( enum processing_mode mode,
-                        int argc, const char* argv[] )
+parse_field_operations (enum processing_mode mode,
+                        int argc, const char* argv[])
 {
   enum processing_mode newmode;
 
   if (argc<=0)
-    error(EXIT_FAILURE,0, _("missing operation. See --help for help"));
+    error (EXIT_FAILURE,0, _("missing operation. See --help for help"));
 
   enum field_operation fop = get_field_operation (argv[0], &newmode);
   if (fop==OP_INVALID)
     {
       /* detect mix-up of modes and operations, and give a friendly message */
       if (get_processing_mode (argv[0]) != MODE_INVALID)
-        error(EXIT_FAILURE,0, _("conflicting operation %s"), quote (argv[0]));
+        error (EXIT_FAILURE,0, _("conflicting operation %s"), quote (argv[0]));
 
-      error(EXIT_FAILURE,0, _("invalid operation %s"), quote (argv[0]));
+      error (EXIT_FAILURE,0, _("invalid operation %s"), quote (argv[0]));
     }
 
   if (!compatible_operation_modes (mode,newmode))
@@ -187,8 +187,8 @@ parse_field_operations( enum processing_mode mode,
            quote (argv[0]));
 
   if (argc<=1)
-    error(EXIT_FAILURE,0, _("missing field number after operation %s"),
-                          quote(argv[0]));
+    error (EXIT_FAILURE,0, _("missing field number after operation %s"),
+                          quote (argv[0]));
 
   parse_operation_columns (argv[1], fop);
 }
@@ -199,7 +199,7 @@ parse_mode (int argc, const char* argv[])
   bool allow_operations = true;
   enum field_operation fop;
   if (argc<=0)
-    error(EXIT_FAILURE,0, _("missing operation. See --help for help"));
+    error (EXIT_FAILURE,0, _("missing operation. See --help for help"));
   enum processing_mode pm = get_processing_mode (argv[0]);
   switch (pm)
   {
@@ -217,25 +217,25 @@ parse_mode (int argc, const char* argv[])
 
   case MODE_GROUPBY:
     if (argc<=1)
-      error(EXIT_FAILURE,0, _("missing field number for %s"), quote (argv[0]));
+      error (EXIT_FAILURE,0, _("missing field number for %s"), quote (argv[0]));
     parse_mode_columns (argv[1]);
     argc -= 2;
     argv += 2;
     break;
 
   case MODE_PER_LINE:
-    error(EXIT_FAILURE,0, _("TODO: fix me, don't use these modes directly"));
+    internal_error ("line more used directly"); /* LCOV_EXCL_LINE */
     break;
 
   /* Implicit mode, determine by operation (e.g. 'sum' => groupby mode) */
   case MODE_INVALID:
     fop = get_field_operation (argv[0], &pm);
     if (fop==OP_INVALID)
-      error(EXIT_FAILURE,0, _("invalid operation '%s'"), argv[0]);
+      error (EXIT_FAILURE,0, _("invalid operation '%s'"), argv[0]);
     break;
 
   default:
-    internal_error ("foo"); /* LCOV_EXCL_LINE */
+    internal_error ("invalid processing mode"); /* LCOV_EXCL_LINE */
     break;
   }
   dm->mode = pm;
@@ -248,7 +248,7 @@ parse_mode (int argc, const char* argv[])
     }
 
   if (argc>0)
-    error(EXIT_FAILURE,0,_("extra operand %s"), quote(argv[0]));
+    error (EXIT_FAILURE,0,_("extra operand %s"), quote (argv[0]));
 }
 
 struct datamash_ops*
@@ -290,7 +290,7 @@ datamash_ops_parse_premode ( enum processing_mode pm,
       argv += 2;
     }
   if (argc>0)
-    error(EXIT_FAILURE,0,_("extra operand %s"), quote(argv[0]));
+    error (EXIT_FAILURE,0,_("extra operand %s"), quote (argv[0]));
   return dm;
 }
 
@@ -311,19 +311,19 @@ datamash_ops_debug_print ( const struct datamash_ops* p )
     {
       const struct group_column_t *tmp = &p->grps[i];
       if (tmp->by_name)
-        fprintf(stderr,"  group-by named column '%s'\n",tmp->name);
+        fprintf (stderr,"  group-by named column '%s'\n",tmp->name);
       else
-        fprintf(stderr,"  group-by numeric column %zu\n",tmp->num);
+        fprintf (stderr,"  group-by numeric column %zu\n",tmp->num);
     }
 
   for (size_t i=0; i<p->num_ops; ++i)
     {
       struct fieldop *o = &p->ops[i];
       if (o->field_by_name)
-        fprintf(stderr,"  operation '%s' on named column '%s'\n",
+        fprintf (stderr,"  operation '%s' on named column '%s'\n",
                         get_field_operation_name (o->op), o->field_name);
       else
-        fprintf(stderr,"  operation '%s' on numeric column %zu\n",
+        fprintf (stderr,"  operation '%s' on numeric column %zu\n",
                         get_field_operation_name (o->op), o->field);
     }
 }

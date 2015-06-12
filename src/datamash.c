@@ -391,8 +391,8 @@ print_column_headers ()
   else
     {
       /* print only the headers of the group-by fields, e.g
-        'GroupBy(field-3)'  (without input headers), or
-        'GroupBy(NAME)'     (with input headers)           */
+        'GroupBy (field-3)'  (without input headers), or
+        'GroupBy (NAME)'     (with input headers)           */
       for (size_t i = 0; i < dm->num_grps; ++i)
         {
           const size_t col_num = dm->grps[i].num;
@@ -404,8 +404,8 @@ print_column_headers ()
     }
 
   /* add headers of the operations, e.g.
-        'sum(field-3)'  (without input headers), or
-        'sum(NAME)'     (with input headers)           */
+        'sum (field-3)'  (without input headers), or
+        'sum (NAME)'     (with input headers)           */
   for (size_t i=0; i<dm->num_ops; ++i)
     {
       struct fieldop *op = &dm->ops[i];

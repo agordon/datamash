@@ -22,14 +22,9 @@
 #include <config.h>
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include "system.h"
-
-#include "xalloc.h"
-#include "quote.h"
-#include "error.h"
-
+#include "assert.h"
 #include "op-defs.h"
 
 struct field_operation_definition
@@ -124,11 +119,12 @@ const char*
 get_field_operation_name (enum field_operation op)
 {
   const struct field_operation_definition* fod = field_operations;
-  while (fod->name) {
-    if (fod->op == op)
-      return fod->name;
-    ++fod;
-  }
+  while (fod->name)
+    {
+      if (fod->op == op)
+        return fod->name;
+      ++fod;
+    }
   internal_error ("invalid op value"); /* LCOV_EXCL_LINE */
   return NULL; /* LCOV_EXCL_LINE */
 }
@@ -137,11 +133,12 @@ enum processing_mode
 get_processing_mode (const char* s)
 {
   const struct processing_mode_definition* pmd = processing_modes;
-  while (pmd->name) {
-    if (strcasecmp (pmd->name, s)==0)
-      return pmd->mode;
-    ++pmd;
-  }
+  while (pmd->name)
+    {
+      if (strcasecmp (pmd->name, s)==0)
+        return pmd->mode;
+      ++pmd;
+    }
   return MODE_INVALID;
 }
 
@@ -149,11 +146,12 @@ const char*
 get_processing_mode_name (enum processing_mode m)
 {
   const struct processing_mode_definition* pmd = processing_modes;
-  while (pmd->name) {
-    if (pmd->mode == m)
-      return pmd->name;
-    ++pmd;
-  }
+  while (pmd->name)
+    {
+      if (pmd->mode == m)
+        return pmd->name;
+      ++pmd;
+    }
   internal_error ("invalid mode value"); /* LCOV_EXCL_LINE */
   return NULL; /* LCOV_EXCL_LINE */
 }

@@ -33,7 +33,6 @@
 #include "error.h"
 #include "minmax.h"
 #include "linebuffer.h"
-#include "quote.h"
 #include "system.h"
 #include "md5.h"
 #include "sha1.h"
