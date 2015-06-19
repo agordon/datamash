@@ -115,7 +115,7 @@ get_field_operation (const char* s, enum processing_mode* /*out*/ mode)
   return OP_INVALID;
 }
 
-const char*
+const char* _GL_ATTRIBUTE_PURE
 get_field_operation_name (enum field_operation op)
 {
   const struct field_operation_definition* fod = field_operations;
@@ -129,7 +129,7 @@ get_field_operation_name (enum field_operation op)
   return NULL;                                    /* LCOV_EXCL_LINE */
 }
 
-enum processing_mode
+enum processing_mode _GL_ATTRIBUTE_PURE
 get_processing_mode (const char* s)
 {
   const struct processing_mode_definition* pmd = processing_modes;
@@ -142,7 +142,7 @@ get_processing_mode (const char* s)
   return MODE_INVALID;
 }
 
-const char*
+const char* _GL_ATTRIBUTE_PURE
 get_processing_mode_name (enum processing_mode m)
 {
   const struct processing_mode_definition* pmd = processing_modes;

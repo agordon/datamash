@@ -54,7 +54,7 @@ have_more_tokens ()
   return tokind < tokcount;
 }
 
-static inline const char*
+static inline const char* _GL_ATTRIBUTE_PURE
 tok_peek ()
 {
   assert (have_more_tokens ());                  /* LCOV_EXCL_LINE */
