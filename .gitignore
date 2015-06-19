@@ -75,7 +75,10 @@ po/.reference
 
 test-suite.log
 
+# compiled binary
 /datamash
+# compiled binary (with mingw cross-compiling)
+/datamash.exe
 
 # Documentation files
 doc/.dirstamp
@@ -108,6 +111,16 @@ lib/*.gcda
 lib/*.gcno
 datamash.lcov
 datamash-cov/
+
+# clang static analysis files
+/clang_output_*
+
+# GNU Global tags
+/GPATH
+/GRTAGS
+/GTAGS
+
+/nohup.out
 
 datamash-*.tar.gz
 datamash-*.tar.gz.sig
