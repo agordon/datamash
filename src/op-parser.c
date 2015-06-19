@@ -180,7 +180,8 @@ static inline bool
 compatible_operation_modes (enum processing_mode current,
                              enum processing_mode added)
 {
-  return (current==added);
+  return ((current==MODE_CROSSTAB)&&(added==MODE_GROUPBY))||
+         (current==added);
 }
 
 static void
@@ -249,6 +250,17 @@ parse_mode ()
 
   case MODE_REMOVE_DUPS:
     parse_processing_mode_column ();
+    break;
+
+  case MODE_CROSSTAB:
+    parse_processing_mode_column ();
+    parse_operations (pm);
+    if (dm->num_grps!=2)
+      error (EXIT_FAILURE,0, _("crosstab requires exactly 2 fields, " \
+			       "found %zu"), dm->num_grps);
+    /* if the user didn't specify an operation, print counts */
+    if (dm->num_ops==0)
+      ADD_NUMERIC_OP (OP_COUNT, dm->grps[0].num);
     break;
 
   case MODE_GROUPBY:

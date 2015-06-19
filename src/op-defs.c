@@ -96,6 +96,8 @@ const struct processing_mode_definition processing_modes[] =
   {"rmdup",    MODE_REMOVE_DUPS},
   {"nop",      MODE_NOOP},
   {"noop",     MODE_NOOP},
+  {"crosstab", MODE_CROSSTAB},
+  {"ct",       MODE_CROSSTAB},
   {NULL,       MODE_INVALID},
 };
 

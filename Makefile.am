@@ -38,6 +38,7 @@ datamash_SOURCES = src/system.h \
 	       src/op-defs.c src/op-defs.h \
 	       src/op-parser.c src/op-parser.h \
 	       src/field-ops.c src/field-ops.h \
+	       src/crosstab.c src/crosstab.h \
 	       src/datamash.c
 
 datamash_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
@@ -118,6 +119,7 @@ TESTS = \
 	tests/datamash-rand.sh \
 	tests/datamash-stats.pl \
 	tests/datamash-transpose.pl \
+	tests/datamash-crosstab.pl \
 	tests/datamash-sort-header.sh \
 	tests/datamash-sort-errors.sh \
 	tests/datamash-io-errors.sh \

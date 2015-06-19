@@ -73,6 +73,7 @@ enum processing_mode
   MODE_REVERSE,       /* reverse fields in each line */
   MODE_PER_LINE,      /* Operations on each line, no grouping */
   MODE_REMOVE_DUPS,   /* Remove duplicated keys from a file */
+  MODE_CROSSTAB,      /* Cross tabulation (aka pivot tables) */
   MODE_NOOP           /* Do nothing. Used for testing and profiling */
 };
 

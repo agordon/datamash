@@ -55,6 +55,7 @@
 #include "op-parser.h"
 #include "field-ops.h"
 #include "utils.h"
+#include "crosstab.h"
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "datamash"
@@ -83,6 +84,10 @@ static bool print_full_line = false;
 static struct datamash_ops *dm = NULL;
 
 static bool line_mode = false; /* if TRUE, handle each line as a group */
+
+static bool crosstab_mode = false; /* if TRUE, do cross-tabulation */
+
+static struct crosstab* crosstab = NULL;
 
 static bool pipe_through_sort = false;
 static FILE* input_stream = NULL;
@@ -280,6 +285,18 @@ safe_line_record_get_field (const struct line_record_t *lr, const size_t n,
 {
   if (!line_record_get_field (lr, n, pptr, plen))
     error_not_enough_fields (n, line_record_num_fields (lr));
+}
+
+static inline void
+safe_line_record_get_fieldz (const struct line_record_t *lr, const size_t n,
+                             char * /* out */ buf, size_t len)
+{
+  const char *p;
+  size_t l;
+  safe_line_record_get_field (lr, n, &p, &l);
+  l = MIN (len-1,l);
+  memcpy (buf, p, l);
+  buf[l] = 0;
 }
 
 /* returns TRUE if the lines are different, false if identical.
@@ -490,10 +507,34 @@ reset_field_ops ()
 static void
 process_group (const struct line_record_t* line)
 {
+  /* TODO: dynamically re-alloc if needed */
+  char col_name[512];
+  char row_name[512];
+
   if (lines_in_group>0)
     {
-      print_input_line (line);
-      summarize_field_ops ();
+      if (crosstab_mode)
+        {
+          /* cross-tabulation mode - save results in a matrix, print later */
+          const size_t row_field = dm->grps[0].num;
+          safe_line_record_get_fieldz (line, row_field,
+                                       row_name, sizeof row_name);
+
+          const size_t col_field = dm->grps[1].num;
+          safe_line_record_get_fieldz (line, col_field,
+                                       col_name, sizeof col_name);
+
+          field_op_summarize (&dm->ops[0]);
+          const char* data = dm->ops[0].out_buf;
+
+          crosstab_add_result (crosstab, row_name, col_name, data);
+        }
+      else
+        {
+          /* group-by/per-line mode - print results once available */
+          print_input_line (line);
+          summarize_field_ops ();
+        }
     }
   lines_in_group = 0;
   reset_field_ops ();
@@ -1080,6 +1121,16 @@ int main (int argc, char* argv[])
 
     case MODE_REMOVE_DUPS:
       remove_dups_in_file ();
+      break;
+
+    case MODE_CROSSTAB:
+      assert ( dm->num_grps== 2 ); /* LCOV_EXCL_LINE */
+      assert ( dm->num_ops == 1 ); /* LCOV_EXCL_LINE */
+      crosstab_mode = true;
+      crosstab = crosstab_init ();
+      process_file ();
+      crosstab_print (crosstab);
+      crosstab_free (crosstab);
       break;
 
     case MODE_INVALID:
