@@ -246,6 +246,7 @@ parse_mode ()
   case MODE_TRANSPOSE:
   case MODE_NOOP:
   case MODE_REVERSE:
+  case MODE_TABULAR_CHECK:
     break;
 
   case MODE_REMOVE_DUPS:

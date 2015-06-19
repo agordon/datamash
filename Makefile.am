@@ -120,6 +120,7 @@ TESTS = \
 	tests/datamash-stats.pl \
 	tests/datamash-transpose.pl \
 	tests/datamash-crosstab.pl \
+	tests/datamash-check-tabular.pl \
 	tests/datamash-sort-header.sh \
 	tests/datamash-sort-errors.sh \
 	tests/datamash-io-errors.sh \

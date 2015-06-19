@@ -789,6 +789,68 @@ noop_file ()
 }
 
 /*
+   Read file, ensure it is in tabular format
+   (same number of fields in each line)
+ */
+static void
+tabular_check_file ()
+{
+  size_t prev_num_fields=0;
+  struct line_record_t lb1, lb2;
+  struct line_record_t *thisline, *prevline;
+
+  thisline = &lb1;
+  prevline = &lb2;
+
+  line_record_init (thisline);
+  line_record_init (prevline);
+
+  while (true)
+    {
+      if (!line_record_fread (thisline, input_stream, eolchar))
+        break;
+      line_number++;
+
+      const size_t num_fields = line_record_num_fields (thisline);
+
+      if (line_number>1 && num_fields != prev_num_fields)
+        {
+          fprintf (stderr, _("line %"PRIuMAX" (%"PRIuMAX" fields):\n  "),
+                       (uintmax_t)(line_number-1), (uintmax_t)prev_num_fields);
+          ignore_value (fwrite (line_record_buffer (prevline),
+                                line_record_length (prevline), sizeof (char),
+                                stderr));
+          fputc ('\n', stderr);
+          fprintf (stderr, _("line %"PRIuMAX" (%"PRIuMAX" fields):\n  "),
+                       (uintmax_t)(line_number), (uintmax_t)num_fields);
+          ignore_value (fwrite (line_record_buffer (thisline),
+                                line_record_length (thisline), sizeof (char),
+                                stderr));
+          fputc ('\n', stderr);
+          error (EXIT_FAILURE, 0, _("check failed: line " \
+                       "%"PRIuMAX" has %"PRIuMAX" fields (previous line had "\
+                       "%"PRIuMAX")"),
+                       (uintmax_t)line_number, (uintmax_t)num_fields,
+                       (uintmax_t)prev_num_fields);
+        }
+      prev_num_fields = num_fields;
+
+      SWAP_LINES (prevline, thisline);
+    }
+
+  /* Print summary */
+  printf (ngettext ("%"PRIuMAX" line", "%"PRIuMAX" lines",
+          select_plural (line_number)), (uintmax_t)line_number);
+  fputs (", ", stdout);
+  printf (ngettext ("%"PRIuMAX" field", "%"PRIuMAX" fields",
+          select_plural (prev_num_fields)), (uintmax_t)prev_num_fields);
+  print_line_separator ();
+
+  line_record_free (&lb1);
+  line_record_free (&lb2);
+}
+
+/*
     Remove lines with duplicates keys from a file
  */
 static void
@@ -1131,6 +1193,10 @@ int main (int argc, char* argv[])
       process_file ();
       crosstab_print (crosstab);
       crosstab_free (crosstab);
+      break;
+
+    case MODE_TABULAR_CHECK:
+      tabular_check_file ();
       break;
 
     case MODE_INVALID:

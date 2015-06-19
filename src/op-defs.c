@@ -98,6 +98,7 @@ const struct processing_mode_definition processing_modes[] =
   {"noop",     MODE_NOOP},
   {"crosstab", MODE_CROSSTAB},
   {"ct",       MODE_CROSSTAB},
+  {"check",    MODE_TABULAR_CHECK},
   {NULL,       MODE_INVALID},
 };
 
