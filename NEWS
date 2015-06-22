@@ -1,3 +1,20 @@
+* Noteworthy changes in release 1.0.7 (2015-06-29) [stable]
+
+** New Features
+
+  New operations: md5, sha1/256/512, base64, rmdup.
+
+  New option --narm to ignore NaN/NA values.
+
+  New feature: ability to specify field by names instead of numbers
+  (require using --header-in or -H).
+
+  New translations added.
+
+** Improvements
+
+  Speed, Portability, Coverage improvements.
+
 * Noteworthy changes in release 1.0.6 (2014-07-29) [stable]
 
 ** New Features
