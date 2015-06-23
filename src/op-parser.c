@@ -146,31 +146,80 @@ add_processing_mode_columns ( const char* s )
   free (copy);
 }
 
-static void
-add_field_operation_columns ( const char* s, enum field_operation op )
+static bool
+try_add_single_field (const char* s, enum field_operation fop)
 {
   long int val;
+  if (!strtol_valid (s,&val))
+    return false;
+  if (val < 1)
+    error (EXIT_FAILURE,0,_("invalid column %s for operation '%s'"),
+                          quote (s), get_field_operation_name (fop));
+  ADD_NUMERIC_OP (fop, val);
+  return true;
+}
+
+
+static bool
+try_add_field_range (const char* s, enum field_operation fop)
+{
+  char *endp;
+  long int val1;
+  long int val2;
+  errno = 0 ;
+  val1 = strtol (s, &endp, 10);
+  if (errno != 0 || endp == s || endp == NULL || *endp != '-')
+    return false;
+  ++endp;
+
+  /* TODO: informative error about invalid range specification? */
+  if (!strtol_valid (endp,&val2)
+      || val1 < 1 || val2 < 1 || (val1>val2))
+    error (EXIT_FAILURE,0,_("invalid field range %s"), quote (s));
+
+  for (long int i = val1; i<=val2; ++i)
+    ADD_NUMERIC_OP (fop, i);
+
+  return true;
+}
+
+static void
+add_named_field (const char* spec, enum field_operation fop)
+{
+  /* TODO: check 'isalpha (*spec)' to require names to start with a letter? */
+  ADD_NAMED_OP (fop, spec);
+}
+
+static void
+parse_operation_column (const char* spec, enum field_operation fop)
+{
+  if (try_add_single_field (spec, fop)
+      || try_add_field_range (spec, fop))
+    return;
+
+  add_named_field (spec, fop);
+}
+
+static void
+parse_operation_column_list (enum field_operation fop)
+{
   char *tok;
-  char *spec = xstrdup (s);
-  char *copy = spec;
+  char *spec, *copy;
+
+  if (!have_more_tokens ())
+    error (EXIT_FAILURE,0, _("missing field number after operation %s"),
+                          quote (get_field_operation_name (fop)));
+
+  copy = spec = xstrdup (tok_peek ());
+  tok_consume ();
 
   while ( (tok = strsep (&spec, ",")) != NULL)
     {
       if (strlen (tok) == 0)
         error (EXIT_FAILURE, 0, _("invalid empty column for operation %s"),
-                                  quote (get_field_operation_name (op)));
-      if (strtol_valid (tok, &val))
-        {
-          if (val<1)
-            error (EXIT_FAILURE, 0, _("invalid column %s for operation '%s'"),
-                                    quote (tok),
-                                    get_field_operation_name (op));
-          ADD_NUMERIC_OP (op, val);
-        }
-      else
-        {
-          ADD_NAMED_OP (op, tok);
-        }
+                                  quote (get_field_operation_name (fop)));
+
+      parse_operation_column (tok, fop);
     }
 
   free (copy);
@@ -207,12 +256,7 @@ parse_operation (enum processing_mode pm)
            quote (tok_peek ()));
   tok_consume ();
 
-  if (!have_more_tokens ())
-    error (EXIT_FAILURE,0, _("missing field number after operation %s"),
-                          quote (get_field_operation_name (fop)));
-
-  add_field_operation_columns (tok_peek (), fop);
-  tok_consume ();
+  parse_operation_column_list (fop);
 }
 
 static void

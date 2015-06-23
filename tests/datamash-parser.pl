@@ -53,6 +53,14 @@ B\t10\tx
 B\t35\ty
 EOF
 
+my $in2=<<"EOF";
+1	2	3	4	5
+6	7	8	9	10
+EOF
+
+my $out2=<<'EOF';
+7	9	11	13	15
+EOF
 
 my @Tests =
 (
@@ -99,18 +107,35 @@ my @Tests =
   ['p12','groupby', {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: missing field number\n"}],
 
+  # field range syntax
+  ['p20','sum 1-44', {IN_PIPE=>""}, {OUT=>""}],
 
+  # compare results of equivalent syntaxes
+  ['p21','sum 1,2,3,4,5', {IN_PIPE=>$in2}, {OUT=>$out2}],
+  ['p22','sum 1-2,3-4,5', {IN_PIPE=>$in2}, {OUT=>$out2}],
+  ['p23','sum 1-2,3-5',   {IN_PIPE=>$in2}, {OUT=>$out2}],
+  ['p24','sum 1-4,5',     {IN_PIPE=>$in2}, {OUT=>$out2}],
+  ['p25','sum 1-5',       {IN_PIPE=>$in2}, {OUT=>$out2}],
+  ['p26','sum 1 sum 2 sum 3 sum 4 sum 5',
+                          {IN_PIPE=>$in2}, {OUT=>$out2}],
+  ['p27','sum 1,2 sum 3-5',
+                          {IN_PIPE=>$in2}, {OUT=>$out2}],
 
-  ## Some error checkings
-#  ['e1',  'sum',  {IN_PIPE=>""}, {EXIT=>1},
-#      {ERR=>"$prog: missing field number after operation 'sum'\n"}],
-
-#my $in_sort_quote1=<<"EOF";
-#A'1
-#B'2
-#A'3
-#B'4
-#EOF
+  # Field range with invalid syntax
+  ['e20','sum 1-',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range '1-'\n"}],
+  ['e21','sum 1-x',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range '1-x'\n"}],
+  ['e22','sum 4-2',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range '4-2'\n"}],
+  # zero in range
+  ['e23','sum 0-2',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range '0-2'\n"}],
+  ['e24','sum 1-0',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range '1-0'\n"}],
+  #Negative in range
+  ['e25','sum 0--5',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range '0--5'\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
