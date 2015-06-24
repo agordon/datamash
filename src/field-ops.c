@@ -128,6 +128,10 @@ struct operation_data operations[] =
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_S_COVARIANCE */
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_P_PEARSON_COR */
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_S_PEARSON_COR */
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -445,6 +449,8 @@ field_op_collect (struct fieldop *op,
     case OP_ANTIMODE:
     case OP_P_COVARIANCE:
     case OP_S_COVARIANCE:
+    case OP_P_PEARSON_COR:
+    case OP_S_PEARSON_COR:
       field_op_add_value (op, num_value);
       break;
 
@@ -581,6 +587,8 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_ANTIMODE:
     case OP_P_COVARIANCE:
     case OP_S_COVARIANCE:
+    case OP_P_PEARSON_COR:
+    case OP_S_PEARSON_COR:
       numeric_result = nanl ("");
       break;
 
@@ -760,6 +768,17 @@ field_op_summarize (struct fieldop *op)
                                          op->num_values,
                                          (op->op==OP_P_COVARIANCE)?
                                                 DF_POPULATION:DF_SAMPLE );
+      break;
+
+    case OP_P_PEARSON_COR:
+    case OP_S_PEARSON_COR:
+      assert (!op->slave);                       /* LCOV_EXCL_LINE */
+      assert (op->slave_op);                     /* LCOV_EXCL_LINE */
+      assert (op->num_values == op->slave_op->num_values); /* LCOV_EXCL_LINE */
+      numeric_result = pearson_corr_value (op->values, op->slave_op->values,
+                                           op->num_values,
+                                           (op->op==OP_P_PEARSON_COR)?
+                                                DF_POPULATION:DF_SAMPLE);
       break;
 
     case OP_MODE:

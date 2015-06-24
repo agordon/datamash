@@ -100,6 +100,13 @@ covariance_value ( const long double * const valuesA,
                    const long double * const valuesB, size_t n, int df );
 
 /*
+ Given an two array of doubles, return the Pearson correlation coefficient
+ */
+long double
+pearson_corr_value ( const long double * const valuesA,
+                     const long double * const valuesB, size_t n, int df);
+
+/*
  Given an array of doubles, return the standard-deviation value.
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */

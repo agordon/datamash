@@ -64,7 +64,9 @@ enum field_operation
   OP_SHA256,        /* Calculate SHA256 of a field */
   OP_SHA512,        /* Calculate SHA512 of a field */
   OP_P_COVARIANCE,  /* Population Covariance */
-  OP_S_COVARIANCE   /* Sample Covariance */
+  OP_S_COVARIANCE,  /* Sample Covariance */
+  OP_P_PEARSON_COR, /* Pearson Correlation Coefficient (population) */
+  OP_S_PEARSON_COR  /* Pearson Correlation Coefficient (sample) */
 };
 
 enum processing_mode

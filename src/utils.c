@@ -161,6 +161,39 @@ covariance_value ( const long double * const valuesA,
   return covariance;
 }
 
+long double
+pearson_corr_value ( const long double * const valuesA,
+                     const long double * const valuesB, size_t n, int df)
+{
+  long double meanA, meanB, sumA=0, sumB=0, sumCo=0;
+  long double sdA, sdB;
+  long double covariance;
+  long double cor;
+
+  assert (df>=0); /* LCOV_EXCL_LINE */
+  if ( (size_t)df == n )
+    return nanl ("");
+
+  meanA = arithmetic_mean_value (valuesA, n);
+  meanB = arithmetic_mean_value (valuesB, n);
+
+  for (size_t i = 0; i < n; i++)
+    {
+      const long double a = (valuesA[i] - meanA);
+      const long double b = (valuesB[i] - meanB);
+      sumA += a*a;
+      sumB += b*b;
+      sumCo += a*b;
+    }
+
+  covariance = sumCo/(n-df);
+  sdA = sqrtl (sumA/(n-df));
+  sdB = sqrtl (sumB/(n-df));
+
+  cor = covariance / ( sdA * sdB );
+  return cor;
+}
+
 
 long double
 stdev_value (const long double * const values, size_t n, int df)

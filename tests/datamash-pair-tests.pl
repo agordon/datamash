@@ -49,16 +49,32 @@ $prog = $prog_bin unless $prog;
 =pod
 Equivalent R code
 
-   x=c(-0.49,0.14,1.62,2.76,-0.46,3.28,-0.01,2.90,2.46,1.52)
-   y=c(-0.21,-0.16,1.86,1.81,0.39,4.17,0.38,1.90,2.69,0.78)
-   scov <- function(x,y) {
+    pop.sd=function(x)(sqrt(var(x)*(length(x)-1)/length(x)))
+    smp.sd=sd
+
+    # alternatively, use the built-in covariance function:
+    # smp.cov=cov
+    smp.cov <- function(x,y) {
       stopifnot(identical(length(x), length(y)))
       sum((x - mean(x)) * (y - mean(y))) / (length(x) - 1)
-   }
-   pcov <- function(x,y) {
+    }
+    pop.cov <- function(x,y) {
       stopifnot(identical(length(x), length(y)))
       sum((x - mean(x)) * (y - mean(y))) / (length(x) )
    }
+
+   # alternative, use the built-in covariance fuction:
+   #  smp.pearsoncor=cor
+   smp.pearsoncor=function(x,y) { smp.cov(x,y)/ ( smp.sd(x)*smp.sd(y) ) }
+   pop.pearsoncor=function(x,y) { pop.cov(x,y)/ ( pop.sd(x)*pop.sd(y) ) }
+
+   in1.x=c(-0.49,0.14,1.62,2.76,-0.46,3.28,-0.01,2.90,2.46,1.52)
+   in1.y=c(-0.21,-0.16,1.86,1.81,0.39,4.17,0.38,1.90,2.69,0.78)
+
+   in2.x = c(1.599,-1.011,-1.687,5.070,6.944,7.934,2.134,5.150,
+             10.197,11.427,10.379,14.867,11.399,13.479,18.328,16.573,
+             17.804,18.694,16.690,21.805)
+   in2.y = seq(20)
 
 =cut
 
@@ -84,11 +100,44 @@ my $out1_pcov=<<'EOF';
 1.622
 EOF
 
+my $in2=<<'EOF';
+1.599	1
+-1.011	2
+-1.687	3
+5.070	4
+6.944	5
+7.934	6
+2.134	7
+5.150	8
+10.197	9
+11.427	10
+10.379	11
+14.867	12
+11.399	13
+13.479	14
+18.328	15
+16.573	16
+17.804	17
+18.694	18
+16.690	19
+21.805	20
+EOF
+
+my $out2_p=<<'EOF';
+0.944
+EOF
+
+my $out2_s=<<'EOF';
+0.944
+EOF
 
 my @Tests =
 (
   ['c1', 'scov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_scov}],
   ['c2', 'pcov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_pcov}],
+
+  ['p1', 'ppearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_p}],
+  ['p2', 'spearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_s}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
