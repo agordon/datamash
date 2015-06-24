@@ -136,6 +136,23 @@ my @Tests =
   #Negative in range
   ['e25','sum 0--5',   {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: invalid field range '0--5'\n"}],
+
+
+  # Test field pair syntaax
+  ['p40','pcov 1:2',      {IN_PIPE=>""}, {OUT=>""}],
+  ['e41','pcov 1', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: operation 'pcov' requires column pairs\n"}],
+  ['e42','pcov 1:', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field pair '1:'\n"}],
+  ['e43','pcov :', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field pair ':'\n"}],
+  ['e44','pcov :1', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field pair ':1'\n"}],
+  ['e45','pcov 1:', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field pair '1:'\n"}],
+  ['e46','pcov hello:world', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

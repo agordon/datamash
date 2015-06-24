@@ -425,6 +425,8 @@ print_column_headers ()
   for (size_t i=0; i<dm->num_ops; ++i)
     {
       struct fieldop *op = &dm->ops[i];
+      if (op->slave)
+        continue;
 
       if (op->field > get_num_column_headers ())
         error_not_enough_fields (op->field, get_num_column_headers ());
@@ -483,6 +485,9 @@ summarize_field_ops ()
   for (size_t i=0;i<dm->num_ops;++i)
     {
       struct fieldop *p = &dm->ops[i];
+      if (p->slave)
+        continue;
+
       field_op_summarize (p);
       fputs (p->out_buf, stdout);
 

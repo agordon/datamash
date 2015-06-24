@@ -74,6 +74,11 @@ _alloc_ops ()
   dm->mode = MODE_INVALID;
 }
 
+/* Evalutates to TRUE if operation X (=enum field_operation)
+   requires a paired field parameters (e.g. 1:2) */
+#define OP_NEED_PAIR_PARAMS(x) (((x)==OP_P_COVARIANCE)||\
+                                ((x)==OP_S_COVARIANCE))
+
 #define ADD_NAMED_GROUP(name)  (add_group_col (true,0,(name)))
 #define ADD_NUMERIC_GROUP(num) (add_group_col (false,num,NULL))
 static void
@@ -183,6 +188,46 @@ try_add_field_range (const char* s, enum field_operation fop)
   return true;
 }
 
+static bool
+try_add_field_pair (const char* s, enum field_operation fop)
+{
+  long int val;
+  char *field1 = xstrdup (s);
+  char *field2 = strchr (field1,':');
+  struct fieldop *op=NULL;
+
+  if (field2==NULL)
+    return false;
+  *field2 = 0;
+  ++field2;
+
+  /* empty first field or empty second field */
+  if (*field1==0 || *field2==0)
+    error (EXIT_FAILURE,0,_("invalid field pair %s"), quote (s));
+
+  if (strtol_valid (field1, &val))
+    ADD_NUMERIC_OP (fop, val);
+  else
+    ADD_NAMED_OP (fop, field1);
+
+  const size_t slave_idx = dm->num_ops-1;
+  op = &dm->ops[slave_idx];
+  op->slave = true;
+
+  if (strtol_valid (field2, &val))
+    ADD_NUMERIC_OP (fop, val);
+  else
+    ADD_NAMED_OP (fop, field2);
+
+  op = &dm->ops[dm->num_ops-1];
+  op->master = true;
+  op->slave_idx = slave_idx;
+
+  free (field1);
+  return true;
+}
+
+
 static void
 add_named_field (const char* spec, enum field_operation fop)
 {
@@ -193,6 +238,13 @@ add_named_field (const char* spec, enum field_operation fop)
 static void
 parse_operation_column (const char* spec, enum field_operation fop)
 {
+  if (OP_NEED_PAIR_PARAMS (fop))
+    {
+      if (!try_add_field_pair (spec, fop))
+        error (EXIT_FAILURE,0,_("operation %s requires column pairs"),
+                              quote (get_field_operation_name (fop)));
+      return;
+    }
   if (try_add_single_field (spec, fop)
       || try_add_field_range (spec, fop))
     return;
@@ -264,6 +316,17 @@ parse_operations (enum processing_mode pm)
 {
   while (have_more_tokens ())
     parse_operation (pm);
+
+  /* After adding all operations, see of there are master/slave ops
+     that need resolving - caching their pointer instead of index */
+  for (size_t i=0; i<dm->num_ops; ++i)
+    {
+      if (!dm->ops[i].master)
+        continue;
+      const size_t si = dm->ops[i].slave_idx;
+      assert (si<=dm->num_ops);                  /* LCOV_EXCL_LINE */
+      dm->ops[i].slave_op = &dm->ops[si];
+    }
 }
 
 static void

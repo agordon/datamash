@@ -71,6 +71,11 @@ struct fieldop
   enum operation_result_type res_type;
   bool numeric;
   bool auto_first; /* if true, automatically set 'value' if 'first' */
+  bool master;     /* if true, this field_op uses another as a slave */
+  bool slave;      /* if true, not used directly, but referenced by
+                      another field_op */
+  size_t slave_idx;
+  struct fieldop* slave_op;
 
   /* Instance information */
   size_t field; /* field number.  1 = first field in input file. */

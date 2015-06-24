@@ -137,7 +137,7 @@ variance_value (const long double * const values, size_t n, int df)
   return variance;
 }
 
-long double
+long double _GL_ATTRIBUTE_PURE
 covariance_value ( const long double * const valuesA,
                    const long double * const valuesB, size_t n, int df )
 {

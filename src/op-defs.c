@@ -74,6 +74,8 @@ struct field_operation_definition field_operations[] =
   {"sha1",    OP_SHA1,    MODE_PER_LINE},
   {"sha256",  OP_SHA256,  MODE_PER_LINE},
   {"sha512",  OP_SHA512,  MODE_PER_LINE},
+  {"pcov",    OP_P_COVARIANCE, MODE_GROUPBY},
+  {"scov",    OP_S_COVARIANCE, MODE_GROUPBY},
   {NULL,      OP_INVALID, MODE_INVALID}
 };
 

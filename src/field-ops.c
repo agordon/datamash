@@ -124,6 +124,10 @@ struct operation_data operations[] =
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_SHA512 */
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  /* OP_P_COVARIANCE */
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_S_COVARIANCE */
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -269,6 +273,8 @@ field_op_init (struct fieldop* /*out*/ op,
   op->numeric = (op->acc_type == NUMERIC_SCALAR
                  || op->acc_type == NUMERIC_VECTOR);
   op->auto_first = operations[oper].auto_first;
+  op->slave = false;
+  op->slave_op = NULL;
 
   op->field = num;
   op->field_by_name = by_name;
@@ -437,6 +443,8 @@ field_op_collect (struct fieldop *op,
     case OP_DP_OMNIBUS:
     case OP_MODE:
     case OP_ANTIMODE:
+    case OP_P_COVARIANCE:
+    case OP_S_COVARIANCE:
       field_op_add_value (op, num_value);
       break;
 
@@ -571,6 +579,8 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_SVARIANCE:
     case OP_MODE:
     case OP_ANTIMODE:
+    case OP_P_COVARIANCE:
+    case OP_S_COVARIANCE:
       numeric_result = nanl ("");
       break;
 
@@ -739,6 +749,17 @@ field_op_summarize (struct fieldop *op)
     case OP_DP_OMNIBUS:
       numeric_result = dagostino_pearson_omnibus_pvalue ( op->values,
                                                           op->num_values );
+      break;
+
+    case OP_P_COVARIANCE:
+    case OP_S_COVARIANCE:
+      assert (!op->slave);                       /* LCOV_EXCL_LINE */
+      assert (op->slave_op);                     /* LCOV_EXCL_LINE */
+      assert (op->num_values == op->slave_op->num_values); /* LCOV_EXCL_LINE */
+      numeric_result = covariance_value (op->values, op->slave_op->values,
+                                         op->num_values,
+                                         (op->op==OP_P_COVARIANCE)?
+                                                DF_POPULATION:DF_SAMPLE );
       break;
 
     case OP_MODE:

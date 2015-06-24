@@ -159,6 +159,13 @@ cat wide_base64 | valgrind --track-origins=yes  --leak-check=full \
                        datamash debase64 1 > wide_orig ||
   { warn_ "debase64 failed on wide_base64" ; fail=1 ; }
 
+## Test Covariance (and paired-columns)
+cat in_4k_rows | valgrind --track-origins=yes  --leak-check=full \
+                          --show-reachable=yes  --error-exitcode=1 \
+                  datamash pcov 1:2 > /dev/null ||
+  { warn_ "pcov 1:2 failed on in_4k_rows" ; fail=1 ; }
+
+
 cmp wide wide_orig ||
   { warn_ "base64 decoding failed (decoded output does not match original)";
     fail=1 ; }
