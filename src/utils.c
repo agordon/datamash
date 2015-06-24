@@ -138,6 +138,31 @@ variance_value (const long double * const values, size_t n, int df)
 }
 
 long double
+covariance_value ( const long double * const valuesA,
+                   const long double * const valuesB, size_t n, int df )
+{
+  long double sum=0;
+  long double meanA, meanB;
+  long double covariance;
+
+  assert (df>=0); /* LCOV_EXCL_LINE */
+  if ( (size_t)df == n )
+    return nanl ("");
+
+  meanA = arithmetic_mean_value (valuesA, n);
+  meanB = arithmetic_mean_value (valuesB, n);
+
+  sum = 0 ;
+  for (size_t i = 0; i < n; i++)
+    sum += (valuesA[i] - meanA) * (valuesB[i] - meanB);
+
+  covariance = sum / ( n - df );
+
+  return covariance;
+}
+
+
+long double
 stdev_value (const long double * const values, size_t n, int df)
 {
   return sqrtl ( variance_value ( values, n, df ) );
