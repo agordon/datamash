@@ -26,7 +26,9 @@
 #include <stdbool.h>
 
 #include "system.h"
+#ifndef MAX
 #include "minmax.h"
+#endif
 #include "linebuffer.h"
 #include "xalloc.h"
 
