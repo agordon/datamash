@@ -170,6 +170,11 @@ dist_examples_DATA = examples/readme.md \
 
 EXTRA_DIST += $(dist_examples_DATA)
 
+if ENABLE_BASH_COMPLETION
+bashcompletiondir = $(BASH_COMPLETION_DIR)
+dist_bashcompletion_DATA = contrib/bash-completion/datamash
+endif
+
 
 
 

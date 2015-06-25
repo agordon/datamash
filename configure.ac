@@ -91,6 +91,24 @@ AC_DEFINE([HAVE_BROKEN_STRTOLD],[1],
           [Define to 1 if strtold does not work properly (e.g. in cygwin)])
 fi
 
+AC_ARG_WITH([bash-completion-dir],
+    AS_HELP_STRING([--with-bash-completion-dir[=PATH]],
+        [Install the bash auto-completion script in this directory.
+         For example, /etc/bash_completion.d @<:@default=datarootdir@:>@]),
+    [],
+    [with_bash_completion_dir=yes])
+
+if test "x$with_bash_completion_dir" = "xyes"; then
+   BASH_COMPLETION_DIR="$datarootdir/${PACKAGE}/bash-completion.d"
+else
+   # either 'no', or a user-specified custom DIR - use it.
+   BASH_COMPLETION_DIR="$with_bash_completion_dir"
+fi
+AC_SUBST([BASH_COMPLETION_DIR])
+AM_CONDITIONAL([ENABLE_BASH_COMPLETION],
+               [test "x$with_bash_completion_dir" != "xno"])
+
+
 ##
 ## Check if the system's sort support "-s" (stable) sort.
 ##  'sort' from GNU Coreutils, FreeBSD, OpenBSD, Busybox support it.

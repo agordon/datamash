@@ -1,6 +1,7 @@
+#!/bin/bash
 # datamash bash-completion
 #
-## Copyright (C) 2014 Assaf Gordon <assafgordon@gmail.com>
+## Copyright (C) 2014-2015 Assaf Gordon <assafgordon@gmail.com>
 ##
 ## This file is part of GNU Datamash.
 ##
@@ -16,54 +17,93 @@
 _datamash ()
 {
   local cur prev words cword split=false
-  _init_completion -n := || return
+  _get_comp_words_by_ref cur prev words cword
 
-  datamash_modes="transpose reverse"
+  local modes="check crosstab groupby reverse rmdup transpose"
+  local modes_re=${modes// /|}
 
-  datamash_operations="sum min max absmin absmax
-  count first last rand
-  unique collapse countunique
-  mean median q1 q3 iqr mode antimode
-  pstdev sstdev pvar svar mad madraw
-  pskew sskew pkurt skurt dpo jarque"
+  #NOTE: do not change the spaces (or indentation or backslashes)
+  #      or the regex will fail.
+  local groupby_ops="sum min max absmin absmax \
+count first last rand \
+unique collapse countunique \
+mean median q1 q3 iqr mode antimode \
+pstdev sstdev pvar svar mad madraw \
+pskew sskew pkurt skurt dpo jarque \
+pcov scov ppearson spearson"
+ local groupby_ops_re=${groupby_ops// /|}
 
-  datamash_short_options="-f -g -H -i -s -t -W -z"
+  local line_ops="base64 debase64 md5 sha1 sha256 sha512"
+  local line_ops_re=${line_ops// /|}
 
-  datamash_long_options="--full --group --header-in --header-out --headers
+  local datamash_short_options="-f -g -H -i -s -t -W -z"
+
+  local datamash_long_options="--full --group --header-in --header-out --headers
   --ignore-case --sort --no-strict --filler --field-separator --whitespace
   --zero-terminated --help --version"
 
+  local all_ops_re="$modes_re|$groupby_ops_re|$line_ops_re"
+
   # IF the previous word as an operator, the next parameter should
   # be a numeric value, so don't offer any completion.
-  [[ "$datamash_operations $datamash_modes" == *"$prev"* ]] && return 0
-
-  # Check if any of the previous parameteters is an operator.
-  # If so, then suggest only other operators, not options.
-  local seen_operators=0
-  local i=$((cword-1))
-  while [ "$i" -gt 0 ] ; do
-      local tmp_word=${words[$i]}
-      if [[ "$datamash_operations $datamash_modes" == *"$tmp_word"* ]]; then
-        seen_operators=1
-        break
-      fi
-      i=$((i-1))
-  done
-  if [ "$seen_operators" -eq 1 ] ; then
-    COMPREPLY=( $(compgen -W "$datamash_operations" -- "$cur") )
+  if [[ "$prev" =~ $all_ops_re ]] ; then
     return 0
   fi
 
-  # Suggest options or operators
-  case "$cur" in
-   -*) COMPREPLY=( $(compgen -W \
-                "$datamash_short_options $datamash_long_options" -- "$cur") )
-       ;;
-   *)  COMPREPLY=( $(compgen -W \
-                "$datamash_modes $datamash_operations" -- "$cur") )
-       ;;
-  esac
+  # Based on current parameteres, check which mode we're in.
+  local suggest_modes=1
+  local suggest_groupby_ops=1
+  local suggest_line_ops=1
+  local i=$((cword-1))
 
+  while [ "$i" -gt 0 ] ; do
+    local tmp_word=${words[$i]}
+
+    if [[ "$tmp_word" =~ $modes_re ]] ; then
+      suggest_modes=0
+      case "$tmp_word" in
+        crosstab|groupby) suggest_line_ops=0
+      esac
+    fi
+
+    if [[ "$tmp_word" =~ $groupby_ops_re ]]; then
+      suggest_modes=0
+      suggest_line_ops=0
+    fi
+    # if the user specified -g, we're in "groupby" mode
+    if [[ "$tmp_word" = "-g" ]] ; then
+      suggest_modes=0
+      suggest_line_ops=0
+    fi
+
+    if [[ "$tmp_word" =~ $line_ops_re ]]; then
+      suggest_modes=0
+      suggest_groupby_ops=0
+    fi
+
+    i=$((i-1))
+  done
+
+  # Options trump everything (if the user typed '-')
+  if [[ "$cur" = "-"* ]] ; then
+    COMPREPLY=( $(compgen -W \
+        "$datamash_short_options $datamash_long_options" -- "$cur") )
+    return 0
+  fi
+
+  # suggest other possibilities
+  local suggest=""
+  if [ "$suggest_modes" -eq 1 ] ; then
+    suggest="$modes"
+  fi
+  if [ "$suggest_groupby_ops" -eq 1 ] ; then
+    suggest="$suggest $groupby_ops"
+  fi
+  if [ "$suggest_line_ops" -eq 1 ] ; then
+    suggest="$suggest $line_ops"
+  fi
+
+  COMPREPLY=( $(compgen -W "$suggest" -- "$cur") )
   return 0
 }
 
