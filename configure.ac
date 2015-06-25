@@ -154,18 +154,11 @@ AC_MSG_RESULT([    CPPFLAGS: $CPPFLAGS])
 AC_MSG_RESULT([    LDFLAGS:  $LDFLAGS])
 AC_MSG_RESULT([])
 AC_MSG_RESULT([ Default installation directories:])
-AC_MSG_RESULT([    program:  ${prefix}/bin/ ])
-dnl The default 'datarootdir' is unexpanded, still contains
-dnl '${prefix}/share' (note the single quotes in the second parameter).
-dnl If it is unexpanded, it means "./configure" will put the default value
-dnl in the resulting 'Makefile'.
-dnl If it is expanded, it means the user called "./configure" with a custom
-dnl "--prefix" parameter.
-if test "x$datarootdir" = 'x${prefix}/share' ; then
-AC_MSG_RESULT([    examples: ${prefix}/share/${PACKAGE}/examples])
-else
-AC_MSG_RESULT([    examples: ${datarootdir}/${PACKAGE}/examples])
-fi
+AC_MSG_RESULT([    program:   ${prefix}/bin/ ])
+eval example_dir=${datarootdir}/${PACKAGE}/examples
+AC_MSG_RESULT([    examples:  ${example_dir}])
+eval bash_comp_dir=$BASH_COMPLETION_DIR
+AC_MSG_RESULT([    bash-comp: ${bash_comp_dir}])
 AC_MSG_RESULT([])
 AC_MSG_RESULT([ To change installation path, re-run:])
 AC_MSG_RESULT([    ./configure --prefix NEW-PATH])
