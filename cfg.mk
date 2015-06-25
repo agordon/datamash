@@ -71,7 +71,7 @@ static-analysis-configure: static-analysis-have-prog
 
 static-analysis-make: static-analysis-have-prog
 	$(MAKE) clean
-	scan-build make
+	scan-build make CFLAGS="-g -O0 -std=c99"
 
 static-analysis: static-analysis-configure static-analysis-make
 
