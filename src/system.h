@@ -37,6 +37,7 @@
 #include <getopt.h>
 #include <unistd.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>

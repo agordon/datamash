@@ -24,7 +24,6 @@
 #include <stdio.h>
 
 #include "system.h"
-#include "assert.h"
 #include "op-defs.h"
 
 struct field_operation_definition
