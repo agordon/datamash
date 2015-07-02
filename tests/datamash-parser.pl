@@ -62,6 +62,11 @@ my $out2=<<'EOF';
 7	9	11	13	15
 EOF
 
+
+## NOTE: these tests check the parser behaviour,
+##       while ignoring the exact wording of the error messages.
+##       The 'datamash-error-msgs.pl' checks the exact message wording.
+##       (ERR_SUBST is used to discard the text of STDERR)
 my @Tests =
 (
   # no explicit mode - 'sum' implies 'group by' without any columns -
@@ -93,7 +98,7 @@ my @Tests =
 
   # Invalid numeric value for column prasing should be treated as named column
   ['p9', 'sum 1x', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+      {ERR=>"$prog: invalid numeric value '1x'\n"}],
 
   # Processing mode without operation
   ['p10','groupby 1', {IN_PIPE=>""}, {EXIT=>1},
@@ -105,7 +110,7 @@ my @Tests =
 
   # missing field number after processing mode
   ['p12','groupby', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing field number\n"}],
+      {ERR=>"$prog: missing column for operation 'groupby'\n"}],
 
   # field range syntax
   ['p20','sum 1-44', {IN_PIPE=>""}, {OUT=>""}],
@@ -122,37 +127,53 @@ my @Tests =
                           {IN_PIPE=>$in2}, {OUT=>$out2}],
 
   # Field range with invalid syntax
-  ['e20','sum 1-',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range '1-'\n"}],
-  ['e21','sum 1-x',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range '1-x'\n"}],
-  ['e22','sum 4-2',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range '4-2'\n"}],
+  ['e20','sum 1-',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e21','sum 1-x',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e22','sum 4-2',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   # zero in range
-  ['e23','sum 0-2',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range '0-2'\n"}],
-  ['e24','sum 1-0',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range '1-0'\n"}],
+  ['e23','sum 0-2',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e24','sum 1-0',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   #Negative in range
-  ['e25','sum 0--5',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range '0--5'\n"}],
-
+  ['e25','sum 1--5',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
   # Test field pair syntaax
   ['p40','pcov 1:2',      {IN_PIPE=>""}, {OUT=>""}],
-  ['e41','pcov 1', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: operation 'pcov' requires column pairs\n"}],
-  ['e42','pcov 1:', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field pair '1:'\n"}],
-  ['e43','pcov :', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field pair ':'\n"}],
-  ['e44','pcov :1', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field pair ':1'\n"}],
-  ['e45','pcov 1:', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field pair '1:'\n"}],
-  ['e46','pcov hello:world', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+  ['e41','pcov 1', {IN_PIPE=>""}, {EXIT=>1},   {ERR_SUBST=>'s/.*//s'}],
+  ['e42','pcov 1:', {IN_PIPE=>""}, {EXIT=>1},  {ERR_SUBST=>'s/.*//s'}],
+  ['e43','pcov :', {IN_PIPE=>""}, {EXIT=>1},   {ERR_SUBST=>'s/.*//s'}],
+  ['e44','pcov :1', {IN_PIPE=>""}, {EXIT=>1},  {ERR_SUBST=>'s/.*//s'}],
+  ['e46','pcov hello:world', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e47','sum 1:3', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
+  # Test scanner edge-cases
+  # Floating point value
+  ['e60','sum 4.5',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+  ['e61','sum 4.',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+
+  # invalid numbers
+  ['e62','sum 4a',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+  ['e63','sum 4_',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+  # Overflow strtol
+  ['e64','sum 1234567890123456789012345678901234567', {IN_PIPE=>""}, {EXIT=>1},
+        {ERR_SUBST=>'s/.*//s'}],
+
+  # Invalid charcters
+  ['e65','sum foo^bar', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+  # Empty columns
+  ['e66','sum 1,,', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+  # Range with names instead of numbers
+  ['e67','sum foo-bar', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+
+  # Valid identifiers with undersocres
+  ['s66','--header-in sum foo_bar', {IN_PIPE=>"foo_bar\n1\n"}, {OUT=>"1\n"}],
+  ['s67','--header-in sum _bar',    {IN_PIPE=>"_bar\n1\n"},    {OUT=>"1\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

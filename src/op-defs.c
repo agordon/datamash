@@ -20,10 +20,9 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
-#include <string.h>
-#include <stdio.h>
 
 #include "system.h"
+
 #include "op-defs.h"
 
 struct field_operation_definition
@@ -89,8 +88,8 @@ struct processing_mode_definition
 const struct processing_mode_definition processing_modes[] =
 {
   {"invalid",  MODE_INVALID},
-  {"grouping", MODE_GROUPBY},
   {"groupby",  MODE_GROUPBY},
+  {"grouping", MODE_GROUPBY},
   {"gb" ,      MODE_GROUPBY},
   {"transpose",MODE_TRANSPOSE},
   {"reverse",  MODE_REVERSE},

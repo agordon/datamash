@@ -22,30 +22,58 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef CALC_SYSTEM_H
-#define CALC_SYSTEM_H
-
-/* Assume ANSI C89 headers are available.  */
-#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-/* Use POSIX headers.  If they are not available, we use the substitute
-   provided by gnulib.  */
-#include <getopt.h>
-#include <unistd.h>
+#ifndef __DATAMASH__SYSTEM_H__
+#define __DATAMASH__SYSTEM_H__
 
 #include <assert.h>
 #include <errno.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
+#include <getopt.h>
 #include <limits.h>
+#include <locale.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#ifdef _STANDALONE_
+
+/* compiling 'standalone' (bypassing gnulib) - add (unsafe) stubs */
+#  define quote(x) (x)
+#  define xrealloc(x,n) realloc (x,n)
+#  define xrealloc(x,n) realloc (x,n)
+#  define XCALLOC(n,t)  calloc (n,sizeof (t))
+#  define XZALLOC(t)    calloc (1,sizeof (t))
+#  define xstrdup(c)    strdup (c)
+static inline void*
+x2nrealloc (void *p, size_t *pn, size_t s)
+{
+  size_t n = (*pn==0)?1000:( (*pn)*2 );
+  if (!p) { n = 1000 ; }
+  *pn = n;
+  return realloc (p, n*s);
+}
+#  define _(x) (x)
+#  define N_(x) (x)
+
+#  include <err.h>
+#  define error(x,y,z,...) errx(x,z,##__VA_ARGS__)
+#  define program_name "datamash"
+
+#  define c_isalpha(c) isalpha((int)c)
+#  define c_isspace(c) isspace((int)c)
+#  define c_isdigit(c) isdigit((int)c)
+
+#else /* !_STANDALONE_ */
+
+#  include "xalloc.h"
+#  include "c-ctype.h"
+#  include "quote.h"
+#  include "error.h"
 
 /* Take care of NLS matters.  */
-
 #include "gettext.h"
 #if ! ENABLE_NLS
 # undef textdomain
@@ -57,10 +85,6 @@
 #define _(msgid) gettext (msgid)
 #define N_(msgid) msgid
 
-#define STREQ(a, b) (strcmp (a, b) == 0)
-#define STREQ_LEN(a, b, n) (strncmp (a, b, n) == 0)
-#define STRPREFIX(a, b) (strncmp(a, b, strlen (b)) == 0)
-
 /* Define away proper_name (leaving proper_name_utf8, which affects far
    fewer programs), since it's not worth the cost of adding ~17KB to
    the x86_64 text size of every single program.  This avoids a 40%
@@ -69,6 +93,12 @@
 #define proper_name(x) (x)
 
 #include "progname.h"
+
+#endif /* !_STANDALONE_ */
+
+#define STREQ(a, b) (strcmp (a, b) == 0)
+#define STREQ_LEN(a, b, n) (strncmp (a, b, n) == 0)
+#define STRPREFIX(a, b) (strncmp(a, b, strlen (b)) == 0)
 
 #define case_GETOPT_VERSION_CHAR(Program_name, Authors)			\
   case GETOPT_VERSION_CHAR:						\
@@ -158,4 +188,4 @@ select_plural (uintmax_t n)
 #define __STR_LINE__ __STR__(__LINE__)
 #define internal_error(x) assert(!#x)
 
-#endif /* CALC_SYSTEM_H */
+#endif /* __DATAMASH__SYSTEM_H__ */
