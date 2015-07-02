@@ -72,6 +72,7 @@ seq -w 1000000 > 1M || framework_failure_ "failed to prepare '1M' file"
   shuf 1M ; shuf 1M ;
   seq -w 999000 1001000 ) > 4M ||
     framework_failure_ "failed to prepare '4M' file"
+seq -w 1001000 > 1M1K || framework_failure_ "failed to prepare '1M1K' file"
 
 ## Prepare a file with very wide fields
 for i in $(seq 1 193 2000) $(seq 500 -7 100);
@@ -146,8 +147,25 @@ done
 ## Test remove-duplicates (using gnulib's hash)
 cat 4M | valgrind --track-origins=yes  --leak-check=full \
                   --show-reachable=yes  --error-exitcode=1 \
-                  datamash rmdup 1 > /dev/null ||
+                  datamash rmdup 1 > rmdup_1M_1.t ||
   { warn_ "rmdup failed on 4M" ; fail=1 ; }
+sort < rmdup_1M_1.t > rmdup_1M_1 \
+    || framework_failure_ "failed to sort rmdup_1M_1.t"
+cmp rmdup_1M_1 1M1K ||
+  { warn_ "rmdup failed on 4M (output differences)" ;
+    fail=1 ; }
+
+## Test remove-duplicates (using gnulib's hash),
+## with smaller memory buffers
+cat 4M | valgrind --track-origins=yes  --leak-check=full \
+                  --show-reachable=yes  --error-exitcode=1 \
+                  datamash ---rmdup-test rmdup 1 > rmdup_1M_2.t ||
+  { warn_ "rmdup failed on 4M (2)" ; fail=1 ; }
+sort < rmdup_1M_2.t > rmdup_1M_2 \
+    || framework_failure_ "failed to sort rmdup_1M_2.t"
+cmp rmdup_1M_2 1M1K ||
+  { warn_ "rmdup (2) failed on 4M (output differences)" ;
+    fail=1 ; }
 
 ## Test Base64 encode/decode
 cat wide | valgrind --track-origins=yes  --leak-check=full \
@@ -164,7 +182,6 @@ cat in_4k_rows | valgrind --track-origins=yes  --leak-check=full \
                           --show-reachable=yes  --error-exitcode=1 \
                   datamash pcov 1:2 > /dev/null ||
   { warn_ "pcov 1:2 failed on in_4k_rows" ; fail=1 ; }
-
 
 cmp wide wide_orig ||
   { warn_ "base64 decoding failed (decoded output does not match original)";

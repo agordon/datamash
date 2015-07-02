@@ -92,6 +92,9 @@ static struct crosstab* crosstab = NULL;
 static bool pipe_through_sort = false;
 static FILE* input_stream = NULL;
 
+/* Use large buffer for normal operation (will be reduced for testing) */
+static size_t rmdup_initial_size = (1024*1024);
+
 enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
@@ -100,7 +103,8 @@ enum
   REMOVE_NA_VALUES_OPTION,
   UNDOC_PRINT_INF_OPTION,
   UNDOC_PRINT_NAN_OPTION,
-  UNDOC_PRINT_PROGNAME_OPTION
+  UNDOC_PRINT_PROGNAME_OPTION,
+  UNDOC_RMDUP_TEST
 };
 
 static char const short_options[] = "sfF:izg:t:HW";
@@ -126,6 +130,7 @@ static struct option const long_options[] =
   {"-print-inf", no_argument, NULL, UNDOC_PRINT_INF_OPTION},
   {"-print-nan", no_argument, NULL, UNDOC_PRINT_NAN_OPTION},
   {"-print-progname", no_argument, NULL, UNDOC_PRINT_PROGNAME_OPTION},
+  {"-rmdup-test", no_argument, NULL, UNDOC_RMDUP_TEST},
   {NULL, 0, NULL, 0},
 };
 
@@ -866,7 +871,7 @@ remove_dups_in_file ()
   struct line_record_t lr;
   struct line_record_t *thisline;
   Hash_table *ht;
-  const size_t init_table_size = 100000;
+  const size_t init_table_size = rmdup_initial_size;
 
   char* keys_buffer = NULL;
   size_t keys_buffer_alloc = 0;
@@ -882,12 +887,11 @@ remove_dups_in_file ()
                         hash_pjw, hash_compare_strings, NULL);
 
   /* Allocate keys buffer */
-  keys_buffer_alloc = 1000000 ;
+  keys_buffer_alloc = rmdup_initial_size ;
   keys_buffer = xmalloc ( keys_buffer_alloc );
 
   /* List of allocated key-buffers */
-  buffer_list_alloc = 1000 ;
-  buffer_list = xnmalloc (buffer_list_alloc, sizeof (char*));
+  buffer_list = x2nrealloc (NULL, &buffer_list_alloc, sizeof (char*));
   buffer_list[0] = keys_buffer;
   buffer_list_size = 1 ;
 
@@ -935,13 +939,11 @@ remove_dups_in_file ()
          {
            keys_buffer = xmalloc ( keys_buffer_alloc ) ;
            next_key_pos = 0;
+
            /* Add new key-buffer to the list */
-           if (buffer_list_size >= buffer_list_alloc)
-             {
-               buffer_list_alloc += 1000 ;
-               buffer_list = xnrealloc (buffer_list, buffer_list_alloc,
-                                        sizeof (char*));
-             }
+           if (buffer_list_size == buffer_list_alloc)
+              buffer_list = x2nrealloc (buffer_list,
+                                        &buffer_list_alloc, sizeof (char*));
            buffer_list[buffer_list_size++] = keys_buffer;
          }
        char *next_key = keys_buffer+next_key_pos;
@@ -1134,6 +1136,10 @@ int main (int argc, char* argv[])
         case UNDOC_PRINT_PROGNAME_OPTION:
           printf ("%s", program_name);
           exit (EXIT_SUCCESS);
+          break;
+
+        case UNDOC_RMDUP_TEST:
+          rmdup_initial_size = 1024;
           break;
 
         case_GETOPT_HELP_CHAR;
