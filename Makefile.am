@@ -36,6 +36,7 @@ datamash_SOURCES = src/system.h \
 	       src/text-lines.c src/text-lines.h \
 	       src/column-headers.c src/column-headers.h \
 	       src/op-defs.c src/op-defs.h \
+	       src/op-scanner.c src/op-scanner.h \
 	       src/op-parser.c src/op-parser.h \
 	       src/field-ops.c src/field-ops.h \
 	       src/crosstab.c src/crosstab.h \
@@ -114,6 +115,7 @@ TESTS = \
 	tests/datamash-tests.pl \
 	tests/datamash-tests-2.pl \
 	tests/datamash-parser.pl \
+	tests/datamash-error-msgs.pl \
 	tests/datamash-md5.pl \
 	tests/datamash-sha.pl \
 	tests/datamash-rand.sh \

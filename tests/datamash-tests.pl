@@ -369,8 +369,6 @@ my @Tests =
   ['b22', 'rand 1',     {IN_PIPE=>$in1},  {OUT => "\n"},
       {OUT_SUBST=>'s/[0-9]+//'}],
 
-
-
   ## Some error checkings
   ['e1',  'sum',  {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: missing field number after operation 'sum'\n"}],
@@ -382,15 +380,15 @@ my @Tests =
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: invalid numeric value in line 1 field 1: 'a'\n"}],
   ['e5',  '-g 4, sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid empty grouping parameter\n"}],
+      {ERR=>"$prog: missing column for operation 'groupby'\n"}],
   ['e6',  '-g 4,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e7',  '-g ,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid empty grouping parameter\n"}],
+      {ERR=>"$prog: missing column for operation 'groupby'\n"}],
   ['e8',  '-g 1,0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid grouping parameter '0'\n"}],
+      {ERR=>"$prog: invalid column 0 for 'groupby'\n"}],
   ['e9',  '-g 1X0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+      {ERR=>"$prog: invalid numeric value '1X0'\n"}],
   ['e10',  '-g 1 -t XX sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e10.1',  '-g 1 -t "" sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
@@ -421,19 +419,19 @@ my @Tests =
   ['e18',  'sum 0' ,  {IN_PIPE=>"a"}, {EXIT=>1},
       {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
   ['e19',  '-- sum -2' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: invalid column '-2' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid column range for operation 'sum'\n"}],
   ['e21',  'sum ""' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: invalid empty column for operation 'sum'\n"}],
+      {ERR=>"$prog: missing field number after operation 'sum'\n"}],
   ['e22',  '-t" " -g 7 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 7 requested, " .
             "line 2 has only 3 fields\n"}],
   ['e23',  '-t" " -g -2 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-      {ERR=>"$prog: invalid grouping parameter '-2'\n"}],
+      {ERR=>"$prog: invalid column - for 'groupby'\n"}],
   ['e24',  '-t" " --header-out -g 5 count 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
       {ERR=>"$prog: invalid input: field 5 requested, " .
             "line 1 has only 3 fields\n"}],
   ['e25',  '-g 1,,2 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid empty grouping parameter\n"}],
+      {ERR=>"$prog: missing column for operation 'groupby'\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
@@ -740,11 +738,11 @@ my @Tests =
 
   ## Mixing grouping,line,transpose/reverse operators should fail
   ['mixop1', 'sum 1 md5 2', {EXIT=>1},
-    {ERR=>"$prog: conflicting operation found: expecting grouping operations," .
+    {ERR=>"$prog: conflicting operation found: expecting groupby operations," .
             " but found line operation 'md5'\n"}],
   ['mixop2', 'md5 1 sum 2', {EXIT=>1},
     {ERR=>"$prog: conflicting operation found: expecting line operations," .
-            " but found grouping operation 'sum'\n"}],
+            " but found groupby operation 'sum'\n"}],
   ['mixop3', 'md5 1 transpose 2', {EXIT=>1},
     {ERR=>"$prog: conflicting operation 'transpose'\n"}],
 

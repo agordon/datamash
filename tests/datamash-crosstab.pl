@@ -169,7 +169,7 @@ my @Tests =
 
   # Test wrong usage
   ['e1',  'ct',  {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing field number\n"}],
+      {ERR=>"$prog: missing column for operation 'crosstab'\n"}],
   ['e2',  'ct 1',  {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: crosstab requires exactly 2 fields, found 1\n"}],
   ['e3',  'ct 1,2,3,4',  {IN_PIPE=>""}, {EXIT=>1},
