@@ -100,6 +100,11 @@ my $out1_pcov=<<'EOF';
 1.622
 EOF
 
+my $out1_pcov_hdr=<<'EOF';
+pcov(field-2)
+1.622
+EOF
+
 my $in2=<<'EOF';
 1.599	1
 -1.011	2
@@ -136,8 +141,12 @@ my @Tests =
   ['c1', 'scov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_scov}],
   ['c2', 'pcov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_pcov}],
 
+  # Pair with output headers - only one field and header should be printed
+  ['c3', '--header-out pcov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_pcov_hdr}],
+
   ['p1', 'ppearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_p}],
   ['p2', 'spearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_s}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
