@@ -34,6 +34,7 @@
 
 #include "system.h"
 
+#include "fpucw.h"
 #include "closeout.h"
 #include "hash.h"
 #include "hash-pjw.h"
@@ -1053,6 +1054,10 @@ int main (int argc, char* argv[])
   int optc;
   enum processing_mode premode = MODE_INVALID;
   const char* premode_group_spec = NULL;
+
+  DECL_LONG_DOUBLE_ROUNDING
+  BEGIN_LONG_DOUBLE_ROUNDING ();
+
   set_program_name (argv[0]);
 
   setlocale (LC_ALL, "");
@@ -1217,6 +1222,8 @@ int main (int argc, char* argv[])
   free_column_headers ();
   close_input ();
   datamash_ops_free (dm);
+
+  END_LONG_DOUBLE_ROUNDING ();
 
   return EXIT_SUCCESS;
 }
