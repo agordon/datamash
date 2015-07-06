@@ -62,33 +62,33 @@ my @Tests =
 
   # missing field number after processing mode
   ['e4','groupby', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing column for operation 'groupby'\n"}],
+      {ERR=>"$prog: missing field for operation 'groupby'\n"}],
 
   # Field range with invalid syntax
   ['e20','sum 1-',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column range for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid field range for operation 'sum'\n"}],
   ['e21','sum 1-x',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: column range for 'sum' must be numeric\n"}],
+      {ERR=>"$prog: field range for 'sum' must be numeric\n"}],
   ['e22','sum 4-2',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column range for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid field range for operation 'sum'\n"}],
   # zero in range
   ['e23','sum 0-2',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid field '0' for operation 'sum'\n"}],
   ['e24','sum 1-0',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column '0' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid field '0' for operation 'sum'\n"}],
   #Negative in range
   ['e25','sum 1--5',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column range for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid field range for operation 'sum'\n"}],
 
   # Test field pair syntaax
   ['e41','pcov 1', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: operation 'pcov' requires column pairs\n"}],
+      {ERR=>"$prog: operation 'pcov' requires field pairs\n"}],
   ['e42','pcov 1:', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column pair for operation 'pcov'\n"}],
+      {ERR=>"$prog: invalid field pair for operation 'pcov'\n"}],
   ['e43','pcov :', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column pair for operation 'pcov'\n"}],
+      {ERR=>"$prog: invalid field pair for operation 'pcov'\n"}],
   ['e44','pcov :1', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column pair for operation 'pcov'\n"}],
+      {ERR=>"$prog: invalid field pair for operation 'pcov'\n"}],
   ['e46','pcov hello:world', {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e47','sum 1:3', {IN_PIPE=>""}, {EXIT=>1},
@@ -97,9 +97,9 @@ my @Tests =
   # Test scanner edge-cases
   # Floating point value
   ['e60','sum 4.5',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column '4.5' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid field '4.5' for operation 'sum'\n"}],
   ['e61','sum 4.',   {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid column '4.' for operation 'sum'\n"}],
+      {ERR=>"$prog: invalid field '4.' for operation 'sum'\n"}],
 
   # invalid numbers
   ['e62','sum 4a',   {IN_PIPE=>""}, {EXIT=>1},
@@ -116,11 +116,27 @@ my @Tests =
 
   # Empty columns
   ['e66','sum 1,,', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing column for operation 'sum'\n"}],
+      {ERR=>"$prog: missing field for operation 'sum'\n"}],
 
   # Range with names instead of numbers
   ['e67','sum foo-bar', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: column range for 'sum' must be numeric\n"}],
+      {ERR=>"$prog: field range for 'sum' must be numeric\n"}],
+
+  # Invalid numeric value for column prasing should be treated as named column
+  ['e70', 'sum 1x', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid numeric value '1x'\n"}],
+
+  # Processing mode without operation
+  ['e71','groupby 1', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing operation\n"}],
+
+  # invalid operation after valid mode
+  ['e72','groupby 1 foobar 2', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid operation 'foobar'\n"}],
+
+  # missing field number after processing mode
+  ['e73','groupby', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing field for operation 'groupby'\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
