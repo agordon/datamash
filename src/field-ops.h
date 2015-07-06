@@ -84,6 +84,9 @@ struct fieldop
 			   is loaded */
   char* field_name;
 
+  union {
+    long double bin_bucket_size;
+  } params;
 
   /* Collected Data */
   bool first;   /* true if this is the first item in a new group */

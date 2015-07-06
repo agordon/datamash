@@ -150,6 +150,27 @@ add_op (enum field_operation op, const struct parser_field_t *f)
 }
 
 static void
+set_op_params (struct fieldop *op)
+{
+  if (op->op==OP_BIN_BUCKETS)
+    {
+      op->params.bin_bucket_size = 100; /* default bucket size */
+      if (_params_used==1)
+        op->params.bin_bucket_size = _params[0].f;
+      /* TODO: in the future, accept offset as well? */
+      if (_params_used>1)
+        error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+                                    quote(get_field_operation_name (op->op)));
+      return;
+    }
+
+  /* All other operations do not take parameters */
+  if (_params_used>0)
+    error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+        quote(get_field_operation_name (op->op)));
+}
+
+static void
 parse_simple_operation_column (struct parser_field_t /*OUTPUT*/ *p,
                                bool in_range, bool in_pair)
 {
@@ -283,6 +304,7 @@ parse_operation_params ()
         case TOK_INTEGER:
           p->type = PARAM_INT;
           p->u    = scan_val_int;
+          p->f    = scan_val_int;
           break;
 
         case TOK_FLOAT:
@@ -329,6 +351,7 @@ create_field_ops ()
     {
       const struct parser_field_t *f = &_fields[i];
       struct fieldop *op = add_op (fop, f);
+      set_op_params (op);
 
       if (OP_NEED_PAIR_PARAMS (fop) && !f->pair)
         error (EXIT_FAILURE, 0, _("operation %s requires field pairs"),
@@ -344,7 +367,8 @@ create_field_ops ()
           while (t.num<to)
             {
               ++t.num;
-              add_op (fop, &t);
+              op = add_op (fop, &t);
+              set_op_params (op);
             }
         }
 
@@ -354,6 +378,7 @@ create_field_ops ()
 
           const struct parser_field_t *other_f = &_fields[++i];
           op = add_op (fop, other_f);
+          set_op_params (op);
           op->master = true;
           op->slave_idx = dm->num_ops-2; /* index of the prev op = slave op */
         }
