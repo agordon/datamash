@@ -166,26 +166,26 @@ parse_simple_operation_column (struct parser_field_t /*OUTPUT*/ *p,
       internal_error ("whitespace");            /* LCOV_EXCL_LINE */
 
     case TOK_COMMA:
-      error (EXIT_FAILURE, 0, _("missing column for operation %s"),
+      error (EXIT_FAILURE, 0, _("missing field for operation %s"),
           quote (get_field_operation_name (fop)));
 
     case TOK_END:
       /* informative error message depends on the context: */
       if (in_range)
-        error (EXIT_FAILURE, 0, _("invalid column range for operation %s"),
+        error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
             quote (get_field_operation_name (fop)));
       if (in_pair)
-        error (EXIT_FAILURE, 0, _("invalid column pair for operation %s"),
+        error (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
             quote (get_field_operation_name (fop)));
-      error (EXIT_FAILURE, 0, _("missing field number after operation %s"),
+      error (EXIT_FAILURE, 0, _("missing field for operation %s"),
           quote (get_field_operation_name (fop)));
 
     case TOK_DASH:
-      error (EXIT_FAILURE, 0, _("invalid column range for operation %s"),
+      error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
           quote (get_field_operation_name (fop)));
 
     case TOK_COLONS:
-      error (EXIT_FAILURE, 0, _("invalid column pair for operation %s"),
+      error (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
           quote (get_field_operation_name (fop)));
 
     case TOK_INTEGER:
@@ -199,7 +199,7 @@ parse_simple_operation_column (struct parser_field_t /*OUTPUT*/ *p,
 
     case TOK_FLOAT:
     default:
-      error (EXIT_FAILURE, 0, _("invalid column '%s' for operation %s"),
+      error (EXIT_FAILURE, 0, _("invalid field '%s' for operation %s"),
           scanner_identifier,
           quote (get_field_operation_name (fop)));
     }
@@ -233,10 +233,10 @@ parse_operation_column ()
       parse_simple_operation_column (q, true, false);
 
       if (p->by_name || q->by_name)
-        error (EXIT_FAILURE, 0, _("column range for %s must be numeric"),
+        error (EXIT_FAILURE, 0, _("field range for %s must be numeric"),
                                 quote (get_field_operation_name (fop)));
       if (p->num >= q->num)
-        error (EXIT_FAILURE, 0, _("invalid column range for operation %s"),
+        error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
                                 quote (get_field_operation_name (fop)));
     }
 }
@@ -331,7 +331,7 @@ create_field_ops ()
       struct fieldop *op = add_op (fop, f);
 
       if (OP_NEED_PAIR_PARAMS (fop) && !f->pair)
-        error (EXIT_FAILURE, 0, _("operation %s requires column pairs"),
+        error (EXIT_FAILURE, 0, _("operation %s requires field pairs"),
                                 quote (get_field_operation_name (fop)));
       if (!OP_NEED_PAIR_PARAMS (fop) && f->pair)
         error (EXIT_FAILURE, 0, _("operation %s cannot use pair of fields"),
@@ -429,7 +429,7 @@ parse_mode_column (enum processing_mode pm)
       internal_error ("whitespace");            /* LCOV_EXCL_LINE */
     case TOK_COMMA:
     case TOK_END:
-      error (EXIT_FAILURE, 0, _("missing column for operation %s"),
+      error (EXIT_FAILURE, 0, _("missing field for operation %s"),
           quote (get_processing_mode_name (pm)));
 
     case TOK_INTEGER:
@@ -443,7 +443,7 @@ parse_mode_column (enum processing_mode pm)
     case TOK_COLONS:
     case TOK_FLOAT:
     default:
-      error (EXIT_FAILURE, 0, _("invalid column %s for %s"),
+      error (EXIT_FAILURE, 0, _("invalid field '%s' for operation %s"),
           scanner_identifier,
           quote (get_processing_mode_name (pm)));
 

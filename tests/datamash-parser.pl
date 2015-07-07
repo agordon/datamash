@@ -97,20 +97,17 @@ my @Tests =
          ',45,46,47,48,49,50',          {IN_PIPE=>""}, {OUT=>""}],
 
   # Invalid numeric value for column prasing should be treated as named column
-  ['p9', 'sum 1x', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value '1x'\n"}],
+  ['p9', 'sum 1x', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
   # Processing mode without operation
-  ['p10','groupby 1', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing operation\n"}],
+  ['p10','groupby 1', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
   # invalid operation after valid mode
   ['p11','groupby 1 foobar 2', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid operation 'foobar'\n"}],
+        {ERR_SUBST=>'s/.*//s'}],
 
   # missing field number after processing mode
-  ['p12','groupby', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing column for operation 'groupby'\n"}],
+  ['p12','groupby', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
   # field range syntax
   ['p20','sum 1-44', {IN_PIPE=>""}, {OUT=>""}],
