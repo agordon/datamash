@@ -171,6 +171,20 @@ my @Tests =
   # Valid identifiers with undersocres
   ['s66','--header-in sum foo_bar', {IN_PIPE=>"foo_bar\n1\n"}, {OUT=>"1\n"}],
   ['s67','--header-in sum _bar',    {IN_PIPE=>"_bar\n1\n"},    {OUT=>"1\n"}],
+
+  # Binning, and optional parameters
+  ['b1', 'bin 1',       {IN_PIPE=>""}, {OUT=>""}],
+  ['b2', 'bin:10 1',    {IN_PIPE=>""}, {OUT=>""}],
+  ['e70','bin:10:30 1', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e71','bin: 1',      {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e72','sum: 1',      {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e73','bin:10: 1',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e74','bin:10:1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e75','bin:10, 1',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e76','bin:, 1',     {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e77','bin,  1',     {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e78','bin:-  1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e79','sum:10 1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

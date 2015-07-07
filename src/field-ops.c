@@ -132,6 +132,8 @@ struct operation_data operations[] =
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_S_PEARSON_COR */
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_BIN_BUCKETS */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -460,6 +462,17 @@ field_op_collect (struct fieldop *op,
       field_op_add_string (op, str, slen);
       break;
 
+    case OP_BIN_BUCKETS:
+      {
+        const long double val = num_value / op->params.bin_bucket_size;
+        modfl (val, & op->value);
+        /* signbit will take care of negative-zero as well. */
+        if (signbit(op->value))
+          --op->value;
+        op->value *= op->params.bin_bucket_size;
+      }
+      break;
+
     case OP_INVALID:
     default:
       /* Should never happen */
@@ -589,6 +602,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_S_COVARIANCE:
     case OP_P_PEARSON_COR:
     case OP_S_PEARSON_COR:
+    case OP_BIN_BUCKETS:
       numeric_result = nanl ("");
       break;
 
@@ -669,6 +683,7 @@ field_op_summarize (struct fieldop *op)
     case OP_MAX:
     case OP_ABSMIN:
     case OP_ABSMAX:
+    case OP_BIN_BUCKETS:
       /* no summarization for these operations, just print the value */
       numeric_result = op->value;
       break;

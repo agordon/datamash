@@ -171,6 +171,73 @@ NA
 NaN
 EOF
 
+my $bin_in1=<<'EOF';
+0
+3
+7
+9
+10
+11
+15
+EOF
+
+# binning '$bin_in1' with default bucket-size=100
+my $bin_out1_100=<<'EOF';
+0
+0
+0
+0
+0
+0
+0
+EOF
+
+# binning '$bin_in1' with bucket-size=5
+my $bin_out1_5=<<'EOF';
+0
+0
+5
+5
+10
+10
+15
+EOF
+
+# binning '$bin_in1' with bucket-size=5.5
+my $bin_out1_5_5=<<'EOF';
+0
+0
+5.5
+5.5
+5.5
+11
+11
+EOF
+
+my $bin_in2=<<'EOF';
+-3
+-0.3
+0.3
+3
+103
+EOF
+
+my $bin_out2_100=<<'EOF';
+-100
+-100
+0
+0
+100
+EOF
+
+my $bin_out2_3=<<'EOF';
+-6
+-3
+0
+3
+102
+EOF
+
 my @Tests =
 (
   # Test 'min' + --full
@@ -334,6 +401,14 @@ my @Tests =
   ['narm77', '--narm rmdup 1',   {IN_PIPE=>$na_all}, {OUT=>"NA\nNaN\n"}],
   ['narm78', '--narm reverse',   {IN_PIPE=>$na_all}, {OUT=>"NA\nNA\nNaN\n"}],
   ['narm79', '--narm transpose',   {IN_PIPE=>$na_all}, {OUT=>"NA\tNA\tNaN\n"}],
+
+
+  # Test binning
+  ['bin1', 'bin 1',     {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_100}],
+  ['bin2', 'bin:5 1',   {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_5}],
+  ['bin3', 'bin:5.5 1', {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_5_5}],
+  ['bin4', 'bin 1',     {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_100}],
+  ['bin5', 'bin:3 1',   {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
 
 );
 

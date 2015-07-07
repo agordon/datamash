@@ -76,6 +76,7 @@ struct field_operation_definition field_operations[] =
   {"scov",    OP_S_COVARIANCE, MODE_GROUPBY},
   {"ppearson",OP_P_PEARSON_COR, MODE_GROUPBY},
   {"spearson",OP_S_PEARSON_COR, MODE_GROUPBY},
+  {"bin",     OP_BIN_BUCKETS,     MODE_PER_LINE},
   {NULL,      OP_INVALID, MODE_INVALID}
 };
 

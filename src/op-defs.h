@@ -66,7 +66,8 @@ enum field_operation
   OP_P_COVARIANCE,  /* Population Covariance */
   OP_S_COVARIANCE,  /* Sample Covariance */
   OP_P_PEARSON_COR, /* Pearson Correlation Coefficient (population) */
-  OP_S_PEARSON_COR  /* Pearson Correlation Coefficient (sample) */
+  OP_S_PEARSON_COR, /* Pearson Correlation Coefficient (sample) */
+  OP_BIN_BUCKETS    /* Binning operation */
 };
 
 enum processing_mode

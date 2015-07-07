@@ -137,6 +137,36 @@ my @Tests =
   # missing field number after processing mode
   ['e73','groupby', {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: missing field for operation 'groupby'\n"}],
+
+  # Bin and optional parameters
+  ['e80','bin:10:30 1', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: too many parameters for operation 'bin'\n"}],
+  ['e81','bin: 1',      {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing parameter for operation 'bin'\n"}],
+
+  # NOTE about the message: because the parser first parses parameters,
+  #      then checks if the operation actually needs parameters, the
+  #      error first complains about 'missing' because there are colons
+  #      but no numeric values.
+  ['e82','sum: 1',      {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing parameter for operation 'sum'\n"}],
+
+  ['e83','bin:10: 1',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing parameter for operation 'bin'\n"}],
+
+  # These ensures the '1' is not accidentally parsed as the field number
+  ['e84','bin:10:1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing field for operation 'bin'\n"}],
+  ['e85','bin:10, 1',   {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing field for operation 'bin'\n"}],
+  ['e86','bin:, 1',     {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid parameter , for operation 'bin'\n"}],
+  ['e87','bin,  1',     {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: missing field for operation 'bin'\n"}],
+  ['e88','bin:-  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid parameter - for operation 'bin'\n"}],
+  ['e89','sum:10 1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: too many parameters for operation 'sum'\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
