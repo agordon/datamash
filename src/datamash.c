@@ -161,27 +161,35 @@ usage (int status)
     emit_try_help ();
   else
     {
-      printf (_("Usage: %s [OPTION] op [col] [op col ...]\n"),
+      printf (_("Usage: %s [OPTION] op [fld] [op fld ...]\n"),
           program_name);
       fputs ("\n", stdout);
       fputs (_("Performs numeric/string operations on input from stdin."),
           stdout);
       fputs ("\n\n", stdout);
-      fputs (_("'op' is the operation to perform;\n"), stdout);
       fputs (_("\
-For grouping,per-line operations 'col' is the input field to use;\n\
-'col' can be a number (1=first field), or a column name when using\n\
+'op' is the operation to perform; If a primary operation is used, it\n\
+must be listed first, optionally followed by other operations.\n"), stdout);
+      fputs (_("\
+'fld' is the input field to use;\n\
+'fld' can be a number (1=first field), or a field name when using\n\
 -H or --header-in options.\n\
 "), stdout);
+      fputs (_("\
+multiple fields can be listed with comma (e.g. 1,6,8). range of fields\n\
+can be listed with a dash (e.g 2-8). Use colons for operations which\n\
+require a pair of fields (e.g. 'pcov 2:6').\n\
+"), stdout);
       fputs ("\n\n", stdout);
-      fputs (_("File operations:\n"),stdout);
-      fputs ("  transpose, reverse\n",stdout);
+      fputs (_("Primary operations:\n"),stdout);
+      fputs ("  groupby, crosstab, transpose, reverse, check\n",stdout);
 
       fputs (_("Line-Filtering operations:\n"),stdout);
       fputs ("  rmdup\n",stdout);
 
       fputs (_("Per-Line operations:\n"),stdout);
-      fputs ("  base64, debase64, md5, sha1, sha256, sha512\n",stdout);
+      fputs ("  base64, debase64, md5, sha1, sha256, sha512,\n", stdout);
+      fputs ("  bin, round, floor, ceil, trunc, frac\n", stdout);
 
       fputs (_("Numeric Grouping operations:\n"),stdout);
       fputs ("  sum, min, max, absmin, absmax\n",stdout);
@@ -192,8 +200,9 @@ For grouping,per-line operations 'col' is the input field to use;\n\
 
       fputs (_("Statistical Grouping operations:\n"),stdout);
       fputs ("\
-  mean, median, q1, q3, iqr, mode, antimode, pstdev, sstdev, pvar\n\
-  svar, mad, madraw, pskew, sskew, pkurt, skurt, dpo, jarque\n\
+  mean, median, q1, q3, iqr, mode, antimode, pstdev, sstdev, pvar,\n\
+  svar, mad, madraw, pskew, sskew, pkurt, skurt, dpo, jarque,\n\
+  scov, pcov, spearson, ppearson\n\
 \n", stdout);
       fputs ("\n", stdout);
 
@@ -204,7 +213,10 @@ For grouping,per-line operations 'col' is the input field to use;\n\
                               (default: print only the grouped keys)\n\
 "), stdout);
       fputs (_("\
-  -g, --group=X[,Y,Z]       group via fields X,[Y,Z]\n\
+  -g, --group=X[,Y,Z]       group via fields X,[Y,Z];\n\
+"), stdout);
+      fputs (_("\
+                              equivalent to primary operation 'groupby'\n\
 "), stdout);
       fputs (_("\
       --header-in           first input line is column headers\n\
