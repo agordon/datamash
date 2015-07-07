@@ -198,6 +198,29 @@ cmp_long_double (const void *p1, const void *p2);
 bool
 hash_compare_strings (void const *x, void const *y);
 
+/* returns non-zero if the input is equavalent to
+   zero (or negative zero) */
+static inline bool
+is_zero (const long double a)
+{
+  return !((a>0)-(a<0));
+}
+
+/* returns non-zero if the input is negative zero */
+static inline bool
+is_signed_zero (const long double a)
+{
+  return signbit (a) && is_zero (a);
+}
+
+/* if the input is negative-zero, returns positive zero.
+   otherwise, returns the input value. */
+static inline long double
+pos_zero (const long double a)
+{
+  return is_signed_zero (a) ? 0 : a;
+}
+
 /* On some systems (e.g. Cygwin) nanl is not defined,
    and gnulib does not yet provide a replacment
    (though it does provide 'isnanl' replacement) */
