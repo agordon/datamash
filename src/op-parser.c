@@ -160,14 +160,14 @@ set_op_params (struct fieldop *op)
       /* TODO: in the future, accept offset as well? */
       if (_params_used>1)
         error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
-                                    quote(get_field_operation_name (op->op)));
+                                    quote (get_field_operation_name (op->op)));
       return;
     }
 
   /* All other operations do not take parameters */
   if (_params_used>0)
     error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
-        quote(get_field_operation_name (op->op)));
+        quote (get_field_operation_name (op->op)));
 }
 
 static void
