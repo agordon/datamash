@@ -33,7 +33,8 @@ pskew sskew pkurt skurt dpo jarque \
 pcov scov ppearson spearson"
  local groupby_ops_re=${groupby_ops// /|}
 
-  local line_ops="base64 debase64 md5 sha1 sha256 sha512"
+  local line_ops="base64 debase64 md5 sha1 sha256 sha512 \
+round floor ceil trunc frac bin"
   local line_ops_re=${line_ops// /|}
 
   local datamash_short_options="-f -g -H -i -s -t -W -z"
