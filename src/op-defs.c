@@ -77,6 +77,11 @@ struct field_operation_definition field_operations[] =
   {"ppearson",OP_P_PEARSON_COR, MODE_GROUPBY},
   {"spearson",OP_S_PEARSON_COR, MODE_GROUPBY},
   {"bin",     OP_BIN_BUCKETS,     MODE_PER_LINE},
+  {"floor",   OP_FLOOR,      MODE_PER_LINE},
+  {"ceil",    OP_CEIL,       MODE_PER_LINE},
+  {"round",   OP_ROUND,      MODE_PER_LINE},
+  {"trunc",   OP_TRUNCATE,   MODE_PER_LINE},
+  {"frac",    OP_FRACTION,   MODE_PER_LINE},
   {NULL,      OP_INVALID, MODE_INVALID}
 };
 

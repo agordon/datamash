@@ -134,6 +134,16 @@ struct operation_data operations[] =
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_BIN_BUCKETS */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_FLOOR */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_CEIL */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_ROUND */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_TRUNCATE */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_FRACTION */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -467,10 +477,34 @@ field_op_collect (struct fieldop *op,
         const long double val = num_value / op->params.bin_bucket_size;
         modfl (val, & op->value);
         /* signbit will take care of negative-zero as well. */
-        if (signbit(op->value))
+        if (signbit (op->value))
           --op->value;
         op->value *= op->params.bin_bucket_size;
       }
+      break;
+
+    case OP_FLOOR:
+      op->value = pos_zero (floorl (num_value));
+      break;
+
+    case OP_CEIL:
+      op->value = pos_zero (ceill (num_value));
+      break;
+
+    case OP_ROUND:
+      op->value = pos_zero (roundl (num_value));
+      break;
+
+    case OP_TRUNCATE:
+      modfl (num_value, &op->value);
+      op->value = pos_zero (op->value);
+      break;
+
+    case OP_FRACTION:
+      {
+        long double dummy;
+        op->value = pos_zero (modfl (num_value, &dummy));
+      };
       break;
 
     case OP_INVALID:
@@ -603,6 +637,11 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_P_PEARSON_COR:
     case OP_S_PEARSON_COR:
     case OP_BIN_BUCKETS:
+    case OP_FLOOR:
+    case OP_CEIL:
+    case OP_ROUND:
+    case OP_TRUNCATE:
+    case OP_FRACTION:
       numeric_result = nanl ("");
       break;
 
@@ -684,6 +723,11 @@ field_op_summarize (struct fieldop *op)
     case OP_ABSMIN:
     case OP_ABSMAX:
     case OP_BIN_BUCKETS:
+    case OP_FLOOR:
+    case OP_CEIL:
+    case OP_ROUND:
+    case OP_TRUNCATE:
+    case OP_FRACTION:
       /* no summarization for these operations, just print the value */
       numeric_result = op->value;
       break;
