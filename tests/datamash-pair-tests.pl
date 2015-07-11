@@ -46,6 +46,16 @@ $prog = $prog_bin unless $prog;
 # Turn off localization of executable's output.
 @ENV{qw(LANGUAGE LANG LC_ALL)} = ('C') x 3;
 
+##
+## Portability hack:
+## find the exact wording of 'nan' and inf (not-a-number).
+## It's lower case in GNU/Linux,FreeBSD,OpenBSD,
+## but is "NaN" on Illumos/OpenSolaris
+my $nan = `$prog ---print-nan`;
+die "test infrastructure failed: can't determine 'nan' string" unless $nan;
+my $inf = `$prog ---print-inf`;
+die "test infrastructure failed: can't determine 'inf' string" unless $inf;
+
 =pod
 Equivalent R code
 
@@ -136,6 +146,20 @@ my $out2_s=<<'EOF';
 0.944
 EOF
 
+my $in3=<<'EOF';
+1	2
+EOF
+
+my $in4=<<'EOF';
+NA	NA
+EOF
+
+my $in5=<<'EOF';
+1	2
+2	NA
+3	6
+EOF
+
 my @Tests =
 (
   ['c1', 'scov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_scov}],
@@ -147,6 +171,20 @@ my @Tests =
   ['p1', 'ppearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_p}],
   ['p2', 'spearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_s}],
 
+  # Test operations on edge-cases of input (one items, no items,
+  # different number of items)
+  ['c4', 'scov 1:2',     {IN_PIPE=>$in3}, {OUT=>"$nan\n"}],
+  ['p4', 'spearson 1:2', {IN_PIPE=>$in3}, {OUT=>"$nan\n"}],
+
+  ['c5', '--narm scov 1:2',     {IN_PIPE=>$in4}, {OUT=>"$nan\n"}],
+  ['p5', '--narm spearson 1:2', {IN_PIPE=>$in4}, {OUT=>"$nan\n"}],
+
+  ['c6', '--narm scov 1:2',     {IN_PIPE=>$in5}, {EXIT=>1},
+    {ERR=>"$prog: input error for operation 'scov': " .
+          "fields 1,2 have different number of items\n"}],
+  ['p6', '--narm spearson 1:2', {IN_PIPE=>$in5}, {EXIT=>1},
+    {ERR=>"$prog: input error for operation 'spearson': " .
+          "fields 1,2 have different number of items\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

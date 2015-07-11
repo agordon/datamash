@@ -26,6 +26,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
@@ -301,6 +303,21 @@ field_op_init (struct fieldop* /*out*/ op,
       op->out_buf_alloc = 1024;
       op->out_buf = xmalloc (op->out_buf_alloc);
     }
+}
+
+/* Ensure this (master) fieldop has the same number of values as
+   as it's slave fieldop. */
+static void
+verify_slave_num_values (const struct fieldop *op)
+{
+  assert (op && !op->slave && op->slave_op);     /* LCOV_EXCL_LINE */
+
+  if (op->num_values != op->slave_op->num_values)
+    error (EXIT_FAILURE, 0, _("input error for operation %s: \
+fields %"PRIuMAX",%"PRIuMAX" have different number of items"),
+                            quote (get_field_operation_name (op->op)),
+                            (uintmax_t)op->slave_op->field,
+                            (uintmax_t)op->field);
 }
 
 /* Add a value (from input) to the current field operation. */
@@ -822,7 +839,7 @@ field_op_summarize (struct fieldop *op)
     case OP_S_COVARIANCE:
       assert (!op->slave);                       /* LCOV_EXCL_LINE */
       assert (op->slave_op);                     /* LCOV_EXCL_LINE */
-      assert (op->num_values == op->slave_op->num_values); /* LCOV_EXCL_LINE */
+      verify_slave_num_values (op);
       numeric_result = covariance_value (op->values, op->slave_op->values,
                                          op->num_values,
                                          (op->op==OP_P_COVARIANCE)?
@@ -833,7 +850,7 @@ field_op_summarize (struct fieldop *op)
     case OP_S_PEARSON_COR:
       assert (!op->slave);                       /* LCOV_EXCL_LINE */
       assert (op->slave_op);                     /* LCOV_EXCL_LINE */
-      assert (op->num_values == op->slave_op->num_values); /* LCOV_EXCL_LINE */
+      verify_slave_num_values (op);
       numeric_result = pearson_corr_value (op->values, op->slave_op->values,
                                            op->num_values,
                                            (op->op==OP_P_PEARSON_COR)?
