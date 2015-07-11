@@ -24,6 +24,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <strings.h>
+#include <inttypes.h>
 
 #include "system.h"
 #include "xalloc.h"
@@ -92,7 +93,8 @@ build_input_line_headers (const struct line_record_t *lr, bool store_names)
       if (!store_names)
         {
           str = xmalloc ( field_name_buf_size );
-          ignore_value (snprintf (str, field_name_buf_size, "field-%zu",i));
+          ignore_value (snprintf (str, field_name_buf_size,
+                                  "field-%"PRIuMAX,(uintmax_t)i));
         }
       else
         {

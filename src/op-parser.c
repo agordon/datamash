@@ -20,6 +20,7 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
+#include <inttypes.h>
 
 #include "system.h"
 
@@ -520,7 +521,7 @@ parse_mode ()
     parse_mode_column_list (pm);
     if (dm->num_grps!=2)
       error (EXIT_FAILURE,0, _("crosstab requires exactly 2 fields, " \
-	                             "found %zu"), dm->num_grps);
+                               "found %"PRIuMAX), (uintmax_t)dm->num_grps);
 
     /* if the user didn't specify an operation, print counts */
     parse_operations (pm);
@@ -533,7 +534,7 @@ parse_mode ()
     else if (dm->num_ops>1)
       {
         error (EXIT_FAILURE,0, _("crosstab supports one operation, " \
-	                               "found %zu"), dm->num_ops);
+                                 "found %"PRIuMAX), (uintmax_t)dm->num_ops);
       }
     break;
 
