@@ -167,6 +167,12 @@ my @Tests =
       {ERR=>"$prog: invalid parameter - for operation 'bin'\n"}],
   ['e89','sum:10 1',    {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: too many parameters for operation 'sum'\n"}],
+
+  # Invalid field specifications for primary operations
+  ['e90',  'groupby 1:2', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field pair for operation 'groupby'\n"}],
+  ['e91',  'groupby 1-2', {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range for operation 'groupby'\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

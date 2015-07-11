@@ -482,11 +482,19 @@ parse_mode_column_list (enum processing_mode pm)
 
   enum TOKEN tok = scanner_peek_token ();
   while (tok == TOK_COMMA)
-   {
-     scanner_get_token ();
-     parse_mode_column (pm);
-     tok = scanner_peek_token ();
-   }
+    {
+      scanner_get_token ();
+      parse_mode_column (pm);
+      tok = scanner_peek_token ();
+    }
+  /* detect and warn about incorrect usage,
+     field specification for groups can't handle dashes or colons (for now) */
+  if (tok == TOK_DASH)
+    error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
+                            quote (get_processing_mode_name (pm)));
+  if (tok == TOK_COLONS)
+    error (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
+                            quote (get_processing_mode_name (pm)));
 }
 
 static void
@@ -521,6 +529,11 @@ parse_mode ()
         const uintmax_t grp_col = dm->grps[0].num;
         struct parser_field_t dummy = {grp_col,false,NULL,false,false};
         add_op (OP_COUNT, &dummy);
+      }
+    else if (dm->num_ops>1)
+      {
+        error (EXIT_FAILURE,0, _("crosstab supports one operation, " \
+	                               "found %zu"), dm->num_ops);
       }
     break;
 

@@ -185,6 +185,11 @@ my @Tests =
   ['e77','bin,  1',     {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e78','bin:-  1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e79','sum:10 1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+
+  # Field specifications for primary operations
+  ['e90',  'groupby 1:2', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e91',  'groupby 1-2', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
