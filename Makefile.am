@@ -237,6 +237,25 @@ include $(top_srcdir)/lib/local.mk
 include $(top_srcdir)/doc/local.mk
 
 ##
+## Compute program's code complexity
+## using gnulib's pmccabe2html module
+
+CYCLO_SOURCES = ${top_srcdir}/src/*.[ch]
+svweburl="http://git.savannah.gnu.org/cgit/"
+
+cyclo-$(PACKAGE).html: $(CYCLO_SOURCES)
+	$(PMCCABE) $(CYCLO_SOURCES) \
+		| sort -nr \
+		| $(AWK) -f ${top_srcdir}/build-aux/pmccabe2html \
+			-v lang=html -v name="$(PACKAGE_NAME)" \
+			-v vcurl="$(svweburl)/$(PACKAGE).git/tree/%FILENAME%" \
+			-v url="http://www.gnu.org/software/$(PACKAGE)/" \
+			-v css=${top_srcdir}/build-aux/pmccabe.css \
+			-v cut_dir=${top_srcdir}/ \
+			> $@-tmp
+	mv $@-tmp $@
+
+##
 ##
 ##
 
