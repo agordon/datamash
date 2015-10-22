@@ -165,6 +165,20 @@ set_op_params (struct fieldop *op)
       return;
     }
 
+  if (op->op==OP_STRBIN)
+    {
+      op->params.strbin_bucket_size = 10; /* default bucket size for strbin */
+      if (_params_used==1)
+        op->params.strbin_bucket_size = _params[0].u;
+      if (op->params.strbin_bucket_size==0)
+        error (EXIT_FAILURE, 0, _("strbin bucket size must not be zero"));
+      /* TODO: in the future, accept offset as well? */
+      if (_params_used>1)
+        error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+                                    quote (get_field_operation_name (op->op)));
+      return;
+    }
+
   /* All other operations do not take parameters */
   if (_params_used>0)
     error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),

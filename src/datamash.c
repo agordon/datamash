@@ -189,7 +189,7 @@ require a pair of fields (e.g. 'pcov 2:6').\n\
 
       fputs (_("Per-Line operations:\n"),stdout);
       fputs ("  base64, debase64, md5, sha1, sha256, sha512,\n", stdout);
-      fputs ("  bin, round, floor, ceil, trunc, frac\n", stdout);
+      fputs ("  bin, strbin, round, floor, ceil, trunc, frac\n", stdout);
 
       fputs (_("Numeric Grouping operations:\n"),stdout);
       fputs ("  sum, min, max, absmin, absmax\n",stdout);

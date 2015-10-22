@@ -68,6 +68,11 @@ Calculate md5/sha1/sha256/sha512 hash of the field value
 bin numeric values into buckets of size \fBBUCKET-SIZE\fR (defaults to 100).
 
 .TP
+.B strbin[:BUCKET-SIZE]
+hashes the input and returns a numeric integer value between zero and
+\fBUCKET-SIZE\f (defaults to 10).
+
+.TP
 .B round/floor/ceil/trunc/frac
 numeric rounding operations. round (round half away from zero),
 floor (round up), ceil (ceiling, round down), trunc (truncate, round towards
@@ -521,6 +526,50 @@ $  ( echo X ; seq \-10 2.5 10 ) \\
   5.0      5
   7.5      5
  10.0     10
+.RE
+.fi
+.PP
+
+
+.SS "Binning string values"
+Hash any input value into a numeric integer.
+A typical usage would be to split an input file
+into N chunks, ensuring that all values of a certain key will
+be stored in the same chunk:
+.PP
+.nf
+.RS
+$ cat input.txt
+PatientA   10
+PatientB   11
+PatientC   12
+PatientA   14
+PatientC   15
+
+.RE
+
+Each patient ID is hashed into a bin between 0 and 9
+and printed in the last field:
+
+.RS
+
+$ \fBdatamash\fR \-\-full strbin 1 < input.txt
+PatientA   10    5
+PatientB   11    6
+PatientC   12    7
+PatientA   14    5
+PatientC   15    7
+
+.RE
+
+Splitting the input into chunks can be done with awk:
+
+.RS
+
+$ cat input.txt \\
+    | \fBdatamash\fR \-\-full strbin 1 \\
+    | awk '{print > $NF ".txt"}'
+
 .RE
 .fi
 .PP

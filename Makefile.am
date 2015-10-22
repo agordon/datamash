@@ -127,6 +127,7 @@ TESTS = \
 	tests/datamash-sort-header.sh \
 	tests/datamash-sort-errors.sh \
 	tests/datamash-io-errors.sh \
+	tests/datamash-strbin.sh \
 	tests/datamash-valgrind.sh
 
 EXTRA_DIST += \

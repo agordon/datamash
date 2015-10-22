@@ -42,6 +42,7 @@
 #include "sha512.h"
 #include "base64.h"
 #include "xalloc.h"
+#include "hash-pjw-bare.h"
 
 #include "utils.h"
 #include "text-options.h"
@@ -136,6 +137,8 @@ struct operation_data operations[] =
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_BIN_BUCKETS */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_STRBIN */
+  {STRING_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_FLOOR */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_CEIL */
@@ -500,6 +503,10 @@ field_op_collect (struct fieldop *op,
       }
       break;
 
+    case OP_STRBIN:
+      op->value = hash_pjw_bare (str,slen) % (op->params.strbin_bucket_size);
+      break;
+
     case OP_FLOOR:
       op->value = pos_zero (floorl (num_value));
       break;
@@ -654,6 +661,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_P_PEARSON_COR:
     case OP_S_PEARSON_COR:
     case OP_BIN_BUCKETS:
+    case OP_STRBIN:
     case OP_FLOOR:
     case OP_CEIL:
     case OP_ROUND:
@@ -740,6 +748,7 @@ field_op_summarize (struct fieldop *op)
     case OP_ABSMIN:
     case OP_ABSMAX:
     case OP_BIN_BUCKETS:
+    case OP_STRBIN:
     case OP_FLOOR:
     case OP_CEIL:
     case OP_ROUND:

@@ -173,6 +173,13 @@ my @Tests =
       {ERR=>"$prog: invalid field pair for operation 'groupby'\n"}],
   ['e91',  'groupby 1-2', {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: invalid field range for operation 'groupby'\n"}],
+
+  # values for strbin operation
+  ['e92','strbin:-  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid parameter - for operation 'strbin'\n"}],
+  ['e93','strbin:0  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: strbin bucket size must not be zero\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
