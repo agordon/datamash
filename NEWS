@@ -1,3 +1,21 @@
+* Noteworthy changes in release 1.1.0 (????-??-??) [stable]
+
+** New Features
+
+  New operations:
+   crosstab (cross-tabulation / pivot-tables),
+   check (verify tabular structure),
+   bin (bin numeric values)
+   strbin (bin strings values)
+   pearson correlation,
+   covariance,
+   rounding functions: round,floor,ceil,trunc,frac
+
+** Improvements
+
+  Speed, Portability, Tests, Coverage improvements.
+
+
 * Noteworthy changes in release 1.0.7 (2015-06-29) [stable]
 
 ** New Features
