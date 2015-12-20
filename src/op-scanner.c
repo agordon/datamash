@@ -207,7 +207,7 @@ scanner_get_token ()
 int TESTMAIN (int argc, const char* argv[])
 {
   if (argc<2)
-    error (EXIT_FAILURE, 0, _("missing script (as parameters)"));
+    error (EXIT_FAILURE, 0, _("missing script (among arguments)"));
 
   scanner_set_input_from_argv (argc-1, argv+1);
 

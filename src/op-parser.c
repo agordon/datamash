@@ -707,7 +707,7 @@ datamash_ops_debug_print ( const struct datamash_ops* p )
 int TESTMAIN (int argc, const char* argv[])
 {
   if (argc<2)
-    error (EXIT_FAILURE, 0, _("missing script (as parameters"));
+    error (EXIT_FAILURE, 0, _("missing script (among arguments)"));
 
   struct datamash_ops *o = datamash_ops_parse (argc-1, argv+1);
   datamash_ops_debug_print ( o );
