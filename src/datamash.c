@@ -210,8 +210,6 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 "), stdout);
       fputs (_("\
   -g, --group=X[,Y,Z]       group via fields X,[Y,Z];\n\
-"), stdout);
-      fputs (_("\
                               equivalent to primary operation 'groupby'\n\
 "), stdout);
       fputs (_("\
