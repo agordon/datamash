@@ -153,25 +153,32 @@ all the values in the input file.
 @exdent @command{datamash} supports the following operations:
 
 @table @asis
-@item File operations:
-@code{transpose}, @code{reverse}
+@item Primary operations:
+@code{groupby}, @code{crosstab}, @code{transpose}, @code{reverse},
+@code{check}
+
+@item Line-Filtering operations:
+@code{rmdup}
 
 @item Per-Line operations:
 @code{base64}, @code{debase64}, @code{md5}, @code{sha1},
-@code{sha256}, @code{sha512}
+@code{sha256}, @code{sha512}, @code{bin}, @code{strbin},
+@code{round}, @code{floor}, @code{ceil}, @code{trunc},
+@code{frac}
 
-@item Numeric operations:
+@item Group-by Numeric operations:
 @code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}
 
-@item Textual/Numeric operations:
+@item Group-by Textual/Numeric operations:
 @code{count}, @code{first}, @code{last}, @code{rand}, @code{unique},
 @code{collapse}, @code{countunique}
 
-@item Statistical operations:
+@item Group-by Statistical operations:
 @code{mean}, @code{median}, @code{q1}, @code{q3}, @code{iqr}, @code{mode},
 @code{antimode}, @code{pstdev}, @code{sstdev}, @code{pvar}, @code{svar},
 @code{mad}, @code{madraw}, @code{sskew}, @code{pskew}, @code{skurt},
-@code{pkurt}, @code{jarque}, @code{dpo}
+@code{pkurt}, @code{jarque}, @code{dpo},
+@code{scov}, @code{pcov}, @code{spearson}, @code{ppearson}
 
 @end table
 
@@ -300,15 +307,30 @@ standard output and then exit successfully.
 @chapter Available operations in @command{datamash}
 
 @table @asis
-@item File operations:
-@cindex file operations
-@cindex operations, file
+@item Primary operations:
+@cindex primary operations
+@cindex operations, primary
 
 @table @option
+@item groupby
+alternative syntax for @option{--group}
+@item crosstab
+cross-tabulate two fields (also known as 'pivot-tables')
 @item transpose
 transpose rows, columns of a text file
 @item reverse
 reverse fields in each line of a text file
+@item check
+verify tabular structure of input (ensure same number of fields in all lines)
+@end table
+
+@item Line-Filtering operation:
+@cindex line filtering operation
+@cindex operations, line filtering
+
+@table @option
+@item rmdup
+remove lines with duplicated key value
 @end table
 
 @item Per-Line operations:
@@ -331,7 +353,7 @@ calculates sha256 hash of the field
 calculates sha512 hash of the field
 @end table
 
-@item Numeric operations:
+@item Group-by Numeric operations:
 @cindex numeric operations
 @cindex operations, numeric
 
@@ -348,7 +370,7 @@ minimum of the absolute values
 maximum of the absolute values
 @end table
 
-@item Textual/Numeric operations:
+@item Group-By Textual/Numeric operations:
 @cindex Textual operations
 @cindex operations, textual
 
@@ -369,7 +391,7 @@ comma-separated list of all input values
 number of unique/distinct values
 @end table
 
-@item Statistical operations:
+@item Group-By Statistical operations:
 @cindex Statistical operations
 @cindex operations, statistical
 
