@@ -203,7 +203,6 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 \n", stdout);
       fputs ("\n", stdout);
 
-      fputs (_("Options:\n"),stdout);
       fputs (_("Grouping Options:\n"),stdout);
       fputs (_("\
   -f, --full                print entire input line before op results\n\
@@ -277,7 +276,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 \n", program_name);
 
       fputs (_("For detailed usage information and examples, see\n"),stdout);
-      printf ("  man %s\n", program_name);
+      printf ("  man %s\n", PACKAGE_NAME);
       fputs (_("The manual and more examples are available at\n"), stdout);
       fputs ("  " PACKAGE_URL "\n\n", stdout);
     }
