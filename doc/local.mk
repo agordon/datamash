@@ -23,6 +23,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 info_TEXINFOS = doc/datamash.texi
+EXTRA_DIST += doc/datamash-texinfo.css
+
+# For the 'make html' target - generate a single HTML file
+# and embed the CSS statements in it.
+AM_MAKEINFOHTMLFLAGS = --no-split \
+	--css-include=$(top_srcdir)/doc/datamash-texinfo.css
+
+# Changes to the CSS should trigger a new HTML regeneration
+$(top_builddir)/doc/datamash.html: $(top_srcdir)/doc/datamash-texinfo.css
 
 doc_datamash_TEXINFOS = \
   doc/fdl.texi

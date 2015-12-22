@@ -233,6 +233,12 @@ manual_title=GNU datamash
 email = $(PACKAGE_BUGREPORT)
 gendocs_args = --email $(email) $(manual) $(manual_title)
 
+# This will affect the result of 'make web-manual'
+# all generated HTML files will contain the embedded CSS statements.
+# 'gendocs_options_' is used in the 'web-manual' target in 'maint.mk'.
+gendocs_options_=\
+    --html "--css-include=$(abs_top_srcdir)/doc/datamash-texinfo.css"
+
 
 include $(top_srcdir)/lib/local.mk
 include $(top_srcdir)/doc/local.mk
