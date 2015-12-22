@@ -75,35 +75,37 @@ The @command{datamash} program
 (@url{http://www.gnu.org/software/datamash}) performs calculation (e.g.
 @emph{sum,}, @emph{count}, @emph{min}, @emph{max}, @emph{skewness},
 @emph{standard deviation}) on input files.
-A simple example: sum up the values in the first column of the input:
+
+Example: sum up the values in the first column of the input:
 
 @example
+@cindex example, sum
 $ seq 10 | datamash sum 1
 55
 @end example
 
 @command{datamash} can group input data and perform operations on each group.
-It can sort the file, and read header lines. An example: Finding the average
-score in statistics course of college students, grouped by their college major:
+It can sort the file, and read header lines.
+
+Example: Given a file with three fields (name, subject, score),
+find the average score in each subject:
 
 @example
-@exdent The input file has three fields: Name,Major,Score:
 $ cat scores.txt
-Name        Major            Score
+Name        Subject          Score
 Bryan       Arts             68
 Isaiah      Arts             80
 Gabriel     Health-Medicine  100
 Tysza       Business         92
 Zackery     Engineering      54
 ...
-@exdent Sorting the input file and group by the second column (Major), then
-@exdent calculating the mean score (third column) and sample-standard-deviation:
+
 @cindex sorting
 @cindex grouping
 @cindex example, sorting
 @cindex example, grouping
 $ datamash --sort --headers --group 2 mean 3 sstdev 3 < scores.txt
-GroupBy(Major)     mean(Score)   sstdev(Score)
+GroupBy(Subject)   mean(Score)   sstdev(Score)
 Arts               68.9474       10.4215
 Business           87.3636       5.18214
 Engineering        66.5385       19.8814
@@ -112,7 +114,8 @@ Life-Sciences      55.3333       20.606
 Social-Sciences    60.2667       17.2273
 @end example
 
-@command{datamash} is designed for interactive exploration of textual data,
+
+@command{datamash} is designed for interactive exploration of textual data
 and for automating tasks in shell scripts.
 
 @command{datamash} has a rich set of statistical functions to quickly assess
