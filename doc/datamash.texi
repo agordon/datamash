@@ -60,14 +60,18 @@ which provides command-line computations on input files.
 * Invoking datamash::	How to run @command{datamash}.
 * Available Operations::        Available operations in @command{datamash}.
 * Statistical Operations::	Statistical operations in @command{datamash}.
+* Usage Examples::      Usage Examples.
 * Reporting bugs::	Sending bug reports and feature suggestions.
 * GNU Free Documentation License:: Copying and sharing this documentation.
 * Concept index::	Index of concepts.
-@end menu
 
+
+@end menu
 
 @node Overview
 @chapter Overview
+
+
 
 @cindex overview
 
@@ -457,6 +461,384 @@ See the @file{files/operators.R} file
 for the R equivalent code for each of datamash's operators.
 When building @command{datamash} from source code on your local computer,
 operators are compared to known results of the equivalent R functions.
+
+
+
+@node Usage Examples
+@chapter Usage Examples
+@cindex usage examples
+@cindex examples, usage
+
+@menu
+* Summary Statistics::		  count,min,max,mean,stdev,median,quartiles
+* Header Lines and Column Names:: Using files with header lines
+* Column Ranges::                 Operating on multiple columns
+* Transpose::                     Transposing (swapping rows, columns)
+* Reverse::                       Reversing columns
+@end menu
+
+
+@node Summary Statistics
+@section Summary Statistics
+@cindex summary statistics example
+@cindex examples, summary statistics
+
+The following are examples of using @command{datamash} to quickly
+calculate summary statistics. The examples will use a file with three
+fields (name, subject, score) representing grades of students:
+
+@example
+$ cat scores.txt
+Shawn     Arts  65
+Marques   Arts  58
+Fernando  Arts  78
+Paul      Arts  63
+Walter    Arts  75
+...
+@end example
+
+Counting how many students study each subject (@emph{subject} is the
+second field in the input file, thus @option{groupby 2}):
+
+@example
+$ datamash --sort groupby 2 @option{count} 2 < scores.txt
+Arts            19
+Business        11
+Engineering     13
+Health-Medicine 13
+Life-Sciences   12
+Social-Sciences 15
+@end example
+
+@cindex min, examples
+@cindex max, examples
+@cindex examples, min
+@cindex examples, max
+Similary, find the minimum and maximum score in each subject:
+
+@example
+$ datamash --sort groupby 2 @option{min} 3 @option{max} 3 < scores.txt
+Arts             46      88
+Business         79      94
+Engineering      39      99
+Health-Medicine  72     100
+Life-Sciences    14      91
+Social-Sciences  27      90
+@end example
+
+@cindex mean, examples
+@cindex standard devian, examples
+@cindex examples, mean
+@cindex examples, standard deviation
+find the mean and (population) standard deviation in each subject:
+
+@example
+$ datamash --sort groupby 2 @option{mean} 3 @option{pstdev} 3 < scores.txt
+Arts              68.947  10.143
+Business          87.363   4.940
+Engineering       66.538  19.101
+Health-Medicine   90.615   8.862
+Life-Sciences     55.333  19.728
+Social-Sciences   60.266  16.643
+@end example
+
+
+@cindex median, examples
+@cindex examples, median
+@cindex quartiles, examples
+@cindex examples, quartiles
+Find the median, first, third quariles and the inter-quartile range in
+each subject:
+
+@example
+$ datamash --sort groupby 2 @option{median} 3 @option{q1} 3 @option{q3} @
+3 @option{iqr} 3  < scores.txt
+Arts              71      61.5      75.5     14
+Business          87      83        92        9
+Engineering       56      51        83       32
+Health-Medicine   91      84       100       16
+Life-Sciences     58.5    44.25     67.75    23.5
+Social-Sciences   62      55        70.5     15.5
+@end example
+
+
+@xref{Header Lines and Column Names} for examples of dealing with
+header lines.
+
+@node Header Lines and Column Names
+@section Header Lines and Column Names
+
+@opindex --header-out
+@cindex examples, header
+@cindex examples, header-out
+@cindex header, examples
+@cindex header-out, examples
+@unnumberedsubsec Output Header Lines
+
+If the input does @emph{not} have a header line, use
+@option{--header-out} to add a header in the first line of the output,
+indicating which operation was performed:
+
+@example
+$ datamash --sort @option{--header-out} groupby 2 @option{min} @
+3 @option{max} 3 < scores.txt
+GroupBy(field-2)  min(field-3)  max(field-3)
+Arts              46            88
+Business          79            94
+Engineering       39            99
+Health-Medicine   72           100
+Life-Sciences     14            91
+Social-Sciences   27            90
+@end example
+
+
+@unnumberedsubsec Skipping Input Header Lines
+
+@opindex --header-in
+@cindex examples, header
+@cindex examples, header-in
+@cindex header-in, examples
+
+If the input has a header line (first line containing column names),
+use @option{--header-in} to skip the line:
+
+@example
+$ cat scores_h.txt
+Name      Major   Score
+Shawn     Arts    65
+Marques   Arts    58
+Fernando  Arts    78
+Paul      Arts    63
+...
+
+
+$ datamash --sort @option{--header-in} groupby 2 mean 3 < scores_h.txt
+Arts             68.947
+Business         87.363
+Engineering      66.538
+Health-Medicine  90.615
+Life-Sciences    55.333
+Social-Sciences  60.266
+@end example
+
+If the header line is not skipped, @command{datamash} will show an error
+(due to strict input validation):
+
+@example
+$ datamash groupby 2 mean 3 < scores_h.txt
+datamash: invalid numeric value in line 1 field 3: 'Score'
+@end example
+
+
+@unnumberedsubsec Using Header Lines
+
+@opindex --headers
+@opindex -H
+@cindex examples, headers
+@cindex headers, examples
+
+Column names in the input header lines can be printed
+in the output header lines by using @option{--headers}
+(or @option{-H}, both are equivalent to @option{--header-in --header-out}):
+
+@example
+$ datamash --sort @option{--headers} groupby 2 mean 3 < scores_h.txt
+GroupBy(Major)    mean(Score)
+Arts              68.947
+Business          87.363
+Engineering       66.538
+Health-Medicine   90.615
+Life-Sciences     55.333
+Social-Sciences   60.266
+@end example
+
+Or in short form (@option{-sH} instead of @option{--sort --headers}),
+equivalent to the above command:
+
+@example
+$ datamash @option{-sH} groupby 2 mean 3
+@end example
+
+
+@unnumberedsubsec Column Names
+@cindex column names
+@cindex field names
+
+When the input file has a header line, column names can be used
+instead of column numbers. In the example below, @var{Major}
+is used instead of the value 2, and @var{Score} is used
+instead of the value 3:
+
+@example
+$ datamash --sort --headers groupby Major mean Score < scores_h.txt
+GroupBy(Major)    mean(Score)
+Arts              68.947
+Business          87.363
+Engineering       66.538
+Health-Medicine   90.615
+Life-Sciences     55.333
+Social-Sciences   60.266
+@end example
+
+@command{datamash} will read the first line of the input, and deduce
+the correct column number based on the given name. If the column name
+is not found, an error will be printed:
+
+@example
+$ datamash --sort --headers groupby 2 mean @option{Foo}  < scores_h.txt
+datamash: column name 'Foo' not found in input file
+@end example
+
+
+
+@node Column Ranges
+@section Column Ranges
+@cindex column ranges
+@cindex ranges, columns
+@cindex multiple columns
+
+@command{datamash} accepts column ranges such as @var{1,2,3} and @var{1-3}.
+
+
+Simulating input with multiple columns:
+
+@example
+$ seq 100 | paste - - - -
+1    2    3    4
+5    6    7    8
+9   10   11   12
+13  14   15   16
+17  18   19   20
+...
+@end example
+
+The following are equivalent:
+
+@example
+$ seq 100 | paste - - - - | datamash sum @option{1 sum 2 sum 3 sum 4}
+1225  1250   1275   1300
+
+$ seq 100 | paste - - - - | datamash sum @option{1,2,3,4}
+1225  1250   1275   1300
+
+$ seq 100 | paste - - - - | datamash sum @option{1-4}
+1225  1250   1275   1300
+
+$ seq 100 | paste - - - - | datamash sum @option{1-3,4}
+1225  1250   1275   1300
+@end example
+
+Ranges can be used with multiple operations:
+
+@example
+$ seq 100 | paste - - - - | datamash @option{sum 1-4 mean 1-4}
+1225  1250   1275   1300   49   50   51   52
+@end example
+
+
+
+
+@node Transpose
+@section Transpose
+@cindex transpose
+@cindex swap rows, columns
+
+Use @option{transpose} to swap rows and columns in a file:
+
+@example
+$ cat input.txt
+Sample   Year   Count
+A        2014   1002
+B        2013    990
+C        2014   2030
+D        2014    599
+
+$ datamash @option{transpose} < input.txt
+Sample  A       B       C       D
+Year    2014    2013    2014    2014
+Count   1002    990     2030    599
+@end example
+
+
+@cindex strict mode
+@cindex input validation, transpose
+@cindex transpose, input validation
+By default, @option{transpose} verifies the input has the same number
+of fields in each line, and fails with an error otherwise:
+
+@example
+$ cat input.txt
+Sample   Year   Count
+A        2014   1002
+B        2013
+C        2014   2030
+D        2014    599
+
+
+$ datamash @option{transpose} < input1.txt
+datamash: transpose input error: line 3 has 2 fields (previous lines had 3);
+see --help to disable strict mode
+@end example
+
+Use @option{--no-strict} to allow missing values:
+
+@opindex --no-strict
+@cindex strict, transpose
+@cindex transpose, strict
+@example
+$ datamash @option{--no-strict} transpose < input1.txt
+Sample  A       B        C        D
+Year    2014    2013     2014     2014
+Count   1002    N/A      2030     599
+@end example
+
+@opindex --filler
+@cindex missing values, transpose
+@cindex transpose, missing values
+@cindex transpose, filler value
+Use @option{--filler} to set the missing-field filler value:
+
+@example
+$ datamash --no-strict @option{--filler XYZ} transpose < input1.txt
+Sample  A       B        C        D
+Year    2014    2013     2014     2014
+Count   1002    XYZ      2030     599
+@end example
+
+
+
+
+@node Reverse
+@section Reverse
+@cindex reverse columns
+@cindex columns, reverse
+
+Use @option{reverse} to reverse the fields order in a file:
+
+@example
+$ cat input.txt
+Sample   Year   Count
+A        2014   1002
+B        2013    990
+C        2014   2030
+D        2014    599
+
+$ datamash @option{reverse} < input.txt
+Count   Year    Sample
+1002    2014    A
+990     2013    B
+2030    2014    C
+599     2014    D
+@end example
+
+@cindex reverse, strict
+@cindex strict, reverse
+By default, reverse verifies the input has the same number of fields
+in each line, and fails with an error otherwise. Use
+@option{--no-strict} to disable this behaviour (@xref{Transpose} section
+above for an example).
+
+
 
 
 @node Reporting bugs
