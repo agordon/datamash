@@ -474,6 +474,7 @@ operators are compared to known results of the equivalent R functions.
 * Header Lines and Column Names:: Using files with header lines
 * Column Ranges::                 Operating on multiple columns
 * Reverse and Transpose::         swapping and transposing rows, columns
+* Groupby on @file{/etc/passwd}:: Groupby, count, collapse
 @end menu
 
 
@@ -878,6 +879,113 @@ zz      yy      xx
 3       2       1
 C       B       A
 @end example
+
+
+
+@node Groupby on @file{/etc/passwd}
+@section Groupby on @file{/etc/passwd}
+@cindex groupby
+@cindex @file{/etc/passwd}, examples
+@cindex examples, @file{/etc/passwd}
+
+@command{datamash} with the @option{groupby} operation mode
+can be used to aggregate information.
+
+Using this simuated @file{/etc/passwd} file as input:
+
+@example
+$ cat passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+mysql:x:115:124:MySQL Server,,,:/var/lib/mysql:/bin/false
+sshd:x:116:65534::/var/run/sshd:/usr/sbin/nologin
+guest:x:118:125:Guest,,,:/tmp/guest-home.phc17z:/bin/bash
+gordon:x:1004:1000:Assaf Gordon,,,,:/home/gordon:/bin/bash
+charles:x:1005:1000:Charles,,,,:/home/charles:/bin/bash
+alice:x:1006:1000:Alice,,,,:/home/alice:/bin/bash
+bob:x:1007:1000:Bob,,,,:/home/bob:/bin/bash
+postgres:x:119:126:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+rabbitmq:x:125:138:RabbitMQ messaging server,,,:/var/lib/rabbitmq:/bin/false
+redis:x:126:140:redis server,,,:/var/lib/redis:/bin/false
+postfix:x:127:141::/var/spool/postfix:/bin/false
+@end example
+
+@opindex -t
+@opindex --field-separator
+Parameter @option{-t} is used to indicate the field separator @var{:}
+(instead of the default @var{tab}).
+
+@cindex groupby, and count
+@cindex count
+@cindex login shell, examples
+Aggregate (@option{groupby}) login shells (column 7) and
+@option{count} how many users use each:
+
+@example
+$ datamash -t: --sort groupby 7 count 7 < passwd
+/bin/bash:7
+/bin/false:4
+/bin/sync:1
+/usr/sbin/nologin:14
+@end example
+
+@cindex groupby, and collapse
+@cindex collapse
+Aggregate (@option{groupby}) login shells (column 7) and print
+comma-separated list of users (column 1) for each shell
+(@option{collapse}):
+
+@example
+$ cat passwd | datamash -t: --sort groupby 7 collapse 1
+/bin/bash:root,guest,gordon,charles,alice,bob,postgres
+/bin/false:mysql,rabbitmq,redis,postfix
+/bin/sync:sync
+/usr/sbin/nologin:daemon,bin,sys,games,man,lp,mail,news,uucp,proxy@
+,www-data,backup,list,sshd
+@end example
+
+Aggregate unix-groups (column 4) and print
+comma-separated list of users (column 1) for in each group:
+
+@example
+$ datamash -t: --sort groupby 4 collapse 1 < /etc/passwd
+0:root
+1:daemon
+10:uucp
+1000:gordon,charles,alice,bob
+12:man
+124:mysql
+125:guest
+126:postgres
+13:proxy
+138:rabbitmq
+140:redis
+141:postfix
+2:bin
+3:sys
+33:www-data
+34:backup
+38:list
+60:games
+65534:sync,sshd
+7:lp
+8:mail
+9:news
+@end example
+
 
 
 
