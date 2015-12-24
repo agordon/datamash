@@ -473,8 +473,7 @@ operators are compared to known results of the equivalent R functions.
 * Summary Statistics::		  count,min,max,mean,stdev,median,quartiles
 * Header Lines and Column Names:: Using files with header lines
 * Column Ranges::                 Operating on multiple columns
-* Transpose::                     Transposing (swapping rows, columns)
-* Reverse::                       Reversing columns
+* Reverse and Transpose::         swapping and transposing rows, columns
 @end menu
 
 
@@ -738,8 +737,10 @@ $ seq 100 | paste - - - - | datamash @option{sum 1-4 mean 1-4}
 
 
 
-@node Transpose
-@section Transpose
+@node Reverse and Transpose
+@section Reverse and Transpose
+
+@unnumberedsubsec Transpose
 @cindex transpose
 @cindex swap rows, columns
 
@@ -807,9 +808,7 @@ Count   1002    XYZ      2030     599
 
 
 
-
-@node Reverse
-@section Reverse
+@unnumberedsubsec Reverse
 @cindex reverse columns
 @cindex columns, reverse
 
@@ -835,9 +834,50 @@ Count   Year    Sample
 @cindex strict, reverse
 By default, reverse verifies the input has the same number of fields
 in each line, and fails with an error otherwise. Use
-@option{--no-strict} to disable this behaviour (@xref{Transpose} section
+@option{--no-strict} to disable this behaviour (see section
 above for an example).
 
+
+
+@unnumberedsubsec Combining Reverse and Transpose
+
+@cindex tac
+@cindex reversing lines
+@cindex reverse, and transpose
+@cindex transpose, and reverse
+Reverse and Transpose can be combined to achieve various manipulations.
+(reminder: @url{http://www.gnu.org/software/coreutils/tac,tac} can be
+used to reverse lines in a file):
+
+@example
+$ cat input.txt
+A       1       xx
+B       2       yy
+C       3       zz
+
+
+$ tac input.txt
+C       3       zz
+B       2       yy
+A       1       xx
+
+
+$ tac input.txt | datamash reverse
+zz      3       C
+yy      2       B
+xx      1       A
+
+
+$ cat input.txt | datamash reverse | datamash transpose
+xx      yy      zz
+1       2       3
+A       B       C
+
+$ tac input.txt | datamash reverse | datamash transpose
+zz      yy      xx
+3       2       1
+C       B       A
+@end example
 
 
 
