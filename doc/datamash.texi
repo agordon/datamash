@@ -475,6 +475,7 @@ operators are compared to known results of the equivalent R functions.
 * Column Ranges::                 Operating on multiple columns
 * Reverse and Transpose::         swapping and transposing rows, columns
 * Groupby on @file{/etc/passwd}:: Groupby, count, collapse
+* Check::                         Validate tabular structure
 @end menu
 
 
@@ -986,6 +987,80 @@ $ datamash -t: --sort groupby 4 collapse 1 < /etc/passwd
 9:news
 @end example
 
+
+
+@node Check
+@section Check - checking tabular structure
+@cindex check
+@cindex checking tabular structure
+
+@command{datamash} @option{check} validates the tabular structure of a
+file, ensuring all lines have the same number of
+fields. @option{check} is meant to be used in scripting and automation
+pipelines, as it will terminate with non-zero exit code if the file is
+not well structured, while also printing detailed context information
+about the offending lines:
+
+@example
+$ cat good.txt
+A    1    ww
+B    2    xx
+C    3    yy
+D    4    zz
+
+
+$ cat bad.txt
+A    1    ww
+B    2    xx
+C    3
+D    4    zz
+
+
+$ datamash check < good.txt && echo ok || echo fail
+4 lines, 3 fields
+ok
+
+
+$ datamash check < bad.txt && echo ok || echo fail
+line 2 (3 fields):
+  B  2 xx
+line 3 (2 fields):
+  C  3
+datamash: check failed: line 3 has 2 fields (previous line had 3)
+fail
+@end example
+
+@cindex fail fast
+@cindex shell scripts, check
+@cindex check, in automation and shell scripts
+In pipeline/automation context, it is often beneficial to validate
+files as early as possible (immediately after file is created, as in
+@url{https://en.wikipedia.org/wiki/Fail-fast, fail-fast methodology}).
+A typical usage in a shell script would be:
+
+@example
+@verbatim
+#!/bin/sh
+
+die()
+{
+    base=$(basename "$0")
+    echo "$base: error: $@" >&2
+    exit 1
+}
+
+custom pipeline-or-program > output.txt \
+    || die "program failed"
+
+datamash check < output.txt \
+    || die "'output.txt' has invalid structure (missing fields)"
+@end verbatim
+@end example
+
+If the generated @file{output.txt} file has invalid structure
+(i.e. missing fields), @command{datamash} will print the @file{stderr}
+enough details to help in troubleshooting (line numbers and offending
+line's content).
 
 
 
