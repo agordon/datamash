@@ -477,6 +477,9 @@ operators are compared to known results of the equivalent R functions.
 * Groupby on @file{/etc/passwd}:: Groupby, count, collapse
 * Check::                         Validate tabular structure
 * Crosstab::                      Cross-tabulation (pivot-tables)
+* Rounding numbers::              round, ceil, floor, trunc, frac
+* Binning numbers::               assigning numbers into fixed number of buckets
+* Binning strings::               assigning strings into fixed number of buckets
 @end menu
 
 
@@ -1080,6 +1083,8 @@ b    x    21
 a    x    40
 @end example
 
+@opindex count
+@cindex count, crosstab and
 Show cross-tabulation between the first field (a/b) and the second
 field (x/y) - counting how many times each pair appears (note: sorting
 is required):
@@ -1097,6 +1102,7 @@ never appear together.
 
 An optional grouping operation can be used instead of counting.
 
+@opindex sum
 @cindex sum, crosstab and
 @cindex crosstab and sum
 For each pair, @option{sum} the values in the third column:
@@ -1108,6 +1114,7 @@ a    43   7
 b    21   N/A
 @end example
 
+@opindex unique
 @cindex unique, crosstab and
 @cindex crosstab and unique
 For each pair, list all @option{unique} values in the third column:
@@ -1118,6 +1125,104 @@ $ datamash -s crosstab 1,2 unique 3 < input.txt
 a    3,40 7
 b    21   N/A
 @end example
+
+
+@node Rounding numbers
+@section Rounding numbers
+
+@cindex rounding numbers
+@opindex round
+@opindex ceil
+@opindex floor
+@opindex trunc
+@opindex frac
+
+The following demonstrate the different rounding operations:
+
+@example
+$ ( echo X ; seq -1.25 0.25 1.25 ) \
+      | datamash --full -H round 1 ceil 1 floor 1 trunc 1 frac 1
+
+  X     round(X)  ceil(X)  floor(X)  trunc(X)   frac(X)
+-1.25   -1        -1       -2        -1         -0.25
+-1.00   -1        -1       -1        -1          0
+-0.75   -1         0       -1         0         -0.75
+-0.50   -1         0       -1         0         -0.5
+-0.25    0         0       -1         0         -0.25
+ 0.00    0         0        0         0          0
+ 0.25    0         1        0         0          0.25
+ 0.50    1         1        0         0          0.5
+ 0.75    1         1        0         0          0.75
+ 1.00    1         1        1         1          0
+ 1.25    1         2        1         1          0.25
+@end example
+
+
+@node Binning numbers
+@section Binning numbers
+@opindex bin
+@cindex buckets, binning numbers
+@cindex binning numbers
+
+Bin input values into buckets of size 5:
+
+@example
+$ ( echo X ; seq -10 2.5 10 ) \
+      | datamash -H --full bin:5 1
+    X  bin(X)
+-10.0    -15
+ -7.5    -10
+ -5.0    -10
+ -2.5     -5
+  0.0      0
+  2.5      0
+  5.0      5
+  7.5      5
+ 10.0     10
+@end example
+
+@node Binning strings
+@section Binning strings
+@opindex strbin
+@cindex buckets, binning strings
+@cindex binning strings
+
+Hash any string input value into a numeric integer.
+A typical usage would be to split an input file
+into @var{N} chunks, ensuring that all values of a certain key will
+be stored in the same chunk:
+
+@example
+$ cat input.txt
+PatientA   10
+PatientB   11
+PatientC   12
+PatientA   14
+PatientC   15
+@end example
+
+Each patient ID is hashed into a bin between 0 and 9
+and printed in the last field:
+
+@example
+$ datamash --full strbin 1 < input.txt
+PatientA   10    5
+PatientB   11    6
+PatientC   12    7
+PatientA   14    5
+PatientC   15    7
+@end example
+
+Splitting the input into chunks can be done with awk:
+
+@example
+@verbatim
+$ cat input.txt | datamash --full strbin 1 \
+    | awk '{print > $NF ".txt"}'
+@end verbatim
+@end example
+
+
 
 
 
