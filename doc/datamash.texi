@@ -476,6 +476,7 @@ operators are compared to known results of the equivalent R functions.
 * Reverse and Transpose::         swapping and transposing rows, columns
 * Groupby on @file{/etc/passwd}:: Groupby, count, collapse
 * Check::                         Validate tabular structure
+* Crosstab::                      Cross-tabulation (pivot-tables)
 @end menu
 
 
@@ -1061,6 +1062,62 @@ If the generated @file{output.txt} file has invalid structure
 (i.e. missing fields), @command{datamash} will print the @file{stderr}
 enough details to help in troubleshooting (line numbers and offending
 line's content).
+
+@node Crosstab
+@section Crosstab - Cross-Tabulation (pivot-tables)
+@cindex crosstab
+@cindex pivot tables
+@cindex cross tabulation
+
+Cross-tabulation compares the relationship between two fields.
+Given the following input file:
+
+@example
+$ cat input.txt
+a    x    3
+a    y    7
+b    x    21
+a    x    40
+@end example
+
+Show cross-tabulation between the first field (a/b) and the second
+field (x/y) - counting how many times each pair appears (note: sorting
+is required):
+
+@example
+$ datamash -s crosstab 1,2 < input.txt
+     x    y
+a    2    1
+b    1    N/A
+@end example
+
+The default operation is @option{count} - in the above example,
+@var{a} and @var{x} appear twice in the input file, while @var{b} and @var{y}
+never appear together.
+
+An optional grouping operation can be used instead of counting.
+
+@cindex sum, crosstab and
+@cindex crosstab and sum
+For each pair, @option{sum} the values in the third column:
+
+@example
+$ datamash -s crosstab 1,2 sum 3 < input.txt
+     x    y
+a    43   7
+b    21   N/A
+@end example
+
+@cindex unique, crosstab and
+@cindex crosstab and unique
+For each pair, list all @option{unique} values in the third column:
+
+@example
+$ datamash -s crosstab 1,2 unique 3 < input.txt
+     x    y
+a    3,40 7
+b    21   N/A
+@end example
 
 
 
