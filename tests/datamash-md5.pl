@@ -2,7 +2,7 @@
 =pod
    Unit Tests for GNU Datamash - tests md5 operations
 
-   Copyright (C) 2013-2015 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2013-2016 Assaf Gordon <assafgordon@gmail.com>
 
    This file is part of GNU Datamash.
 
