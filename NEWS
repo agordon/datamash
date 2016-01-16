@@ -1,6 +1,8 @@
-* Noteworthy changes in release 1.1.0 (????-??-??) [stable]
+* Noteworthy changes in release 1.1.0 (2016-01-16) [stable]
 
 ** New Features
+
+  Bumped version to 1.1.0 to better comply to semver.
 
   New operations:
    crosstab (cross-tabulation / pivot-tables),
