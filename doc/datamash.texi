@@ -472,6 +472,7 @@ operators are compared to known results of the equivalent R functions.
 @menu
 * Summary Statistics::		  count,min,max,mean,stdev,median,quartiles
 * Header Lines and Column Names:: Using files with header lines
+* Field Delimiters::              Tabs, Whitespace, other delimiteres
 * Column Ranges::                 Operating on multiple columns
 * Reverse and Transpose::         swapping and transposing rows, columns
 * Groupby on @file{/etc/passwd}:: Groupby, count, collapse
@@ -692,6 +693,52 @@ is not found, an error will be printed:
 @example
 $ datamash --sort --headers groupby 2 mean @option{Foo}  < scores_h.txt
 datamash: column name 'Foo' not found in input file
+@end example
+
+
+
+@node Field Delimiters
+@section Field Delimiteres
+@cindex field delimiters
+@cindex whitespace delimiters
+@cindex delimiters, whitespace
+@cindex tab delimiters
+@cindex delimiters, tabs
+
+@command{datamash} uses tabs (ascii character 0x09) as default field
+delimiters.  Use @option{-W} to treat one or more consecutive
+whitespace characters as field delimiters. Use @option{-t},
+@option{--field-separator} to set a custom field delimiter.
+
+The following examples illustrate the various options.
+
+By default, fields are deparated by a single tab tab. Multiple tabs
+denotes multiple fields (this is consistent with GNU coreutil's
+@command{cut}):
+
+@example
+$ printf '1\t\t2\n' | datamash sum 3
+2
+$ printf '1\t\t2\n' | cut -f3
+2
+@end example
+
+Using @option{-W}, one or more consecutive whitespace characters
+are treated as a single field delimiter:
+
+@example
+$ printf '1  \t  2\n' | datamash -W sum 2
+2
+$ printf '1  \t  2\n' | datamash -W sum 3
+datamash: invalid input: field 3 requested, line 1 has only 2 fields
+@end example
+
+Using @option{-t}, a custom field delimiter character can be specified.
+Multiple consecutive delimiters are treated as multiple fields:
+
+@example
+$ printf '1,10,,100\n' | datamash -t, sum 4
+100
 @end example
 
 
