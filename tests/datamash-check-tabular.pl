@@ -55,12 +55,29 @@ b	z
 c	x	7
 EOF
 
-# missing field on second line, but there is a tab
+# Same as in2, with whitespace delimiters
+my $in2_ws=<<"EOF";
+a    x  \t  1
+  b   \t  z
+c x 7
+EOF
+
+# second line has 2 tab characters, thus 3 fields
+# (the last field is empty).
+# version 1.1.0 and before rejected such input.
 my $in3=<<"EOF";
 a	x	1
 b	z\t
 c	x	7
 EOF
+
+# Same as in3, with whitespace delimiters
+my $in3_ws=<<"EOF";
+a     x  \t  1
+b \t  z  \t
+   c\t\t\tx     \t  7
+EOF
+
 
 # one line
 my $in4=<<'EOF';
@@ -90,6 +107,8 @@ my @Tests =
 
   ['c2', 'check', {IN_PIPE=>$in4}, {OUT=>"1 line, 3 fields\n"}],
   ['c3', 'check', {IN_PIPE=>$in5}, {OUT=>"4 lines, 1 field\n"}],
+  ['c4', 'check', {IN_PIPE=>$in3}, {OUT=>"3 lines, 3 fields\n"}],
+  ['c5', '-W check', {IN_PIPE=>$in3_ws}, {OUT=>"3 lines, 3 fields\n"}],
 
   # Check bad input:
   # The first four lines will be something like:
@@ -100,15 +119,20 @@ my @Tests =
   # The ERR_SUBSTR will remove these messages, as they are highly variable
   # and dependant on the input. Then only the last line of error message
   # is checked.
-  ['c4', 'check', {IN_PIPE=>$in2}, {EXIT=>1},
+  ['e1', 'check', {IN_PIPE=>$in2}, {EXIT=>1},
       {ERR_SUBST => 's/^(li|  ).*$//'},
       {ERR => "\n\n\n\n$prog: check failed: line 2 has 2 fields " .
                              "(previous line had 3)\n"}],
-  ['c5', 'check', {IN_PIPE=>$in3}, {EXIT=>1},
+  ['e1ws', '-W check', {IN_PIPE=>$in2_ws}, {EXIT=>1},
+      {ERR_SUBST => 's/^(li|  ).*$//'},
+      {ERR => "\n\n\n\n$prog: check failed: line 2 has 2 fields " .
+                             "(previous line had 3)\n"}],
+
+  ['e2', 'check', {IN_PIPE=>$in6}, {EXIT=>1},
     {ERR_SUBST => 's/^(li|  ).*$//'},
-    {ERR => "\n\n\n\n$prog: check failed: line 2 has 2 fields " .
-                           "(previous line had 3)\n"}],
-  ['c6', 'check', {IN_PIPE=>$in6}, {EXIT=>1},
+    {ERR => "\n\n\n\n$prog: check failed: line 4 has 0 fields " .
+                           "(previous line had 1)\n"}],
+  ['e2ws', '-W check', {IN_PIPE=>$in6}, {EXIT=>1},
     {ERR_SUBST => 's/^(li|  ).*$//'},
     {ERR => "\n\n\n\n$prog: check failed: line 4 has 0 fields " .
                            "(previous line had 1)\n"}],

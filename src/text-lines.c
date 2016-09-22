@@ -101,7 +101,7 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
   /* Move 'fptr' to point to the beginning of 'field' */
   if (field_delim != TAB_WHITESPACE)
     {
-      while (pos<buflen)
+      while (buflen && pos<=buflen)
         {
           /* scan buffer until next delimiter */
           const char* field_beg = fptr;
@@ -121,7 +121,7 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
           ++pos;
           ++fptr;
         }
-        lr->num_fields = num_fields;
+      lr->num_fields = num_fields;
     }
   else
     {
@@ -147,15 +147,12 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
             }
 
           /* Add new field */
-          if (flen>0)
-            {
-              ++num_fields;
-              line_record_reserve_fields (lr, num_fields);
-              lr->num_fields = num_fields;
-              lr->fields[num_fields-1].buf = field_beg;
-              lr->fields[num_fields-1].len = flen;
-            }
+          line_record_reserve_fields (lr, num_fields);
+          lr->fields[num_fields].buf = field_beg;
+          lr->fields[num_fields].len = flen;
+          ++num_fields;
         }
+      lr->num_fields = num_fields;
     }
 }
 
