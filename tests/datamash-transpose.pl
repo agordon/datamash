@@ -135,6 +135,18 @@ X:Y
 EOF
 
 
+# Transposing with missing value in the last line
+# (bug in 1.1.0 would result in 'c' being silently dropped).
+my $in_missing1=<<'EOF';
+a	b	c
+1	2
+EOF
+my $out_missing1=<<'EOF';
+a	1
+b	2
+c	N/A
+EOF
+
 my @Tests =
 (
     # Simple transpose and reverse
@@ -201,6 +213,11 @@ my @Tests =
     # Generate a new header, assuming the first line is a NOT header line.
     ['rev-hdr6','-t: --header-out reverse', {IN_PIPE=>$in_hdr1},
        {OUT=>"field-2:field-1\nY:X\na:1\nb:2\n"}],
+
+    # bug uncovered by report in:
+    # http://lists.gnu.org/archive/html/bug-datamash/2016-09/msg00000.html
+    ['msg1', '--no-strict transpose', {IN_PIPE=>$in_missing1},
+       {OUT=>$out_missing1}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

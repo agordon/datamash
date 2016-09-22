@@ -648,6 +648,7 @@ transpose_file ()
   size_t alloc_lines = 0;
   struct line_record_t *lines = NULL;
 
+  size_t max_num_fields = 0 ;
   size_t prev_num_fields = 0 ;
 
   /* Read all input lines - but instead of reusing line_record_t,
@@ -679,11 +680,12 @@ transpose_file ()
                     (uintmax_t)prev_num_fields);
 
       prev_num_fields = num_fields;
+      max_num_fields = MAX (max_num_fields,num_fields);
 
     }
 
   /* Output all fields */
-  for (size_t i = 1 ; i <= prev_num_fields ; ++i)
+  for (size_t i = 1 ; i <= max_num_fields ; ++i)
     {
       for (size_t j = 0; j < line_number; ++j)
         {
