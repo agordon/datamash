@@ -1,5 +1,5 @@
-." GNU Datamash - manual page
-." Copyright (C) 2014-2016 Assaf Gordon <assafgordon@gmail.com>
+.\" GNU Datamash - manual page
+.\" Copyright (C) 2014-2016 Assaf Gordon <assafgordon@gmail.com>
 [NAME]
 datamash - command-line calculations
 
@@ -72,7 +72,7 @@ bin numeric values into buckets of size \fBBUCKET-SIZE\fR (defaults to 100).
 .TP
 .B strbin[:BUCKET-SIZE]
 hashes the input and returns a numeric integer value between zero and
-\fBUCKET-SIZE\f (defaults to 10).
+\fBBUCKET-SIZE\fB (defaults to 10).
 
 .TP
 .B round/floor/ceil/trunc/frac
@@ -353,8 +353,8 @@ The following demonstrate the different rounding operations:
 .nf
 .RS
 .RE
-." NOTE: The weird spacing/alignment is due to extract backslash
-."       characters. Modify with caution.
+.\" NOTE: The weird spacing/alignment is due to extract backslash
+.\"       characters. Modify with caution.
 $ ( echo X ; seq \-1.25 0.25 1.25 ) \\
       | datamash \-\-full \-H round 1 ceil 1 floor 1 trunc 1 frac 1
 
