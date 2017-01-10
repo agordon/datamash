@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2016 Assaf Gordon <assafgordon@gmail.com>
+# Copyright (C) 2014-2017 Assaf Gordon <assafgordon@gmail.com>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -10,7 +10,8 @@
 
 #
 # Syntax-Check rules (sc_XXX) copied from GNU Coreutils' cfg.mk file:
-# Copyright (C) 2003-2014 Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+# 2012, 2013, 2014, 2017 Free Software Foundation, Inc.
 #
 
 # Syntax-checks to skip:
@@ -24,6 +25,11 @@ local-checks-to-skip = \
 # checked by 'sc_immutable_NEWS' rule.
 # updated by 'update-NEWS-hash' rule.
 old_NEWS_hash = d41d8cd98f00b204e9800998ecf8427e
+
+update-copyright-env = \
+  env \
+  UPDATE_COPYRIGHT_HOLDER='Assaf Gordon' \
+  UPDATE_COPYRIGHT_USE_INTERVALS=2
 
 
 
