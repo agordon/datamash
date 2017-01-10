@@ -140,6 +140,15 @@ AC_CONFIG_FILES([Makefile
   po/Makefile.in
 ])
 
+
+# This is needed when building outside the source dir
+# with --disable-dependency-tracking.
+# Inspired by sed's https://bugs.gnu.org/25371
+AS_MKDIR_P([lib])
+AS_MKDIR_P([src])
+AS_MKDIR_P([doc])
+AS_MKDIR_P([tests])
+
 AC_OUTPUT
 
 dnl
