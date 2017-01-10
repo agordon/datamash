@@ -7,7 +7,7 @@
 #   Software Foundation, Inc.
 
 # Modifications for GNU Datamash are
-# Copyright (C) 2014-2016 Assaf Gordon <assafgordon@gmail.com>
+# Copyright (C) 2014-2017 Assaf Gordon <assafgordon@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

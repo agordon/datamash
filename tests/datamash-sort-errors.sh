@@ -1,7 +1,7 @@
 #!/bin/sh
 #   Unit Tests for GNU Datamash - perform simple calculation on input data
 
-#    Copyright (C) 2014-2016 Assaf Gordon <assafgordon@gmail.com>
+#    Copyright (C) 2014-2017 Assaf Gordon <assafgordon@gmail.com>
 #
 #    This file is part of GNU Datamash.
 #

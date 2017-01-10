@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#    Copyright (C) 2014-2016 Assaf Gordon <assafgordon@gmail.com>
+#    Copyright (C) 2014-2017 Assaf Gordon <assafgordon@gmail.com>
 #
 #    datamash I/O error testing module
 #
