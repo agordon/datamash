@@ -91,20 +91,26 @@ AC_DEFINE([HAVE_BROKEN_STRTOLD],[1],
           [Define to 1 if strtold does not work properly (e.g. in cygwin)])
 fi
 
+
+##
+## Check for bash-completion using pkg-config
+## See: https://github.com/scop/bash-completion/README
 AC_ARG_WITH([bash-completion-dir],
     AS_HELP_STRING([--with-bash-completion-dir[=PATH]],
         [Install the bash auto-completion script in this directory.
-         For example, /etc/bash_completion.d @<:@default=datarootdir@:>@]),
+         @<:@default=yes@:>@]),
     [],
     [with_bash_completion_dir=yes])
 
 if test "x$with_bash_completion_dir" = "xyes"; then
-   BASH_COMPLETION_DIR="$datarootdir/${PACKAGE}/bash-completion.d"
+  PKG_CHECK_VAR(bashcompdir, [bash-completion], [completionsdir], ,
+                bashcompdir="$datarootdir/${PACKAGE}/bash-completion.d")
+
 else
-   # either 'no', or a user-specified custom DIR - use it.
-   BASH_COMPLETION_DIR="$with_bash_completion_dir"
+  # either 'no', or a user-specified custom DIR - use it.
+  bashcompdir="$with_bash_completion_dir"
 fi
-AC_SUBST([BASH_COMPLETION_DIR])
+AC_SUBST(bashcompdir)
 AM_CONDITIONAL([ENABLE_BASH_COMPLETION],
                [test "x$with_bash_completion_dir" != "xno"])
 
@@ -166,7 +172,12 @@ AC_MSG_RESULT([ Default installation directories:])
 AC_MSG_RESULT([    program:   ${prefix}/bin/ ])
 eval example_dir=${datarootdir}/${PACKAGE}/examples
 AC_MSG_RESULT([    examples:  ${example_dir}])
-eval bash_comp_dir=$BASH_COMPLETION_DIR
+
+if test "x$with_bash_completion_dir" != "xno" ; then
+   eval bash_comp_dir=$bashcompdir
+else
+   bash_comp_dir="Not installed"
+fi
 AC_MSG_RESULT([    bash-comp: ${bash_comp_dir}])
 AC_MSG_RESULT([])
 AC_MSG_RESULT([ To change installation path, re-run:])
