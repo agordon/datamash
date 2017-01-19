@@ -1,3 +1,12 @@
+* Noteworthy changes in release 1.1.1 (2017-01-19) [stable]
+
+** Bug fixes
+
+  'check' command correctly counts a trailing delimiter at end of lines.
+
+  'transpose' command correctly handles missing fields on the last line.
+
+
 * Noteworthy changes in release 1.1.0 (2016-01-16) [stable]
 
 ** New Features
