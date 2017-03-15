@@ -39,6 +39,7 @@ enum field_operation
   OP_QUARTILE_1,
   OP_QUARTILE_3,
   OP_IQR,       /* Inter-quartile range */
+  OP_PERCENTILE,
   OP_PSTDEV,    /* Population Standard Deviation */
   OP_SSTDEV,    /* Sample Standard Deviation */
   OP_PVARIANCE, /* Population Variance */

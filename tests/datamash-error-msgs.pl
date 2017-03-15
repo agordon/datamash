@@ -180,6 +180,18 @@ my @Tests =
   ['e93','strbin:0  1',    {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: strbin bucket size must not be zero\n"}],
 
+   # values for percentile operation
+  ['e94','perc:0  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid percentile value 0\n"}],
+  ['e95','perc:101  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid percentile value 101\n"}],
+  ['e96','perc:foo  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid parameter foo for operation 'perc'\n"}],
+  ['e97','perc:-32  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: invalid parameter - for operation 'perc'\n"}],
+  ['e98','perc:1:2  1',    {IN_PIPE=>""}, {EXIT=>1},
+      {ERR=>"$prog: too many parameters for operation 'perc'\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

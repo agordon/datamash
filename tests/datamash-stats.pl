@@ -168,6 +168,13 @@ The datamash tests below should return the same results are thes R commands:
     q1=function(x) { quantile(x, prob=0.25) }
     q3=function(x) { quantile(x, prob=0.75) }
 
+    # Helper functions for quartiles
+    perc1=function(x) { quantile(x, prob=0.01) }
+    perc90=function(x) { quantile(x, prob=0.90) }
+    perc95=function(x) { quantile(x, prob=0.95) }
+    perc99=function(x) { quantile(x, prob=0.99) }
+    perc100=function(x) { quantile(x, prob=1) }
+
     # Helper function for madraw
     madraw=function(x) { mad(x,constant=1.0) }
 
@@ -227,6 +234,9 @@ The datamash tests below should return the same results are thes R commands:
     test(median)
     test(q1)
     test(q3)
+    test(perc90)
+    test(perc95)
+    test(perc99)
     test(iqr)
     test(smp.sd)
     test(pop.sd)
@@ -314,6 +324,80 @@ my @Tests =
   ['q3_11','q3 1' ,  {IN_PIPE=>$seq21},  {OUT => "61.5\n"},],
   ['q3_12','q3 1' ,  {IN_PIPE=>$seq22},  {OUT => "70\n"},],
   ['q3_13','q3 1' ,  {IN_PIPE=>$seq23},  {OUT => "8\n"},],
+
+  # Test perc:90
+  ['perc90_1', 'perc:90 1' ,  {IN_PIPE=>$seq1},   {OUT => "3.7\n"}],
+  ['perc90_2', 'perc:90 1' ,  {IN_PIPE=>$seq2},   {OUT => "2.8\n"}],
+  ['perc90_3', 'perc:90 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  # sorted/unsorted should not change the result.
+  ['perc90_4', 'perc:90 1' ,  {IN_PIPE=>$seq9},   {OUT => "19.8\n"}],
+  ['perc90_5', 'perc:90 1' ,  {IN_PIPE=>$seq10},  {OUT => "23.6\n"}],
+  ['perc90_6', 'perc:90 1' ,  {IN_PIPE=>$seq11},  {OUT => "29\n"}],
+  ['perc90_7', 'perc:90 1' ,  {IN_PIPE=>$seq12},  {OUT => "30.8\n"}],
+  ['perc90_8', 'perc:90 1' ,  {IN_PIPE=>$seq12_unsorted},  {OUT => "30.8\n"}],
+  ['perc90_9', '--sort perc:90 1',
+    {IN_PIPE=>$seq12_unsorted},  {OUT => "30.8\n"}],
+  ['perc90_10','perc:90 1' ,  {IN_PIPE=>$seq20},  {OUT => "111\n"},],
+  ['perc90_11','perc:90 1' ,  {IN_PIPE=>$seq21},  {OUT => "84.2\n"},],
+  ['perc90_12','perc:90 1' ,  {IN_PIPE=>$seq22},  {OUT => "70\n"},],
+  ['perc90_13','perc:90 1' ,  {IN_PIPE=>$seq23},  {OUT => "9\n"},],
+
+  # Test perc:95
+  ['perc95_1', 'perc:95 1' ,  {IN_PIPE=>$seq1},   {OUT => "3.85\n"}],
+  ['perc95_2', 'perc:95 1' ,  {IN_PIPE=>$seq2},   {OUT => "2.9\n"}],
+  ['perc95_3', 'perc:95 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  # sorted/unsorted should not change the result.
+  ['perc95_4', 'perc:95 1' ,  {IN_PIPE=>$seq9},   {OUT => "21.4\n"}],
+  ['perc95_5', 'perc:95 1' ,  {IN_PIPE=>$seq10},  {OUT => "26.3\n"}],
+  ['perc95_6', 'perc:95 1' ,  {IN_PIPE=>$seq11},  {OUT => "30\n"}],
+  ['perc95_7', 'perc:95 1' ,  {IN_PIPE=>$seq12},  {OUT => "33.7\n"}],
+  ['perc95_8', 'perc:95 1' ,  {IN_PIPE=>$seq12_unsorted},  {OUT => "33.7\n"}],
+  ['perc95_9', '--sort perc:95 1',
+    {IN_PIPE=>$seq12_unsorted},  {OUT => "33.7\n"}],
+  ['perc95_10','perc:95 1' ,  {IN_PIPE=>$seq20},  {OUT => "114.15\n"},],
+  ['perc95_11','perc:95 1' ,  {IN_PIPE=>$seq21},  {OUT => "103.35\n"},],
+  ['perc95_12','perc:95 1' ,  {IN_PIPE=>$seq22},  {OUT => "73\n"},],
+  ['perc95_13','perc:95 1' ,  {IN_PIPE=>$seq23},  {OUT => "10\n"},],
+
+  # Test perc:99
+  ['perc99_1', 'perc:99 1' ,  {IN_PIPE=>$seq1},   {OUT => "3.97\n"}],
+  ['perc99_2', 'perc:99 1' ,  {IN_PIPE=>$seq2},   {OUT => "2.98\n"}],
+  ['perc99_3', 'perc:99 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  # sorted/unsorted should not change the result.
+  ['perc99_4', 'perc:99 1' ,  {IN_PIPE=>$seq9},   {OUT => "22.68\n"}],
+  ['perc99_5', 'perc:99 1' ,  {IN_PIPE=>$seq10},  {OUT => "28.46\n"}],
+  ['perc99_6', 'perc:99 1' ,  {IN_PIPE=>$seq11},  {OUT => "30.8\n"}],
+  ['perc99_7', 'perc:99 1' ,  {IN_PIPE=>$seq12},  {OUT => "36.34\n"}],
+  ['perc99_8', 'perc:99 1' ,  {IN_PIPE=>$seq12_unsorted},  {OUT => "36.34\n"}],
+  ['perc99_9', '--sort perc:99 1',
+    {IN_PIPE=>$seq12_unsorted},  {OUT => "36.34\n"}],
+  ['perc99_10','perc:99 1' ,  {IN_PIPE=>$seq20},  {OUT => "118.02\n"},],
+  ['perc99_11','perc:99 1' ,  {IN_PIPE=>$seq21},  {OUT => "120.49\n"},],
+  ['perc99_12','perc:99 1' ,  {IN_PIPE=>$seq22},  {OUT => "73\n"},],
+  ['perc99_13','perc:99 1' ,  {IN_PIPE=>$seq23},  {OUT => "11\n"},],
+
+  # Test edge cases: perc:1 and perc:100
+  ['perc1_1',  'perc:1 1',    {IN_PIPE=>$seq20},  {OUT => "78\n"},],
+  ['perc100_1','perc:100 1',  {IN_PIPE=>$seq20},  {OUT => "120\n"},],
+
+  # Sanity check: percentile:50 should be equal to 'median' 'op'
+  ['perc50_1','perc:50 1' ,  {IN_PIPE=>$seq20}, {OUT => "100\n"},],
+  ['perc50_2','perc:50 1' ,  {IN_PIPE=>$seq21}, {OUT => "37\n"},],
+  ['perc50_3','perc:50 1' ,  {IN_PIPE=>$seq22}, {OUT => "67\n"},],
+  ['perc50_4','perc:50 1' ,  {IN_PIPE=>$seq23}, {OUT => "6\n"},],
+
+  # Sanity check: percentile:25 should be equal to 'q1' op
+  ['perc25_1','perc:25 1' ,  {IN_PIPE=>$seq20},  {OUT => "93\n"},],
+  ['perc25_2','perc:25 1' ,  {IN_PIPE=>$seq21},  {OUT => "23\n"},],
+  ['perc25_3','perc:25 1' ,  {IN_PIPE=>$seq22},  {OUT => "67\n"},],
+  ['perc25_4','perc:25 1' ,  {IN_PIPE=>$seq23},  {OUT => "4\n"},],
+
+  # Sanity check: percentile:75 should be equal to 'q3' op
+  ['perc75_10','perc:75 1' ,  {IN_PIPE=>$seq20},  {OUT => "107\n"},],
+  ['perc75_11','perc:75 1' ,  {IN_PIPE=>$seq21},  {OUT => "61.5\n"},],
+  ['perc75_12','perc:75 1' ,  {IN_PIPE=>$seq22},  {OUT => "70\n"},],
+  ['perc75_13','perc:75 1' ,  {IN_PIPE=>$seq23},  {OUT => "8\n"},],
+
 
   # Test IQR
   ['iqr_1', 'iqr 1' ,  {IN_PIPE=>$seq1},   {OUT => "1.5\n"}],

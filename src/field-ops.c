@@ -81,6 +81,8 @@ struct operation_data operations[] =
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_IQR */
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_PERCENTILE */
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_PSTDEV */
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_SSTDEV */
@@ -465,6 +467,7 @@ field_op_collect (struct fieldop *op,
     case OP_QUARTILE_1:
     case OP_QUARTILE_3:
     case OP_IQR:
+    case OP_PERCENTILE:
     case OP_PSTDEV:
     case OP_SSTDEV:
     case OP_PVARIANCE:
@@ -648,6 +651,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_QUARTILE_1:
     case OP_QUARTILE_3:
     case OP_IQR:
+    case OP_PERCENTILE:
     case OP_MAD:
     case OP_MADRAW:
     case OP_PSTDEV:
@@ -785,6 +789,12 @@ field_op_summarize (struct fieldop *op)
       field_op_sort_values (op);
       numeric_result = quartile3_value ( op->values, op->num_values )
                        - quartile1_value ( op->values, op->num_values );
+      break;
+
+    case OP_PERCENTILE:
+      field_op_sort_values (op);
+      numeric_result = percentile_value ( op->values, op->num_values,
+                                          op->params.percentile / 100.0 );
       break;
 
     case OP_PSTDEV:

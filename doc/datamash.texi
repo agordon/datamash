@@ -181,7 +181,8 @@ all the values in the input file.
 @code{collapse}, @code{countunique}
 
 @item Group-by Statistical operations:
-@code{mean}, @code{median}, @code{q1}, @code{q3}, @code{iqr}, @code{mode},
+@code{mean}, @code{mode},
+@code{median}, @code{q1}, @code{q3}, @code{iqr}, @code{perc},
 @code{antimode}, @code{pstdev}, @code{sstdev}, @code{pvar}, @code{svar},
 @code{mad}, @code{madraw}, @code{sskew}, @code{pskew}, @code{skurt},
 @code{pkurt}, @code{jarque}, @code{dpo},
@@ -413,6 +414,8 @@ median value
 3rd quartile value
 @item iqr
 inter-quartile range
+@item perc
+percentile value
 @item mode
 mode value (most common value)
 @item antimode

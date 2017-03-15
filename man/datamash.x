@@ -165,6 +165,10 @@ median value
 inter-quartile range
 
 .TP
+.B perc[:PERCENTILE]
+percentile value \fPERCENTILE\fR (defaults to 95).
+
+.TP
 .B mode
 mode value (most common value)
 

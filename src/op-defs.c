@@ -49,6 +49,7 @@ struct field_operation_definition field_operations[] =
   {"q1",      OP_QUARTILE_1, MODE_GROUPBY},
   {"q3",      OP_QUARTILE_3, MODE_GROUPBY},
   {"iqr",     OP_IQR,     MODE_GROUPBY},
+  {"perc",    OP_PERCENTILE, MODE_GROUPBY},
   {"pstdev",  OP_PSTDEV,  MODE_GROUPBY},
   {"sstdev",  OP_SSTDEV,  MODE_GROUPBY},
   {"pvar",    OP_PVARIANCE,    MODE_GROUPBY},

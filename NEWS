@@ -1,3 +1,10 @@
+* Noteworthy changes in release X.X.X
+
+** New Features
+
+  New operation: perc (percentile)
+
+
 * Noteworthy changes in release 1.1.1 (2017-01-19) [stable]
 
 ** Bug fixes

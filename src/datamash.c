@@ -197,7 +197,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 
       fputs (_("Statistical Grouping operations:\n"),stdout);
       fputs ("\
-  mean, median, q1, q3, iqr, mode, antimode, pstdev, sstdev, pvar,\n\
+  mean, median, q1, q3, iqr, perc, mode, antimode, pstdev, sstdev, pvar,\n\
   svar, mad, madraw, pskew, sskew, pkurt, skurt, dpo, jarque,\n\
   scov, pcov, spearson, ppearson\n\
 \n", stdout);
@@ -442,8 +442,14 @@ print_column_headers ()
 
       if (op->field > get_num_column_headers ())
         error_not_enough_fields (op->field, get_num_column_headers ());
-      printf ("%s" "(%s)",get_field_operation_name (op->op),
-                          get_input_field_name (op->field));
+
+      printf ("%s", get_field_operation_name (op->op));
+
+      if (op->op == OP_PERCENTILE) {
+        printf (":%lu", op->params.percentile);
+      }
+
+      printf ("(%s)", get_input_field_name (op->field));
 
       if (i != dm->num_ops-1)
         print_field_separator ();

@@ -602,6 +602,12 @@ my @Tests =
   ['hdr23', '-t: --header-in rmdup 1', {IN_PIPE=>""}, {OUT=>""}],
   ['hdr24', '-t: -H rmdup 1', {IN_PIPE=>""}, {OUT=>""}],
 
+  # percentile operation has special header handling (which includes
+  # the percentile value).
+  ['hdr25', '-W -H perc 2', {IN_PIPE=>$in_hdr1},
+    {OUT=>"perc:95(y)\n8.45\n"},],
+  ['hdr26', '-W -H perc:50 2', {IN_PIPE=>$in_hdr1},
+    {OUT=>"perc:50(y)\n4\n"}],
 
   # Test single line per group
   ['sl1', '-t" " -g 1 mean 2', {IN_PIPE=>$in_g4},

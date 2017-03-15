@@ -87,6 +87,7 @@ struct fieldop
   union {
     long double bin_bucket_size;
     size_t strbin_bucket_size;
+    size_t percentile;
   } params;
 
   /* Collected Data */
