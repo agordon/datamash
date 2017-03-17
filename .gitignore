@@ -26,6 +26,7 @@ config.h.in
 config.in
 config.log
 config.status
+config.cache
 configure
 libtool
 
@@ -82,6 +83,7 @@ test-suite.log
 
 # Documentation files
 doc/.dirstamp
+doc/.gitignore
 doc/datamash.info
 doc/datamash.pdf
 doc/datamash.t2p
