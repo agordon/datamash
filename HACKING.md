@@ -2,6 +2,33 @@
 
 This file contains random collection of hacking tid bits.
 
+## Building from git
+
+Use the following commands to build the latest version of datamash
+(including development/unreleased features):
+
+    git clone git://git.savannnah.gnu.org/datamash.git
+    cd datamash
+    ./bootstrap
+    ./configure
+    make
+    make check
+
+The following programs and versions are required when building from
+git sources:
+
+    autoconf (>=2.62)
+    automake (>=1.11.1)
+    autopoint and gettext (>=0.19.4)
+    gperf
+    pkg-config
+    makeinfo (part of GNU texinfo)
+    perl
+
+These programs are for development from git but are not needed when
+building from the released tar archives found on
+https://ftp.gnu.org/gnu/datamash/ .
+
 ## Compilation Options
 
 To use a specific compiler (e.g. `clang`), run:

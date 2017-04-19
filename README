@@ -74,6 +74,14 @@ See Platform/OS-specific download instructions at
   http://www.gnu.org/software/datamash/download/
 
 
+To build from latest git sources, see the HACKING.md file. This file is
+available when cloning from git, but is not distributed in the tar archive.
+To clone the git repository run
+    git clone git://git.savannah.gnu.org/datamash.git
+It is also available online at
+    https://git.savannah.gnu.org/cgit/datamash.git/tree/HACKING.md
+
+
 BASH Auto-completion
 ====================
 
