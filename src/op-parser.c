@@ -240,13 +240,14 @@ parse_simple_operation_column (struct parser_field_t /*OUTPUT*/ *p,
            quote (get_field_operation_name (fop)));
 
     case TOK_INTEGER:
-      /* Zero values will fall-thought to the error message below */
+      /* Zero values will fall-through to the error message below */
       if (scan_val_int>0)
         {
           p->by_name = false;
           p->num = scan_val_int;
           break;
         }
+      /* fallthrough */
 
     case TOK_FLOAT:
     default:
@@ -493,6 +494,7 @@ parse_mode_column (enum processing_mode pm)
           ADD_NUMERIC_GROUP (scan_val_int);
           break;
         }
+      /* fallthrough */
 
     case TOK_DASH:
     case TOK_COLONS:
