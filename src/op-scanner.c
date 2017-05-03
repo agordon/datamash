@@ -31,6 +31,7 @@
 
 #include "system.h"
 
+#include "die.h"
 #include "op-scanner.h"
 
 /* Used by other modules */
@@ -164,7 +165,7 @@ scanner_get_token ()
           rc = TOK_FLOAT;
         }
       if ((c_isalpha (*pend) || *pend=='_') || (errno == ERANGE))
-        error (EXIT_FAILURE, 0, _("invalid numeric value '%s'"),
+        die (EXIT_FAILURE, 0, _("invalid numeric value '%s'"),
                                 scan_pos);
 
       set_identifier (scan_pos, pend-scan_pos);
@@ -185,7 +186,7 @@ scanner_get_token ()
       return TOK_IDENTIFIER;
     }
 
-  error (EXIT_FAILURE, 0, _("invalid operand %s"), quote (scan_pos));
+  die (EXIT_FAILURE, 0, _("invalid operand %s"), quote (scan_pos));
   return TOK_END;
 }
 
@@ -207,7 +208,7 @@ scanner_get_token ()
 int TESTMAIN (int argc, const char* argv[])
 {
   if (argc<2)
-    error (EXIT_FAILURE, 0, _("missing script (among arguments)"));
+    die (EXIT_FAILURE, 0, _("missing script (among arguments)"));
 
   scanner_set_input_from_argv (argc-1, argv+1);
 
@@ -241,7 +242,7 @@ int TESTMAIN (int argc, const char* argv[])
       break;
 
     default:
-      error (EXIT_FAILURE, 0 ,_("unknown token %d\n"),tok);
+      die (EXIT_FAILURE, 0 ,_("unknown token %d\n"),tok);
     }
   }
 

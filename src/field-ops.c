@@ -32,7 +32,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "error.h"
+#include "die.h"
 #include "minmax.h"
 #include "linebuffer.h"
 #include "system.h"
@@ -318,7 +318,7 @@ verify_slave_num_values (const struct fieldop *op)
   assert (op && !op->slave && op->slave_op);     /* LCOV_EXCL_LINE */
 
   if (op->num_values != op->slave_op->num_values)
-    error (EXIT_FAILURE, 0, _("input error for operation %s: \
+    die (EXIT_FAILURE, 0, _("input error for operation %s: \
 fields %"PRIuMAX",%"PRIuMAX" have different number of items"),
                             quote (get_field_operation_name (op->op)),
                             (uintmax_t)op->slave_op->field,
@@ -350,7 +350,7 @@ field_op_collect (struct fieldop *op,
          and returns invalid value.
          Make a copy of the input buffer and NULL-terminate it */
       if (slen >= sizeof (tmpbuf))
-        error (EXIT_FAILURE, 0,
+        die (EXIT_FAILURE, 0,
                 "internal error: input field too long (%zu)", slen);
       memcpy (tmpbuf,str,slen);
       tmpbuf[slen]=0;

@@ -34,6 +34,7 @@
 
 #include "system.h"
 
+#include "die.h"
 #include "fpucw.h"
 #include "closeout.h"
 #include "hash.h"
@@ -147,7 +148,7 @@ group_columns_find_named_columns ()
 
       p->num = get_input_field_number (p->name);
       if (p->num == 0)
-        error (EXIT_FAILURE, 0,
+        die (EXIT_FAILURE, 0,
                 _("column name %s not found in input file"),
                 quote (p->name));
       p->by_name = false;
@@ -353,7 +354,7 @@ process_line (const struct line_record_t *line)
           char *tmp = xmalloc (len+1);
           memcpy (tmp,str,len);
           tmp[len] = 0 ;
-          error (EXIT_FAILURE, 0,
+          die (EXIT_FAILURE, 0,
               _("%s in line %"PRIuMAX" field %"PRIuMAX": '%s'"),
               field_op_collect_result_name (flocr),
               (uintmax_t)line_number, (uintmax_t)op->field, tmp);
@@ -469,7 +470,7 @@ field_op_find_named_columns ()
         continue;
       p->field = get_input_field_number (p->field_name);
       if (p->field == 0)
-        error (EXIT_FAILURE, 0,
+        die (EXIT_FAILURE, 0,
                 _("column name %s not found in input file"),
                 quote (p->field_name));
       p->field_by_name = false;
@@ -679,7 +680,7 @@ transpose_file ()
       const size_t num_fields = line_record_num_fields (thisline);
 
       if (strict && line_number>1 && num_fields != prev_num_fields)
-          error (EXIT_FAILURE, 0, _("transpose input error: line %"PRIuMAX" " \
+          die (EXIT_FAILURE, 0, _("transpose input error: line %"PRIuMAX" " \
                     "has %"PRIuMAX" fields (previous lines had %"PRIuMAX");\n" \
                     "see --help to disable strict mode"),
                     (uintmax_t)line_number, (uintmax_t)num_fields,
@@ -736,7 +737,7 @@ reverse_fields_in_file ()
       const size_t num_fields = line_record_num_fields (thisline);
 
       if (strict && line_number>1 && num_fields != prev_num_fields)
-          error (EXIT_FAILURE, 0, _("reverse-field input error: line " \
+          die (EXIT_FAILURE, 0, _("reverse-field input error: line " \
                        "%"PRIuMAX" has %"PRIuMAX" fields (previous lines had " \
                        "%"PRIuMAX");\n" \
                        "see --help to disable strict mode"),
@@ -852,7 +853,7 @@ tabular_check_file ()
                                 line_record_length (thisline), sizeof (char),
                                 stderr));
           fputc ('\n', stderr);
-          error (EXIT_FAILURE, 0, _("check failed: line " \
+          die (EXIT_FAILURE, 0, _("check failed: line " \
                        "%"PRIuMAX" has %"PRIuMAX" fields (previous line had "\
                        "%"PRIuMAX")"),
                        (uintmax_t)line_number, (uintmax_t)num_fields,
@@ -968,7 +969,7 @@ remove_dups_in_file ()
        /* Add key to buffer (if not found) */
        const int i = hash_insert_if_absent (ht, next_key, NULL);
        if ( i == -1 )
-         error (EXIT_FAILURE, errno, _("hash memory allocation error"));
+         die (EXIT_FAILURE, errno, _("hash memory allocation error"));
 
        if ( i == 1 )
          {
@@ -1029,14 +1030,14 @@ open_input ()
           snprintf (tmp,sizeof (tmp),"-k%"PRIuMAX",%"PRIuMAX" ",
                     (uintmax_t)col_num,(uintmax_t)col_num);
           if (strlen (tmp)+strlen (cmd)+1 >= sizeof (cmd))
-            error (EXIT_FAILURE, 0,
+            die (EXIT_FAILURE, 0,
                    _("sort command too-long (please report this bug)"));
           strcat (cmd,tmp);
         }
 
       input_stream = popen (cmd,"r");
       if (input_stream == NULL)
-        error (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
+        die (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
     }
   else
     {
@@ -1052,7 +1053,7 @@ close_input ()
   int i;
 
   if (ferror (input_stream))
-    error (EXIT_FAILURE, errno, _("read error"));
+    die (EXIT_FAILURE, errno, _("read error"));
 
   if (pipe_through_sort)
     i = pclose (input_stream);
@@ -1060,7 +1061,7 @@ close_input ()
     i = fclose (input_stream);
 
   if (i != 0)
-    error (EXIT_FAILURE, errno, _("read error (on close)"));
+    die (EXIT_FAILURE, errno, _("read error (on close)"));
 }
 
 int main (int argc, char* argv[])
@@ -1135,7 +1136,7 @@ int main (int argc, char* argv[])
 
         case 't':
           if (optarg[0] == '\0' || optarg[1] != '\0')
-            error (EXIT_FAILURE, 0,
+            die (EXIT_FAILURE, 0,
                    _("the delimiter must be a single character"));
           in_tab = out_tab = optarg[0];
           break;
@@ -1186,7 +1187,7 @@ int main (int argc, char* argv[])
 
   /* If using named-columns, but no input header - abort */
   if (dm->header_required && !input_header)
-    error (EXIT_FAILURE, 0,
+    die (EXIT_FAILURE, 0,
            _("-H or --header-in must be used with named columns"));
 
   open_input ();

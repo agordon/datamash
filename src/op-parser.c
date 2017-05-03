@@ -24,6 +24,7 @@
 
 #include "system.h"
 
+#include "die.h"
 #include "op-scanner.h"
 #include "op-defs.h"
 #include "op-parser.h"
@@ -160,7 +161,7 @@ set_op_params (struct fieldop *op)
         op->params.bin_bucket_size = _params[0].f;
       /* TODO: in the future, accept offset as well? */
       if (_params_used>1)
-        error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+        die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
                                     quote (get_field_operation_name (op->op)));
       return;
     }
@@ -171,10 +172,10 @@ set_op_params (struct fieldop *op)
       if (_params_used==1)
         op->params.strbin_bucket_size = _params[0].u;
       if (op->params.strbin_bucket_size==0)
-        error (EXIT_FAILURE, 0, _("strbin bucket size must not be zero"));
+        die (EXIT_FAILURE, 0, _("strbin bucket size must not be zero"));
       /* TODO: in the future, accept offset as well? */
       if (_params_used>1)
-        error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+        die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
                                     quote (get_field_operation_name (op->op)));
       return;
     }
@@ -185,17 +186,17 @@ set_op_params (struct fieldop *op)
       if (_params_used==1)
         op->params.percentile = _params[0].u;
       if (op->params.percentile==0 || op->params.percentile>100)
-        error (EXIT_FAILURE, 0, _("invalid percentile value %" PRIuMAX),
+        die (EXIT_FAILURE, 0, _("invalid percentile value %" PRIuMAX),
                op->params.percentile);
       if (_params_used>1)
-        error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+        die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
                                     quote (get_field_operation_name (op->op)));
       return;
     }
 
   /* All other operations do not take parameters */
   if (_params_used>0)
-    error (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+    die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
         quote (get_field_operation_name (op->op)));
 }
 
@@ -216,27 +217,27 @@ parse_simple_operation_column (struct parser_field_t /*OUTPUT*/ *p,
       internal_error ("whitespace");            /* LCOV_EXCL_LINE */
 
     case TOK_COMMA:
-      error (EXIT_FAILURE, 0, _("missing field for operation %s"),
-          quote (get_field_operation_name (fop)));
+      die (EXIT_FAILURE, 0, _("missing field for operation %s"),
+           quote (get_field_operation_name (fop)));
 
     case TOK_END:
       /* informative error message depends on the context: */
       if (in_range)
-        error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
-            quote (get_field_operation_name (fop)));
+        die (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
+             quote (get_field_operation_name (fop)));
       if (in_pair)
-        error (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
-            quote (get_field_operation_name (fop)));
-      error (EXIT_FAILURE, 0, _("missing field for operation %s"),
-          quote (get_field_operation_name (fop)));
+        die (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
+             quote (get_field_operation_name (fop)));
+      die (EXIT_FAILURE, 0, _("missing field for operation %s"),
+           quote (get_field_operation_name (fop)));
 
     case TOK_DASH:
-      error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
-          quote (get_field_operation_name (fop)));
+      die (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
+           quote (get_field_operation_name (fop)));
 
     case TOK_COLONS:
-      error (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
-          quote (get_field_operation_name (fop)));
+      die (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
+           quote (get_field_operation_name (fop)));
 
     case TOK_INTEGER:
       /* Zero values will fall-thought to the error message below */
@@ -249,7 +250,7 @@ parse_simple_operation_column (struct parser_field_t /*OUTPUT*/ *p,
 
     case TOK_FLOAT:
     default:
-      error (EXIT_FAILURE, 0, _("invalid field '%s' for operation %s"),
+      die (EXIT_FAILURE, 0, _("invalid field '%s' for operation %s"),
           scanner_identifier,
           quote (get_field_operation_name (fop)));
     }
@@ -283,10 +284,10 @@ parse_operation_column ()
       parse_simple_operation_column (q, true, false);
 
       if (p->by_name || q->by_name)
-        error (EXIT_FAILURE, 0, _("field range for %s must be numeric"),
+        die (EXIT_FAILURE, 0, _("field range for %s must be numeric"),
                                 quote (get_field_operation_name (fop)));
       if (p->num >= q->num)
-        error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
+        die (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
                                 quote (get_field_operation_name (fop)));
     }
 }
@@ -343,7 +344,7 @@ parse_operation_params ()
 
         case TOK_WHITESPACE:
         case TOK_END:
-          error (EXIT_FAILURE, 0, _("missing parameter for operation %s"),
+          die (EXIT_FAILURE, 0, _("missing parameter for operation %s"),
                                   quote (get_field_operation_name (fop)));
 
         case TOK_COMMA:
@@ -351,7 +352,7 @@ parse_operation_params ()
         case TOK_IDENTIFIER:
         case TOK_COLONS:
         default:
-          error (EXIT_FAILURE, 0, _("invalid parameter %s for operation %s"),
+          die (EXIT_FAILURE, 0, _("invalid parameter %s for operation %s"),
                                   scanner_identifier,
                                   quote (get_field_operation_name (fop)));
 
@@ -383,10 +384,10 @@ create_field_ops ()
       set_op_params (op);
 
       if (OP_NEED_PAIR_PARAMS (fop) && !f->pair)
-        error (EXIT_FAILURE, 0, _("operation %s requires field pairs"),
+        die (EXIT_FAILURE, 0, _("operation %s requires field pairs"),
                                 quote (get_field_operation_name (fop)));
       if (!OP_NEED_PAIR_PARAMS (fop) && f->pair)
-        error (EXIT_FAILURE, 0, _("operation %s cannot use pair of fields"),
+        die (EXIT_FAILURE, 0, _("operation %s cannot use pair of fields"),
                                 quote (get_field_operation_name (fop)));
 
       if (f->range)
@@ -426,15 +427,15 @@ parse_operation (enum processing_mode pm)
     {
       pm2 = get_processing_mode (scanner_identifier);
       if (pm2 != MODE_INVALID)
-        error (EXIT_FAILURE,0, _("conflicting operation %s"),
+        die (EXIT_FAILURE,0, _("conflicting operation %s"),
                                quote (scanner_identifier));
 
-      error (EXIT_FAILURE,0, _("invalid operation %s"),
+      die (EXIT_FAILURE,0, _("invalid operation %s"),
                              quote (scanner_identifier));
     }
 
   if (!compatible_operation_modes (pm,pm2))
-    error (EXIT_FAILURE, 0, _("conflicting operation found: "\
+    die (EXIT_FAILURE, 0, _("conflicting operation found: "\
            "expecting %s operations, but found %s operation %s"),
            get_processing_mode_name (pm),
            get_processing_mode_name (pm2),
@@ -483,8 +484,8 @@ parse_mode_column (enum processing_mode pm)
       internal_error ("whitespace");            /* LCOV_EXCL_LINE */
     case TOK_COMMA:
     case TOK_END:
-      error (EXIT_FAILURE, 0, _("missing field for operation %s"),
-          quote (get_processing_mode_name (pm)));
+      die (EXIT_FAILURE, 0, _("missing field for operation %s"),
+           quote (get_processing_mode_name (pm)));
 
     case TOK_INTEGER:
       if (scan_val_int>0)
@@ -497,7 +498,7 @@ parse_mode_column (enum processing_mode pm)
     case TOK_COLONS:
     case TOK_FLOAT:
     default:
-      error (EXIT_FAILURE, 0, _("invalid field '%s' for operation %s"),
+      die (EXIT_FAILURE, 0, _("invalid field '%s' for operation %s"),
           scanner_identifier,
           quote (get_processing_mode_name (pm)));
 
@@ -519,10 +520,10 @@ parse_mode_column_list (enum processing_mode pm)
   /* detect and warn about incorrect usage,
      field specification for groups can't handle dashes or colons (for now) */
   if (tok == TOK_DASH)
-    error (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
+    die (EXIT_FAILURE, 0, _("invalid field range for operation %s"),
                             quote (get_processing_mode_name (pm)));
   if (tok == TOK_COLONS)
-    error (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
+    die (EXIT_FAILURE, 0, _("invalid field pair for operation %s"),
                             quote (get_processing_mode_name (pm)));
 }
 
@@ -548,7 +549,7 @@ parse_mode ()
   case MODE_CROSSTAB:
     parse_mode_column_list (pm);
     if (dm->num_grps!=2)
-      error (EXIT_FAILURE,0, _("crosstab requires exactly 2 fields, " \
+      die (EXIT_FAILURE,0, _("crosstab requires exactly 2 fields, " \
                                "found %"PRIuMAX), (uintmax_t)dm->num_grps);
 
     /* if the user didn't specify an operation, print counts */
@@ -561,7 +562,7 @@ parse_mode ()
       }
     else if (dm->num_ops>1)
       {
-        error (EXIT_FAILURE,0, _("crosstab supports one operation, " \
+        die (EXIT_FAILURE,0, _("crosstab supports one operation, " \
                                  "found %"PRIuMAX), (uintmax_t)dm->num_ops);
       }
     break;
@@ -570,7 +571,7 @@ parse_mode ()
     parse_mode_column_list (pm);
     parse_operations (pm);
     if (dm->num_ops==0)
-      error (EXIT_FAILURE,0, _("missing operation"));
+      die (EXIT_FAILURE,0, _("missing operation"));
     break;
 
   case MODE_PER_LINE:
@@ -584,7 +585,7 @@ parse_mode ()
   }
 
   if (scanner_peek_token ()!=TOK_END)
-    error (EXIT_FAILURE,0,_("extra operand %s"), quote (scanner_identifier));
+    die (EXIT_FAILURE,0,_("extra operand %s"), quote (scanner_identifier));
 }
 
 static void
@@ -608,7 +609,7 @@ parse_mode_or_op ()
       return ;
     }
 
-  error (EXIT_FAILURE,0, _("invalid operation %s"),
+  die (EXIT_FAILURE,0, _("invalid operation %s"),
 		  quote (scanner_identifier));
 }
 
@@ -721,7 +722,7 @@ datamash_ops_debug_print ( const struct datamash_ops* p )
 int TESTMAIN (int argc, const char* argv[])
 {
   if (argc<2)
-    error (EXIT_FAILURE, 0, _("missing script (among arguments)"));
+    die (EXIT_FAILURE, 0, _("missing script (among arguments)"));
 
   struct datamash_ops *o = datamash_ops_parse (argc-1, argv+1);
   datamash_ops_debug_print ( o );
