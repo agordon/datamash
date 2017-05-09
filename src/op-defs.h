@@ -31,6 +31,7 @@ enum field_operation
   OP_MAX,
   OP_ABSMIN,
   OP_ABSMAX,
+  OP_RANGE,
   OP_FIRST,
   OP_LAST,
   OP_RAND,

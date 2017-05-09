@@ -103,6 +103,10 @@ minimum of the absolute values
 .TP
 .B absmax
 maximum of the absolute values
+
+.TP
+.B range
+the values range (max-min)
 .PP
 
 .SS "Textual/Numeric Grouping operations"

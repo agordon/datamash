@@ -2,7 +2,9 @@
 
 ** New Features
 
-  New operation: perc (percentile)
+  New operations:
+    perc (percentile),
+    range (max-min of values in group/column)
 
 
 * Noteworthy changes in release 1.1.1 (2017-01-19) [stable]

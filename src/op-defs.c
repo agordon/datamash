@@ -41,6 +41,7 @@ struct field_operation_definition field_operations[] =
   {"max",     OP_MAX,     MODE_GROUPBY},
   {"absmin",  OP_ABSMIN,  MODE_GROUPBY},
   {"absmax",  OP_ABSMAX,  MODE_GROUPBY},
+  {"range",   OP_RANGE,   MODE_GROUPBY},
   {"first",   OP_FIRST,   MODE_GROUPBY},
   {"last",    OP_LAST,    MODE_GROUPBY},
   {"rand",    OP_RAND,    MODE_GROUPBY},

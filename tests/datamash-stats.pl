@@ -168,6 +168,11 @@ The datamash tests below should return the same results are thes R commands:
     q1=function(x) { quantile(x, prob=0.25) }
     q3=function(x) { quantile(x, prob=0.75) }
 
+    # Helper function for 'range'
+    # R's built-in range() function returns a vector of min/max.
+    # datamash's range returns the actual range
+    dm_range=function(x) { t = range(x) ; return(t[2]-t[1]) }
+
     # Helper functions for quartiles
     perc1=function(x) { quantile(x, prob=0.01) }
     perc90=function(x) { quantile(x, prob=0.90) }
@@ -230,6 +235,7 @@ The datamash tests below should return the same results are thes R commands:
     }
 
     # Run tests
+    test(range)
     test(mean)
     test(median)
     test(q1)
@@ -324,6 +330,22 @@ my @Tests =
   ['q3_11','q3 1' ,  {IN_PIPE=>$seq21},  {OUT => "61.5\n"},],
   ['q3_12','q3 1' ,  {IN_PIPE=>$seq22},  {OUT => "70\n"},],
   ['q3_13','q3 1' ,  {IN_PIPE=>$seq23},  {OUT => "8\n"},],
+
+  # Test range
+  ['range_1', 'range 1' ,  {IN_PIPE=>$seq1},   {OUT => "3\n"}],
+  ['range_2', 'range 1' ,  {IN_PIPE=>$seq2},   {OUT => "2\n"}],
+  ['range_3', 'range 1' ,  {IN_PIPE=>$seq3},   {OUT => "0\n"}],
+  ['range_4', 'range 1' ,  {IN_PIPE=>$seq9},   {OUT => "21\n"}],
+  ['range_5', 'range 1' ,  {IN_PIPE=>$seq10},  {OUT => "27\n"}],
+  ['range_6', 'range 1' ,  {IN_PIPE=>$seq11},  {OUT => "29\n"}],
+  ['range_7', 'range 1' ,  {IN_PIPE=>$seq12},  {OUT => "35\n"}],
+  ['range_8', 'range 1' ,  {IN_PIPE=>$seq12_unsorted},  {OUT => "35\n"}],
+  ['range_9', '--sort range 1' ,  {IN_PIPE=>$seq12_unsorted},  {OUT => "35\n"}],
+  ['range_10','range 1' ,  {IN_PIPE=>$seq20},  {OUT => "42\n"},],
+  ['range_11','range 1' ,  {IN_PIPE=>$seq21},  {OUT => "168\n"},],
+  ['range_12','range 1' ,  {IN_PIPE=>$seq22},  {OUT => "12\n"},],
+  ['range_13','range 1' ,  {IN_PIPE=>$seq23},  {OUT => "11\n"},],
+
 
   # Test perc:90
   ['perc90_1', 'perc:90 1' ,  {IN_PIPE=>$seq1},   {OUT => "3.7\n"}],

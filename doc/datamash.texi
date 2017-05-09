@@ -174,7 +174,7 @@ all the values in the input file.
 @code{frac}
 
 @item Group-by Numeric operations:
-@code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}
+@code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}, @code{range}
 
 @item Group-by Textual/Numeric operations:
 @code{count}, @code{first}, @code{last}, @code{rand}, @code{unique},
@@ -376,6 +376,8 @@ maximum value
 minimum of the absolute values
 @item absmax
 maximum of the absolute values
+@item range
+range of values (maximum - minimum)
 @end table
 
 @item Group-By Textual/Numeric operations:

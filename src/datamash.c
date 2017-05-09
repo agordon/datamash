@@ -190,7 +190,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs ("  bin, strbin, round, floor, ceil, trunc, frac\n", stdout);
 
       fputs (_("Numeric Grouping operations:\n"),stdout);
-      fputs ("  sum, min, max, absmin, absmax\n",stdout);
+      fputs ("  sum, min, max, absmin, absmax, range\n",stdout);
 
       fputs (_("Textual/Numeric Grouping operations:\n"),stdout);
       fputs ("  count, first, last, rand, unique, collapse, countunique\n",

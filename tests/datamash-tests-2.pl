@@ -468,6 +468,14 @@ my @Tests =
   ['rnd1', '-H --full round 1 floor 1 ceil 1 trunc 1 frac 1',
     {IN_PIPE=>$round_in1}, {OUT=>$round_out1}],
 
+  # Test range
+  ['rng1', '-t" " -g 1 range 2',{IN_PIPE=>$in_full1}, {OUT=>"A 2\nB 8\n"}],
+  ['rng2', '-W range 2', {IN_PIPE=>$in_full1}, {OUT=>"8\n"}],
+  ['rng3', 'range 1', {IN_PIPE=>""}, {OUT=>""}],
+  # Skip invalid values
+  ['rng4', '--narm range 1', {IN_PIPE=>"19\nNA\n9\n"}, {OUT=>"10\n"}],
+  ['rng5', '--narm range 1', {IN_PIPE=>"NA\n"}, {OUT=>"$nan\n"}],
+
 );
 
 if ($have_stable_sort) {

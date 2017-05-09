@@ -65,6 +65,8 @@ struct operation_data operations[] =
   {NUMERIC_SCALAR, AUTO_SET_FIRST, NUMERIC_RESULT},
   /* OP_ABSMAX */
   {NUMERIC_SCALAR, AUTO_SET_FIRST, NUMERIC_RESULT},
+  /* OP_RANGE */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_FIRST */
   {STRING_SCALAR,  IGNORE_FIRST, STRING_RESULT},
   /* OP_LAST */
@@ -414,6 +416,24 @@ field_op_collect (struct fieldop *op,
         }
       break;
 
+    case OP_RANGE:
+      /* Upon the first value, we store it twice
+         (once for min, once for max).
+         For subsequence values, we update the min/max entries directly. */
+      if (op->first)
+        {
+          field_op_add_value (op, num_value);
+          field_op_add_value (op, num_value);
+        }
+      else
+        {
+          if (num_value < op->values[0])
+            op->values[0] = num_value;
+          if (num_value > op->values[1])
+            op->values[1] = num_value;
+        }
+      break;
+
     case OP_FIRST:
       if (op->first)
         {
@@ -671,6 +691,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_ROUND:
     case OP_TRUNCATE:
     case OP_FRACTION:
+    case OP_RANGE:
       numeric_result = nanl ("");
       break;
 
@@ -768,6 +789,10 @@ field_op_summarize (struct fieldop *op)
       /* Only one string is returned in the buffer, return it */
       field_op_reserve_out_buf (op, op->str_buf_used);
       memcpy (op->out_buf, op->str_buf, op->str_buf_used);
+      break;
+
+    case OP_RANGE:
+      numeric_result = op->values[1] - op->values[0];
       break;
 
     case OP_MEDIAN:
