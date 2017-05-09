@@ -31,6 +31,7 @@ SUBDIRS = po
 bin_PROGRAMS = datamash
 
 datamash_SOURCES = src/system.h \
+	       src/die.h \
 	       src/text-options.c src/text-options.h \
 	       src/utils.c src/utils.h \
 	       src/text-lines.c src/text-lines.h \
