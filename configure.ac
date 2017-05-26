@@ -59,6 +59,23 @@ gl_WARN_ADD([-Wsuggest-attribute=const])
 gl_WARN_ADD([-Wsuggest-attribute=pure])
 AC_SUBST([WARN_CFLAGS])
 
+
+# Enable lint checks, for coverage/static-analyzers.
+AC_ARG_ENABLE([lint],
+              [AS_HELP_STRING([--enable-lint],[enable lint])],
+              [case $enableval in
+                 yes|no) ;;
+                 *)   AC_MSG_ERROR([bad value $enableval for lint option]) ;;
+               esac
+               use_lint=$enableval],
+              [use_lint=no]
+              )
+if test "$use_lint" = yes ; then
+  AC_DEFINE([lint], [1], [Define to 1 if the compiler is checking for lint.])
+fi
+
+
+
 ## Add --enable-werror option to ./configure,
 ## To enable/disable treating compiler warnings as errors.
 ## If not specified AND we're compiling from .git repository,

@@ -51,6 +51,10 @@ To disable code optimization (e.g. for easier debugging), run:
     # or during make
     make CFLAGS="-g -O0"
 
+To enable LINT mode:
+
+    ./configure --enable-lint
+
 To test Debian-hardening configuration, run:
 
     make deb-hard
