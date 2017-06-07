@@ -554,8 +554,8 @@ field_op_collect (struct fieldop *op,
       };
       break;
 
-    case OP_INVALID:
-    default:
+    case OP_INVALID:                 /* LCOV_EXCL_LINE */
+    default:                         /* LCOV_EXCL_LINE */
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
     }
@@ -730,8 +730,8 @@ field_op_summarize_empty (struct fieldop *op)
       strcpy (op->out_buf, "");
       break;
 
-    case OP_INVALID:
-    default:
+    case OP_INVALID:                 /* LCOV_EXCL_LINE */
+    default:                         /* LCOV_EXCL_LINE */
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
     }
@@ -952,8 +952,8 @@ field_op_summarize (struct fieldop *op)
       field_op_to_hex (op, tmpbuf, 64);
       break;
 
-    case OP_INVALID:
-    default:
+    case OP_INVALID:                 /* LCOV_EXCL_LINE */
+    default:                         /* LCOV_EXCL_LINE */
       /* Should never happen */
       internal_error ("bad op");     /* LCOV_EXCL_LINE */
     }
@@ -1034,9 +1034,9 @@ field_op_collect_result_name (const enum FIELD_OP_COLLECT_RESULT flocr)
      return _("invalid numeric value");
    case FLOCR_INVALID_BASE64:
      return _("invalid base64 value");
-   case FLOCR_OK:
-   case FLOCR_OK_KEEP_LINE:
-   case FLOCR_OK_SKIPPED:
+   case FLOCR_OK:                                /* LCOV_EXCL_LINE */
+   case FLOCR_OK_KEEP_LINE:                      /* LCOV_EXCL_LINE */
+   case FLOCR_OK_SKIPPED:                        /* LCOV_EXCL_LINE */
    default:
      internal_error ("op_collect_result_name");  /* LCOV_EXCL_LINE */
      return "";                                  /* LCOV_EXCL_LINE */

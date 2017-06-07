@@ -1230,8 +1230,8 @@ int main (int argc, char* argv[])
       tabular_check_file ();
       break;
 
-    case MODE_INVALID:
-    default:
+    case MODE_INVALID:                           /* LCOV_EXCL_LINE */
+    default:                                     /* LCOV_EXCL_LINE */
       internal_error ("op mode");                /* LCOV_EXCL_LINE */
     }
   free_column_headers ();

@@ -213,7 +213,7 @@ parse_simple_operation_column (struct parser_field_t /*OUTPUT*/ *p,
       p->name = xstrdup (scanner_identifier);
       break;
 
-    case TOK_WHITESPACE:
+    case TOK_WHITESPACE:                        /* LCOV_EXCL_LINE */
       internal_error ("whitespace");            /* LCOV_EXCL_LINE */
 
     case TOK_COMMA:
@@ -481,8 +481,9 @@ parse_mode_column (enum processing_mode pm)
       ADD_NAMED_GROUP (scanner_identifier);
       break;
 
-    case TOK_WHITESPACE:
+    case TOK_WHITESPACE:                        /* LCOV_EXCL_LINE */
       internal_error ("whitespace");            /* LCOV_EXCL_LINE */
+
     case TOK_COMMA:
     case TOK_END:
       die (EXIT_FAILURE, 0, _("missing field for operation %s"),
@@ -576,12 +577,12 @@ parse_mode ()
       die (EXIT_FAILURE,0, _("missing operation"));
     break;
 
-  case MODE_PER_LINE:
+  case MODE_PER_LINE:                           /* LCOV_EXCL_LINE */
     internal_error ("line mode used directly"); /* LCOV_EXCL_LINE */
     break;
 
-  case MODE_INVALID:
-  default:
+  case MODE_INVALID:                 /* LCOV_EXCL_LINE */
+  default:                           /* LCOV_EXCL_LINE */
     internal_error ("wrong opmode"); /* LCOV_EXCL_LINE */
     break;
   }
