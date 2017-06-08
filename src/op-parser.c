@@ -25,6 +25,7 @@
 #include "system.h"
 
 #include "die.h"
+#include "ignore-value.h"
 #include "op-scanner.h"
 #include "op-defs.h"
 #include "op-parser.h"
@@ -530,6 +531,75 @@ parse_mode_column_list (enum processing_mode pm)
                             quote (get_processing_mode_name (pm)));
 }
 
+static bool
+parse_check_line_or_field (const char* s)
+{
+  if (STREQ (s,"lines") || STREQ (s,"line") \
+      || STREQ (s,"rows") || STREQ (s,"row"))
+    return true;
+  if (STREQ (s,"fields") || STREQ (s,"field") \
+      || STREQ (s,"columns") || STREQ (s,"column") || STREQ (s,"col"))
+    return false;
+
+  die (EXIT_FAILURE, 0, _("invalid option %s for operation check"), quote (s));
+}
+
+static void
+parse_mode_check ()
+{
+  bool set_lines = true; // false = set columns
+  uintmax_t value = 0;
+
+  uintmax_t n_lines = 0;
+  uintmax_t n_fields = 0;
+
+  enum TOKEN tok = scanner_peek_token ();
+  while (tok != TOK_END)
+    {
+      tok = scanner_get_token ();
+      if (tok == TOK_INTEGER)
+        {
+          value = scan_val_int;
+
+          ignore_value (scanner_get_token ());
+          set_lines = parse_check_line_or_field (scanner_identifier);
+        }
+      else
+        {
+          set_lines = parse_check_line_or_field (scanner_identifier);
+          tok = scanner_get_token ();
+          if (tok != TOK_INTEGER)
+            die (EXIT_FAILURE, 0, _("number expected after option in " \
+                                    "operation 'check'"));
+          value = scan_val_int;
+        }
+
+      if (value == 0)
+        die (EXIT_FAILURE, 0, _("invalid value zero for lines/fields in "  \
+                                "operation 'check'"));
+
+      if (set_lines)
+        {
+          if (n_lines>0)
+            die (EXIT_FAILURE, 0, _("number of lines/rows already set in " \
+                                    "operation 'check'"));
+          n_lines = value;
+        }
+      else
+        {
+          if (n_fields>0)
+            die (EXIT_FAILURE, 0, _("number of fields/columns already set in " \
+                                    "operation 'check'"));
+          n_fields = value;
+        }
+
+      tok = scanner_peek_token ();
+    }
+
+  dm->mode_params.check_params.n_lines = n_lines;
+  dm->mode_params.check_params.n_fields = n_fields;
+}
+
 static void
 parse_mode ()
 {
@@ -542,7 +612,10 @@ parse_mode ()
   case MODE_TRANSPOSE:
   case MODE_NOOP:
   case MODE_REVERSE:
+    break;
+
   case MODE_TABULAR_CHECK:
+    parse_mode_check ();
     break;
 
   case MODE_REMOVE_DUPS:

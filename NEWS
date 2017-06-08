@@ -6,6 +6,9 @@
     perc (percentile),
     range (max-min of values in group/column)
 
+  Improved 'check' operation:
+    Expected number of lines/fields can be specified as parameter.
+
 
 * Noteworthy changes in release 1.1.1 (2017-01-19) [stable]
 

@@ -123,6 +123,17 @@ my @Tests =
   ['p27','sum 1,2 sum 3-5',
                           {IN_PIPE=>$in2}, {OUT=>$out2}],
 
+  # 'check' options
+  ['p30','check',      {IN_PIPE=>""}, {OUT=>"0 lines, 0 fields\n"}],
+  ['p31','check foo',  {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['p32','check 10',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['p33','check lines lines', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['p34','check 1 line fields', {IN_PIPE=>""}, {EXIT=>1},
+                                {ERR_SUBST=>'s/.*//s'}],
+  ['p35','check 10 foo',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+
+
   # Field range with invalid syntax
   ['e20','sum 1-',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e21','sum 1-x',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],

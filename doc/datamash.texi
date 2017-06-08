@@ -1086,6 +1086,62 @@ datamash: check failed: line 3 has 2 fields (previous line had 3)
 fail
 @end example
 
+@subsection Expected number of lines/fields
+
+@option{check} accepts optional @var{lines} and @var{fields} and will
+return failure if the input does not have the requested number of lines/fields.
+
+@exdent The syntax is:
+
+@example
+datamash check [@var{N} lines] [@var{N} fields]
+@end example
+
+@exdent Usage examples:
+
+@example
+$ cat file.txt
+A    1    ww
+B    2    xx
+C    3    yy
+D    4    zz
+
+$ datamash check 4 lines < file.txt && echo ok
+4 lines, 3 fields
+ok
+
+$ datamash check 3 fields < file.txt && echo ok
+4 lines, 3 fields
+ok
+
+$ datamash check 4 lines 3 fields < file.txt && echo ok
+4 lines, 3 fields
+ok
+
+$ datamash check 7 fields < file.txt && echo ok
+line 1 (3 fields):
+  A    1    ww
+datamash: check failed: line 1 has 3 fields (expecting 22)
+
+$ datamash check 10 lines < file.txt && echo ok
+datamash: check failed: input had 4 lines (expecting 10)
+@end example
+
+For convenience, @var{line},@var{row},@var{rows}
+can be used instead of @var{lines};
+@var{field},@var{columns},@var{column},@var{col} can be used
+instead of @var{fields}.
+The following are all equivalent:
+
+@example
+datamash check 4 lines 10 fields < file.txt
+datamash check 4 rows  10 columns < file.txt
+datamash check 10 col 4 row < file.txt
+@end example
+
+
+@subsection checks in automation scripts
+
 @cindex fail fast
 @cindex shell scripts, check
 @cindex check, in automation and shell scripts

@@ -825,6 +825,9 @@ tabular_check_file ()
   struct line_record_t lb1, lb2;
   struct line_record_t *thisline, *prevline;
 
+  const uintmax_t n_lines = dm->mode_params.check_params.n_lines;
+  const uintmax_t n_fields = dm->mode_params.check_params.n_fields;
+
   thisline = &lb1;
   prevline = &lb2;
 
@@ -839,7 +842,26 @@ tabular_check_file ()
 
       const size_t num_fields = line_record_num_fields (thisline);
 
-      if (line_number>1 && num_fields != prev_num_fields)
+      /* Check if the number of fields is different than expected/requested
+         on the command line (e.g. with 'datamash check 6 fields') */
+      if (n_fields && n_fields != num_fields)
+        {
+          fprintf (stderr, _("line %"PRIuMAX" (%"PRIuMAX" fields):\n  "),
+                       (uintmax_t)(line_number), (uintmax_t)num_fields);
+          ignore_value (fwrite (line_record_buffer (thisline),
+                                line_record_length (thisline), sizeof (char),
+                                stderr));
+          fputc ('\n', stderr);
+          die (EXIT_FAILURE, 0, _("check failed: line " \
+                       "%"PRIuMAX" has %"PRIuMAX" fields (expecting "\
+                       "%"PRIuMAX")"),
+                       (uintmax_t)line_number, (uintmax_t)num_fields,
+                       (uintmax_t)n_fields);
+        }
+
+      /* Check if the the number of fields changed from one line to the next
+         (only if no expected number of fields specified on the command line).*/
+      else if (line_number>1 && num_fields != prev_num_fields)
         {
           fprintf (stderr, _("line %"PRIuMAX" (%"PRIuMAX" fields):\n  "),
                        (uintmax_t)(line_number-1), (uintmax_t)prev_num_fields);
@@ -862,6 +884,14 @@ tabular_check_file ()
       prev_num_fields = num_fields;
 
       SWAP_LINES (prevline, thisline);
+    }
+
+  /* Check if we read too many/few lines */
+  if (n_lines && n_lines != line_number)
+    {
+      die (EXIT_FAILURE, 0, _("check failed: input had %"PRIuMAX" lines " \
+                              "(expecting %"PRIuMAX")"),
+           (uintmax_t)line_number, (uintmax_t)n_lines);
     }
 
   /* Print summary */

@@ -37,10 +37,12 @@ transpose rows, columns of the input file
 reverse field order in each line
 
 .TP
-.B check
-verify the input file has same number of fields in all lines.
+.B check [N lines] [N fields]
+verify the input file has same number of fields in all lines,
+or the expected number of lines/fields.
 number of lines and fields are printed to STDOUT. Exits with non-zero code
-and prints the offending line if there's a mismatch in the number of fields.
+and prints the offending line if there's a mismatch in the number of lines/
+fields.
 .PP
 
 
@@ -453,8 +455,8 @@ $ sha1sum *.txt | datamash -Wf sha1 2
 
 
 .SS "Check file structure"
-Check the structure of the input file (ensure all lines
-have the same number of fields):
+Check the structure of the input file: ensure all lines
+have the same number of fields, or expected number of lines/fields:
 .PP
 .nf
 .RS
@@ -469,6 +471,17 @@ line 5 (2 fields):
   13
 datamash: check failed: line 5 has 2 fields (previous line had 3)
 fail
+
+$ seq 10 | paste \- \- | datamash check 2 fields 5 lines
+5 lines, 2 fields
+
+$ seq 10 | paste \- \- | datamash check 4 fields
+line 1 (2 fields):
+  1     2
+datamash: check failed: line 1 has 2 fields (expecting 4)
+
+$ seq 10 | paste \- \- | datamash check 7 lines
+datamash: check failed: input had 5 lines (expecting 7)
 .RE
 .fi
 .PP

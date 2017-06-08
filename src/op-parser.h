@@ -39,6 +39,12 @@ struct op_column_t
   enum   field_operation op;
 };
 
+struct mode_check_params_t
+{
+  uintmax_t n_lines;         /* If not zero, require this number of lines */
+  uintmax_t n_fields;        /* if not zero, require this number of fields */
+};
+
 struct datamash_ops
 {
   enum processing_mode mode; /* the processing mode */
@@ -52,6 +58,14 @@ struct datamash_ops
   struct fieldop    *ops;  /* field operations */
   size_t num_ops;
   size_t alloc_ops;
+
+  /* Additional parameters for mode operatons
+     (i.e. ones relating to the operation mode,
+     not to specific field-ops) */
+  union
+  {
+    struct mode_check_params_t check_params;
+  } mode_params;
 };
 
 /* Parse the operations, return new datamash_ops structure.
