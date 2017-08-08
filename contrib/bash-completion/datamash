@@ -24,10 +24,10 @@ _datamash ()
 
   #NOTE: do not change the spaces (or indentation or backslashes)
   #      or the regex will fail.
-  local groupby_ops="sum min max absmin absmax \
+  local groupby_ops="sum min max absmin absmax range \
 count first last rand \
 unique collapse countunique \
-mean median q1 q3 iqr mode antimode \
+mean median q1 q3 iqr perc mode antimode \
 pstdev sstdev pvar svar mad madraw \
 pskew sskew pkurt skurt dpo jarque \
 pcov scov ppearson spearson strbin"
