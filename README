@@ -85,22 +85,38 @@ It is also available online at
 BASH Auto-completion
 ====================
 
-bash auto-completion script is in ./contrib/bash-completion/datamash .
-If ./configure finds the needed bash-completion parameters during setup,
-the bash completion script will be automatically installed to the correct
-place (e.g. /usr/share/bash-completion/completions or /etc/bash.d).
+The datamash package inclueds a bash auto-completion script.
+The installation location can be controlled using
 
-Script installation can be disabled with:
-    ./configure --with-bash-completion-dir=no
+    ./configure --with-bash-completion-dir=[no|local|global|PATH]
 
-Or set to a specific directory with:
-    ./configure --with-bash-completion-dir=[PATH]
+The options are:
 
-Note when using `./configure --prefix=DIR`, the bash-completion
-default directory can still be outside DIR (e.g `/usr/share/bash-completion`).
-To disable or override it, use `--with-bash-completion-dir`.
+* local  - install under the package's $PREFIX path.
+           typically `/usr/local/share/datamash/bash-completion.d/` ,
+           but can be changed with `./configure --prefix`.
+           This is the default.
 
+* no     - do not install the bash completion script.
 
+* [PATH] - install into the PATH specified on the command line, e.g.
+           `./configure --with-bash-completion-dir=/for/bar/bash-completion.d/`
+
+* global - install into the system's global bash-completion directory,
+           as reported by `pkg-config`. This will be the result of:
+           `pkg-config --variable=completionsdir bash-completion`
+           Which is commonly `/usr/share/bash-completion/completions`
+           or `/etc/bash.d`.
+           If `pkg-config` is not found or if `pkg-config` does not have
+           the config (.pc) file for the bash-completion package,
+           defaults to 'local'.
+
+`local` is the default, and should be used particularly if installing under
+a non-default `--prefix` without root permissions.
+`global` should be used if you are installing to default location (/usr/local)
+and have root permissions (e.g. `sudo make install`).
+Using custom PATH or `global` should be used when packaging datamash for
+further distribution.
 
 Questions and Bug Reports
 =========================

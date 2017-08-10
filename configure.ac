@@ -9,7 +9,7 @@ dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_INIT([GNU datamash],
-        [m4_esyscmd([build-aux/git-version-gen .tarball-version])],
+	[m4_esyscmd([build-aux/git-version-gen .tarball-version])],
 	[assafgordon@gmail.com], [],
 	[http://www.gnu.org/software/datamash])
 
@@ -109,20 +109,21 @@ AC_DEFINE([HAVE_BROKEN_STRTOLD],[1],
 fi
 
 
-##
 ## Check for bash-completion using pkg-config
-## See: https://github.com/scop/bash-completion/README
+##   ./configure --with-bash-completion-dir=[no|local|global|PATH] .
+## See README for details.
 AC_ARG_WITH([bash-completion-dir],
     AS_HELP_STRING([--with-bash-completion-dir[=PATH]],
-        [Install the bash auto-completion script in this directory.
-         @<:@default=yes@:>@]),
+        [Where to install the bash auto-completion script: no|local|global|PATH.
+         @<:@default=local@:>@]),
     [],
-    [with_bash_completion_dir=yes])
+    [with_bash_completion_dir=local])
 
-if test "x$with_bash_completion_dir" = "xyes"; then
+if test "x$with_bash_completion_dir" = "xlocal" ; then
+  bashcompdir="$datarootdir/${PACKAGE}/bash-completion.d"
+elif test "x$with_bash_completion_dir" = "xglobal"; then
   PKG_CHECK_VAR(bashcompdir, [bash-completion], [completionsdir], ,
                 bashcompdir="$datarootdir/${PACKAGE}/bash-completion.d")
-
 else
   # either 'no', or a user-specified custom DIR - use it.
   bashcompdir="$with_bash_completion_dir"

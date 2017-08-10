@@ -9,6 +9,10 @@
   Improved 'check' operation:
     Expected number of lines/fields can be specified as parameter.
 
+** Improvements
+
+  Improved bash-completion script installation path (see README for details).
+
 
 * Noteworthy changes in release 1.1.1 (2017-01-19) [stable]
 
