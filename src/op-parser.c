@@ -188,7 +188,7 @@ set_op_params (struct fieldop *op)
         op->params.percentile = _params[0].u;
       if (op->params.percentile==0 || op->params.percentile>100)
         die (EXIT_FAILURE, 0, _("invalid percentile value %" PRIuMAX),
-               op->params.percentile);
+             (uintmax_t)op->params.percentile);
       if (_params_used>1)
         die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
                                     quote (get_field_operation_name (op->op)));

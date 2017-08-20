@@ -447,7 +447,7 @@ print_column_headers ()
       printf ("%s", get_field_operation_name (op->op));
 
       if (op->op == OP_PERCENTILE) {
-        printf (":%lu", op->params.percentile);
+        printf (":%"PRIuMAX, (uintmax_t)op->params.percentile);
       }
 
       printf ("(%s)", get_input_field_name (op->field));
