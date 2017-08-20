@@ -170,7 +170,7 @@ my @Tests =
         {ERR_SUBST=>'s/.*//s'}],
 
   # Invalid charcters
-  ['e65','sum foo^bar', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e65','sum "foo^bar"', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
   # Empty columns
   ['e66','sum 1,,', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],

@@ -111,7 +111,7 @@ my @Tests =
       {ERR=>"$prog: invalid numeric value " .
             "'1234567890123456789012345678901234567'\n"}],
   # Invalid charcters
-  ['e65','sum foo^bar', {IN_PIPE=>""}, {EXIT=>1},
+  ['e65','sum "foo^bar"', {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: invalid operand '^bar'\n"}],
 
   # Empty columns
