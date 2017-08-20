@@ -358,13 +358,15 @@ my @Tests =
   ['narm10', '--narm sum 1',  {IN_PIPE=>$na4}, {OUT=>"6\n"}],
   ['narm11', '--narm mean 1', {IN_PIPE=>$na4}, {OUT=>"2\n"}],
   # without --narm, 'nan' should be processed, not skipped
-  ['narm12', 'sum 1',         {IN_PIPE=>$na4}, {OUT=>"$nan\n"}],
+  ['narm12', 'sum 1',         {IN_PIPE=>$na4}, {OUT=>"$nan\n"},
+      {OUT_SUBST=>'s/^-//'}],
 
   ## Test with 'nan'
   ['narm13', '--narm sum 1',  {IN_PIPE=>$na5}, {OUT=>"6\n"}],
   ['narm14', '--narm mean 1', {IN_PIPE=>$na5}, {OUT=>"2\n"}],
   # without --narm, 'nan' should be processed, not skipped
-  ['narm15', 'sum 1',         {IN_PIPE=>$na5}, {OUT=>"$nan\n"}],
+  ['narm15', 'sum 1',         {IN_PIPE=>$na5}, {OUT=>"$nan\n"},
+      {OUT_SUBST=>'s/^-//'}],
 
   # These input have strings starting with 'NA' or 'NAN' but should not
   # be mistaken for them.
