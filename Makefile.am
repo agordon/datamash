@@ -13,10 +13,8 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = -Ilib -I$(top_srcdir)/lib -Isrc -I$(top_srcdir)/src
 
 EXTRA_DIST = \
-        build-aux/make_bin_dist.sh \
-        build-aux/rebuild-coverage.sh \
-        build-aux/gen-coverage-report.sh \
-	build-aux/tag-new-version.sh \
+	build-aux/make_bin_dist.sh \
+	build-aux/prerelease-checks.sh \
 	build-aux/git-log-fix \
 	build-aux/create_small_file_system.sh \
 	build-aux/create_corrupted_file_system.sh \
