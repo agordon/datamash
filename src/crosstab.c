@@ -182,8 +182,8 @@ crosstab_print (const struct crosstab* ct)
       print_line_separator ();
     }
 
-  IF_LINT(free (rows_list));
-  IF_LINT(free (cols_list));
+  IF_LINT (free (rows_list));
+  IF_LINT (free (cols_list));
 }
 /* vim: set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1: */
 /* vim: set shiftwidth=2: */

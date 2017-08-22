@@ -859,7 +859,7 @@ tabular_check_file ()
                        (uintmax_t)n_fields);
         }
 
-      /* Check if the the number of fields changed from one line to the next
+      /* Check if the number of fields changed from one line to the next
          (only if no expected number of fields specified on the command line).*/
       else if (line_number>1 && num_fields != prev_num_fields)
         {
