@@ -26,9 +26,9 @@ PACKAGE=datamash
 
 die()
 {
-BASE=$(basename "$0")
-echo "$BASE: error: $@" >&2
-exit 1
+  BASE=$(basename "$0")
+  echo "$BASE: error: $*" >&2
+  exit 1
 }
 
 ##
@@ -51,15 +51,11 @@ do
 done
 
 ##
-## Use the TARBALL (from previous 'make distcheck'),
-##   and check on multiple platforms
-VER=$(./build-aux/git-version-gen v) || die "failed to detect git version"
-TARBALL="${PACKAGE}-${VER}.tar.gz"
-[ -e "$TARBALL" ] || die "tarball $TARBALL not found"
-
-./build-aux/check-remote-make-all.sh "$TARBALL" ||
-          die "check-remote-make-all.sh $TARBALL failed"
-./build-aux/check-remote-make-extra.sh "$TARBALL" ||
-          die "check-remote-make-extra.sh $TARBALL failed"
-./build-aux/check-remote-make-git.sh ||
-          die "check-remote-make-git.sh failed"
+## Build with non-root installation prefix
+##
+DIR=$(mktemp -d tmp-install.XXXXXX) || die "mktemp failed"
+DIR=$(realpath "$DIR") || die "realpath failed on '$DIR'"
+make distclean || die "make distclean failed (before non-root install)"
+./configure --prefix "$DIR" || die "./configure --prefix=$DIR failed"
+make || die "make failed (for non-root install)"
+make install || die "make install failed (for non-root install)"
