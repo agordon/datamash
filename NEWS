@@ -1,3 +1,10 @@
+* Noteworthy changes in release *
+
+** New Features
+
+  New option: --output-delimiter=X overrides -t/-W.
+
+
 * Noteworthy changes in release 1.2 (2017-08-22) [stable]
 
 ** New Features

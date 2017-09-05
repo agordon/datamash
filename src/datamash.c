@@ -97,12 +97,16 @@ static FILE* input_stream = NULL;
 /* Use large buffer for normal operation (will be reduced for testing) */
 static size_t rmdup_initial_size = (1024*1024);
 
+/* Explicit output delimiter with --output-delimiter */
+static int explicit_output_delimiter = -1;
+
 enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
   OUTPUT_HEADER_OPTION,
   NO_STRICT_OPTION,
   REMOVE_NA_VALUES_OPTION,
+  OUTPUT_DELIMITER_OPTION,
   UNDOC_PRINT_INF_OPTION,
   UNDOC_PRINT_NAN_OPTION,
   UNDOC_PRINT_PROGNAME_OPTION,
@@ -123,6 +127,7 @@ static struct option const long_options[] =
   {"headers", no_argument, NULL, 'H'},
   {"full", no_argument, NULL, 'f'},
   {"filler", required_argument, NULL, 'F'},
+  {"output-delimiter", required_argument, NULL, OUTPUT_DELIMITER_OPTION},
   {"sort", no_argument, NULL, 's'},
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
   {"narm", no_argument, NULL, REMOVE_NA_VALUES_OPTION},
@@ -243,6 +248,10 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs (_("General Options:\n"),stdout);
       fputs (_("\
   -t, --field-separator=X   use X instead of TAB as field delimiter\n\
+"), stdout);
+      fputs (_("\
+      --output-delimiter=X  use X instead as output field delimiter\n\
+                            (default: use same delimiter as -t/-W)\n\
 "), stdout);
       fputs (_("\
       --narm                skip NA/NaN values\n\
@@ -1171,6 +1180,13 @@ int main (int argc, char* argv[])
           in_tab = out_tab = optarg[0];
           break;
 
+	case OUTPUT_DELIMITER_OPTION:
+          if (optarg[0] == '\0' || optarg[1] != '\0')
+            die (EXIT_FAILURE, 0,
+                   _("the delimiter must be a single character"));
+	  explicit_output_delimiter = (char)optarg[0];
+	  break;
+
         case 'W':
           in_tab = TAB_WHITESPACE;
           out_tab = '\t';
@@ -1207,6 +1223,10 @@ int main (int argc, char* argv[])
       error (0, 0, _("missing operation specifiers"));
       usage (EXIT_FAILURE);
     }
+
+  /* If --output-delimiter=X was used, override any previous output delimiter */
+  if (explicit_output_delimiter != -1)
+    out_tab = explicit_output_delimiter ;
 
   /* The rest of the parameters are the operations */
   if (premode == MODE_INVALID)

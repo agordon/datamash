@@ -280,11 +280,21 @@ value.
 @itemx -t @var{x}
 @opindex --field-separator
 @opindex -t
-Use character @var{X} instead of TAB as field delimiter.
+Use character @var{X} instead of TAB as input and output field delimiter.
+If @option{--output-delimiter} is also used, it will override the output
+field delimiter.
 
 @item --narm
 @opindex --narm
 Skip @var{NA} or @var{NaN} values.
+
+@item --output-delimiter=@var{x}
+@opindex --output-delimiter
+@opindex -t
+Use character @var{X} instead as output field delimiter.
+This option overrides @option{--field-separator}/@option{-t}/
+@option{--whitespace}/@option{-W}.
+
 
 @item --whitespace
 @itemx -W
@@ -292,6 +302,8 @@ Skip @var{NA} or @var{NaN} values.
 @opindex -W
 Use whitespace (one or more spaces and/or tabs) for field delimiters.
 TAB character will be used as output field separator.
+If @option{--output-delimiter} is also used, it will override the output
+field delimiter.
 
 @item --zero-terminated
 @itemx -z

@@ -41,7 +41,7 @@ round floor ceil trunc frac bin"
 
   local datamash_long_options="--full --group --header-in --header-out --headers
   --ignore-case --sort --no-strict --filler --field-separator --whitespace
-  --zero-terminated --help --version"
+  --zero-terminated --help --version --output-delimiter"
 
   local all_ops_re="$modes_re|$groupby_ops_re|$line_ops_re"
 

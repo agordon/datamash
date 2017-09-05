@@ -478,6 +478,26 @@ my @Tests =
   ['rng4', '--narm range 1', {IN_PIPE=>"19\nNA\n9\n"}, {OUT=>"10\n"}],
   ['rng5', '--narm range 1', {IN_PIPE=>"NA\n"}, {OUT=>"$nan\n"}],
 
+
+  # Test output-delimiter
+  ['odlm1', '-t: last 1 last 2', {IN_PIPE=>$na_mid1}, {OUT=>"7:8\n"}],
+  ['odlm2', '-t: --output-delimiter "%" last 1 last 2',
+   {IN_PIPE=>$na_mid1}, {OUT=>"7%8\n"}],
+  ['odlm3', '--output-delimiter "%" -t: last 1 last 2',
+   {IN_PIPE=>$na_mid1}, {OUT=>"7%8\n"}],
+
+  # output-delimiter with whitespace
+  ['odlm4', '-t " " last 1 last 2', {IN_PIPE=>$in_full1}, {OUT=>"B 3\n"}],
+  ['odlm5', '-W     last 1 last 2', {IN_PIPE=>$in_full1}, {OUT=>"B\t3\n"}],
+  ['odlm6', '-W --output-delimiter ":" last 1 last 2',
+   {IN_PIPE=>$in_full1}, {OUT=>"B:3\n"}],
+  ['odlm7', '--output-delimiter ":" -W last 1 last 2',
+   {IN_PIPE=>$in_full1}, {OUT=>"B:3\n"}],
+
+  # Multiple output delimiters
+  ['odlm8', '--output-delimiter "x" -W --output-delimiter "y" last 1 last 2',
+   {IN_PIPE=>$in_full1}, {OUT=>"By3\n"}],
+
 );
 
 if ($have_stable_sort) {

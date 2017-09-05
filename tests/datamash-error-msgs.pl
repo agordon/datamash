@@ -192,6 +192,15 @@ my @Tests =
   ['e98','perc:1:2  1',    {IN_PIPE=>""}, {EXIT=>1},
       {ERR=>"$prog: too many parameters for operation 'perc'\n"}],
 
+  # Invalid output delimiters
+  ['e100', '--output-delimiter', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: option '--output-delimiter' requires an argument\n".
+         "Try '$prog --help' for more information.\n"}],
+  ['e101', '--output-delimiter ""', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: the delimiter must be a single character\n"}],
+  ['e102', '--output-delimiter "XX"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: the delimiter must be a single character\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
