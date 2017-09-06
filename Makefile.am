@@ -56,6 +56,7 @@ datamash_LDADD = \
        $(LDEXPL_LIBM) \
        $(LIBICONV) \
        $(LIBINTL) \
+       $(LIB_CRYPTO) \
        $(ROUND_LIBM) \
        $(ROUNDL_LIBM) \
        $(SQRT_LIBM) \
