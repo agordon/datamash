@@ -4,6 +4,19 @@
 
   New option: --output-delimiter=X overrides -t/-W.
 
+** Bug fixes
+
+  Datamash now builds correctly with external OpenSSL libraries
+  (./configure --with-openssl=yes). The 'configure' script now reports
+  whether internal or external libraries are used:
+
+     $ ./configure [OPTIONS]
+     [...]
+     Configuration summary for datamash
+         md5/sha*: internal (gnulib)
+  OR
+         md5/sha*: external (-lcrypto)
+
 
 * Noteworthy changes in release 1.2 (2017-08-22) [stable]
 

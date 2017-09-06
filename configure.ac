@@ -185,6 +185,16 @@ AC_MSG_RESULT([    COMPILER: $CC])
 AC_MSG_RESULT([    CFLAGS:   $CFLAGS $WARN_CFLAGS $MINGW_CFLAGS])
 AC_MSG_RESULT([    CPPFLAGS: $CPPFLAGS])
 AC_MSG_RESULT([    LDFLAGS:  $LDFLAGS])
+
+# Show which sha* implementation is used
+# for hash functions (md5/sha*)
+if test "x$LIB_CRYPTO" = x ; then
+  lib_crypto_desc="internal (gnulib)"
+else
+  lib_crypto_desc="external ($LIB_CRYPTO)"
+fi
+AC_MSG_RESULT([    md5/sha*: $lib_crypto_desc])
+
 AC_MSG_RESULT([])
 AC_MSG_RESULT([ Default installation directories:])
 AC_MSG_RESULT([    program:   ${prefix}/bin/ ])
