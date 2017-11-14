@@ -420,6 +420,8 @@ number of unique/distinct values
 @table @option
 @item mean
 mean of the values
+@item trimmean
+trimmed mean of the values
 @item median
 median value
 @item q1

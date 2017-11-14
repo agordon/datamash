@@ -4,6 +4,12 @@
 
   New option: --output-delimiter=X overrides -t/-W.
 
+  New operation: trimmean (trimmed mean value).
+  To calculate 20% trimmed mean:
+     $ printf "%s\n" 13 3 7 33 3 9 | datamash  trimmean:0.2  1
+     8
+
+
 ** Bug fixes
 
   Datamash now builds correctly with external OpenSSL libraries

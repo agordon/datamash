@@ -153,6 +153,8 @@ struct operation_data operations[] =
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_FRACTION */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_TRIMMED_MEAN */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -506,6 +508,7 @@ field_op_collect (struct fieldop *op,
     case OP_S_COVARIANCE:
     case OP_P_PEARSON_COR:
     case OP_S_PEARSON_COR:
+    case OP_TRIMMED_MEAN:
       field_op_add_value (op, num_value);
       break;
 
@@ -692,6 +695,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_TRUNCATE:
     case OP_FRACTION:
     case OP_RANGE:
+    case OP_TRIMMED_MEAN:
       numeric_result = nanl ("");
       break;
 
@@ -820,6 +824,12 @@ field_op_summarize (struct fieldop *op)
       field_op_sort_values (op);
       numeric_result = percentile_value ( op->values, op->num_values,
                                           op->params.percentile / 100.0 );
+      break;
+
+    case OP_TRIMMED_MEAN:
+      field_op_sort_values (op);
+      numeric_result = trimmed_mean_value ( op->values, op->num_values,
+					    op->params.trimmed_mean);
       break;
 
     case OP_PSTDEV:

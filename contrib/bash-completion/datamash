@@ -27,7 +27,7 @@ _datamash ()
   local groupby_ops="sum min max absmin absmax range \
 count first last rand \
 unique collapse countunique \
-mean median q1 q3 iqr perc mode antimode \
+mean trimmean median q1 q3 iqr perc mode antimode \
 pstdev sstdev pvar svar mad madraw \
 pskew sskew pkurt skurt dpo jarque \
 pcov scov ppearson spearson strbin"

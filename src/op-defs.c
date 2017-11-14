@@ -85,6 +85,7 @@ struct field_operation_definition field_operations[] =
   {"round",   OP_ROUND,      MODE_PER_LINE},
   {"trunc",   OP_TRUNCATE,   MODE_PER_LINE},
   {"frac",    OP_FRACTION,   MODE_PER_LINE},
+  {"trimmean",OP_TRIMMED_MEAN,   MODE_GROUPBY},
   {NULL,      OP_INVALID, MODE_INVALID}
 };
 

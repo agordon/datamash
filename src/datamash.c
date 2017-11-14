@@ -203,8 +203,9 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 
       fputs (_("Statistical Grouping operations:\n"),stdout);
       fputs ("\
-  mean, median, q1, q3, iqr, perc, mode, antimode, pstdev, sstdev, pvar,\n\
-  svar, mad, madraw, pskew, sskew, pkurt, skurt, dpo, jarque,\n\
+  mean, trimmean, median, q1, q3, iqr, perc, mode, antimode, \n\
+  pstdev, sstdev, pvar, svar, mad, madraw,\n\
+  pskew, sskew, pkurt, skurt, dpo, jarque,\n\
   scov, pcov, spearson, ppearson\n\
 \n", stdout);
       fputs ("\n", stdout);
@@ -457,6 +458,9 @@ print_column_headers ()
 
       if (op->op == OP_PERCENTILE) {
         printf (":%"PRIuMAX, (uintmax_t)op->params.percentile);
+      }
+      if (op->op == OP_TRIMMED_MEAN) {
+        printf (":%Lg", op->params.trimmed_mean);
       }
 
       printf ("(%s)", get_input_field_name (op->field));

@@ -75,7 +75,8 @@ enum field_operation
   OP_CEIL,          /* Ceiling */
   OP_ROUND,         /* Round */
   OP_TRUNCATE,      /* Truncate */
-  OP_FRACTION       /* Fraction */
+  OP_FRACTION,      /* Fraction */
+  OP_TRIMMED_MEAN   /* Trimmed Mean */
 };
 
 enum processing_mode

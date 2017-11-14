@@ -180,6 +180,14 @@ The datamash tests below should return the same results are thes R commands:
     perc99=function(x) { quantile(x, prob=0.99) }
     perc100=function(x) { quantile(x, prob=1) }
 
+    trimmean0=function(x){mean(x,trim=0)}
+    trimmean10=function(x){mean(x,trim=0.1)}
+    trimmean20=function(x){mean(x,trim=0.2)}
+    trimmean30=function(x){mean(x,trim=0.3)}
+    trimmean40=function(x){mean(x,trim=0.4)}
+    trimmean50=function(x){mean(x,trim=0.5)}
+
+
     # Helper function for madraw
     madraw=function(x) { mad(x,constant=1.0) }
 
@@ -243,6 +251,12 @@ The datamash tests below should return the same results are thes R commands:
     test(perc90)
     test(perc95)
     test(perc99)
+    test(trimmean0)
+    test(trimmean10)
+    test(trimmean20)
+    test(trimmean30)
+    test(trimmean40)
+    test(trimmean50)
     test(iqr)
     test(smp.sd)
     test(pop.sd)
@@ -419,6 +433,72 @@ my @Tests =
   ['perc75_11','perc:75 1' ,  {IN_PIPE=>$seq21},  {OUT => "61.5\n"},],
   ['perc75_12','perc:75 1' ,  {IN_PIPE=>$seq22},  {OUT => "70\n"},],
   ['perc75_13','perc:75 1' ,  {IN_PIPE=>$seq23},  {OUT => "8\n"},],
+
+
+  # Trimmed Mean:0
+  ['tmean0_1', 'trimmean:0 1' ,  {IN_PIPE=>$seq1},   {OUT => "2.5\n"}],
+  ['tmean0_2', 'trimmean:0 1' ,  {IN_PIPE=>$seq2},   {OUT => "2\n"}],
+  ['tmean0_3', 'trimmean:0 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  ['tmean0_4', 'trimmean:0 1' ,  {IN_PIPE=>$seq9},   {OUT => "11.111\n"}],
+  ['tmean0_5', 'trimmean:0 1' ,  {IN_PIPE=>$seq10},  {OUT => "12.9\n"}],
+  ['tmean0_6', 'trimmean:0 1' ,  {IN_PIPE=>$seq11},  {OUT => "14.545\n"}],
+  ['tmean0_7', 'trimmean:0 1' ,  {IN_PIPE=>$seq12},  {OUT => "16.416\n"}],
+  ['tmean0_8', 'trimmean:0 1' ,  {IN_PIPE=>$seq20},  {OUT => "100.06\n"},],
+  ['tmean0_9', 'trimmean:0 1' ,  {IN_PIPE=>$seq21},  {OUT => "45.32\n"},],
+  ['tmean0_10','trimmean:0 1' ,  {IN_PIPE=>$seq22},  {OUT => "67.45\n"},],
+  ['tmean0_11','trimmean:0 1' ,  {IN_PIPE=>$seq23},  {OUT => "6.125\n"},],
+
+  # Trimmed Mean:0.1
+  ['tmean1_1', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq1},   {OUT => "2.5\n"}],
+  ['tmean1_2', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq2},   {OUT => "2\n"}],
+  ['tmean1_3', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  ['tmean1_4', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq9},   {OUT => "11.111\n"}],
+  ['tmean1_5', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq10},  {OUT => "12.25\n"}],
+  ['tmean1_6', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq11},  {OUT => "14.111\n"}],
+  ['tmean1_7', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq12},  {OUT => "15.8\n"}],
+  ['tmean1_8', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq20},  {OUT => "100.275\n"},],
+  ['tmean1_9', 'trimmean:0.1 1' ,  {IN_PIPE=>$seq21},  {OUT => "42\n"},],
+  ['tmean1_10','trimmean:0.1 1' ,  {IN_PIPE=>$seq22},  {OUT => "67.45\n"},],
+  ['tmean1_11','trimmean:0.1 1' ,  {IN_PIPE=>$seq23},  {OUT => "6.076\n"},],
+
+  # Trimmed Mean:0.2
+  ['tmean2_1', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq1},   {OUT => "2.5\n"}],
+  ['tmean2_2', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq2},   {OUT => "2\n"}],
+  ['tmean2_3', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  ['tmean2_4', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq9},   {OUT => "10.714\n"}],
+  ['tmean2_5', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq10},  {OUT => "12\n"}],
+  ['tmean2_6', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq11},  {OUT => "13.571\n"}],
+  ['tmean2_7', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq12},  {OUT => "15.5\n"}],
+  ['tmean2_8', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq20},  {OUT => "100.516\n"},],
+  ['tmean2_9', 'trimmean:0.2 1' ,  {IN_PIPE=>$seq21},  {OUT => "40.1\n"},],
+  ['tmean2_10','trimmean:0.2 1' ,  {IN_PIPE=>$seq22},  {OUT => "67.6\n"},],
+  ['tmean2_11','trimmean:0.2 1' ,  {IN_PIPE=>$seq23},  {OUT => "6.053\n"},],
+
+  # Trimmed Mean:0.4
+  ['tmean4_1', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq1},   {OUT => "2.5\n"}],
+  ['tmean4_2', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq2},   {OUT => "2\n"}],
+  ['tmean4_3', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  ['tmean4_4', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq9},   {OUT => "10.333\n"}],
+  ['tmean4_5', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq10},  {OUT => "12\n"}],
+  ['tmean4_6', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq11},  {OUT => "13.666\n"}],
+  ['tmean4_7', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq12},  {OUT => "15\n"}],
+  ['tmean4_8', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq20},  {OUT => "100.55\n"},],
+  ['tmean4_9', 'trimmean:0.4 1' ,  {IN_PIPE=>$seq21},  {OUT => "37.3\n"},],
+  ['tmean4_10','trimmean:0.4 1' ,  {IN_PIPE=>$seq22},  {OUT => "67\n"},],
+  ['tmean4_11','trimmean:0.4 1' ,  {IN_PIPE=>$seq23},  {OUT => "6.067\n"},],
+
+  # Trimmed Mean:0.5
+  ['tmean5_1', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq1},   {OUT => "2.5\n"}],
+  ['tmean5_2', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq2},   {OUT => "2\n"}],
+  ['tmean5_3', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq3},   {OUT => "2\n"}],
+  ['tmean5_4', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq9},   {OUT => "11\n"}],
+  ['tmean5_5', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq10},  {OUT => "12\n"}],
+  ['tmean5_6', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq11},  {OUT => "13\n"}],
+  ['tmean5_7', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq12},  {OUT => "15\n"}],
+  ['tmean5_8', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq20},  {OUT => "100\n"},],
+  ['tmean5_9', 'trimmean:0.5 1' ,  {IN_PIPE=>$seq21},  {OUT => "37\n"},],
+  ['tmean5_10','trimmean:0.5 1' ,  {IN_PIPE=>$seq22},  {OUT => "67\n"},],
+  ['tmean5_11','trimmean:0.5 1' ,  {IN_PIPE=>$seq23},  {OUT => "6\n"},],
 
 
   # Test IQR

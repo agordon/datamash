@@ -195,6 +195,21 @@ set_op_params (struct fieldop *op)
       return;
     }
 
+  if (op->op==OP_TRIMMED_MEAN)
+    {
+      op->params.trimmed_mean = 0; /* default trimmed mean = no trim */
+      if (_params_used==1)
+        op->params.trimmed_mean = _params[0].f;
+      if (op->params.trimmed_mean<0 || op->params.trimmed_mean>0.5)
+        die (EXIT_FAILURE, 0, _("invalid trim mean value %Lg " \
+				"(expected 0 <= X <= 0.5)"),
+             op->params.trimmed_mean);
+      if (_params_used>1)
+        die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+                                    quote (get_field_operation_name (op->op)));
+      return;
+    }
+
   /* All other operations do not take parameters */
   if (_params_used>0)
     die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),

@@ -405,6 +405,29 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
   return best_value;
 }
 
+long double  _GL_ATTRIBUTE_PURE
+trimmed_mean_value ( const long double * const values, size_t n,
+		     const long double trimmed_mean_percent)
+{
+  assert (trimmed_mean_percent >= 0); /* LCOV_EXCL_LINE */
+  assert (trimmed_mean_percent <= 0.5); /* LCOV_EXCL_LINE */
+
+  /* For R compatability:
+     mean (x,trim=0.5) in R is equivalent to median (x).  */
+  if (trimmed_mean_percent >= 0.5)
+    return median_value (values, n);
+
+  /* number of element to skip from each end */
+  size_t c = pos_zero (floorl (trimmed_mean_percent * n));
+
+  long double v = 0;
+  for (size_t i=c; i< (n-c); i++)
+    v += values[i];
+
+  return v / (long double)(n-c*2);
+}
+
+
 int _GL_ATTRIBUTE_PURE
 cmpstringp (const void *p1, const void *p2)
 {

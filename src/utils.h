@@ -182,6 +182,13 @@ enum MODETYPE
 long double
 mode_value ( const long double * const values, size_t n, enum MODETYPE type);
 
+/*
+ Given an array of doubles, return the mode/anti-mode values.
+ */
+long double
+trimmed_mean_value ( const long double * const values, size_t n,
+		     const long double trimmed_mean_percent);
+
 
 /*
  comparison functions, to be used with 'qsort ()'

@@ -201,6 +201,16 @@ my @Tests =
   ['e102', '--output-delimiter "XX"', {IN_PIPE=>""}, {EXIT=>1},
    {ERR=>"$prog: the delimiter must be a single character\n"}],
 
+   # values for trimmean operation
+  ['e103','trimmean:12  1',    {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: invalid trim mean value 12 (expected 0 <= X <= 0.5)\n"}],
+  ['e104','trimmean:0.51  1',    {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: invalid trim mean value 0.51 (expected 0 <= X <= 0.5)\n"}],
+  ['e105','trimmean:-32  1',    {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: invalid parameter - for operation 'trimmean'\n"}],
+  ['e106','trimmean:1:2  1',    {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: too many parameters for operation 'trimmean'\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
