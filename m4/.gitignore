@@ -160,3 +160,5 @@
 /stpcpy.m4
 /getprogname.m4
 /limits-h.m4
+/asm-underscore.m4
+/host-cpu-c-abi.m4
