@@ -44,7 +44,7 @@ When sending messages to bug-datamash@gnu.org :
 
 
 
-Copyright (C) 2017 Assaf Gordon <assafgordon@gmail.com>
+Copyright (C) 2017-2018 Assaf Gordon <assafgordon@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

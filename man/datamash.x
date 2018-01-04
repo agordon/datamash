@@ -1,5 +1,5 @@
 ." GNU Datamash - manual page
-." Copyright (C) 2014-2017 Assaf Gordon <assafgordon@gmail.com>
+." Copyright (C) 2014-2018 Assaf Gordon <assafgordon@gmail.com>
 [NAME]
 datamash - command-line calculations
 

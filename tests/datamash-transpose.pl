@@ -4,7 +4,7 @@
   Tests for 'transpose' and 'reverse' operation modes.
 
 
-   Copyright (C) 2013-2017 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2013-2018 Assaf Gordon <assafgordon@gmail.com>
 
    This file is part of GNU Datamash.
 

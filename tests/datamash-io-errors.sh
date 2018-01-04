@@ -1,7 +1,7 @@
 #!/bin/sh
 #   Unit Tests for GNU Datamash - I/O error simulation
 
-#    Copyright (C) 2014-2017 Assaf Gordon <assafgordon@gmail.com>
+#    Copyright (C) 2014-2018 Assaf Gordon <assafgordon@gmail.com>
 #
 #    This file is part of GNU Datamash.
 #

@@ -15,7 +15,7 @@
 This manual is for GNU Datamash (version @value{VERSION}, @value{UPDATED}),
 which provides command-line computations on input files.
 
-Copyright @copyright{} 2014-2017 Assaf Gordon.
+Copyright @copyright{} 2014-2018 Assaf Gordon.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
