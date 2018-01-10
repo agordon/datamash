@@ -2,6 +2,8 @@
 
 ** New Features
 
+  New option: -R/--round=N rounds numeric values to N decimal places.
+
   New option: --output-delimiter=X overrides -t/-W.
 
   New operation: trimmean (trimmed mean value).

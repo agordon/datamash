@@ -295,6 +295,11 @@ Use character @var{X} instead as output field delimiter.
 This option overrides @option{--field-separator}/@option{-t}/
 @option{--whitespace}/@option{-W}.
 
+@item --round=@var{N}
+@itemx -R @var{N}
+@opindex --round
+@opindex -R
+Round numeric output to @var{N} decimal places.
 
 @item --whitespace
 @itemx -W

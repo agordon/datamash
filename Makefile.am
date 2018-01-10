@@ -125,6 +125,7 @@ TESTS = \
 	tests/datamash-check.pl \
 	tests/datamash-pair-tests.pl \
 	tests/datamash-check-tabular.pl \
+	tests/datamash-output-format.pl \
 	tests/datamash-sort-header.sh \
 	tests/datamash-sort-errors.sh \
 	tests/datamash-io-errors.sh \

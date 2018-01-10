@@ -42,8 +42,10 @@ extern int out_tab ;
 /* Global case-sensitivity option. Defaults to 'true' . */
 extern bool case_sensitive ;
 
-/* precision used with printf "%.*Lg" */
-extern int numeric_output_precision;
+/* Numeric output format (default: "%.14Lg" */
+extern char* numeric_output_format;
+/* number of bytes to allocate for output buffer */
+extern int   numeric_output_bufsize;
 
 /* The character used to separate collapsed/uniqued strings */
 extern char collapse_separator;
@@ -78,5 +80,9 @@ print_line_separator ()
 {
   putchar (eolchar);
 }
+
+
+void
+set_numeric_output_precision(const char* digits);
 
 #endif

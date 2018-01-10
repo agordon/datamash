@@ -742,9 +742,9 @@ field_op_summarize_empty (struct fieldop *op)
 
   if (op->res_type==NUMERIC_RESULT)
     {
-      field_op_reserve_out_buf (op, numeric_output_precision*2);
+      field_op_reserve_out_buf (op, numeric_output_bufsize);
       snprintf (op->out_buf, op->out_buf_alloc,
-                "%.*Lg", numeric_output_precision, numeric_result);
+                numeric_output_format, numeric_result);
     }
 }
 
@@ -970,9 +970,9 @@ field_op_summarize (struct fieldop *op)
 
   if (op->res_type==NUMERIC_RESULT)
     {
-      field_op_reserve_out_buf (op, numeric_output_precision*2);
+      field_op_reserve_out_buf (op, numeric_output_bufsize);
       snprintf (op->out_buf, op->out_buf_alloc,
-                "%.*Lg", numeric_output_precision, numeric_result);
+                numeric_output_format, numeric_result);
     }
 }
 

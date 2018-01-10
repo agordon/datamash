@@ -211,6 +211,16 @@ my @Tests =
   ['e106','trimmean:1:2  1',    {IN_PIPE=>""}, {EXIT=>1},
    {ERR=>"$prog: too many parameters for operation 'trimmean'\n"}],
 
+  # Rounding
+  ['e110','--round ""', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: missing rounding digits value\n"}],
+  ['e111','--round "3a"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: invalid rounding digits value '3a'\n"}],
+  # Rounding Currently hard-coded to 1 to 50 decimal-point digits.
+  ['e112','--round "0"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: invalid rounding digits value '0'\n"}],
+  ['e113','--round "51"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: invalid rounding digits value '51'\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

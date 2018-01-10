@@ -113,7 +113,7 @@ enum
   UNDOC_RMDUP_TEST
 };
 
-static char const short_options[] = "sfF:izg:t:HW";
+static char const short_options[] = "sfF:izg:t:HWR:";
 
 static struct option const long_options[] =
 {
@@ -131,6 +131,7 @@ static struct option const long_options[] =
   {"sort", no_argument, NULL, 's'},
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
   {"narm", no_argument, NULL, REMOVE_NA_VALUES_OPTION},
+  {"round", required_argument, NULL, 'R'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   /* Undocumented options */
@@ -256,6 +257,9 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 "), stdout);
       fputs (_("\
       --narm                skip NA/NaN values\n\
+"), stdout);
+      fputs (_("\
+  -R, --round=N             round numeric output to N decimal places\n\
 "), stdout);
       fputs (_("\
   -W, --whitespace          use whitespace (one or more spaces and/or tabs)\n\
@@ -1165,6 +1169,10 @@ int main (int argc, char* argv[])
           input_header = output_header = true;
           break;
 
+	case 'R':
+	  set_numeric_output_precision (optarg);
+	  break;
+
         case 's':
           pipe_through_sort = true;
           break;
@@ -1220,7 +1228,6 @@ int main (int argc, char* argv[])
           usage (EXIT_FAILURE);
         }
     }
-
 
   if (argc <= optind)
     {

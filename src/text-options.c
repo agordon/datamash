@@ -20,12 +20,13 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
-
+#include <float.h>
 #include <ctype.h>
 #include <stdbool.h>
 
 #include "system.h"
 
+#include "die.h"
 #include "text-options.h"
 
 /* The character marking end of line. Default to \n. */
@@ -41,7 +42,10 @@ int out_tab= '\t';
 bool case_sensitive = true;
 
 /* In the future: allow users to change this */
-int numeric_output_precision = 14;
+char* numeric_output_format = "%.14Lg";
+
+/* number of bytes to allocate for output buffer */
+int   numeric_output_bufsize = 200;
 
 /* The character used to separate collapsed/uniqued strings */
 /* In the future: allow users to change this */
@@ -78,3 +82,37 @@ init_blank_table (void)
    See: http://stackoverflow.com/a/16245669 */
 void print_field_separator ();
 void print_line_separator ();
+
+
+
+/* Calculate the required size of the output buffer */
+static void
+finalize_numeric_output_buffer()
+{
+  char c;
+  long double d = LDBL_MAX;
+  int n = snprintf (&c, 1, numeric_output_format, d);
+  numeric_output_bufsize = n + 100 ;
+}
+
+void
+set_numeric_output_precision(const char* digits)
+{
+  long int l;
+  char *p;
+  char tmp[100];
+
+  if (digits == NULL || digits[0] == '\0')
+    die (EXIT_FAILURE, 0, _("missing rounding digits value"));
+
+  errno = 0;
+  l = strtol (digits, &p, 10);
+  if (errno != 0 || *p != '\0' || l <=0 || l> 50)
+    die (EXIT_FAILURE, 0, _("invalid rounding digits value %s"),
+	 quote (digits));
+
+  snprintf (tmp, sizeof (tmp), "%%.%dLf", (int)l);
+  numeric_output_format = xstrdup (tmp);
+
+  finalize_numeric_output_buffer ();
+}
