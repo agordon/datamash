@@ -15,7 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with GNU Datamash.  If not, see <http://www.gnu.org/licenses/>.
+   along with GNU Datamash.  If not, see <https://www.gnu.org/licenses/>.
 */
 #ifndef __DOUBLE_FORMAT_H__
 #define __DOUBLE_FORMAT_H__

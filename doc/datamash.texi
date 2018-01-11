@@ -76,7 +76,7 @@ which provides command-line computations on input files.
 @cindex overview
 
 The @command{datamash} program
-(@url{http://www.gnu.org/software/datamash}) performs calculation (e.g.
+(@url{https://www.gnu.org/software/datamash}) performs calculation (e.g.
 @emph{sum,}, @emph{count}, @emph{min}, @emph{max}, @emph{skewness},
 @emph{standard deviation}) on input files.
 
@@ -485,7 +485,7 @@ p-value of the D'Agostino-Pearson Omnibus test for normality.
 
 @unnumberedsec Equivalent R functions
 GNU Datamash is designed to closely follow R project's
-(@url{http://www.r-project.org/}) statistical functions.
+(@url{https://www.r-project.org/}) statistical functions.
 See the @file{files/operators.R} file
 for the R equivalent code for each of datamash's operators.
 When building @command{datamash} from source code on your local computer,
@@ -928,7 +928,7 @@ above for an example).
 @cindex reverse, and transpose
 @cindex transpose, and reverse
 Reverse and Transpose can be combined to achieve various manipulations.
-(reminder: @url{http://www.gnu.org/software/coreutils/tac,tac} can be
+(reminder: @url{https://www.gnu.org/software/coreutils/tac,tac} can be
 used to reverse lines in a file):
 
 @example

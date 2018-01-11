@@ -15,7 +15,7 @@
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Compute.  If not, see <http://www.gnu.org/licenses/>.
+## along with Compute.  If not, see <https://www.gnu.org/licenses/>.
 
 ##
 ## A short R script to generate random data for the 'scores' example.

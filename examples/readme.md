@@ -237,4 +237,4 @@ Strand information is in column 4. How many transcripts are in each chromsomse A
 
 ## More Information
 
-For more information about `datamash` usage, run `datamash --help`, and the [datamash Website](http://www.gnu.org/software/datamash).
+For more information about `datamash` usage, run `datamash --help`, and the [datamash Website](https://www.gnu.org/software/datamash).

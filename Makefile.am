@@ -250,7 +250,7 @@ include $(top_srcdir)/doc/local.mk
 ## using gnulib's pmccabe2html module
 
 cyclo_sources = ${top_srcdir}/src/*.[ch]
-svweburl="http://git.savannah.gnu.org/cgit/"
+svweburl="https://git.savannah.gnu.org/cgit/"
 
 cyclo-$(PACKAGE).html: $(cyclo_sources)
 	$(PMCCABE) $(cyclo_sources) \
@@ -258,7 +258,7 @@ cyclo-$(PACKAGE).html: $(cyclo_sources)
 		| $(AWK) -f ${top_srcdir}/build-aux/pmccabe2html \
 			-v lang=html -v name="$(PACKAGE_NAME)" \
 			-v vcurl="$(svweburl)/$(PACKAGE).git/tree/%FILENAME%" \
-			-v url="http://www.gnu.org/software/$(PACKAGE)/" \
+			-v url="https://www.gnu.org/software/$(PACKAGE)/" \
 			-v css=${top_srcdir}/build-aux/pmccabe.css \
 			-v cut_dir=${top_srcdir}/ \
 			> $@-tmp

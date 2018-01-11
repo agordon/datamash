@@ -8,7 +8,7 @@ it is designed to be portable and reliable, and aid researchers
 to easily automate analysis pipelines, without writing code or even
 short scripts.
 
-Home page: http://www.gnu.org/software/datamash
+Home page: https://www.gnu.org/software/datamash
 
 
 Usage
@@ -19,7 +19,7 @@ See `datamash --help` for basic usage information.
 See `man datamash` for examples and operation details.
 
 For the instrucions manual, see `info datamash` or visit
-  http://www.gnu.org/software/datamash/manual/
+  https://www.gnu.org/software/datamash/manual/
 
 
 
@@ -53,13 +53,13 @@ what is the average, grouped by college major?
     Life-Sciences    55.3333
     Engineering      66.5385
 
-See more examples at http://www.gnu.org/software/datamash/examples/
+See more examples at https://www.gnu.org/software/datamash/examples/
 
 
 Download and Installation
 =========================
 
-Download the latest source code at http://www.gnu.org/software/datamash .
+Download the latest source code at https://www.gnu.org/software/datamash .
 
 General installation commands:
 
@@ -71,7 +71,7 @@ General installation commands:
     $ sudo make install
 
 See Platform/OS-specific download instructions at
-  http://www.gnu.org/software/datamash/download/
+  https://www.gnu.org/software/datamash/download/
 
 
 To build from latest git sources, see the HACKING.md file. This file is
@@ -122,7 +122,7 @@ Questions and Bug Reports
 =========================
 
 - Please send questions and bug reports to bug-datamash@gnu.org .
-- Searchable archive at http://lists.gnu.org/archive/html/bug-datamash .
+- Searchable archive at https://lists.gnu.org/archive/html/bug-datamash .
 - Subscribe at https://lists.gnu.org/mailman/listinfo/bug-datamash .
 
 

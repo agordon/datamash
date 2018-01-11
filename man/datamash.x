@@ -605,5 +605,5 @@ $ cat input.txt \\
 
 [ADDITIONAL INFORMATION]
 See
-.UR http://www.gnu.org/software/datamash
-GNU Datamash Website (http://www.gnu.org/software/datamash)
+.UR https://www.gnu.org/software/datamash
+GNU Datamash Website (https://www.gnu.org/software/datamash)

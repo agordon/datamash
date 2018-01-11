@@ -199,9 +199,9 @@ To show hide detailed build commands (showing only the file being built), run:
 The build system uses **non recursive makefile** structure.  
 Search for the 1997 paper "Recursive Make Considered Harmful" by Peter Miller,  
 and see examples of switching to non-recursive make in
-[GNU Coreutils](http://git.savannah.gnu.org/cgit/coreutils.git/log/?qt=grep&q=recursive+make),
-[GNU Hello](http://git.savannah.gnu.org/cgit/hello.git/log/?qt=grep&q=recursive),
-[GNU Datamash](http://git.savannah.gnu.org/cgit/datamash.git/commit/?id=9f4afd218aadc306f888d57295df3f77ae37be1f)
+[GNU Coreutils](https://git.savannah.gnu.org/cgit/coreutils.git/log/?qt=grep&q=recursive+make),
+[GNU Hello](https://git.savannah.gnu.org/cgit/hello.git/log/?qt=grep&q=recursive),
+[GNU Datamash](https://git.savannah.gnu.org/cgit/datamash.git/commit/?id=9f4afd218aadc306f888d57295df3f77ae37be1f)
 
 ### Makefile structure
 
@@ -235,4 +235,4 @@ such as:
     ./configure --host=x86_64-w64-mingw32
 
 Compilation under Cygwin does not require this flag.  
-See related discussion: <http://lists.gnu.org/archive/html/bug-gnulib/2014-09/msg00052.html>
+See related discussion: <https://lists.gnu.org/archive/html/bug-gnulib/2014-09/msg00052.html>
