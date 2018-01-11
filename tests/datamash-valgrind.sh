@@ -187,4 +187,10 @@ cmp wide wide_orig ||
   { warn_ "base64 decoding failed (decoded output does not match original)";
     fail=1 ; }
 
+## Test large output formats
+cat wide | valgrind --track-origins=yes  --leak-check=full \
+                  --show-reachable=yes  --error-exitcode=1 \
+                  datamash --format "%05000.5000f" sum 1 > /dev/null ||
+  { warn_ "custom-format failed" ; fail=1 ; }
+
 Exit $fail

@@ -27,6 +27,7 @@
 #include "system.h"
 
 #include "die.h"
+#include "double-format.h"
 #include "text-options.h"
 
 /* The character marking end of line. Default to \n. */
@@ -114,5 +115,12 @@ set_numeric_output_precision(const char* digits)
   snprintf (tmp, sizeof (tmp), "%%.%dLf", (int)l);
   numeric_output_format = xstrdup (tmp);
 
+  finalize_numeric_output_buffer ();
+}
+
+void
+set_numeric_printf_format (const char* format)
+{
+  numeric_output_format = validate_double_format (format);
   finalize_numeric_output_buffer ();
 }

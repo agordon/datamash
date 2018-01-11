@@ -39,6 +39,7 @@ datamash_SOURCES = src/system.h \
 	       src/op-parser.c src/op-parser.h \
 	       src/field-ops.c src/field-ops.h \
 	       src/crosstab.c src/crosstab.h \
+	       src/double-format.c src/double-format.h \
 	       src/datamash.c
 
 datamash_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)

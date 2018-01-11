@@ -221,6 +221,31 @@ my @Tests =
    {ERR=>"$prog: invalid rounding digits value '0'\n"}],
   ['e113','--round "51"', {IN_PIPE=>""}, {EXIT=>1},
    {ERR=>"$prog: invalid rounding digits value '51'\n"}],
+
+  # Custom Output Formats
+  ['e120','--format ""', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '' has no % directive\n"}],
+  ['e121','--format "foobar"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format 'foobar' has no % directive\n"}],
+  ['e122','--format "aa%%ff"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format 'aa%%ff' has no % directive\n"}],
+  ['e123','--format "%Lg"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%Lg' has unknown/invalid type %L directive\n"}],
+  ['e124','--format "%*g"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%*g' has unknown/invalid type %* directive\n"}],
+  ['e125','--format "%g %f"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%g %f' has too many % directives\n"}],
+  ['e126','--format "%"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%' missing valid type after '%'\n"}],
+  ['e127','--format "%3"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%3' missing valid type after '%'\n"}],
+  ['e128','--format "%#.4"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%#.4' missing valid type after '%'\n"}],
+  ['e129','--format "%f%"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%f%' has too many % directives\n"}],
+  ['e130','--format "%f%3"', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: format '%f%3' has too many % directives\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

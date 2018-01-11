@@ -85,4 +85,7 @@ print_line_separator ()
 void
 set_numeric_output_precision(const char* digits);
 
+void
+set_numeric_printf_format (const char* format);
+
 #endif

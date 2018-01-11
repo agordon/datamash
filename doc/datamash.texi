@@ -276,6 +276,11 @@ value.
 
 @table @option
 
+@item --format=@var{FORMAT}
+@opindex --format
+print numeric values with printf style floating-point @var{FORMAT}.
+
+
 @item --field-separator=@var{x}
 @itemx -t @var{x}
 @opindex --field-separator

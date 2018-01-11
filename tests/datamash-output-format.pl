@@ -63,6 +63,48 @@ my @Tests =
   # Test multiple rounding options
   ['r8', '--round 3 -R 7 sum 1',   {IN_PIPE=>$in1},  {OUT => "1.0000090\n"}],
   ['r9', '--round 7 -R 3 sum 1',   {IN_PIPE=>$in1},  {OUT => "1.000\n"}],
+
+
+  # Test Custom formats: %f
+  ['f1', '--format "%07.3f" sum 1',  {IN_PIPE=>$in1},  {OUT => "001.000\n"}],
+  ['f2', '--format "%.7f"   sum 1',  {IN_PIPE=>$in1},  {OUT => "1.0000090\n"}],
+  ['f3', '--format "%10f"   sum 1',  {IN_PIPE=>$in1},  {OUT => "  1.000009\n"}],
+  ['f4', '--format "%-10f"  sum 1',  {IN_PIPE=>$in1},  {OUT => "1.000009  \n"}],
+  ['f5', '--format "%+10f"  sum 1',  {IN_PIPE=>$in1},  {OUT => " +1.000009\n"}],
+  # Test %#f (alternate form: always show decimal point)
+  ['f6', '--format "%.0f"   sum 1',  {IN_PIPE=>$in1},  {OUT => "1\n"}],
+  ['f7', '--format "%#.0f"  sum 1',  {IN_PIPE=>$in1},  {OUT => "1.\n"}],
+
+  # Test Custom formats: %g
+  ['g1', '--format "%g"    sum 1',  {IN_PIPE=>$in1},  {OUT => "1.00001\n"}],
+  ['g2', '--format "%10g"  sum 1',  {IN_PIPE=>$in1},  {OUT => "   1.00001\n"}],
+  ['g3', '--format "%010g" sum 1',  {IN_PIPE=>$in1},  {OUT => "0001.00001\n"}],
+  ['g4', '--format "%.10g" sum 1',  {IN_PIPE=>$in1},  {OUT => "1.000009\n"}],
+  ['g5', '--format "%.3g"  sum 1',  {IN_PIPE=>$in1},  {OUT => "1\n"}],
+  # Test %#g (alternate form: don't trim zero decimal digits)
+  ['g6', '--format "%.4g"  sum 1',  {IN_PIPE=>$in1},  {OUT => "1\n"}],
+  ['g7', '--format "%#.4g" sum 1',  {IN_PIPE=>$in1},  {OUT => "1.000\n"}],
+
+  # Test Custom formats: %e
+  ['e1', '--format "%e"    sum 1', {IN_PIPE=>$in1}, {OUT=>"1.000009e+00\n"}],
+  ['e2', '--format "%.3e"  sum 1', {IN_PIPE=>$in1}, {OUT=>"1.000e+00\n"}],
+
+  # Test Custom formats: %a
+  ['a1', '--format "%0.3a" sum 1', {IN_PIPE=>$in1}, {OUT=>"0x8.000p-3\n"}],
+
+
+  # Custom formats can use lots of memory
+  ['m1', '--format "%04000.0f"   sum 1',  {IN_PIPE=>$in1},
+   {OUT => "0" x 3999 . "1\n"}],
+
+  # due to binary floating representation, some decimal point digits won't be
+  # zero (e.g. 1.0000090000000000000000000000000523453254320000000...).
+  # The OUT_SUBST replaces exactly 3994 digits (as expected from the format)
+  # with an "X".
+  ['m2', '--format "%.4000f"   sum 1',  {IN_PIPE=>$in1},
+   {OUT => "1.000009X\n"},
+   {OUT_SUBST => 's/^(1\.000009)([0-9]{3994})$/\1X/'}],
+
 );
 
 

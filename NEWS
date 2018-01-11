@@ -2,6 +2,13 @@
 
 ** New Features
 
+  New option: --format=FMT sets printf style floating-point format.
+  Example:
+     $ echo '50.5' | datamash --format "%07.3f" sum 1
+     050.500
+     $ echo '50.5' | datamash --format "%07.3e" sum 1
+     5.050e+01
+
   New option: -R/--round=N rounds numeric values to N decimal places.
 
   New option: --output-delimiter=X overrides -t/-W.

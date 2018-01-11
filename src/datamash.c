@@ -107,6 +107,7 @@ enum
   NO_STRICT_OPTION,
   REMOVE_NA_VALUES_OPTION,
   OUTPUT_DELIMITER_OPTION,
+  CUSTOM_FORMAT_OPTION,
   UNDOC_PRINT_INF_OPTION,
   UNDOC_PRINT_NAN_OPTION,
   UNDOC_PRINT_PROGNAME_OPTION,
@@ -127,6 +128,7 @@ static struct option const long_options[] =
   {"headers", no_argument, NULL, 'H'},
   {"full", no_argument, NULL, 'f'},
   {"filler", required_argument, NULL, 'F'},
+  {"format", required_argument, NULL, CUSTOM_FORMAT_OPTION},
   {"output-delimiter", required_argument, NULL, OUTPUT_DELIMITER_OPTION},
   {"sort", no_argument, NULL, 's'},
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
@@ -250,6 +252,10 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs (_("General Options:\n"),stdout);
       fputs (_("\
   -t, --field-separator=X   use X instead of TAB as field delimiter\n\
+"), stdout);
+      fputs (_("\
+      --format=FORMAT       print numeric values with printf style\n\
+                            floating-point FORMAT.\n\
 "), stdout);
       fputs (_("\
       --output-delimiter=X  use X instead as output field delimiter\n\
@@ -1179,6 +1185,10 @@ int main (int argc, char* argv[])
 
         case NO_STRICT_OPTION:
           strict = false;
+          break;
+
+        case CUSTOM_FORMAT_OPTION:
+          set_numeric_printf_format (optarg);
           break;
 
         case REMOVE_NA_VALUES_OPTION:
