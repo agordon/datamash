@@ -88,7 +88,7 @@ void print_line_separator ();
 
 /* Calculate the required size of the output buffer */
 static void
-finalize_numeric_output_buffer()
+finalize_numeric_output_buffer ()
 {
   char c;
   long double d = LDBL_MAX;
@@ -97,7 +97,7 @@ finalize_numeric_output_buffer()
 }
 
 void
-set_numeric_output_precision(const char* digits)
+set_numeric_output_precision (const char* digits)
 {
   long int l;
   char *p;

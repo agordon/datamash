@@ -28,7 +28,6 @@ hence FSF copyright.
 #include "system.h"
 #include "die.h"
 #include "quote.h"
-#include "ignore-value.h"
 #include "xalloc.h"
 
 
