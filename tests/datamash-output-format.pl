@@ -90,7 +90,9 @@ my @Tests =
   ['e2', '--format "%.3e"  sum 1', {IN_PIPE=>$in1}, {OUT=>"1.000e+00\n"}],
 
   # Test Custom formats: %a
-  ['a1', '--format "%0.3a" sum 1', {IN_PIPE=>$in1}, {OUT=>"0x8.000p-3\n"}],
+  # Disable the test for now. Valid output can differ (e.g. 0x8.000p-3 and
+  # 0x1.000p0 ).
+  # ['a1', '--format "%0.3a" sum 1', {IN_PIPE=>$in1}, {OUT=>"0x8.000p-3\n"}],
 
 
   # Custom formats can use lots of memory
