@@ -98,12 +98,13 @@ my @Tests =
    {OUT => "0" x 3999 . "1\n"}],
 
   # due to binary floating representation, some decimal point digits won't be
-  # zero (e.g. 1.0000090000000000000000000000000523453254320000000...).
-  # The OUT_SUBST replaces exactly 3994 digits (as expected from the format)
+  # zero (e.g. 1.0000090000000000000000000000000523453254320000000... or
+  # 1.000008999999...).
+  # The OUT_SUBST replaces exactly 3995 digits (as expected from the format)
   # with an "X".
   ['m2', '--format "%.4000f"   sum 1',  {IN_PIPE=>$in1},
-   {OUT => "1.000009X\n"},
-   {OUT_SUBST => 's/^(1\.000009)([0-9]{3994})$/\1X/'}],
+   {OUT => "1.00000X\n"},
+   {OUT_SUBST => 's/^(1\.00000)([0-9]{3995})$/\1X/'}],
 
 );
 
