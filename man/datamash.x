@@ -178,7 +178,7 @@ inter-quartile range
 
 .TP
 .B perc[:PERCENTILE]
-percentile value \fPERCENTILE\fR (defaults to 95).
+percentile value \fBPERCENTILE\fR (defaults to 95).
 
 .TP
 .B mode
