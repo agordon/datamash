@@ -64,6 +64,10 @@ bool strict = true;
    will be filled with this value */
 char* missing_field_filler = "N/A";
 
+/* if true, skip comments line (lines starting with optional whitespace
+   followed by '#' or ';'. See line_record_is_comment().  */
+bool skip_comments = false;
+
 #define UCHAR_LIM (UCHAR_MAX + 1)
 bool blanks[UCHAR_LIM];
 

@@ -62,6 +62,10 @@ extern bool strict;
    will be filled with this value */
 extern char* missing_field_filler;
 
+/* if true, skip comments line (lines starting with optional whitespace
+   followed by '#' or ';'. See line_record_is_comment().  */
+extern bool skip_comments;
+
 #define UCHAR_LIM (UCHAR_MAX + 1)
 extern bool blanks[UCHAR_LIM];
 

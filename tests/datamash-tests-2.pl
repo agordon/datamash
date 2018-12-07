@@ -292,6 +292,14 @@ X	round(X)	floor(X)	ceil(X)	trunc(X)	frac(X)
 1.1	1	1	2	1	0.1
 EOF
 
+
+my $in_comments=<<'EOF';
+ #foo	3
+bar	5
+;baz	7
+EOF
+
+
 my @Tests =
 (
   # Test 'min' + --full
@@ -300,7 +308,7 @@ my @Tests =
   # Test with "--full", "i2" and "i6" should be displayed
   ['slct2', '-t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 3 i2 3\nB 0 i6 0\n"}],
-  # --full with --sort => should not change results
+ # --full with --sort => should not change results
   ['slct3', '-s -t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 3 i2 3\nB 0 i6 0\n"}],
 
@@ -498,7 +506,17 @@ my @Tests =
   ['odlm8', '--output-delimiter "x" -W --output-delimiter "y" last 1 last 2',
    {IN_PIPE=>$in_full1}, {OUT=>"By3\n"}],
 
+
+  # Test -C/--skip-comments option
+  ['sc1', 'sum 2',      {IN_PIPE=>$in_comments}, {OUT=>"15\n"}],
+  ['sc2', '-C sum 2',   {IN_PIPE=>$in_comments}, {OUT=>"5\n"}],
+  ['sc3', 'reverse',    {IN_PIPE=>$in_comments},
+   {OUT=>"3	 #foo\n" .
+	 "5	bar\n" .
+	 "7	;baz\n"}],
+  ['sc4', '-C reverse', {IN_PIPE=>$in_comments}, {OUT=>"5	bar\n"}],
 );
+
 
 if ($have_stable_sort) {
   push @Tests, (

@@ -114,7 +114,7 @@ enum
   UNDOC_RMDUP_TEST
 };
 
-static char const short_options[] = "sfF:izg:t:HWR:";
+static char const short_options[] = "sfF:izg:t:HWR:C";
 
 static struct option const long_options[] =
 {
@@ -123,6 +123,7 @@ static struct option const long_options[] =
   {"whitespace", no_argument, NULL, 'W'},
   {"group", required_argument, NULL, 'g'},
   {"ignore-case", no_argument, NULL, 'i'},
+  {"skip-comments", no_argument, NULL, 'C'},
   {"header-in", no_argument, NULL, INPUT_HEADER_OPTION},
   {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
   {"headers", no_argument, NULL, 'H'},
@@ -214,6 +215,10 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs ("\n", stdout);
 
       fputs (_("Grouping Options:\n"),stdout);
+      fputs (_("\
+  -C, --skip-comments       skip comment lines (starting with '#' or ';'\n\
+                              and optional whitespace)\n\
+"), stdout);
       fputs (_("\
   -f, --full                print entire input line before op results\n\
                               (default: print only the grouped keys)\n\
@@ -509,7 +514,7 @@ process_input_header (FILE *stream)
   struct line_record_t lr;
 
   line_record_init (&lr);
-  if (line_record_fread (&lr, stream, eolchar))
+  if (line_record_fread (&lr, stream, eolchar, skip_comments))
     {
       build_input_line_headers (&lr, true);
       line_number++;
@@ -620,7 +625,7 @@ process_file ()
     {
       bool new_group = false;
 
-      if (!line_record_fread (thisline, input_stream, eolchar))
+      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
         break;
       line_number++;
 
@@ -696,7 +701,7 @@ transpose_file ()
       num_lines++;
       line_record_init (thisline);
 
-      if (!line_record_fread ( thisline, input_stream, eolchar))
+      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
         break;
       line_number++;
 
@@ -753,7 +758,7 @@ reverse_fields_in_file ()
 
   while (true)
     {
-      if (!line_record_fread (thisline, input_stream, eolchar))
+      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
         break;
       line_number++;
 
@@ -822,7 +827,7 @@ noop_file ()
   line_record_init (thisline);
   while (true)
     {
-      if (!line_record_fread (thisline, input_stream, eolchar))
+      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
         break;
       line_number++;
 
@@ -859,7 +864,7 @@ tabular_check_file ()
 
   while (true)
     {
-      if (!line_record_fread (thisline, input_stream, eolchar))
+      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
         break;
       line_number++;
 
@@ -966,7 +971,7 @@ remove_dups_in_file ()
 
   if (input_header)
     {
-      if (line_record_fread (thisline, input_stream, eolchar))
+      if (line_record_fread (thisline, input_stream, eolchar, skip_comments))
         {
           line_number++;
 
@@ -996,7 +1001,7 @@ remove_dups_in_file ()
 
   while (true)
     {
-      if (!line_record_fread (thisline, input_stream, eolchar))
+      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
         break;
       line_number++;
 
@@ -1142,6 +1147,10 @@ int main (int argc, char* argv[])
     {
       switch (optc)
         {
+	case 'C':
+	  skip_comments = true;
+	  break;
+
         case 'F':
           missing_field_filler = optarg;
           break;

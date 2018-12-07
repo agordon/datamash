@@ -157,14 +157,28 @@ line_record_parse_fields (struct line_record_t *lr, int field_delim)
 }
 
 
+static bool
+line_record_is_comment (const struct line_record_t* lr)
+{
+  const char* pch = line_record_buffer (lr);
+
+  /* Skip white space at beginning of line */
+  size_t s = strspn (pch, " \t");
+  /* First non-whitespace character */
+  char c = pch[s];
+  return (c=='#' || c==';');
+}
+
 bool
 line_record_fread (struct /* in/out */ line_record_t* lr,
-                  FILE *stream, char delimiter)
+                  FILE *stream, char delimiter, bool skip_comments)
 {
-  if (readlinebuffer_delim (&lr->lbuf, stream, delimiter) == 0)
-    return false;
+  do {
+    if (readlinebuffer_delim (&lr->lbuf, stream, delimiter) == 0)
+      return false;
+    linebuffer_nullify (&lr->lbuf);
+  } while (skip_comments && line_record_is_comment (lr));
 
-  linebuffer_nullify (&lr->lbuf);
 
   line_record_parse_fields (lr, in_tab);
   return true;

@@ -340,6 +340,27 @@ Social-Sciences   60.2          16.6
 .fi
 .PP
 
+.SS "Skipping comment lines"
+Use \fB\-C\fR \fB(\-\-skip\-comments)\fR to skip lines starting with \'#\'
+or \'\;\' characters (and optional whitespace before them):
+.PP
+.nf
+.RS
+$ cat in.txt
+ #foo   3
+bar     5
+;baz    7
+
+$ datamash sum 2 < in.txt
+15
+
+$ datamash \-C sum 2 < in.txt
+5
+.RE
+.fi
+.PP
+
+
 
 .SS "Multiple fields"
 
