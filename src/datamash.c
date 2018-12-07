@@ -1064,7 +1064,12 @@ open_input ()
              the 'sort' child-process */
           process_input_header (stdin);
         }
+#ifdef SORT_WITHOUT_LOCALE
+      /* For mingw/windows systems */
+      strcat (cmd,"sort ");
+#else
       strcat (cmd,"LC_ALL=C sort ");
+#endif
       if (!case_sensitive)
         strcat (cmd,"-f ");
 #ifdef HAVE_STABLE_SORT
@@ -1133,7 +1138,12 @@ int main (int argc, char* argv[])
 
   set_program_name (argv[0]);
 
+#ifdef FORCE_C_LOCALE
+  /* Used on mingw/windows system */
+  setlocale (LC_ALL, "C");
+#else
   setlocale (LC_ALL, "");
+#endif
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
