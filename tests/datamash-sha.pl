@@ -2,7 +2,7 @@
 =pod
    Unit Tests for GNU Datamash - tests sha1/256/5125 operations
 
-   Copyright (C) 2013-2018 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2013-2019 Assaf Gordon <assafgordon@gmail.com>
 
    This file is part of GNU Datamash.
 

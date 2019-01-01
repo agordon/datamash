@@ -1,4 +1,4 @@
-dnl Copyright (C) 2013-2018 Assaf Gordon <assafgordon@gmail.com>
+dnl Copyright (C) 2013-2019 Assaf Gordon <assafgordon@gmail.com>
 dnl
 dnl This file is free software; as a special exception the author gives
 dnl unlimited permission to copy and/or distribute it, with or without
