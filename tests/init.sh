@@ -1,6 +1,6 @@
 # source this file; set up for tests
 
-# Copyright (C) 2009-2016 Free Software Foundation, Inc.
+# Copyright (C) 2009-2019 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,9 @@
 # Running a single test, with verbose output:
 #   $ make check TESTS=test-foo.sh VERBOSE=yes
 #
+# Running a single test, keeping the temporary directory:
+#   $ make check TESTS=test-foo.sh KEEP=yes
+#
 # Running a single test, with single-stepping:
 #   1. Go into a sub-shell:
 #   $ bash
@@ -58,6 +61,19 @@
 #   $ exit
 
 ME_=`expr "./$0" : '.*/\(.*\)$'`
+
+# Prepare PATH_SEPARATOR.
+# The user is always right.
+if test "${PATH_SEPARATOR+set}" != set; then
+  # Determine PATH_SEPARATOR by trying to find /bin/sh in a PATH which
+  # contains only /bin. Note that ksh looks also at the FPATH variable,
+  # so we have to set that as well for the test.
+  PATH_SEPARATOR=:
+  (PATH='/bin;/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 \
+    && { (PATH='/bin:/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 \
+           || PATH_SEPARATOR=';'
+       }
+fi
 
 # We use a trap below for cleanup.  This requires us to go through
 # hoops to get the right exit status transported through the handler.
@@ -128,6 +144,13 @@ else
 fi
 
 # We require $(...) support unconditionally.
+# We require non-surprising "local" semantics (this eliminates dash).
+# This takes the admittedly draconian step of eliminating dash, because the
+# assignment tab=$(printf '\t') works fine, yet preceding it with "local "
+# transforms it into an assignment that sets the variable to the empty string.
+# That is too counter-intuitive, and can lead to subtle run-time malfunction.
+# The example below is less subtle in that with dash, it evokes the run-time
+# exception "dash: 1: local: 1: bad variable name".
 # We require a few additional shell features only when $EXEEXT is nonempty,
 # in order to support automatic $EXEEXT emulation:
 # - hyphen-containing alias names
@@ -151,6 +174,7 @@ fi
 gl_shell_test_script_='
 test $(echo y) = y || exit 1
 f_local_() { local v=1; }; f_local_ || exit 1
+f_dash_local_fail_() { local t=$(printf " 1"); }; f_dash_local_fail_
 score_=10
 if test "$VERBOSE" = yes; then
   test -n "$( (exec 3>&1; set -x; P=1 true 2>&3) 2> /dev/null)" && score_=9
@@ -239,7 +263,7 @@ test -n "$BASH_VERSION" && unalias -a
 # That is part of the shell-selection test above.  Why use aliases rather
 # than functions?  Because support for hyphen-containing aliases is more
 # widespread than that for hyphen-containing function names.
-test -n "$EXEEXT" && shopt -s expand_aliases
+test -n "$EXEEXT" && test -n "$BASH_VERSION" && shopt -s expand_aliases
 
 # Enable glibc's malloc-perturbing option.
 # This is useful for exposing code that depends on the fact that
@@ -287,44 +311,24 @@ compare_dev_null_ ()
   return 2
 }
 
-if diff_out_=`exec 2>/dev/null; diff -u "$0" "$0" < /dev/null` \
-   && diff -u Makefile "$0" 2>/dev/null | grep '^[+]#!' >/dev/null; then
-  # diff accepts the -u option and does not (like AIX 7 'diff') produce an
-  # extra space on column 1 of every content line.
+for diff_opt_ in -u -U3 -c '' no; do
+  test "$diff_opt_" != no &&
+    diff_out_=`exec 2>/dev/null; diff $diff_opt_ "$0" "$0" < /dev/null` &&
+    break
+done
+if test "$diff_opt_" != no; then
   if test -z "$diff_out_"; then
-    compare_ () { diff -u "$@"; }
+    compare_ () { diff $diff_opt_ "$@"; }
   else
     compare_ ()
     {
-      if diff -u "$@" > diff.out; then
-        # No differences were found, but Solaris 'diff' produces output
-        # "No differences encountered". Hide this output.
-        rm -f diff.out
-        true
-      else
-        cat diff.out
-        rm -f diff.out
-        false
-      fi
-    }
-  fi
-elif diff_out_=`exec 2>/dev/null; diff -c "$0" "$0" < /dev/null`; then
-  if test -z "$diff_out_"; then
-    compare_ () { diff -c "$@"; }
-  else
-    compare_ ()
-    {
-      if diff -c "$@" > diff.out; then
-        # No differences were found, but AIX and HP-UX 'diff' produce output
-        # "No differences encountered" or "There are no differences between the
-        # files.". Hide this output.
-        rm -f diff.out
-        true
-      else
-        cat diff.out
-        rm -f diff.out
-        false
-      fi
+      # If no differences were found, AIX and HP-UX 'diff' produce output
+      # like "No differences encountered".  Hide this output.
+      diff $diff_opt_ "$@" > diff.out
+      diff_status_=$?
+      test $diff_status_ -eq 0 || cat diff.out || diff_status_=2
+      rm -f diff.out || diff_status_=2
+      return $diff_status_
     }
   fi
 elif cmp -s /dev/null /dev/null 2>/dev/null; then
@@ -361,11 +365,15 @@ remove_tmp_ ()
 {
   __st=$?
   cleanup_
-  # cd out of the directory we're about to remove
-  cd "$initial_cwd_" || cd / || cd /tmp
-  chmod -R u+rwx "$test_dir_"
-  # If removal fails and exit status was to be 0, then change it to 1.
-  rm -rf "$test_dir_" || { test $__st = 0 && __st=1; }
+  if test "$KEEP" = yes; then
+    echo "Not removing temporary directory $test_dir_"
+  else
+    # cd out of the directory we're about to remove
+    cd "$initial_cwd_" || cd / || cd /tmp
+    chmod -R u+rwx "$test_dir_"
+    # If removal fails and exit status was to be 0, then change it to 1.
+    rm -rf "$test_dir_" || { test $__st = 0 && __st=1; }
+  fi
   exit $__st
 }
 
@@ -434,13 +442,13 @@ path_prepend_ ()
     path_dir_=$1
     case $path_dir_ in
       '') fail_ "invalid path dir: '$1'";;
-      /*) abs_path_dir_=$path_dir_;;
+      /* | ?:*) abs_path_dir_=$path_dir_;;
       *) abs_path_dir_=$initial_cwd_/$path_dir_;;
     esac
     case $abs_path_dir_ in
-      *:*) fail_ "invalid path dir: '$abs_path_dir_'";;
+      *$PATH_SEPARATOR*) fail_ "invalid path dir: '$abs_path_dir_'";;
     esac
-    PATH="$abs_path_dir_:$PATH"
+    PATH="$abs_path_dir_$PATH_SEPARATOR$PATH"
 
     # Create an alias, FOO, for each FOO.exe in this directory.
     create_exe_shims_ "$abs_path_dir_" \
@@ -466,7 +474,6 @@ setup_ ()
   fi
 
   initial_cwd_=$PWD
-  fail=0
 
   pfx_=`testdir_prefix_`
   test_dir_=`mktempd_ "$initial_cwd_" "$pfx_-$ME_.XXXX"` \
@@ -520,7 +527,7 @@ rand_bytes_ ()
   fi
 
   n_plus_50_=`expr $n_ + 50`
-  cmds_='date; date +%N; free; who -a; w; ps auxww; ps ef; netstat -n'
+  cmds_='date; date +%N; free; who -a; w; ps auxww; ps -ef'
   data_=` (eval "$cmds_") 2>&1 | gzip `
 
   # Ensure that $data_ has length at least 50+$n_
@@ -550,8 +557,9 @@ mktempd_ ()
   # Disallow any trailing slash on specified destdir:
   # it would subvert the post-mktemp "case"-based destdir test.
   case $destdir_ in
-  /) ;;
+  / | //) destdir_slash_=$destdir;;
   */) fail_ "invalid destination dir: remove trailing slash(es)";;
+  *) destdir_slash_=$destdir_/;;
   esac
 
   case $template_ in
@@ -561,20 +569,17 @@ mktempd_ ()
   esac
 
   # First, try to use mktemp.
-  d=`unset TMPDIR; { mktemp -d -t -p "$destdir_" "$template_"; } 2>/dev/null` \
-    || fail=1
+  d=`unset TMPDIR; { mktemp -d -t -p "$destdir_" "$template_"; } 2>/dev/null` &&
 
   # The resulting name must be in the specified directory.
-  case $d in "$destdir_"*);; *) fail=1;; esac
+  case $d in "$destdir_slash_"*) :;; *) false;; esac &&
 
   # It must have created the directory.
-  test -d "$d" || fail=1
+  test -d "$d" &&
 
   # It must have 0700 permissions.  Handle sticky "S" bits.
-  perms=`ls -dgo "$d" 2>/dev/null|tr S -` || fail=1
-  case $perms in drwx------*) ;; *) fail=1;; esac
-
-  test $fail = 0 && {
+  perms=`ls -dgo "$d" 2>/dev/null` &&
+  case $perms in drwx--[-S]---*) :;; *) false;; esac && {
     echo "$d"
     return
   }
@@ -593,7 +598,7 @@ mktempd_ ()
   i_=1
   while :; do
     X_=`rand_bytes_ $nx_`
-    candidate_dir_="$destdir_/$base_template_$X_"
+    candidate_dir_="$destdir_slash_$base_template_$X_"
     err_=`mkdir -m 0700 "$candidate_dir_" 2>&1` \
       && { echo "$candidate_dir_"; return; }
     test $MAX_TRIES_ -le $i_ && break;
