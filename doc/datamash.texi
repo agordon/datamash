@@ -725,6 +725,18 @@ datamash: column name 'Foo' not found in input file
 @end example
 
 
+Field names must be escaped with a backslash if they start with a digit
+or contain special characters (dash/minus, colons, commas).
+Note the interplay between escaping with backslash and shell quoting.
+The following equivalent command sum the values of a field named @samp{FOO-BAR}:
+
+@example
+$ datamash -H sum FOO\\-BAR < input.txt
+$ datamash -H sum 'FOO\-BAR' < input.txt
+$ datamash -H sum "FOO\\-BAR" < input.txt
+@end example
+
+
 
 @node Field Delimiters
 @section Field Delimiteres

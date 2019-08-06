@@ -105,6 +105,7 @@ scanner_peek_token ()
 enum TOKEN
 scanner_get_token ()
 {
+  char ident[MAX_IDENTIFIER_LENGTH];
   char *pend;
 
   if (have_peek)
@@ -173,16 +174,41 @@ scanner_get_token ()
       return rc;
     }
 
-  /* a valid identifier ( [a-z_][a-z0-9_]+ ) */
-  if (c_isalpha (*scan_pos) || *scan_pos == '_')
+  /* a valid identifier ( [a-z_][a-z0-9_]+ ),
+     also backslash-CHAR is accepted as part of the identifier,
+     to allow dash, colons, */
+  if (c_isalpha (*scan_pos) || *scan_pos == '_' || *scan_pos == '\\')
     {
-      size_t l=1;
-      char *v=scan_pos+1;
-      while ( c_isalpha (*v) || c_isdigit (*v) || *v=='_' )
-        ++l, ++v;
+      int len = 0;
+      char *v = scan_pos;
+      while (1)
+        {
+          if (c_isalpha (*v) || c_isdigit (*v) || *v=='_' )
+            {
+              // Accept charracter
+            }
+          else if (*v == '\\')
+            {
+              ++v;
+              if (!*v)
+                die (EXIT_FAILURE, 0, _("backslash at end of identifier"));
 
-      set_identifier (scan_pos, l);
-      scan_pos += l;
+              // Accept following character
+            }
+          else
+            break;
+
+          if (len >= (MAX_IDENTIFIER_LENGTH-1))
+            die (EXIT_FAILURE, 0, _("identifier name too long"));
+
+          ident[len++] = *v;
+          ++v;
+        }
+      ident[len] = '\0';
+
+      set_identifier (ident, len);
+      scan_pos = v;
+
       return TOK_IDENTIFIER;
     }
 

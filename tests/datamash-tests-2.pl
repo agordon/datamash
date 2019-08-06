@@ -299,6 +299,13 @@ bar	5
 ;baz	7
 EOF
 
+my $in_esc_ident=<<'EOF';
+A_Chlor_T1h_r1-metaG B 9C -bar
+1 2 3 4
+10 20 30 40
+EOF
+
+
 
 my @Tests =
 (
@@ -519,6 +526,21 @@ my @Tests =
 
   # Bug in mode/antimode in 1.4 and earlier
   ['bug_mode1', 'mode 1', {IN_PIPE=>"-1"}, {OUT=>"-1\n"}],
+
+  ##
+  ## Backslash escaping in identifiers
+  ##
+
+  ## minus in field name
+  ['esc1', '-W -H sum "A_Chlor_T1h_r1\\-metaG"', {IN_PIPE=>$in_esc_ident},
+     {OUT=>"sum(A_Chlor_T1h_r1-metaG)\n11\n"}],
+  # field name starting with an identifier
+  ['esc2', '-W -H sum "\\9C"', {IN_PIPE=>$in_esc_ident},
+   {OUT=>"sum(9C)\n33\n"}],
+  # field name starting with minus
+  ['esc3', '-W -H sum "\\-bar"', {IN_PIPE=>$in_esc_ident},
+     {OUT=>"sum(-bar)\n44\n"}],
+
 );
 
 

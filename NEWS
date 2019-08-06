@@ -1,5 +1,16 @@
 * Noteworthy changes in release 1.? (?-?-?) [stable]
 
+** New Features
+
+  Datamash now accepts backslash-escaped characters in field names.
+  This allows working with named fields containing dash/mins,colons,commas
+  or field names starting with digits (Note the interplay between
+  backslash and shell quoting). The following are equivalent,
+  and sum an input field named 'FOO-BAR':
+      datamash -H sum FOO\\-BAR < input.txt
+      datamash -H sum 'FOO\-BAR' < input.txt
+      datamash -H sum "FOO\\-BAR" < input.txt
+
 ** Bug fixes
 
   Datamash now correctly calculates mode/antimode for negative values.

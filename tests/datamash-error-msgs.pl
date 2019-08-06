@@ -34,6 +34,10 @@ use MIME::Base64 ;
 (my $program_name = $0) =~ s|.*/||;
 my $prog_bin = 'datamash';
 
+
+# MAX_IDENTIFIER_LENGTH is defined in op-scanner.h
+my $ident_too_long = "x" x 512 ;
+
 ## Cross-Compiling portability hack:
 ##  under qemu/binfmt, argv[0] (which is used to report errors) will contain
 ##  the full path of the binary, if the binary is on the $PATH.
@@ -246,6 +250,12 @@ my @Tests =
   ['e130','--format "%f%3"', {IN_PIPE=>""}, {EXIT=>1},
    {ERR=>"$prog: format '%f%3' has too many % directives\n"}],
 
+
+  # identifier scanning errors
+  ['e140',"-H sum 'foo\\'", {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: backslash at end of identifier\n"}],
+  ['e141',"-H sum $ident_too_long", {IN_PIPE=>""}, {EXIT=>1},
+   {ERR=>"$prog: identifier name too long\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

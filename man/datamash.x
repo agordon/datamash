@@ -340,6 +340,23 @@ Social-Sciences   60.2          16.6
 .fi
 .PP
 
+Field names must be escaped with a backslash if they start with a digit
+or contain special characters (dash/minus, colons, commas).
+Note the interplay between escaping with backslash and shell quoting.
+The following equivalent command sum the values of a field named "FOO-BAR":
+
+.PP
+.nf
+.RS
+$ datamash -H sum FOO\\\\\-BAR < input.txt
+$ datamash -H sum 'FOO\\\-BAR' < input.txt
+$ datamash -H sum "FOO\\\\\-BAR" < input.txt
+.RE
+.fi
+.PP
+
+
+
 .SS "Skipping comment lines"
 Use \fB\-C\fR \fB(\-\-skip\-comments)\fR to skip lines starting with \'#\'
 or \'\;\' characters (and optional whitespace before them):

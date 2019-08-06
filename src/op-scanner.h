@@ -22,6 +22,8 @@
 #ifndef __OP_SCANNER_H__
 #define __OP_SCANNER_H__
 
+#define MAX_IDENTIFIER_LENGTH 512
+
 enum TOKEN
 {
   TOK_END=0,
