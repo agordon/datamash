@@ -515,6 +515,10 @@ my @Tests =
 	 "5	bar\n" .
 	 "7	;baz\n"}],
   ['sc4', '-C reverse', {IN_PIPE=>$in_comments}, {OUT=>"5	bar\n"}],
+
+
+  # Bug in mode/antimode in 1.4 and earlier
+  ['bug_mode1', 'mode 1', {IN_PIPE=>"-1"}, {OUT=>"-1\n"}],
 );
 
 

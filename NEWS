@@ -1,3 +1,14 @@
+* Noteworthy changes in release 1.? (?-?-?) [stable]
+
+** Bug fixes
+
+  Datamash now correctly calculates mode/antimode for negative values.
+  In version 1.4 and earlier, the following produced incorrect results:
+    $ echo -1 | datamash-1.4 mode 1
+    1.844674407371e+19
+
+
+
 * Noteworthy changes in release 1.4 (2018-12-22) [stable]
 
 ** New Features

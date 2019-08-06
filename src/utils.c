@@ -381,7 +381,7 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
   long double last_value = values[0];
   size_t seq_size=1;
   size_t best_seq_size= (type==MODE)?1:SIZE_MAX;
-  size_t best_value = values[0];
+  long double best_value = values[0];
 
   for (size_t i=1; i<n; i++)
     {
