@@ -305,7 +305,24 @@ A_Chlor_T1h_r1-metaG B 9C -bar
 10 20 30 40
 EOF
 
+#
+my $in_dirname_basename=<<'EOF';
+/foo/bar
+/foo/
+foo
+/
+.
+..
+EOF
 
+my $exp_dirname_basename=<<'EOF';
+/foo	bar
+/	foo
+.	foo
+/	/
+.	.
+.	..
+EOF
 
 my @Tests =
 (
@@ -541,6 +558,10 @@ my @Tests =
   ['esc3', '-W -H sum "\\-bar"', {IN_PIPE=>$in_esc_ident},
      {OUT=>"sum(-bar)\n44\n"}],
 
+
+  # dirname and basename
+  ['dnbn1', 'dirname 1 basename 1', {IN_PIPE=>$in_dirname_basename},
+     {OUT=>$exp_dirname_basename}],
 );
 
 

@@ -81,6 +81,11 @@ hashes the input and returns a numeric integer value between zero and
 numeric rounding operations. round (round half away from zero),
 floor (round up), ceil (ceiling, round down), trunc (truncate, round towards
 zero), frac (fraction, return fraction part of a decimal-point value).
+
+.TP
+.B dirname/basename
+extract the directory name and the base file name from a given string
+(same as to dirname(1) and basename(1)).
 .PP
 
 

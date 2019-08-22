@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <libgen.h> /* for dirname & POSIX version of basename */
 
 #include "die.h"
 #include "minmax.h"
@@ -155,6 +156,10 @@ struct operation_data operations[] =
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_TRIMMED_MEAN */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_DIRNAME */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  /* OP_BASENAME */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -468,6 +473,8 @@ field_op_collect (struct fieldop *op,
     case OP_SHA1:
     case OP_SHA256:
     case OP_SHA512:
+    case OP_DIRNAME:
+    case OP_BASENAME:
       /* Replace the 'current' string with the latest one */
       field_op_replace_string (op, str, slen);
       break;
@@ -730,6 +737,8 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_SHA1:
     case OP_SHA256:
     case OP_SHA512:
+    case OP_DIRNAME:
+    case OP_BASENAME:
       field_op_reserve_out_buf (op, 1);
       strcpy (op->out_buf, "");
       break;
@@ -960,6 +969,24 @@ field_op_summarize (struct fieldop *op)
     case OP_SHA512:
       sha512_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
       field_op_to_hex (op, tmpbuf, 64);
+      break;
+
+    case OP_DIRNAME:
+      {
+        op->str_buf[op->str_buf_used] = 0;
+        char *t = dirname (op->str_buf);
+        field_op_reserve_out_buf (op, op->str_buf_used);
+        strcpy (op->out_buf,t);
+      }
+      break;
+
+    case OP_BASENAME:
+      {
+        op->str_buf[op->str_buf_used] = 0;
+        char *t = basename (op->str_buf);
+        field_op_reserve_out_buf (op, op->str_buf_used);
+        strcpy (op->out_buf,t);
+      }
       break;
 
     case OP_INVALID:                 /* LCOV_EXCL_LINE */

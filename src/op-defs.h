@@ -76,7 +76,9 @@ enum field_operation
   OP_ROUND,         /* Round */
   OP_TRUNCATE,      /* Truncate */
   OP_FRACTION,      /* Fraction */
-  OP_TRIMMED_MEAN   /* Trimmed Mean */
+  OP_TRIMMED_MEAN,  /* Trimmed Mean */
+  OP_DIRNAME,       /* like dirname (1) */
+  OP_BASENAME       /* like basename (1) */
 };
 
 enum processing_mode

@@ -11,6 +11,12 @@
       datamash -H sum 'FOO\-BAR' < input.txt
       datamash -H sum "FOO\\-BAR" < input.txt
 
+  New operations: dirname, basename
+  These behave just like dirname(1) and basename(1):
+     $ echo /home/foo/bar.txt | datamash dirname 1 basename 1
+     /home/foo    bar.txt
+
+
 ** Bug fixes
 
   Datamash now correctly calculates mode/antimode for negative values.
