@@ -57,12 +57,14 @@ coverage-expensive:
 	$(MAKE) RUN_EXPENSIVE_TESTS=yes coverage
 
 # Exclude markdown (*.md) files from no-trailing-blanks rule.
+# Exclude the second unit test file - some of the expected tests
+# have trailing spaces.
 # The exclusion list is initially defined in ./gnulib/cfg.mk ,
 #   and is overridden here.
 # The 'sc_trailing_blank' rule is defined in ./maint.mk
 #    (which is auto-generated from gnulib).
 exclude_file_name_regexp--sc_trailing_blank = \
-  ^(.*\.md)$$
+  ^(.*\.md|.*datamash-tests-2\.pl)$$
 
 
 # Scan-Build: use clang's static analysis tool
