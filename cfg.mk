@@ -158,7 +158,7 @@ sc_prohibit_test_empty:
 
 _space_before_paren_exempt =? \\n\\$$
 _space_before_paren_exempt = \
-  (^ *\#|\\n\\$$|%s\(to %s|(date|group|character)\(s\))
+  (^ *\#|\\n\\$$|%s\(to %s|(date|group|character)\(s\)|STREQ_LEN)
 # Ensure that there is a space before each open parenthesis in C code.
 sc_space_before_open_paren:
 	@if $(VC_LIST_EXCEPT) | grep -l '\.[ch]$$' > /dev/null; then	\
