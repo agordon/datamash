@@ -171,7 +171,7 @@ all the values in the input file.
 @code{base64}, @code{debase64}, @code{md5}, @code{sha1},
 @code{sha256}, @code{sha512}, @code{bin}, @code{strbin},
 @code{round}, @code{floor}, @code{ceil}, @code{trunc},
-@code{frac}, @code{dirname}, @code{basename}
+@code{frac}, @code{dirname}, @code{basename}, @code{extname}, @code{barename}
 
 @item Group-by Numeric operations:
 @code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}, @code{range}
@@ -387,6 +387,12 @@ Similar to @command{dirname(1)}.
 @item basename
 extracts the base file name of the field (assuming the field is a file name).
 Similar to @command{basename(1)}.
+@item extname
+extracts the extension of the file name of the field (assuming the field is a
+file name).
+@item extname
+extracts the base file name of the field without the extension (assuming the
+field is a file name).
 @end table
 
 @item Group-by Numeric operations:

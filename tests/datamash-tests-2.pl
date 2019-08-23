@@ -313,6 +313,7 @@ foo
 /
 .
 ..
+	
 EOF
 
 my $exp_dirname_basename=<<'EOF';
@@ -322,7 +323,50 @@ my $exp_dirname_basename=<<'EOF';
 /	/
 .	.
 .	..
+.	
 EOF
+
+my $in_barename_extname=<<'EOF';
+hello-world.txt
+hello.world.txt
+.hello
+.txt
+foo%bar
+foo
+foo.tar.gz
+foo.txt.std
+foo.org.lz
+foo.a3
+foo.gpg
+foo.txt.xz.gpg
+foo.log.bz2
+foo.bar
+foo.bloo
+foo.bar.txt.log
+	
+EOF
+
+my $exp_barename_extname=<<'EOF';
+hello-world	txt
+hello.world	txt
+.hello	
+.txt	
+foo%bar	
+foo	
+foo	tar.gz
+foo	txt.std
+foo	org.lz
+foo	a3
+foo	gpg
+foo	txt.xz.gpg
+foo	log.bz2
+foo	bar
+foo	bloo
+foo.bar.txt	log
+	
+EOF
+
+
 
 my @Tests =
 (
@@ -562,6 +606,11 @@ my @Tests =
   # dirname and basename
   ['dnbn1', 'dirname 1 basename 1', {IN_PIPE=>$in_dirname_basename},
      {OUT=>$exp_dirname_basename}],
+
+  # barename and extname
+  ['bnen1', 'barename 1 extname 1', {IN_PIPE=>$in_barename_extname},
+     {OUT=>$exp_barename_extname}],
+
 );
 
 

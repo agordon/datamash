@@ -205,6 +205,16 @@ cmp_long_double (const void *p1, const void *p2);
 bool
 hash_compare_strings (void const *x, void const *y);
 
+
+/* Return the number of characters FROM THE END of 's'
+   that match a guessed file extension.
+   Return 0 if no extension is found.
+   's' does not need to be NULL terminated. */
+size_t
+guess_file_extension (const char*s, size_t len);
+
+
+
 /* returns non-zero if the input is equavalent to
    zero (or negative zero) */
 static inline bool
@@ -227,6 +237,7 @@ pos_zero (const long double a)
 {
   return is_signed_zero (a) ? 0 : a;
 }
+
 
 /* On some systems (e.g. Cygwin) nanl is not defined,
    and gnulib does not yet provide a replacment

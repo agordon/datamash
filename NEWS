@@ -16,6 +16,14 @@
      $ echo /home/foo/bar.txt | datamash dirname 1 basename 1
      /home/foo    bar.txt
 
+  New operations: extname, barename
+  'extname' extract the extension of the file name.
+  'barename' (not to be confused with 'basename') extract the basename
+  without the extension.
+
+     $ echo /home/foo/bar.tar.gz | datamash barename 1 extame 1
+     bar         tar.gz
+
 
 ** Bug fixes
 

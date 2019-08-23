@@ -76,6 +76,8 @@ struct field_operation_definition field_operations[] =
   {"sha512",  OP_SHA512,  MODE_PER_LINE},
   {"dirname", OP_DIRNAME, MODE_PER_LINE},
   {"basename",OP_BASENAME,MODE_PER_LINE},
+  {"extname", OP_EXTNAME, MODE_PER_LINE},
+  {"barename",OP_BARENAME,MODE_PER_LINE},
   {"pcov",    OP_P_COVARIANCE, MODE_GROUPBY},
   {"scov",    OP_S_COVARIANCE, MODE_GROUPBY},
   {"ppearson",OP_P_PEARSON_COR, MODE_GROUPBY},

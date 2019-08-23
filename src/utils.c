@@ -458,3 +458,57 @@ hash_compare_strings (void const *x, void const *y)
   assert (x != y); /* LCOV_EXCL_LINE */
   return STREQ (x, y) ? true : false;
 }
+
+
+static bool
+is_add_on_extension (const char *s, size_t l)
+{
+  if ((l==4) \
+      && (STREQ_LEN(s,".gpg",4) \
+          || STREQ_LEN(s,".bz2",4) \
+          || STREQ_LEN(s,".std",4)))
+    return true;
+  if ((l==3) \
+      && (STREQ_LEN(s,".gz",3) || STREQ_LEN(s,".xz",3) || STREQ_LEN(s,".lz",3)))
+    return true;
+  return false;
+}
+
+size_t _GL_ATTRIBUTE_PURE
+guess_file_extension (const char*s, size_t len)
+{
+  size_t prev_extension = 0;
+
+  if (len==0)
+    return 0;
+
+  size_t l = len - 1 ;
+
+ next_extension:
+  while (l && c_isalnum (s[l]))
+    --l;
+  if (l>0 && s[l] == '.')
+    {
+      /* Found an extension, check if it's a known "add-on" one */
+
+      /* check the string until to previous extension (if there was one),
+         or the end of the string. */
+      size_t ext_len = (prev_extension==0)?(len-l):(prev_extension-l);
+      if (is_add_on_extension (&s[l],ext_len))
+        {
+          prev_extension = l;
+          --l;
+          goto next_extension;
+        }
+
+      return len-l;
+    }
+
+  /* In a case such as "foo.gpg", the first detected extension '.gpg'
+     is found, but the second iteration fails (as 'foo' is not an extension).
+     In such cases, revert to reporting the previously found extension. */
+  if (prev_extension)
+    return len-prev_extension;
+
+  return 0;
+}

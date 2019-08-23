@@ -86,6 +86,14 @@ zero), frac (fraction, return fraction part of a decimal-point value).
 .B dirname/basename
 extract the directory name and the base file name from a given string
 (same as to dirname(1) and basename(1)).
+
+.TP
+.B extname
+extract the extension of the file name (without the '.').
+
+.TP
+.B barename
+extract the base file name without the extension.
 .PP
 
 

@@ -160,6 +160,10 @@ struct operation_data operations[] =
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_BASENAME */
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  /* OP_EXTNAME */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  /* OP_BARENAME */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -475,6 +479,8 @@ field_op_collect (struct fieldop *op,
     case OP_SHA512:
     case OP_DIRNAME:
     case OP_BASENAME:
+    case OP_EXTNAME:
+    case OP_BARENAME:
       /* Replace the 'current' string with the latest one */
       field_op_replace_string (op, str, slen);
       break;
@@ -739,6 +745,8 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_SHA512:
     case OP_DIRNAME:
     case OP_BASENAME:
+    case OP_EXTNAME:
+    case OP_BARENAME:
       field_op_reserve_out_buf (op, 1);
       strcpy (op->out_buf, "");
       break;
@@ -981,11 +989,52 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_BASENAME:
+    case OP_EXTNAME:
+    case OP_BARENAME:
       {
+        if (op->str_buf_used==1)
+          {
+            /* Empty string, containing only NUL */
+            field_op_reserve_out_buf (op, 1);
+            op->out_buf[0] = '\0';
+            break;
+          }
+
         op->str_buf[op->str_buf_used] = 0;
         char *t = basename (op->str_buf);
         field_op_reserve_out_buf (op, op->str_buf_used);
-        strcpy (op->out_buf,t);
+
+        if (op->op == OP_BASENAME)
+          {
+            /* Just copy the extracted base name */
+            strcpy (op->out_buf,t);
+          }
+        else
+          {
+            /* Guess the file extension */
+            size_t tl = strlen (t);
+            size_t l = guess_file_extension (t, tl);
+
+            if (op->op == OP_EXTNAME)
+              {
+                /* Store the extension */
+                if (l>0)
+                  {
+                    memcpy (op->out_buf, t+(tl-l+1), l-1);
+                    op->out_buf[l-1] = '\0';
+                  }
+                else
+                  {
+                    op->out_buf[0] = '\0';
+                  }
+              }
+            else
+              {
+                /* Store the basename without the extension */
+                memcpy (op->out_buf, t, tl-l);
+                op->out_buf[tl-l] = '\0';
+              }
+          }
       }
       break;
 
