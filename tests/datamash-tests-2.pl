@@ -611,6 +611,34 @@ my @Tests =
   ['bnen1', 'barename 1 extname 1', {IN_PIPE=>$in_barename_extname},
      {OUT=>$exp_barename_extname}],
 
+
+
+  ## GetNum variants
+  ['gn1', 'getnum 1',   {IN_PIPE=>"moo-123.45"}, {OUT=>"123.45\n"}],
+  # Integer
+  ['gn2', 'getnum:i 1', {IN_PIPE=>"moo-123.45"}, {OUT=>"-123\n"}],
+  # Hex 0x123 = 291
+  ['gn3', 'getnum:h 1', {IN_PIPE=>"moo-123.45"}, {OUT=>"291\n"}],
+  # Octal 0123 = 83
+  ['gn4', 'getnum:o 1', {IN_PIPE=>"moo-123.45"}, {OUT=>"83\n"}],
+  # Natural
+  ['gn5', 'getnum:n 1', {IN_PIPE=>"moo-123.45"}, {OUT=>"123\n"}],
+  # Decimal
+  ['gn6', 'getnum:d 1', {IN_PIPE=>"moo-123.45"}, {OUT=>"-123.45\n"}],
+
+  ['gn10', 'getnum 1',   {IN_PIPE=>"moo"},     {OUT=>"0\n"}],
+  ['gn11', 'getnum:d 1', {IN_PIPE=>"moo"},     {OUT=>"0\n"}],
+  ['gn12', 'getnum:i 1', {IN_PIPE=>"moo---4"}, {OUT=>"0\n"}],
+  ['gn13', 'getnum:d 1', {IN_PIPE=>"moo...4"}, {OUT=>"0\n"}],
+  ['gn14', 'getnum:i 1',
+   {IN_PIPE=>"moo999999999999999999999999999991234312341432123451541341312431"},
+   {OUT=>"0\n"}],
+  ['gn15', 'getnum:d 1',
+   {IN_PIPE=>"moo" . 9 x "3000"},
+   {OUT=>"0\n"}],
+  ['gn16', 'getnum:n 1', {IN_PIPE=>"moo" x 4000 . "42" . "bar" x 1000},
+   {OUT=>"42\n"}],
+
 );
 
 

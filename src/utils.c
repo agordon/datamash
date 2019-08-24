@@ -512,3 +512,83 @@ guess_file_extension (const char*s, size_t len)
 
   return 0;
 }
+
+
+struct EXTRACT_NUMBER_TYPE
+{
+  char *pattern;
+  int base;
+  bool floating_point;
+};
+
+/* NOTE: order must match 'enum extract_number_type' */
+static struct EXTRACT_NUMBER_TYPE extract_number_types[] =
+  {
+   /* Natural Number (nonnegative integers), including ZERO */
+   {"0123456789", 10,  false},
+
+   /* Integers */
+   {"-+0123456789", 10, false},
+
+   /* Positive Hex number */
+   {"0123456789abcdefABCDEF", 16, false},
+
+   /* Positive Octal number */
+   {"01234567", 8, false},
+
+   /* Simple positive decimal point (including zero) */
+   {".01234567", 10, true},
+
+   /* Simple decimal point (positive and negative) */
+   {"+-.01234567", 10, true}
+  };
+
+
+long double
+extract_number (const char* s, size_t len, enum extract_number_type type)
+{
+  static char* buf, *endptr;
+  static size_t buf_alloc;
+
+  long double r = 0;
+  char *pattern;
+  int base ;
+  bool fp;
+
+  pattern = extract_number_types[type].pattern;
+  base = extract_number_types[type].base;
+  fp = extract_number_types[type].floating_point;
+
+  if (len+1 > buf_alloc)
+    {
+      buf = xrealloc (buf, len+1);
+      buf_alloc = len + 1;
+    }
+
+  size_t skip = strcspn (s, pattern);
+  size_t span = strspn (s+skip, pattern);
+
+  memcpy (buf, s+skip, span);
+  buf[span] = '\0';
+
+  if (!fp)
+    {
+      errno = 0;
+      long long int val = strtoll (buf, &endptr, base);
+      if (errno != 0)
+        {
+          /* failed to parse value */
+          val = 0;
+        }
+      r = val;
+    }
+  else
+    {
+      errno = 0;
+      r = strtold (buf, &endptr);
+      if (errno != 0)
+        r = 0;
+    }
+
+  return r;
+}

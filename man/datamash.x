@@ -94,6 +94,11 @@ extract the extension of the file name (without the '.').
 .TP
 .B barename
 extract the base file name without the extension.
+
+.TP
+.B getnum[:TYPE]
+extract a number from the field. \fBTYPE\fR is optional single letter option
+n/i/d/p/h/o (see examples below).
 .PP
 
 
@@ -653,6 +658,57 @@ $ cat input.txt \\
 .RE
 .fi
 .PP
+
+
+.SS "Extracting numbers with getnum"
+The 'getnum' operation extracts a numeric value from the field:
+
+.PP
+.nf
+.RS
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum 1
+123.45
+.RE
+
+\fBgetnum\fR accepts an optional single-letter \fBTYPE\fR option:
+.nf
+    getnum:n - natural numbers (positive integers, including zero)
+    getnum:i - integers
+    getnum:d - decimal point numbers
+    getnum:p - positive decimal point numbers (this is the default)
+    getnum:h - hex numbers
+    getnum:o - octal numbers
+.fi
+
+.PP
+Examples:
+.nf
+.RS
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum 1
+123.45
+
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum:n 1
+123
+
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum:i 1
+-123
+
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum:d 1
+123.45
+
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum:p 1
+-123.45
+
+# Hex 0x123 = 291 Decimal
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum:h 1
+291
+
+# Octal 0123 = 83 Decimal
+$ echo zoom-123.45xyz | \fBdatamash\fR getnum:o 1
+83
+.RE
+
+
 
 [ADDITIONAL INFORMATION]
 See

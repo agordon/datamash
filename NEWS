@@ -20,9 +20,28 @@
   'extname' extract the extension of the file name.
   'barename' (not to be confused with 'basename') extract the basename
   without the extension.
-
+  Example:
      $ echo /home/foo/bar.tar.gz | datamash barename 1 extame 1
      bar         tar.gz
+
+  New operation: getnum
+  This operation extracts a number from a string.
+  'getnum' accepts an optional single letter option:
+     getnum:n - natural numbers (positive integers, including zero)
+     getnum:i - integers
+     getnum:d - decimal point numbers
+     getnum:p - positive decimal point numbers (this is the default)
+     getnum:h - hex numbers
+     getnum:o - octal numbers
+   Examples:
+     $ echo foo-42.0-bar | datamash getnum 1
+     42.0
+     $ echo foo-42.0-bar | datamash getnum:n 1
+     42
+     $ echo foo-42.0-bar | datamash getnum:i 1
+     -42
+     $ echo foo-42.0-bar | datamash getnum:d 1
+     -42.0
 
 
 ** Bug fixes

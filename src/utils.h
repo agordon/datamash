@@ -214,6 +214,22 @@ size_t
 guess_file_extension (const char*s, size_t len);
 
 
+/* Extract the first detected number from a string 's'
+   (skipping non-number characters).
+   's' does not need to be NUL-terminated. */
+enum extract_number_type
+  {
+   ENT_NATURAL = 0,
+   ENT_INTEGER,
+   ENT_HEX,
+   ENT_OCT,
+   ENT_POSITIVE_DECIMAL,
+   ENT_DECIMAL
+  };
+long double
+extract_number (const char* s, size_t len, enum extract_number_type type);
+
+
 
 /* returns non-zero if the input is equavalent to
    zero (or negative zero) */

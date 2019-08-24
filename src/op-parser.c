@@ -29,6 +29,7 @@
 #include "op-scanner.h"
 #include "op-defs.h"
 #include "op-parser.h"
+#include "utils.h"
 #include "field-ops.h"
 
 static struct datamash_ops *dm = NULL;
@@ -46,10 +47,12 @@ struct parser_param_t
 {
   enum {
     PARAM_INT,
-    PARAM_FLOAT
+    PARAM_FLOAT,
+    PARAM_CHAR
   } type;
   uintmax_t u;
   long double f;
+  char c;
 };
 
 /* The currently parsed operation */
@@ -210,6 +213,42 @@ set_op_params (struct fieldop *op)
       return;
     }
 
+  if (op->op==OP_GETNUM)
+    {
+      op->params.get_num_type = ENT_POSITIVE_DECIMAL;
+      if (_params_used==1)
+        {
+          switch (_params[0].c)
+            {
+            case 'h':
+              op->params.get_num_type = ENT_HEX;
+              break;
+            case 'o':
+              op->params.get_num_type = ENT_OCT;
+              break;
+            case 'i':
+              op->params.get_num_type = ENT_INTEGER;
+              break;
+            case 'n':
+              op->params.get_num_type = ENT_NATURAL;
+              break;
+            case 'd':
+              op->params.get_num_type = ENT_DECIMAL;
+              break;
+            case 'p':
+              op->params.get_num_type = ENT_POSITIVE_DECIMAL;
+              break;
+
+            default:
+              die (EXIT_FAILURE, 0, _("invalid getnum type '%c'"),_params[0].c);
+            }
+        }
+      if (_params_used>1)
+        die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+                                    quote (get_field_operation_name (op->op)));
+      return;
+    }
+
   /* All other operations do not take parameters */
   if (_params_used>0)
     die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
@@ -324,7 +363,7 @@ parse_operation_column_list ()
 }
 
 static void
-parse_operation_params ()
+parse_operation_params (enum field_operation op)
 {
   /* currently, the only place we want to detect a whitespace, spearating
      between operation's parameters and field numbers.
@@ -364,9 +403,19 @@ parse_operation_params ()
           die (EXIT_FAILURE, 0, _("missing parameter for operation %s"),
                                   quote (get_field_operation_name (fop)));
 
+        case TOK_IDENTIFIER:
+          /* Currently, only OP_GETNUM accepts non-numeric parameter */
+          if (op == OP_GETNUM)
+            {
+              p->type = PARAM_CHAR;
+              p->c    = scanner_identifier[0];
+              break;
+            }
+          /* Otherwise, fall through */
+          /* FALLTHROUGH */
+
         case TOK_COMMA:
         case TOK_DASH:
-        case TOK_IDENTIFIER:
         case TOK_COLONS:
         default:
           die (EXIT_FAILURE, 0, _("invalid parameter %s for operation %s"),
@@ -458,7 +507,7 @@ parse_operation (enum processing_mode pm)
            get_processing_mode_name (pm2),
            quote (scanner_identifier));
 
-  parse_operation_params ();
+  parse_operation_params (fop);
 
   parse_operation_column_list ();
 

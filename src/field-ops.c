@@ -164,6 +164,8 @@ struct operation_data operations[] =
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_BARENAME */
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  /* OP_GETNUM */
+  {STRING_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -570,6 +572,10 @@ field_op_collect (struct fieldop *op,
       };
       break;
 
+    case OP_GETNUM:
+      op->value = extract_number (str, slen, op->params.get_num_type);
+      break;
+
     case OP_INVALID:                 /* LCOV_EXCL_LINE */
     default:                         /* LCOV_EXCL_LINE */
       /* Should never happen */
@@ -709,6 +715,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_FRACTION:
     case OP_RANGE:
     case OP_TRIMMED_MEAN:
+    case OP_GETNUM:
       numeric_result = nanl ("");
       break;
 
@@ -800,6 +807,7 @@ field_op_summarize (struct fieldop *op)
     case OP_ROUND:
     case OP_TRUNCATE:
     case OP_FRACTION:
+    case OP_GETNUM:
       /* no summarization for these operations, just print the value */
       numeric_result = op->value;
       break;

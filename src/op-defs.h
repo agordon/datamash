@@ -80,7 +80,8 @@ enum field_operation
   OP_DIRNAME,       /* like dirname (1) */
   OP_BASENAME,      /* like basename (1) */
   OP_EXTNAME,       /* guess extension of file name */
-  OP_BARENAME       /* like basename without the guessed extension  */
+  OP_BARENAME,      /* like basename without the guessed extension  */
+  OP_GETNUM         /* Extract a number from a string */
 };
 
 enum processing_mode

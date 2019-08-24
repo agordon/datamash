@@ -171,7 +171,8 @@ all the values in the input file.
 @code{base64}, @code{debase64}, @code{md5}, @code{sha1},
 @code{sha256}, @code{sha512}, @code{bin}, @code{strbin},
 @code{round}, @code{floor}, @code{ceil}, @code{trunc},
-@code{frac}, @code{dirname}, @code{basename}, @code{extname}, @code{barename}
+@code{frac}, @code{dirname}, @code{basename}, @code{extname}, @code{barename},
+@code{getnum}
 
 @item Group-by Numeric operations:
 @code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}, @code{range}
@@ -393,6 +394,9 @@ file name).
 @item extname
 extracts the base file name of the field without the extension (assuming the
 field is a file name).
+@item getnum
+extract a number from the field. @code{getnum} accepts an optional single
+letter option @samp{n/i/d/p/h/o} affecting the detected value.
 @end table
 
 @item Group-by Numeric operations:
@@ -522,6 +526,7 @@ operators are compared to known results of the equivalent R functions.
 * Rounding numbers::              round, ceil, floor, trunc, frac
 * Binning numbers::               assigning numbers into fixed number of buckets
 * Binning strings::               assigning strings into fixed number of buckets
+* Extracting numeric values::     using getnum
 @end menu
 
 
@@ -1378,6 +1383,67 @@ $ cat input.txt | datamash --full strbin 1 \
 @end verbatim
 @end example
 
+
+@node Extracting numeric values
+@section Extracting numeric values - using getnum
+@opindex getnum
+@cindex numbers, extracting from a field
+
+The @code{getnum} operation extracts a numeric value from the field:
+
+@example
+@verbatim
+$ echo zoom-123.45xyz | datamash getnum 1
+123.45
+@end verbatim
+@end example
+
+
+@code{getnum} accepts an optional single-letter @var{TYPE} option:
+
+@table @option
+@item getnum:n
+natural numbers (positive integers, including zero)
+@item getnum:i
+integers
+@item getnum:d
+decimal point numbers
+@item getnum:p
+positive decimal point numbers (this is the default)
+@item getnum:h
+hex numbers
+@item getnum:o
+octal numbers
+@end table
+
+Examples:
+
+@example
+@verbatim
+$ echo zoom-123.45xyz | datamash getnum 1
+123.45
+
+$ echo zoom-123.45xyz | datamash getnum:n 1
+123
+
+$ echo zoom-123.45xyz | datamash getnum:i 1
+-123
+
+$ echo zoom-123.45xyz | datamash getnum:d 1
+123.45
+
+$ echo zoom-123.45xyz | datamash getnum:p 1
+-123.45
+
+# Hex 0x123 = 291 Decimal
+$ echo zoom-123.45xyz | datamash getnum:h 1
+291
+
+# Octal 0123 = 83 Decimal
+$ echo zoom-123.45xyz | datamash getnum:o 1
+83
+@end verbatim
+@end example
 
 
 
