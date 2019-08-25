@@ -44,7 +44,7 @@ datamash_SOURCES = src/system.h \
 
 datamash_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
 datamash_LDADD = \
-       $(top_builddir)/lib/lib$(PACKAGE).a \
+       lib/lib$(PACKAGE).a \
        $(EXP_LIBM) \
        $(EXPL_LIBM) \
        $(FABS_LIBM) \
