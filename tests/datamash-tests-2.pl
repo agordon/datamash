@@ -366,6 +366,11 @@ foo.bar.txt	log
 	
 EOF
 
+my $in1_cut=<<'EOF';
+a,b,c
+1,X,6
+EOF
+
 
 
 my @Tests =
@@ -638,6 +643,11 @@ my @Tests =
    {OUT=>"0\n"}],
   ['gn16', 'getnum:n 1', {IN_PIPE=>"moo" x 4000 . "42" . "bar" x 1000},
    {OUT=>"42\n"}],
+
+
+  # cut operation
+  ['cut1','-t, cut 3,1,2', {IN_PIPE=>$in1_cut}, {OUT=>"c,a,b\n6,1,X\n"}],
+  ['cut2','-t, -H cut c,a', {IN_PIPE=>$in1_cut}, {OUT=>"cut(c),cut(a)\n6,1\n"}],
 
 );
 

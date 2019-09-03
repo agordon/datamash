@@ -99,6 +99,10 @@ extract the base file name without the extension.
 .B getnum[:TYPE]
 extract a number from the field. \fBTYPE\fR is optional single letter option
 n/i/d/p/h/o (see examples below).
+
+.TP
+.B cut
+copy input field to output field (similar to cut(1)).
 .PP
 
 

@@ -172,7 +172,7 @@ all the values in the input file.
 @code{sha256}, @code{sha512}, @code{bin}, @code{strbin},
 @code{round}, @code{floor}, @code{ceil}, @code{trunc},
 @code{frac}, @code{dirname}, @code{basename}, @code{extname}, @code{barename},
-@code{getnum}
+@code{getnum}, @code{cut}
 
 @item Group-by Numeric operations:
 @code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}, @code{range}
@@ -397,6 +397,8 @@ field is a file name).
 @item getnum
 extract a number from the field. @code{getnum} accepts an optional single
 letter option @samp{n/i/d/p/h/o} affecting the detected value.
+@item cut
+copy input field to output field (similar to @command{cut(1)}).
 @end table
 
 @item Group-by Numeric operations:

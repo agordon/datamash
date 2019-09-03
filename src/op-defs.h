@@ -81,7 +81,8 @@ enum field_operation
   OP_BASENAME,      /* like basename (1) */
   OP_EXTNAME,       /* guess extension of file name */
   OP_BARENAME,      /* like basename without the guessed extension  */
-  OP_GETNUM         /* Extract a number from a string */
+  OP_GETNUM,        /* Extract a number from a string */
+  OP_CUT            /* like cut (1) */
 };
 
 enum processing_mode

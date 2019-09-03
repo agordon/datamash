@@ -43,6 +43,15 @@
      $ echo foo-42.0-bar | datamash getnum:d 1
      -42.0
 
+  New operation: cut
+  Similar to cut(1), it copies the input field to the output as-is.
+  The advantage over cut(1) is that combined with datamash's other features,
+  input fields can be specified by name instead of column number, and
+  output fields can be re-ordered and duplicated.
+  Example:
+    $ printf "a b c\n1 X 6\n" | datamash -W -H cut c,a,c
+    cut(c)  cut(a)  cut(c)
+    6       1       6
 
 ** Bug fixes
 

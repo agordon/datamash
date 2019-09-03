@@ -91,6 +91,7 @@ struct field_operation_definition field_operations[] =
   {"frac",    OP_FRACTION,   MODE_PER_LINE},
   {"trimmean",OP_TRIMMED_MEAN,   MODE_GROUPBY},
   {"getnum",  OP_GETNUM,   MODE_PER_LINE},
+  {"cut",     OP_CUT,     MODE_PER_LINE},
   {NULL,      OP_INVALID, MODE_INVALID}
 };
 

@@ -166,6 +166,8 @@ struct operation_data operations[] =
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_GETNUM */
   {STRING_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_CUT */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   {0, 0, NUMERIC_RESULT}
 };
 
@@ -576,6 +578,10 @@ field_op_collect (struct fieldop *op,
       op->value = extract_number (str, slen, op->params.get_num_type);
       break;
 
+    case OP_CUT:
+      field_op_replace_string (op, str, slen);
+      break;
+
     case OP_INVALID:                 /* LCOV_EXCL_LINE */
     default:                         /* LCOV_EXCL_LINE */
       /* Should never happen */
@@ -738,6 +744,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_FIRST:
     case OP_LAST:
     case OP_RAND:
+    case OP_CUT:
       field_op_reserve_out_buf (op, 4);
       strcpy (op->out_buf, "N/A");
       break;
@@ -815,6 +822,7 @@ field_op_summarize (struct fieldop *op)
     case OP_FIRST:
     case OP_LAST:
     case OP_RAND:
+    case OP_CUT:
       /* Only one string is returned in the buffer, return it */
       field_op_reserve_out_buf (op, op->str_buf_used);
       memcpy (op->out_buf, op->str_buf, op->str_buf_used);
