@@ -1,6 +1,6 @@
 /* GNU Datamash - perform simple calculation on input data
 
-   Copyright (C) 2018-2019 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2018-2020 Assaf Gordon <assafgordon@gmail.com>
    Copyright (C) 1994-2018 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify

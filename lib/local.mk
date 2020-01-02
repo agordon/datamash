@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2019 Assaf Gordon <assafgordon@gmail.com>
+# Copyright (C) 2014-2020 Assaf Gordon <assafgordon@gmail.com>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
