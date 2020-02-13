@@ -630,6 +630,10 @@ my @Tests =
   ['gn5', 'getnum:n 1', {IN_PIPE=>"moo-123.45"}, {OUT=>"123\n"}],
   # Decimal
   ['gn6', 'getnum:d 1', {IN_PIPE=>"moo-123.45"}, {OUT=>"-123.45\n"}],
+  # GetNum variants
+  ['gn6-1', 'getnum 1',   {IN_PIPE=>"moo-103.89"}, {OUT=>"103.89\n"}],
+  # Integer
+  ['gn6-2', 'getnum:i 1', {IN_PIPE=>"moo-789.45"}, {OUT=>"-789\n"}],
 
   ['gn10', 'getnum 1',   {IN_PIPE=>"moo"},     {OUT=>"0\n"}],
   ['gn11', 'getnum:d 1', {IN_PIPE=>"moo"},     {OUT=>"0\n"}],
@@ -639,7 +643,7 @@ my @Tests =
    {IN_PIPE=>"moo999999999999999999999999999991234312341432123451541341312431"},
    {OUT=>"0\n"}],
   ['gn15', 'getnum:d 1',
-   {IN_PIPE=>"moo" . 9 x "3000"},
+   {IN_PIPE=>"moo" . "9" x 10000},
    {OUT=>"0\n"}],
   ['gn16', 'getnum:n 1', {IN_PIPE=>"moo" x 4000 . "42" . "bar" x 1000},
    {OUT=>"42\n"}],

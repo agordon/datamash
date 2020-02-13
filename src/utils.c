@@ -537,10 +537,10 @@ static struct EXTRACT_NUMBER_TYPE extract_number_types[] =
    {"01234567", 8, false},
 
    /* Simple positive decimal point (including zero) */
-   {".01234567", 10, true},
+   {".0123456789", 10, true},
 
    /* Simple decimal point (positive and negative) */
-   {"+-.01234567", 10, true}
+   {"+-.0123456789", 10, true}
   };
 
 
