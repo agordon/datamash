@@ -1,3 +1,11 @@
+* Noteworthy changes in release ?.? (?-?-?) [stable]
+
+** Bug Fixes
+
+  The 'gutnum' operation (introduced in vresion 1.5) now correctly
+  prints detected numbers without truncating them.
+
+
 * Noteworthy changes in release 1.5 (2019-09-17) [stable]
 
 ** New Features
