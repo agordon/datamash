@@ -63,7 +63,9 @@ enum field_operation
   OP_DEBASE64,      /* Decode Base64 field */
   OP_MD5,           /* Calculate MD5 of a field */
   OP_SHA1,          /* Calculate SHA1 of a field */
+  OP_SHA224,        /* Calculate SHA224 of a field */
   OP_SHA256,        /* Calculate SHA256 of a field */
+  OP_SHA384,        /* Calculate SHA384 of a field */
   OP_SHA512,        /* Calculate SHA512 of a field */
   OP_P_COVARIANCE,  /* Population Covariance */
   OP_S_COVARIANCE,  /* Sample Covariance */

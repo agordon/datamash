@@ -37,7 +37,7 @@ use CuTmpdir qw(datamash);
 ## Perl 5.8 and earlier do not have Digest::SHA as core module.
 ## Skip the test if it is not found.
 my $have_sha =
-   eval qq{use Digest::SHA qw(sha1_hex sha256_hex  sha512_hex);1;};
+   eval qq{use Digest::SHA qw(sha1_hex sha224_hex sha256_hex sha384_hex sha512_hex);1;};
 
 CuSkip::skip "requires Perl>5.8 with Digest::SHA module\nload error:\n$@"
    unless $have_sha;
@@ -97,13 +97,17 @@ sub transform_column($$$)
 }
 
 my $out_g1_sha1 = transform_column ($in_g1, 2, \&sha1_hex);
+my $out_g1_sha224 = transform_column ($in_g1, 2, \&sha224_hex);
 my $out_g1_sha256 = transform_column ($in_g1, 2, \&sha256_hex);
+my $out_g1_sha384 = transform_column ($in_g1, 2, \&sha384_hex);
 my $out_g1_sha512 = transform_column ($in_g1, 2, \&sha512_hex);
 
 my @Tests =
 (
    ['sha1-1',  '-W sha1 2',   {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha1}],
+   ['sha224-1','-W sha224 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha224}],
    ['sha256-1','-W sha256 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha256}],
+   ['sha384-1','-W sha384 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha384}],
    ['sha512-1','-W sha512 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha512}],
 );
 

@@ -1,3 +1,10 @@
+* Noteworthy changes in release ?.? (?-?-?) [?]
+
+** New Features
+
+  New operations: sha224/sha384.
+
+
 * Noteworthy changes in release 1.6 (2020-02-24) [stable]
 
 ** Bug Fixes

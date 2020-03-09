@@ -64,8 +64,8 @@ Encode the field as base64
 Decode the field as base64, exit with error if invalid base64 string
 
 .TP
-.B md5/sha1/sha256/sha512
-Calculate md5/sha1/sha256/sha512 hash of the field value
+.B md5/sha1/sha224/sha256/sha384/sha512
+Calculate md5/sha1/sha224/sha256/sha384/sha512 hash of the field value
 
 .TP
 .B bin[:BUCKET-SIZE]

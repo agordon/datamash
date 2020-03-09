@@ -169,8 +169,8 @@ all the values in the input file.
 
 @item Per-Line operations:
 @code{base64}, @code{debase64}, @code{md5}, @code{sha1},
-@code{sha256}, @code{sha512}, @code{bin}, @code{strbin},
-@code{round}, @code{floor}, @code{ceil}, @code{trunc},
+@code{sha224}, @code{sha256}, @code{sha384}, @code{sha512}, @code{bin},
+@code{strbin}, @code{round}, @code{floor}, @code{ceil}, @code{trunc},
 @code{frac}, @code{dirname}, @code{basename}, @code{extname}, @code{barename},
 @code{getnum}, @code{cut}
 
@@ -378,8 +378,12 @@ value which cannot be decoded.
 calculates md5 hash of the field
 @item sha1
 calculates sha1 hash of the field
+@item sha224
+calculates sha224 hash of the field
 @item sha256
 calculates sha256 hash of the field
+@item sha384
+calculates sha384 hash of the field
 @item sha512
 calculates sha512 hash of the field
 @item dirname

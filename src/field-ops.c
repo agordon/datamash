@@ -128,7 +128,11 @@ struct operation_data operations[] =
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_SHA1 */
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  /* OP_SHA224 */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_SHA256 */
+  {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
+  /* OP_SHA384 */
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
   /* OP_SHA512 */
   {STRING_SCALAR, IGNORE_FIRST, STRING_RESULT},
@@ -479,7 +483,9 @@ field_op_collect (struct fieldop *op,
     case OP_BASE64:
     case OP_MD5:
     case OP_SHA1:
+    case OP_SHA224:
     case OP_SHA256:
+    case OP_SHA384:
     case OP_SHA512:
     case OP_DIRNAME:
     case OP_BASENAME:
@@ -755,7 +761,9 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_DEBASE64:
     case OP_MD5:
     case OP_SHA1:
+    case OP_SHA224:
     case OP_SHA256:
+    case OP_SHA384:
     case OP_SHA512:
     case OP_DIRNAME:
     case OP_BASENAME:
@@ -985,9 +993,19 @@ field_op_summarize (struct fieldop *op)
       field_op_to_hex (op, tmpbuf, 20);
       break;
 
+    case OP_SHA224:
+      sha224_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
+      field_op_to_hex (op, tmpbuf, 28);
+      break;
+
     case OP_SHA256:
       sha256_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
       field_op_to_hex (op, tmpbuf, 32);
+      break;
+
+    case OP_SHA384:
+      sha384_buffer (op->str_buf, op->str_buf_used-1, tmpbuf);
+      field_op_to_hex (op, tmpbuf, 48);
       break;
 
     case OP_SHA512:
