@@ -36,6 +36,8 @@ enum field_operation
   OP_LAST,
   OP_RAND,
   OP_MEAN,
+  OP_GEOMEAN,
+  OP_HARMMEAN,
   OP_MEDIAN,
   OP_QUARTILE_1,
   OP_QUARTILE_3,

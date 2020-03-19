@@ -452,6 +452,10 @@ number of unique/distinct values
 @table @option
 @item mean
 mean of the values
+@item geomean
+geometric mean of the values
+@item harmmean
+harmonic mean of the values
 @item trimmean
 trimmed mean of the values
 @item median

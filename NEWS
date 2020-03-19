@@ -4,6 +4,8 @@
 
   New operations: sha224/sha384.
 
+  New operations: geomean (Geometric mean) and harmmean (Harmonic mean).
+
 
 * Noteworthy changes in release 1.6 (2020-02-24) [stable]
 

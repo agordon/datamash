@@ -45,23 +45,35 @@ datamash_SOURCES = src/system.h \
 datamash_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
 datamash_LDADD = \
        lib/lib$(PACKAGE).a \
+       $(CEIL_LIBM) \
+       $(CEILL_LIBM) \
        $(EXP_LIBM) \
        $(EXPL_LIBM) \
        $(FABS_LIBM) \
        $(FABSL_LIBM) \
        $(FLOOR_LIBM) \
+       $(FLOORL_LIBM) \
        $(FREXP_LIBM) \
        $(FREXPL_LIBM) \
        $(ISNANL_LIBM) \
        $(LDEXP_LIBM) \
        $(LDEXPL_LIBM) \
+       $(LIB_CRYPTO) \
+       $(LIB_HARD_LOCALE) \
+       $(LIB_MBRTOWC) \
+       $(LIB_SETLOCALE_NULL) \
        $(LIBICONV) \
        $(LIBINTL) \
-       $(LIB_CRYPTO) \
+       $(LOG_LIBM) \
+       $(LOGL_LIBM) \
+       $(MODF_LIBM) \
+       $(MODFL_LIBM) \
        $(ROUND_LIBM) \
        $(ROUNDL_LIBM) \
        $(SQRT_LIBM) \
-       $(SQRTL_LIBM)
+       $(SQRTL_LIBM) \
+       $(TRUNC_LIBM) \
+       $(TRUNCL_LIBM)
 
 # Add LOCALDIR for gettext
 localedir = $(datadir)/locale

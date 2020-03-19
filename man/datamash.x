@@ -177,6 +177,14 @@ to R's \fBsd()\fR function).
 mean of the values
 
 .TP
+.B geomean
+geometric mean of the values
+
+.TP
+.B harmmean
+harmonic mean of the values
+
+.TP
 .B trimmean[:PERCENT]
 trimmed mean of the values. \fBPERCENT\fR should be between 0 and 0.5.
 (\fBtrimmean:0\fR is equivalent to \fBmean\fR. \fBtrimmean:0.5\fR is equivalent

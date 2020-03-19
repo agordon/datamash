@@ -186,3 +186,5 @@
 /iswxdigit.m4
 /setlocale_null.m4
 /zzgnulib.m4
+/logl.m4
+/log.m4

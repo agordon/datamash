@@ -46,6 +46,8 @@ struct field_operation_definition field_operations[] =
   {"last",    OP_LAST,    MODE_GROUPBY},
   {"rand",    OP_RAND,    MODE_GROUPBY},
   {"mean",    OP_MEAN,    MODE_GROUPBY},
+  {"geomean", OP_GEOMEAN, MODE_GROUPBY},
+  {"harmmean", OP_HARMMEAN, MODE_GROUPBY},
   {"median",  OP_MEDIAN,  MODE_GROUPBY},
   {"q1",      OP_QUARTILE_1, MODE_GROUPBY},
   {"q3",      OP_QUARTILE_3, MODE_GROUPBY},

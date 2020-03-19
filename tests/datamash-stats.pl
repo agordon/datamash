@@ -297,6 +297,38 @@ my @Tests =
   ['mean12','mean 1' ,  {IN_PIPE=>$seq22}, {OUT => "67.45\n"},],
   ['mean13','mean 1' ,  {IN_PIPE=>$seq23}, {OUT => "6.125\n"},],
 
+  # Test geometric mean
+  ['geomean1', 'geomean 1' ,  {IN_PIPE=>$seq1},  {OUT => "2.213\n"}],
+  ['geomean2', 'geomean 1' ,  {IN_PIPE=>$seq2},  {OUT => "1.817\n"}],
+  ['geomean3', 'geomean 1' ,  {IN_PIPE=>$seq3},  {OUT => "2\n"}],
+  # sorted/unsorted should not change the result.
+  ['geomean4', 'geomean 1' ,  {IN_PIPE=>$seq9},  {OUT => "8.464\n"},],
+  ['geomean5', 'geomean 1' ,  {IN_PIPE=>$seq10}, {OUT => "9.573\n"}],
+  ['geomean6', 'geomean 1' ,  {IN_PIPE=>$seq12}, {OUT => "11.817\n"},],
+  ['geomean7', 'geomean 1' ,  {IN_PIPE=>$seq11}, {OUT => "10.653\n"},],
+  ['geomean8', 'geomean 1' ,  {IN_PIPE=>$seq12_unsorted}, {OUT => "11.817\n"},],
+  ['geomean9', '--sort geomean 1' ,
+     {IN_PIPE=>$seq12_unsorted}, {OUT => "11.817\n"},],
+  ['geomean10','geomean 1' ,  {IN_PIPE=>$seq20}, {OUT => "99.596\n"},],
+  ['geomean11','geomean 1' ,  {IN_PIPE=>$seq21}, {OUT => "34.644\n"},],
+  ['geomean12','geomean 1' ,  {IN_PIPE=>$seq22}, {OUT => "67.386\n"},],
+
+  # Test harmonic mean
+  ['harmmean1', 'harmmean 1' ,  {IN_PIPE=>$seq1},  {OUT => "1.92\n"}],
+  ['harmmean2', 'harmmean 1' ,  {IN_PIPE=>$seq2},  {OUT => "1.636\n"}],
+  ['harmmean3', 'harmmean 1' ,  {IN_PIPE=>$seq3},  {OUT => "2\n"}],
+  # sorted/unsorted should not change the result.
+  ['harmmean4', 'harmmean 1' ,  {IN_PIPE=>$seq9},  {OUT => "6.004\n"},],
+  ['harmmean5', 'harmmean 1' ,  {IN_PIPE=>$seq10}, {OUT => "6.521\n"}],
+  ['harmmean6', 'harmmean 1' ,  {IN_PIPE=>$seq12}, {OUT => "7.534\n"},],
+  ['harmmean7', 'harmmean 1' ,  {IN_PIPE=>$seq11}, {OUT => "7.025\n"},],
+  ['harmmean8', 'harmmean 1' ,  {IN_PIPE=>$seq12_unsorted}, {OUT => "7.534\n"},],
+  ['harmmean9', '--sort harmmean 1' ,
+     {IN_PIPE=>$seq12_unsorted}, {OUT => "7.534\n"},],
+  ['harmmean10','harmmean 1' ,  {IN_PIPE=>$seq20}, {OUT => "99.122\n"},],
+  ['harmmean11','harmmean 1' ,  {IN_PIPE=>$seq21}, {OUT => "19.563\n"},],
+  ['harmmean12','harmmean 1' ,  {IN_PIPE=>$seq22}, {OUT => "67.322\n"},],
+
   # Test median
   ['med1', 'median 1' ,  {IN_PIPE=>$seq1},  {OUT => "2.5\n"}],
   ['med2', 'median 1' ,  {IN_PIPE=>$seq2},  {OUT => "2\n"}],
