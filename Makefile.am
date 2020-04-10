@@ -26,7 +26,7 @@ SUBDIRS = po
 ##
 ## Main Program
 ##
-bin_PROGRAMS = datamash
+bin_PROGRAMS = datamash decorate
 
 datamash_SOURCES = src/system.h \
 	       src/die.h \
@@ -63,6 +63,10 @@ datamash_LDADD = \
        $(SQRT_LIBM) \
        $(SQRTL_LIBM)
 
+decorate_SOURCES = src/decorate.c
+decorate_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
+decorate_LDFLAGS = lib/lib$(PACKAGE).a
+
 # Add LOCALDIR for gettext
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
@@ -72,9 +76,10 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 ## Man Page
 ##
 
-man_MANS = datamash.1
+man_MANS = datamash.1 decorate.1
 EXTRA_DIST += $(man_MANS) \
 		man/datamash.x \
+		man/decorate.x \
 		man/help2man
 
 CLEANFILES =
@@ -94,6 +99,14 @@ datamash.1: datamash $(top_srcdir)/man/datamash.x
 	   perl $(abs_top_srcdir)/man/help2man \
 	       --include=$(top_srcdir)/man/datamash.x \
 	       datamash -o $@-t
+	chmod u=rw,go=r $@-t
+	mv -f $@-t $@
+
+decorate.1: decorate $(top_srcdir)/man/decorate.x
+	PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
+	   perl $(abs_top_srcdir)/man/help2man \
+	       --include=$(top_srcdir)/man/decorate.x \
+	       decorate -o $@-t
 	chmod u=rw,go=r $@-t
 	mv -f $@-t $@
 
@@ -149,8 +162,9 @@ TESTS_ENVIRONMENT = \
   PERL5LIB='$(abs_top_srcdir)/tests$(PATH_SEPARATOR)'"$$PERL5LIB" \
   PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
   DATAMASH=`echo datamash | sed '$(transform)'` \
+  DECORATE=`echo decorate | sed '$(transform)'` \
   test_dir='$(abs_top_srcdir)/tests' ; \
-  export top_srcdir PERL5LIB PATH DATAMASH test_dir ; \
+  export top_srcdir PERL5LIB PATH DATAMASH DECORATE test_dir ; \
   9>&2
 
 ##

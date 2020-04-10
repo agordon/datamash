@@ -20,6 +20,7 @@ build-aux/
 
 # Autogenerate man page
 datamash.1
+decorate.1
 
 config.h
 config.h.in
@@ -78,8 +79,10 @@ test-suite.log
 
 # compiled binary
 /datamash
+/decorate
 # compiled binary (with mingw cross-compiling)
 /datamash.exe
+/decorate.exe
 
 # Documentation files
 doc/.dirstamp
