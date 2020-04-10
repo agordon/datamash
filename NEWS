@@ -2,6 +2,9 @@
 
 ** New Features
 
+  decorate(1): new program - sorts input in non-standard ordering, e.g.
+  IPv4, IPv6, roman numerals.
+
   New operations: sha224/sha384.
 
   New operations: geomean (Geometric mean) and harmmean (Harmonic mean).

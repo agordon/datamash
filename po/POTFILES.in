@@ -7,8 +7,11 @@ lib/version-etc.c
 lib/xalloc-die.c
 lib/xstrtol-error.c
 src/datamash.c
+src/decorate-functions.c
+src/decorate.c
 src/double-format.c
 src/field-ops.c
+src/key-compare.c
 src/op-parser.c
 src/op-scanner.c
 src/system.h
