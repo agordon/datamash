@@ -141,7 +141,7 @@ random_md5_state_init (char const *random_source);
 
 /* Insert a malloc'd copy of key KEY_ARG at the end of the key list.  */
 
-void
+extern struct keyfield*
 insertkey (struct keyfield *key_arg);
 
 /* Report a bad field specification SPEC, with extra info MSGID.  */
@@ -174,6 +174,12 @@ key_init (struct keyfield *key);
 void
 debug_line (struct line const *line, const bool unique, const bool stable);
 
+/* print the key spec as a parameter */
+void
+debug_keylist (FILE* stream);
+
+void
+debug_keyfield (FILE* stream, const struct keyfield *key);
 
 /* Return whether sorting options specified for key.  */
 

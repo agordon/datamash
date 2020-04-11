@@ -38,12 +38,12 @@
 #include "error.h"
 #include "die.h"
 #ifdef KEY_COMPARE_VERSION
-#include "filevercmp.h"
+//#include "filevercmp.h"
 #endif
 #include "hard-locale.h"
 #ifdef KEY_COMPARE_RANDOM
-#include "md5.h"
-#include "randread.h"
+//#include "md5.h"
+//#include "randread.h"
 #endif
 #include "quote.h"
 //#include "strnumcmp.h"
@@ -59,6 +59,14 @@
 
 #include <inttypes.h>
 #include <intprops.h>
+#include <ctype.h>
+
+/* '\n' is considered a field separator with  --zero-terminated.  */
+static inline bool
+field_sep (unsigned char ch)
+{
+  return isblank (ch) || ch == '\n';
+}
 
 /* The representation of the decimal point in the current locale.  */
 int decimal_point = 0;
@@ -104,6 +112,7 @@ struct month
 
 /* Table mapping month names to integers.
    Alphabetic order allows binary search. */
+#if 0
 static struct month monthtab[] =
 {
   {"APR", 4},
@@ -119,6 +128,7 @@ static struct month monthtab[] =
   {"OCT", 10},
   {"SEP", 9}
 };
+#endif
 #endif /* KEY_COMPARE_MONTH */
 
 /* Tab character separating fields.  If TAB_DEFAULT, then fields are
@@ -144,7 +154,6 @@ struct_month_cmp (void const *m1, void const *m2)
 #endif
 
 /* Initialize the character class tables. */
-#if 0
 static void
 inittables (void)
 {
@@ -159,6 +168,8 @@ inittables (void)
       nondictionary[i] = ! isalnum (i) && ! field_sep (i);
       fold_toupper[i] = toupper (i);
     }
+
+#if 0
 
 #if HAVE_NL_LANGINFO
 #ifdef KEY_COMPARE_MONTH
@@ -186,8 +197,8 @@ inittables (void)
     }
 #endif
 #endif
-}
 #endif
+}
 
 /* Return a pointer to the first character of the field specified
    by KEY in LINE. */
@@ -334,6 +345,7 @@ limfield (struct line const *line, struct keyfield const *key)
 }
 
 #ifdef KEY_COMPARE_HUMAN_NUMERIC
+#if 0
 /* Table that maps characters to order-of-magnitude values.  */
 static char const unit_order[UCHAR_LIM] =
   {
@@ -362,7 +374,9 @@ static char const unit_order[UCHAR_LIM] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 #endif
   };
+#endif
 
+#if 0
 /* Traverse number given as *number consisting of digits, thousands_sep, and
    decimal_point chars only.  Returns the highest digit found in the number,
    or '\0' if no digit has been found.  Upon return *number points at the
@@ -409,12 +423,12 @@ traverse_raw_number (char const **number)
   *number = p - 1;
   return max_digit;
 }
-
+#endif
 /* Return an integer that represents the order of magnitude of the
    unit following the number.  The number may contain thousands
    separators and a decimal point, but it may not contain leading blanks.
    Negative numbers get negative orders; zero numbers have a zero order.  */
-
+#if 0
 static int _GL_ATTRIBUTE_PURE
 find_unit_order (char const *number)
 {
@@ -430,10 +444,10 @@ find_unit_order (char const *number)
   else
     return 0;
 }
-
+#endif
 /* Compare numbers A and B ending in units with SI or IEC prefixes
        <none/unknown> < K/k < M < G < T < P < E < Z < Y  */
-
+#if 0
 static int
 human_numcompare (char const *a, char const *b)
 {
@@ -445,6 +459,7 @@ human_numcompare (char const *a, char const *b)
   int diff = find_unit_order (a) - find_unit_order (b);
   return (diff ? diff : strnumcmp (a, b, decimal_point, thousands_sep));
 }
+#endif
 #endif /* KEY_COMPARE_HUMAN_NUMERIC */
 
 /* Compare strings A and B as numbers without explicitly converting them to
@@ -515,7 +530,7 @@ general_numcompare (char const *sa, char const *sb)
 #ifdef KEY_COMPARE_MONTH
 /* Return an integer in 1..12 of the month name MONTH.
    Return 0 if the name in S is not recognized.  */
-
+#if 0
 static int
 getmonth (char const *month, char **ea)
 {
@@ -555,9 +570,11 @@ getmonth (char const *month, char **ea)
 
   return 0;
 }
+#endif
 #endif /* KEY_COMPARE_MONTH */
 
 #ifdef KEY_COMPARE_RANDOM
+#if 0
 /* A randomly chosen MD5 state, used for random comparison.  */
 static struct md5_ctx random_md5_state;
 
@@ -729,6 +746,7 @@ compare_random (char *restrict texta, size_t lena,
 
   return diff;
 }
+#endif
 #endif /* KEY_COMPARE_RANDOM */
 
 
@@ -1003,7 +1021,7 @@ keycompare (struct line const *a, struct line const *b)
 
 /* Insert a malloc'd copy of key KEY_ARG at the end of the key list.  */
 
-extern void
+extern struct keyfield*
 insertkey (struct keyfield *key_arg)
 {
   struct keyfield **p;
@@ -1013,6 +1031,7 @@ insertkey (struct keyfield *key_arg)
     continue;
   *p = key;
   key->next = NULL;
+  return key;
 }
 
 /* Report a bad field specification SPEC, with extra info MSGID.  */
@@ -1435,7 +1454,6 @@ key_warnings (struct keyfield const *gkey, bool gkey_only,
 }
 #endif
 
-#if 0
 extern void
 init_key_spec (void)
 {
@@ -1463,4 +1481,59 @@ init_key_spec (void)
 
   inittables ();
 }
-#endif
+
+
+extern void
+debug_keyfield (FILE* stream, const struct keyfield *key)
+{
+  fprintf(stream,"-k ");
+  fprintf(stream,"%zu", key->sword+1);
+  if (key->schar)
+    fprintf(stream,".%zu", key->schar+1);
+  if (key->skipsblanks)
+    fprintf(stream,"b");
+  if (key->eword != SIZE_MAX)
+    {
+      fprintf(stream,",%zu",key->eword+1);
+      if (key->echar)
+        fprintf(stream,".%zu", key->echar);
+    }
+  if (key->skipeblanks)
+    fprintf(stream,"b");
+  if (key->ignore == nondictionary)
+    fprintf(stream,"d");
+  if (key->translate == fold_toupper)
+    fprintf(stream,"f");
+  if (key->general_numeric)
+    fprintf(stream,"g");
+  if (key->human_numeric)
+    fprintf(stream,"h");
+  if (key->ignore == nonprinting)
+    fprintf(stream,"i");
+  if (key->month)
+    fprintf(stream,"M");
+  if (key->numeric)
+    fprintf(stream,"n");
+  if (key->random)
+    fprintf(stream,"R");
+  if (key->reverse)
+    fprintf(stream,"r");
+  if (key->version)
+    fprintf(stream,"V");
+
+  if (key->decorate_fn)
+    fprintf(stream,":[decorate %p]", key->decorate_fn);
+  if (key->decorate_cmd)
+    fprintf(stream,"@%s", key->decorate_cmd);
+}
+
+extern void
+debug_keylist (FILE *stream)
+{
+  struct keyfield const *key = keylist;
+
+  do {
+    debug_keyfield (stream,key);
+    fprintf(stream,"\n");
+  }  while (key && ((key = key->next)));
+}

@@ -32,7 +32,7 @@
 #include "key-compare.h"
 #define Version VERSION
 #include "version-etc.h"
-
+#include "ignore-value.h"
 #define SORT_FAILURE EXIT_FAILURE
 
 //#include "key-compare.h"
@@ -50,6 +50,9 @@ const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon" ;
 static bool debug = false;
 
 static char eol_delimiter = '\n';
+
+/* List of key field to be decorated  */
+static struct keyfield *decorate_keylist = NULL;
 
 enum
 {
@@ -284,63 +287,21 @@ static struct conversions_t conversions[] = {
 };
 
 static void
-parse_conversion_spec (const char* optarg, const char *s, struct keyfield *key)
-{
-  if (*s == '\0')
-    badfieldspec (optarg, N_("missing conversion option (':' or '@')"));
-
-  if (*s == '@')
-    {
-      /* external conversion */
-      ++s;
-
-      if (*s == '\0')
-        badfieldspec (optarg, N_("missing external conversion command"));
-
-      die (SORT_FAILURE, 0, "external commands are not implemented (yet)");
-    }
-  else if (*s == ':')
-    {
-      bool found = false;
-      /* built-in conversions */
-      ++s;
-
-      if (*s == '\0')
-        badfieldspec (optarg, N_("missing internal conversion function"));
-
-      for (int i = 0 ; conversions[i].name; ++i)
-        {
-          if (STREQ (s, conversions[i].name))
-            {
-              found = true;
-              key->decorate_fn = conversions[i].decorate_fn;
-              break;
-            }
-        }
-      if (!found)
-        badfieldspec (optarg, N_("invalid built-in conversion option"));
-    }
-  else
-    badfieldspec (optarg,
-                  N_("invalid conversion option (expecting ':' or '@')"));
-}
-
-static void
 decorate_fields (struct linebuffer *linebuf)
 {
   struct line l;   /* The struct used by key-compare */
   struct line *a;
 
   size_t len = linebuf->length;
-  struct keyfield *key = keylist;
+  struct keyfield *key = decorate_keylist;
 
   l.text = linebuf->buffer;
   l.length = linebuf->length;
   l.keybeg = NULL;
   l.keylim = NULL;
 
-  l.keybeg = begfield (&l, keylist);
-  l.keylim = limfield (&l, keylist);
+  l.keybeg = begfield (&l, decorate_keylist);
+  l.keylim = limfield (&l, decorate_keylist);
 
   if (l.keybeg >= l.keylim)
     {
@@ -375,8 +336,7 @@ decorate_fields (struct linebuffer *linebuf)
 
       /* Process the extracted key in NUL-terminated string 'ta' */
 
-      /* Print field delimiter */
-      fputc ((tab == TAB_DEFAULT) ? ' ' : tab, stdout);
+      //fprintf(stderr,"extracted field: '%s'\n", ta);
 
       if (key->decorate_fn)
         {
@@ -387,6 +347,9 @@ decorate_fields (struct linebuffer *linebuf)
         {
           /* run external command */
         }
+
+      /* Print field delimiter */
+      fputc ((tab == TAB_DEFAULT) ? ' ' : tab, stdout);
 
       /* restore the field-separator */
       ta[tlena] = enda;
@@ -441,9 +404,9 @@ decorate_file (const char *infile)
       if (lb.length>0 && lb.buffer[lb.length-1]==eol_delimiter)
         --l;
 
-      fwrite (lb.buffer, 1, l, stdout);
-
       decorate_fields (&lb);
+
+      fwrite (lb.buffer, 1, l, stdout);
 
       fputc (eol_delimiter, stdout);
     }
@@ -453,18 +416,222 @@ decorate_file (const char *infile)
     die (EXIT_FAILURE, 0, _("error reading %s"), quoteaf (infile));
 
   /* stdout is handled via the atexit-invoked close_stdout function.  */
-
   free (lb.buffer);
 }
 
+
+/* this code was copied from src/sort.c */
+struct keyfield*
+parse_sort_key_arg(const char* optarg, char const** endpos)
+{
+  char const *s;
+  struct keyfield key_buf;
+  struct keyfield *key = NULL;
+
+  key = key_init (&key_buf);
+
+  /* Get POS1. */
+  s = parse_field_count (optarg, &key->sword,
+                         N_("invalid number at field start"));
+
+  if (! key->sword--)
+    {
+      /* Provoke with 'sort -k0' */
+      badfieldspec (optarg, N_("field number is zero"));
+    }
+  if (*s == '.')
+    {
+      s = parse_field_count (s + 1, &key->schar,
+                             N_("invalid number after '.'"));
+      if (! key->schar--)
+        {
+          /* Provoke with 'sort -k1.0' */
+          badfieldspec (optarg, N_("character offset is zero"));
+        }
+    }
+  if (! (key->sword || key->schar))
+    key->sword = SIZE_MAX;
+  s = set_ordering (s, key, bl_start);
+  if (*s != ',')
+    {
+      key->eword = SIZE_MAX;
+      key->echar = 0;
+    }
+  else
+    {
+      /* Get POS2. */
+      s = parse_field_count (s + 1, &key->eword,
+                             N_("invalid number after ','"));
+      if (! key->eword--)
+        {
+          /* Provoke with 'sort -k1,0' */
+          badfieldspec (optarg, N_("field number is zero"));
+        }
+      if (*s == '.')
+        {
+          s = parse_field_count (s + 1, &key->echar,
+                                 N_("invalid number after '.'"));
+        }
+      s = set_ordering (s, key, bl_end);
+    }
+
+  /* TODO: strange, sort's original code sets sword=SIZE_MAX for "-k1".
+   * force override??? */
+  if (key->sword==SIZE_MAX)
+    key->sword=0;
+
+  key = insertkey (key); /* returns a newly malloc'd struct */
+
+  *endpos = s;
+
+  return key;
+}
+
+
+static void
+parse_external_conversion_spec (const char* optarg, const char *s, struct keyfield *key)
+{
+  ignore_value (key);
+
+  if (*s == '\0')
+    badfieldspec (optarg, N_("missing external conversion command"));
+
+  die (SORT_FAILURE, 0, "external commands are not implemented (yet)");
+}
+
+
+static void
+parse_builtin_conversion_spec (const char* optarg, const char *s, struct keyfield *key)
+{
+  bool found = false;
+  /* built-in conversions */
+  ++s;
+
+  if (*s == '\0')
+    badfieldspec (optarg, N_("missing internal conversion function"));
+
+  for (int i = 0 ; conversions[i].name; ++i)
+    {
+      if (STREQ (s, conversions[i].name))
+        {
+          found = true;
+          key->decorate_fn = conversions[i].decorate_fn;
+          break;
+        }
+    }
+  if (!found)
+    badfieldspec (optarg, N_("invalid built-in conversion option"));
+}
+
+void check_allowed_key_flags (const struct keyfield* key)
+{
+  /* key->reverse is the only ordering flag allowed */
+  if (key->skipsblanks || key->skipeblanks
+      || (key->ignore != 0) || (key->translate != 0)
+      || (key->general_numeric) || (key->human_numeric)
+      || (key->month) || (key->numeric)
+      || (key->random) || (key->version))
+    badfieldspec (optarg, N_("ordering flags (b/d/i/h/n/g/M/R/V) can not be combined with a conversion function"));
+}
+
+void parse_key_arg(const char* optarg)
+{
+  char const *s;
+  struct keyfield *key = parse_sort_key_arg (optarg, &s);
+
+  switch (*s)
+    {
+    case '\0':
+      /* End of key-spec, this is a standard sort key spec
+         to be passed as-is. */
+      break;
+
+    case ':':
+      /* built-in conversion */
+      check_allowed_key_flags (key);
+      parse_builtin_conversion_spec (optarg, s, key);
+      break;
+
+    case '@':
+      /* external command conversion */
+      check_allowed_key_flags (key);
+      parse_external_conversion_spec (optarg, s, key);
+      break;
+
+    default:
+      /* invalid key spec character */
+      badfieldspec (optarg, N_("invalid key specification"));
+      break;
+
+    }
+}
+
+void
+insert_decorate_key (struct keyfield *key_arg)
+{
+  struct keyfield **p;
+  struct keyfield *key = xmemdup (key_arg, sizeof *key);
+
+  /* decorated fields always skip blanks */
+  key->skipsblanks = key->skipeblanks = true;
+
+  for (p = &decorate_keylist; *p; p = &(*p)->next)
+    continue;
+  *p = key;
+  key->next = NULL;
+}
+
+
+void
+adjust_key_fields()
+{
+  struct keyfield *key = keylist;
+  int cnt = 0;
+  int idx = 0;
+
+  do {
+    if (key->decorate_fn || key->decorate_cmd)
+      ++cnt;
+  }  while (key && ((key = key->next)));
+
+  if (debug)
+    fprintf(stderr, "Found %d decorate fields\n", cnt);
+
+  key = keylist;
+  do {
+    if (key->decorate_fn || key->decorate_cmd)
+      {
+        /* Save the input keyfield spec */
+        insert_decorate_key (key);
+
+        /* when passing args to 'sort',
+           move decorated key fields to the begining */
+        key->sword = idx ; /* note: sword is ZERO based,
+                              so 0 is the first column */
+        if (key->eword != SIZE_MAX)
+          key->eword = idx;
+
+        key->numeric = true;
+        key->decorate_fn = NULL ;
+        key->decorate_cmd = NULL;
+        ++idx;
+      }
+    else
+      {
+        /* shift all non-decorate key fields by the count
+           of decorated fields (which will be inserted at the begining
+           of each line)*/
+        key->sword += cnt ;
+        if (key->eword != SIZE_MAX)
+          key->eword += cnt;
+      }
+  }  while (key && ((key = key->next)));
+}
 
 
 int
 main (int argc, char **argv)
 {
-  struct keyfield *key = NULL;
-  struct keyfield key_buf;
-  char const *s;
   int opt;
 
   set_program_name (argv[0]);
@@ -472,7 +639,7 @@ main (int argc, char **argv)
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  //init_key_spec ();
+  init_key_spec ();
 
   atexit (close_stdout);
 
@@ -480,65 +647,8 @@ main (int argc, char **argv)
     {
       switch (opt)
         {
-        /* this case was copied from src/sort.c */
         case 'k':
-          key = key_init (&key_buf);
-
-          /* Get POS1. */
-          s = parse_field_count (optarg, &key->sword,
-                                 N_("invalid number at field start"));
-          if (! key->sword--)
-            {
-              /* Provoke with 'sort -k0' */
-              badfieldspec (optarg, N_("field number is zero"));
-            }
-          if (*s == '.')
-            {
-              s = parse_field_count (s + 1, &key->schar,
-                                     N_("invalid number after '.'"));
-              if (! key->schar--)
-                {
-                  /* Provoke with 'sort -k1.0' */
-                  badfieldspec (optarg, N_("character offset is zero"));
-                }
-            }
-          if (! (key->sword || key->schar))
-            key->sword = SIZE_MAX;
-          s = set_ordering (s, key, bl_start);
-          if (*s != ',')
-            {
-              key->eword = SIZE_MAX;
-              key->echar = 0;
-            }
-          else
-            {
-              /* Get POS2. */
-              s = parse_field_count (s + 1, &key->eword,
-                                     N_("invalid number after ','"));
-              if (! key->eword--)
-                {
-                  /* Provoke with 'sort -k1,0' */
-                  badfieldspec (optarg, N_("field number is zero"));
-                }
-              if (*s == '.')
-                {
-                  s = parse_field_count (s + 1, &key->echar,
-                                         N_("invalid number after '.'"));
-                }
-              s = set_ordering (s, key, bl_end);
-            }
-
-          /* always skip blanks, equivalent to sort's -b option */
-          key->skipsblanks = key->skipeblanks = true;
-
-          /* which conversion/decoration to use */
-          parse_conversion_spec (optarg, s, key);
-
-          /* TODO: strange, sort's original code sets sword=SIZE_MAX for "-k1".
-           * force override??? */
-          if (key->sword==SIZE_MAX)
-            key->sword=0;
-          insertkey (key);
+          parse_key_arg (optarg);
           break;
 
         case 't':
@@ -586,6 +696,12 @@ main (int argc, char **argv)
 
   if (!keylist)
     die (SORT_FAILURE, 0, _("missing -k/--key decoration options"));
+
+  if (debug)
+    debug_keylist (stderr);
+  adjust_key_fields ();
+  if (debug)
+    debug_keylist (stderr);
 
   if (optind < argc)
     {
