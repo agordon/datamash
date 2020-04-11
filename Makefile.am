@@ -63,9 +63,19 @@ datamash_LDADD = \
        $(SQRT_LIBM) \
        $(SQRTL_LIBM)
 
-decorate_SOURCES = src/decorate.c
+decorate_SOURCES = src/decorate.c \
+	src/key-compare.c src/key-compare.h
 decorate_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
-decorate_LDFLAGS = lib/lib$(PACKAGE).a
+decorate_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DKEY_COMPARE_DECORATION \
+	-DKEY_COMPARE_HUMAN_NUMERIC \
+	-DKEY_COMPARE_NONPRINTING \
+	-DKEY_COMPARE_MONTH \
+	-DKEY_COMPARE_RANDOM \
+	-DKEY_COMPARE_REVERSE \
+	-DKEY_COMPARE_VERSION
+
+decorate_LDADD = lib/lib$(PACKAGE).a
 
 # Add LOCALDIR for gettext
 localedir = $(datadir)/locale
