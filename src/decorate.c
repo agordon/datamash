@@ -20,6 +20,7 @@
 #include <arpa/inet.h>
 #include <limits.h>
 #include <inttypes.h>
+#include <intprops.h>
 
 #include "system.h"
 //#include "stdio--.h"
@@ -56,13 +57,15 @@ static struct keyfield *decorate_keylist = NULL;
 
 enum
 {
-  DEBUG_OPTION = CHAR_MAX + 1
+  DEBUG_OPTION = CHAR_MAX + 1,
+  UNDECORATE_OPTION
 };
 
 static struct option const longopts[] =
 {
   {"key", required_argument, NULL, 'k'},
   {"check-chars", required_argument, NULL, 'w'},
+  {"undecorate", required_argument, NULL, UNDECORATE_OPTION},
   {"zero-terminated", no_argument, NULL, 'z'},
   {"-debug", no_argument, NULL, DEBUG_OPTION},
   {GETOPT_HELP_OPTION_DECL},
@@ -138,7 +141,8 @@ decorate_as_is (const char* in)
 static bool
 decorate_strlen (const char* in)
 {
-  fprintf (stdout, "%"PRIuMAX, (uintmax_t)strlen (in));
+  uintmax_t u = (uintmax_t)strlen (in);
+  printf ("%0*"PRIuMAX, (int)INT_BUFSIZE_BOUND (u), u);
   return true;
 }
 
@@ -195,7 +199,7 @@ decorate_roman_numerals (const char* in)
     }
 
   result += last;
-  printf ("%"PRIiMAX, result);
+  printf ("%0*"PRIiMAX, (int)INT_BUFSIZE_BOUND (result), result);
   return true;
 }
 
@@ -212,6 +216,7 @@ decorate_ipv4_inet_addr (const char* in)
       error (0, 0, _("invalid IPv4 address %s"), quote (in));
       return false;
     }
+
 
   printf ("%08X", ntohl (adr.s_addr));
   return true;
@@ -420,6 +425,65 @@ decorate_file (const char *infile)
 }
 
 
+
+static void
+undecorate_file (const char *infile, int num_fields)
+{
+  intmax_t linenum = 0;
+  struct linebuffer lb;
+  struct keyfield key;
+  struct line l;
+  memset (&l, 0, sizeof(l));
+
+  /* Create a dummy keyfield, encompasing the first N fields to skip */
+  memset(&key, 0, sizeof(key));
+  key.sword = num_fields;
+  key.skipsblanks = true;
+
+  if (! (STREQ (infile, "-") || freopen (infile, "r", stdin)))
+    die (EXIT_FAILURE, errno, "%s", quotef (infile));
+
+  //fadvise (stdin, FADVISE_SEQUENTIAL);
+
+  initbuffer (&lb);
+
+  while (!feof (stdin))
+    {
+      if (readlinebuffer_delim (&lb, stdin, eol_delimiter) == 0)
+        break;
+
+      ++linenum;
+
+      l.text = lb.buffer;
+      l.length = lb.length;
+
+      /* don't print EOL character, if any */
+      if (lb.length>0 && lb.buffer[lb.length-1]==eol_delimiter)
+        --l.length;
+
+      /* skip the first N fields */
+      char* p = begfield(&l, &key);
+      size_t t = l.length - (p-l.text);
+
+      if (debug)
+        {
+          fprintf(stderr,"Orig Line: %zu chars: '%.*s'\n", l.length, (int)l.length, l.text);
+          fprintf(stderr,"Undec Line: %zu chars: '%.*s'\n", t, (int)t, p);
+        }
+      fwrite (p, 1, t, stdout);
+
+      fputc (eol_delimiter, stdout);
+    }
+
+  // closefiles:
+  if (ferror (stdin) || fclose (stdin) != 0)
+    die (EXIT_FAILURE, 0, _("error reading %s"), quoteaf (infile));
+
+  /* stdout is handled via the atexit-invoked close_stdout function.  */
+  free (lb.buffer);
+}
+
+
 /* this code was copied from src/sort.c */
 struct keyfield*
 parse_sort_key_arg(const char* optarg, char const** endpos)
@@ -611,7 +675,6 @@ adjust_key_fields()
         if (key->eword != SIZE_MAX)
           key->eword = idx;
 
-        key->numeric = true;
         key->decorate_fn = NULL ;
         key->decorate_cmd = NULL;
         ++idx;
@@ -633,6 +696,7 @@ int
 main (int argc, char **argv)
 {
   int opt;
+  int undecorate_fields = 0;
 
   set_program_name (argv[0]);
   setlocale (LC_ALL, "");
@@ -681,6 +745,13 @@ main (int argc, char **argv)
           eol_delimiter = '\0';
           break;
 
+        case UNDECORATE_OPTION:
+          undecorate_fields = atoi(optarg);
+          if (undecorate_fields <= 0)
+            die (SORT_FAILURE, 0, _("invalid number of fields to undecorate %s"),
+                 quote (optarg));
+          break;
+
         case DEBUG_OPTION:
           debug = true;
           break;
@@ -694,22 +765,39 @@ main (int argc, char **argv)
         }
     }
 
-  if (!keylist)
-    die (SORT_FAILURE, 0, _("missing -k/--key decoration options"));
+  if (!keylist && !undecorate_fields)
+    die (SORT_FAILURE, 0, _("missing -k/--key decoration or --undecorate options"));
 
-  if (debug)
-    debug_keylist (stderr);
-  adjust_key_fields ();
-  if (debug)
-    debug_keylist (stderr);
+  if (undecorate_fields && keylist)
+    die (SORT_FAILURE, 0, _("--undecorate cannot be used with --keys or --decorate"));
 
-  if (optind < argc)
+  if (keylist)
     {
-      for (int i = optind; i < argc; ++i)
-        decorate_file (argv[i]);
+      if (debug)
+        debug_keylist (stderr);
+      adjust_key_fields ();
+      if (debug)
+        debug_keylist (stderr);
+
+      if (optind < argc)
+        {
+          for (int i = optind; i < argc; ++i)
+            decorate_file (argv[i]);
+        }
+      else
+        decorate_file ("-");
     }
   else
-    decorate_file ("-");
+    {
+      /* Undecorate */
+      if (optind < argc)
+        {
+          for (int i = optind; i < argc; ++i)
+            undecorate_file (argv[i], undecorate_fields);
+        }
+      else
+        undecorate_file ("-", undecorate_fields);
+    }
 
   return EXIT_SUCCESS;
 }
