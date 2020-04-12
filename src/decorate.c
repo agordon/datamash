@@ -62,6 +62,7 @@ enum
   DEBUG_OPTION = CHAR_MAX + 1,
   DECORATE_OPTION,
   UNDECORATE_OPTION,
+  PRINT_SORT_ARGS_OPTION,
 
   /* Sort options */
   COMPRESS_PROGRAM_OPTION,
@@ -78,6 +79,7 @@ static struct option const longopts[] =
   {"undecorate", required_argument, NULL, UNDECORATE_OPTION},
   {"-debug", no_argument, NULL, DEBUG_OPTION},
   {"zero-terminated", no_argument, NULL, 'z'},
+  {"print-sort-args", no_argument, NULL, PRINT_SORT_ARGS_OPTION},
 
   /* sort options, passed as-is to the sort process */
   {"check", optional_argument, NULL, CHECK_OPTION},
@@ -642,6 +644,7 @@ main (int argc, char **argv)
   int undecorate_fields = 0;
   int num_decorate_fields = 0;
   bool decorate_only = false;
+  bool print_sort_args = false;
 
   set_program_name (argv[0]);
   setlocale (LC_ALL, "");
@@ -748,6 +751,10 @@ main (int argc, char **argv)
                  quote (optarg));
           break;
 
+        case PRINT_SORT_ARGS_OPTION:
+          print_sort_args = true;
+          break;
+
         case DEBUG_OPTION:
           debug = true;
           break;
@@ -778,6 +785,23 @@ main (int argc, char **argv)
       num_decorate_fields = adjust_key_fields ();
       if (debug)
         debug_keylist (stderr);
+    }
+
+  if (print_sort_args)
+    {
+      /* print and exit */
+      char** sort_args = build_sort_process_args ();
+      char **p = sort_args;
+      while (*p)
+        {
+          /* TODO: shell quoting / escaping */
+          fputs(*p, stdout);
+          ++p;
+          if (*p)
+            fputc(' ', stdout);
+        }
+      fputc('\n', stdout);
+      exit(EXIT_SUCCESS);
     }
 
   if (decorate_only)
