@@ -19,6 +19,7 @@
 #include <limits.h>
 #include <inttypes.h>
 #include <intprops.h>
+#include <sys/wait.h>
 
 #include "system.h"
 //#include "stdio--.h"
@@ -55,6 +56,7 @@ static struct keyfield *decorate_keylist = NULL;
 enum
 {
   DEBUG_OPTION = CHAR_MAX + 1,
+  DECORATE_OPTION,
   UNDECORATE_OPTION
 };
 
@@ -62,6 +64,7 @@ static struct option const longopts[] =
 {
   {"key", required_argument, NULL, 'k'},
   {"check-chars", required_argument, NULL, 'w'},
+  {"decorate", no_argument, NULL, DECORATE_OPTION},
   {"undecorate", required_argument, NULL, UNDECORATE_OPTION},
   {"zero-terminated", no_argument, NULL, 'z'},
   {"-debug", no_argument, NULL, DEBUG_OPTION},
@@ -233,6 +236,9 @@ decorate_file (const char *infile)
 
   initbuffer (&lb);
 
+  if (debug)
+    fprintf(stderr,"decorate: starting read loop\n");
+
   while (!feof (stdin))
     {
       if (readlinebuffer_delim (&lb, stdin, eol_delimiter) == 0)
@@ -248,7 +254,11 @@ decorate_file (const char *infile)
 
       decorate_fields (&lb);
 
-      fwrite (lb.buffer, 1, l, stdout);
+      if (debug)
+        fprintf(stderr,"decorate: writing line: '%.*s'\n", (int)l, lb.buffer);
+
+      if (fwrite (lb.buffer, 1, l, stdout) != l)
+        die (EXIT_FAILURE, errno, _("decorate: fwrite failed"));
 
       fputc (eol_delimiter, stdout);
     }
@@ -256,6 +266,9 @@ decorate_file (const char *infile)
   // closefiles:
   if (ferror (stdin) || fclose (stdin) != 0)
     die (EXIT_FAILURE, 0, _("error reading %s"), quoteaf (infile));
+
+  if (debug)
+    fprintf(stderr,"decorate: end loop\n");
 
   /* stdout is handled via the atexit-invoked close_stdout function.  */
   free (lb.buffer);
@@ -483,7 +496,7 @@ insert_decorate_key (struct keyfield *key_arg)
 }
 
 
-void
+int
 adjust_key_fields()
 {
   struct keyfield *key = keylist;
@@ -526,6 +539,32 @@ adjust_key_fields()
           key->eword += cnt;
       }
   }  while (key && ((key = key->next)));
+
+  return cnt;
+}
+
+static void
+do_decorate(int optind, int argc, char** argv)
+{
+  if (optind < argc)
+    {
+      for (int i = optind; i < argc; ++i)
+        decorate_file (argv[i]);
+    }
+  else
+    decorate_file ("-");
+}
+
+static void
+do_undecorate(int optind, int argc, char** argv, int undecorate_fields)
+{
+  if (optind < argc)
+    {
+      for (int i = optind; i < argc; ++i)
+        undecorate_file (argv[i], undecorate_fields);
+    }
+  else
+    undecorate_file ("-", undecorate_fields);
 }
 
 
@@ -534,6 +573,8 @@ main (int argc, char **argv)
 {
   int opt;
   int undecorate_fields = 0;
+  int num_decorate_fields = 0;
+  bool decorate_only = false;
 
   set_program_name (argv[0]);
   setlocale (LC_ALL, "");
@@ -542,7 +583,7 @@ main (int argc, char **argv)
 
   init_key_spec ();
 
-  atexit (close_stdout);
+  //atexit (close_stdout);
 
   while ((opt = getopt_long (argc, argv, "k:t:z", longopts, NULL)) != -1)
     {
@@ -582,6 +623,10 @@ main (int argc, char **argv)
           eol_delimiter = '\0';
           break;
 
+        case DECORATE_OPTION:
+          decorate_only = true;
+          break;
+
         case UNDECORATE_OPTION:
           undecorate_fields = atoi(optarg);
           if (undecorate_fields <= 0)
@@ -602,38 +647,152 @@ main (int argc, char **argv)
         }
     }
 
-  if (!keylist && !undecorate_fields)
-    die (SORT_FAILURE, 0, _("missing -k/--key decoration or --undecorate options"));
+  if (decorate_only && undecorate_fields)
+    die (SORT_FAILURE, 0, _("--decorate and --undecorate options are mutually exclusive"));
 
   if (undecorate_fields && keylist)
     die (SORT_FAILURE, 0, _("--undecorate cannot be used with --keys or --decorate"));
+
+  if (!keylist && !undecorate_fields)
+    die (SORT_FAILURE, 0, _("missing -k/--key decoration or --undecorate options"));
+
 
   if (keylist)
     {
       if (debug)
         debug_keylist (stderr);
-      adjust_key_fields ();
+      num_decorate_fields = adjust_key_fields ();
       if (debug)
         debug_keylist (stderr);
+    }
 
-      if (optind < argc)
-        {
-          for (int i = optind; i < argc; ++i)
-            decorate_file (argv[i]);
-        }
-      else
-        decorate_file ("-");
+  if (decorate_only)
+    {
+      do_decorate (optind, argc, argv);
+    }
+  else if (undecorate_fields)
+    {
+      do_undecorate (optind, argc, argv, undecorate_fields);
     }
   else
     {
-      /* Undecorate */
-      if (optind < argc)
+      /* decorate + sort + undecorate */
+      int dec_sort_fds[2];
+      int sort_undec_fds[2];
+      if (pipe(dec_sort_fds) != 0)
+        die (SORT_FAILURE, errno, _("failed to create dec-sort pipe"));
+      if (pipe(sort_undec_fds) != 0)
+        die (SORT_FAILURE, errno, _("failed to create sort-undec pipe"));
+
+      pid_t undec_pid = -1, sort_pid = -1;
+      if (debug)
+        fprintf(stderr,"=1= my PID = %i   undec_pid = %i, sort_pid = %i\n", getpid(), undec_pid, sort_pid);
+      undec_pid = fork ();
+      /* fork for the 'decorate' process */
+      if (undec_pid == -1)
+        die (SORT_FAILURE, errno, _("failed to fork-1"));
+
+      if (debug)
+        fprintf(stderr,"=2= my PID = %i   undec_pid = %i, sort_pid = %i\n", getpid(), undec_pid, sort_pid);
+
+      if (undec_pid != 0)
         {
-          for (int i = optind; i < argc; ++i)
-            undecorate_file (argv[i], undecorate_fields);
+          /* This is the parent, fork again for the sort process */
+          sort_pid = fork ();
+          if (sort_pid == -1)
+            die (SORT_FAILURE, errno, _("failed to fork-2"));
+        }
+
+      if (debug)
+        fprintf(stderr,"=3= my PID = %i   undec_pid = %i, sort_pid = %i\n", getpid(), undec_pid, sort_pid);
+
+      if (undec_pid!=0 && sort_pid!=0)
+        {
+          if (debug)
+            fprintf(stderr,"DECORATE process starting (PID %i)\n", getpid());
+
+          /* this is the parent - we fork again to run 'sort' */
+
+          /* close the read-end pipe */
+          if (close(sort_undec_fds[0])!=0)
+            die (SORT_FAILURE, errno, _("failed to close sort-undec read-pipe"));
+          if (close(sort_undec_fds[1])!=0)
+            die (SORT_FAILURE, errno, _("failed to close sort-undec write-pipe"));
+          if (close(dec_sort_fds[0])!=0)
+            die (SORT_FAILURE, errno, _("failed to close dec-sort read-pipe"));
+
+          /* replace the STDOUT of this process, to the write-end pipe */
+          if (dup2(dec_sort_fds[1], STDOUT_FILENO) == -1)
+            die (SORT_FAILURE, errno, _("failed to reassign dec-sort STDOUT"));
+
+          do_decorate (optind, argc, argv);
+
+          if (debug)
+            fprintf(stderr,"decorate: closing STDOUT\n");
+
+          fclose(stdout);
+          close(dec_sort_fds[1]);
+
+          if (debug)
+            fprintf(stderr,"decorate: waiting for children 1\n");
+          waitpid (undec_pid, NULL, 0);
+
+          if (debug)
+            fprintf(stderr,"decorate: waiting for children 2\n");
+          waitpid (sort_pid, NULL, 0);
+
+          if (debug)
+            fprintf(stderr,"decorate: done\n");
+        }
+      else if (sort_pid==0)
+        {
+          /* This is the sort process */
+          if (debug)
+            fprintf(stderr,"SORT child starting (pid %i)\n", getpid());
+
+          if (close(dec_sort_fds[1])!=0)
+            die (SORT_FAILURE, errno, _("failed to close dec-sort write-pipe"));
+          if (close(sort_undec_fds[0])!=0)
+            die (SORT_FAILURE, errno, _("failed to close sort-undec read-pipe"));
+
+          /* replace the STDIN of this process, to the read-end pipe of 'decorate' */
+          if (dup2(dec_sort_fds[0], STDIN_FILENO) == -1)
+            die (SORT_FAILURE, errno, _("failed to reassign dec-sort STDIN"));
+
+          /* replace the STDOUT of this process, to the write-end pipe of 'undecorate' */
+          if (dup2(sort_undec_fds[1], STDOUT_FILENO) == -1)
+            die (SORT_FAILURE, errno, _("failed to reassign sort-undec STDOUT"));
+
+          char*const sort_args[] = {
+                                    "sort",
+                                    "-k1,1",
+                                    "-k4,4n",
+                                    NULL
+          };
+          execvp("sort", sort_args);
+
+          die (SORT_FAILURE, errno, _("failed to run the sort command"));
         }
       else
-        undecorate_file ("-", undecorate_fields);
+        {
+          /* This is the undecorate process */
+          if (debug)
+            fprintf(stderr,"UNDECORATE child starting (pid %d)\n", getpid());
+
+          if (close(dec_sort_fds[0])!=0)
+            die (SORT_FAILURE, errno, _("failed to close dec-sort read-pipe"));
+          if (close(dec_sort_fds[1])!=0)
+            die (SORT_FAILURE, errno, _("failed to close dec-sort write-pipe"));
+          if (close(sort_undec_fds[1])!=0)
+            die (SORT_FAILURE, errno, _("failed to close sort-undec write-pipe"));
+
+          /* replace the STDIN of this process, to the read-end pipe */
+          if (dup2(sort_undec_fds[0], STDIN_FILENO) == -1)
+            die (SORT_FAILURE, errno, _("failed to reassign sort-undec STDIN"));
+
+          /* undecorate from STDIN */
+          do_undecorate (1, 0, NULL, num_decorate_fields);
+        }
     }
 
   return EXIT_SUCCESS;
