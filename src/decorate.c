@@ -543,6 +543,36 @@ adjust_key_fields()
   return cnt;
 }
 
+char**
+build_sort_process_args ()
+{
+  int argc = 2 ; /* one 'sort' program name (argv[0]), one for NULL */
+  struct keyfield *key = keylist;
+
+  /* step 1: count number of args */
+
+  do {
+    ++argc;
+  }  while (key && ((key = key->next)));
+
+
+
+  /* Step 2: allocate and build argv.
+     The terminating NULL is implicit thanks to calloc. */
+  char** argv = xcalloc (argc, sizeof(char*));
+  int i = 0;
+
+  argv[i++] = xstrdup("sort"); /* argv[0] */
+
+  key = keylist;
+  do {
+    argv[i++] = debug_keyfield (key);
+  }  while (key && ((key = key->next)));
+
+  return argv;
+}
+
+
 static void
 do_decorate(int optind, int argc, char** argv)
 {
@@ -687,17 +717,18 @@ main (int argc, char **argv)
       pid_t undec_pid = -1, sort_pid = -1;
       if (debug)
         fprintf(stderr,"=1= my PID = %i   undec_pid = %i, sort_pid = %i\n", getpid(), undec_pid, sort_pid);
-      undec_pid = fork ();
+
       /* fork for the 'decorate' process */
+      undec_pid = fork ();
       if (undec_pid == -1)
         die (SORT_FAILURE, errno, _("failed to fork-1"));
 
       if (debug)
         fprintf(stderr,"=2= my PID = %i   undec_pid = %i, sort_pid = %i\n", getpid(), undec_pid, sort_pid);
 
+      /* if this is the parent, fork again for the sort process */
       if (undec_pid != 0)
         {
-          /* This is the parent, fork again for the sort process */
           sort_pid = fork ();
           if (sort_pid == -1)
             die (SORT_FAILURE, errno, _("failed to fork-2"));
@@ -710,8 +741,6 @@ main (int argc, char **argv)
         {
           if (debug)
             fprintf(stderr,"DECORATE process starting (PID %i)\n", getpid());
-
-          /* this is the parent - we fork again to run 'sort' */
 
           /* close the read-end pipe */
           if (close(sort_undec_fds[0])!=0)
@@ -735,10 +764,12 @@ main (int argc, char **argv)
 
           if (debug)
             fprintf(stderr,"decorate: waiting for children 1\n");
+
           waitpid (undec_pid, NULL, 0);
 
           if (debug)
             fprintf(stderr,"decorate: waiting for children 2\n");
+
           waitpid (sort_pid, NULL, 0);
 
           if (debug)
@@ -763,12 +794,16 @@ main (int argc, char **argv)
           if (dup2(sort_undec_fds[1], STDOUT_FILENO) == -1)
             die (SORT_FAILURE, errno, _("failed to reassign sort-undec STDOUT"));
 
-          char*const sort_args[] = {
-                                    "sort",
-                                    "-k1,1",
-                                    "-k4,4n",
-                                    NULL
-          };
+          char** sort_args = build_sort_process_args ();
+          if (debug)
+            {
+              char **p = sort_args;
+              while (*p)
+                {
+                  fprintf(stderr,"sort: argv[] = '%s'\n", *p);
+                  ++p;
+                }
+            }
           execvp("sort", sort_args);
 
           die (SORT_FAILURE, errno, _("failed to run the sort command"));

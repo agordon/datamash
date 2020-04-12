@@ -167,8 +167,8 @@ debug_line (struct line const *line, const bool unique, const bool stable);
 void
 debug_keylist (FILE* stream);
 
-void
-debug_keyfield (FILE* stream, const struct keyfield *key);
+char*
+debug_keyfield (const struct keyfield *key);
 
 /* Return whether sorting options specified for key.  */
 

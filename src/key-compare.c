@@ -49,6 +49,7 @@
 //#include "strnumcmp.h"
 //#include "xmemcoll.h"
 #include "xstrtol.h"
+#include "xalloc.h"
 //#include "mbswidth.h"
 #include "ignore-value.h"
 #include "key-compare.h"
@@ -1483,48 +1484,60 @@ init_key_spec (void)
 }
 
 
-extern void
-debug_keyfield (FILE* stream, const struct keyfield *key)
+extern char*
+debug_keyfield (const struct keyfield *key)
 {
-  fprintf(stream,"-k ");
-  fprintf(stream,"%zu", key->sword+1);
+  size_t len = (INT_BUFSIZE_BOUND (uintmax_t))*4 /* up to 4 numbers */
+    + strlen("-k,.")  /* argument syntax */
+    + strlen("bbdfghiMnRrV") /* all possible options */
+    + ( (key->decorate_fn)?30:0 )
+    + ( (key->decorate_cmd)?strlen(key->decorate_cmd):0)
+    + 100 + 1 ; /* extra for good luck, and NULL */
+
+  char* buf = xcalloc (len,1);
+  char *p = buf;
+
+  p = stpcpy(p,"-k");
+  p += sprintf(p, "%zu", key->sword+1);
   if (key->schar)
-    fprintf(stream,".%zu", key->schar+1);
+    p += sprintf(p,".%zu", key->schar+1);
   if (key->skipsblanks)
-    fprintf(stream,"b");
+    p = stpcpy(p,"b");
   if (key->eword != SIZE_MAX)
     {
-      fprintf(stream,",%zu",key->eword+1);
+      p += sprintf(p,",%zu",key->eword+1);
       if (key->echar)
-        fprintf(stream,".%zu", key->echar);
+        p += sprintf(p,".%zu", key->echar);
     }
   if (key->skipeblanks)
-    fprintf(stream,"b");
+    p = stpcpy(p,"b");
   if (key->ignore == nondictionary)
-    fprintf(stream,"d");
+    p = stpcpy(p,"d");
   if (key->translate == fold_toupper)
-    fprintf(stream,"f");
+    p = stpcpy(p,"f");
   if (key->general_numeric)
-    fprintf(stream,"g");
+    p = stpcpy(p,"g");
   if (key->human_numeric)
-    fprintf(stream,"h");
+    p = stpcpy(p,"h");
   if (key->ignore == nonprinting)
-    fprintf(stream,"i");
+    p = stpcpy(p,"i");
   if (key->month)
-    fprintf(stream,"M");
+    p = stpcpy(p,"M");
   if (key->numeric)
-    fprintf(stream,"n");
+    p = stpcpy(p,"n");
   if (key->random)
-    fprintf(stream,"R");
+    p = stpcpy(p,"R");
   if (key->reverse)
-    fprintf(stream,"r");
+    p = stpcpy(p,"r");
   if (key->version)
-    fprintf(stream,"V");
+    p = stpcpy(p,"V");
 
   if (key->decorate_fn)
-    fprintf(stream,":[decorate %p]", key->decorate_fn);
+    p += sprintf(p,":[decorate %p]", key->decorate_fn);
   if (key->decorate_cmd)
-    fprintf(stream,"@%s", key->decorate_cmd);
+    p += sprintf(p,"@%s", key->decorate_cmd);
+
+  return buf;
 }
 
 extern void
@@ -1533,7 +1546,9 @@ debug_keylist (FILE *stream)
   struct keyfield const *key = keylist;
 
   do {
-    debug_keyfield (stream,key);
-    fprintf(stream,"\n");
+    char *p = debug_keyfield (key);
+    fputs(p, stream);
+    fputc('\n', stream);
+    free(p);
   }  while (key && ((key = key->next)));
 }
