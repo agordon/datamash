@@ -217,4 +217,18 @@ select_plural (uintmax_t n)
 # endif
 #endif
 
+
+/* Exit statuses.  */
+enum
+  {
+    /* POSIX says to exit with status 1 if invoked with -c and the
+       input is not properly sorted.  */
+    SORT_OUT_OF_ORDER = 1,
+
+    /* POSIX says any other irregular exit must exit with a status
+       code greater than 1.  */
+    SORT_FAILURE = 2
+  };
+
+
 #endif /* __DATAMASH__SYSTEM_H__ */

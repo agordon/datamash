@@ -16,8 +16,6 @@
 #include <config.h>
 
 #include <getopt.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
 #include <limits.h>
 #include <inttypes.h>
 #include <intprops.h>
@@ -34,9 +32,8 @@
 #define Version VERSION
 #include "version-etc.h"
 #include "ignore-value.h"
-#define SORT_FAILURE EXIT_FAILURE
 
-//#include "key-compare.h"
+#include "decorate-functions.h"
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "decorate"
@@ -130,166 +127,6 @@ Available conversions:\n\
     }
   exit (status);
 }
-
-static bool
-decorate_as_is (const char* in)
-{
-  fprintf (stdout, "%s", in);
-  return true;
-}
-
-static bool
-decorate_strlen (const char* in)
-{
-  uintmax_t u = (uintmax_t)strlen (in);
-  printf ("%0*"PRIuMAX, (int)INT_BUFSIZE_BOUND (u), u);
-  return true;
-}
-
-static int
-roman_numeral_to_value (char c)
-{
-  switch (c)
-    {
-    case 'M': return 1000;
-    case 'D': return 500;
-    case 'C': return 100;
-    case 'L': return 50;
-    case 'X': return 10;
-    case 'V': return 5;
-    case 'I': return 1;
-    default:  return 0;
-    }
-}
-
-
-/* Naive implementation of Roman numerals conversion.
-   Does not support alternative forms such as
-    XIIX,IIXX for 18,
-    IIC for 98.  */
-static bool
-decorate_roman_numerals (const char* in)
-{
-  intmax_t result = 0;
-  intmax_t cur,last = 0;
-  while (*in)
-    {
-      cur = roman_numeral_to_value (*in);
-      if (!cur)
-        {
-          error (0, 0, _("invalid roman numeral '%c' in %s"),  *in, quote (in));
-          return false;
-        }
-
-      if (last)
-        {
-          if (last >= cur)
-            {
-              result += last;
-            }
-          else
-            {
-              result += (cur - last);
-              cur = 0;
-            }
-        }
-
-      last = cur;
-      ++in;
-    }
-
-  result += last;
-  printf ("%0*"PRIiMAX, (int)INT_BUFSIZE_BOUND (result), result);
-  return true;
-}
-
-static bool
-decorate_ipv4_inet_addr (const char* in)
-{
-  struct in_addr adr;
-  int s;
-
-  s = inet_aton (in, &adr);
-
-  if (s == 0)
-    {
-      error (0, 0, _("invalid IPv4 address %s"), quote (in));
-      return false;
-    }
-
-
-  printf ("%08X", ntohl (adr.s_addr));
-  return true;
-}
-
-
-static bool
-decorate_ipv4_dot_decimal (const char* in)
-{
-  struct in_addr adr;
-  int s;
-
-  s = inet_pton (AF_INET, in, &adr);
-
-  if (s < 0)
-    die (SORT_FAILURE, errno, _("inet_pton (AF_INET) failed"));
-
-  if (s == 0)
-    {
-      error (0, 0, _("invalid dot-decimal IPv4 address %s"), quote (in));
-      return false;
-    }
-
-  printf ("%08X", ntohl (adr.s_addr));
-  return true;
-}
-
-static bool
-decorate_ipv6 (const char* in)
-{
-  struct in6_addr adr;
-  int s;
-
-  s = inet_pton (AF_INET6, in, &adr);
-
-  if (s < 0)
-    die (SORT_FAILURE, errno, _("inet_pton (AF_INET6) failed"));
-
-  if (s == 0)
-    {
-      error (0, 0, _("invalid IPv6 address %s"), quote (in));
-      return false;
-    }
-
-  /* A portable way to print IPv6 binary representation. */
-  for (int i=0;i<16;i+=2)
-    {
-      printf ("%02X%02X", adr.s6_addr[i], adr.s6_addr[i+1]);
-      if (i != 14)
-        fputc (':', stdout);
-    }
-
-  return true;
-}
-
-struct conversions_t
-{
-  const char* name;
-  bool (*decorate_fn)(const char* in);
-};
-
-static struct conversions_t conversions[] = {
-  { "as-is",    decorate_as_is },     /* for debugging */
-  { "roman",    decorate_roman_numerals },
-  { "strlen",   decorate_strlen },
-  { "ipv4",     decorate_ipv4_dot_decimal },
-  { "ip4",      decorate_ipv4_dot_decimal }, /* alias */
-  { "ipv6",     decorate_ipv6 },
-  { "ip6",      decorate_ipv6 },             /* alias */
-  { "ipv4inet", decorate_ipv4_inet_addr },
-  { "ip4inet",  decorate_ipv4_inet_addr },   /* alias */
-  { NULL,       0 }
-};
 
 static void
 decorate_fields (struct linebuffer *linebuf)
@@ -574,12 +411,12 @@ parse_builtin_conversion_spec (const char* optarg, const char *s, struct keyfiel
   if (*s == '\0')
     badfieldspec (optarg, N_("missing internal conversion function"));
 
-  for (int i = 0 ; conversions[i].name; ++i)
+  for (int i = 0 ; builtin_conversions[i].name; ++i)
     {
-      if (STREQ (s, conversions[i].name))
+      if (STREQ (s, builtin_conversions[i].name))
         {
           found = true;
-          key->decorate_fn = conversions[i].decorate_fn;
+          key->decorate_fn = builtin_conversions[i].decorate_fn;
           break;
         }
     }

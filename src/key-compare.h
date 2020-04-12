@@ -20,17 +20,6 @@
 
 #define UCHAR_LIM (UCHAR_MAX + 1)
 
-/* Exit statuses.  */
-enum
-  {
-    /* POSIX says to exit with status 1 if invoked with -c and the
-       input is not properly sorted.  */
-    SORT_OUT_OF_ORDER = 1,
-
-    /* POSIX says any other irregular exit must exit with a status
-       code greater than 1.  */
-    SORT_FAILURE = 2
-  };
 
 /* The representation of the decimal point in the current locale.  */
 extern int decimal_point;

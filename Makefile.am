@@ -64,7 +64,8 @@ datamash_LDADD = \
        $(SQRTL_LIBM)
 
 decorate_SOURCES = src/decorate.c \
-	src/key-compare.c src/key-compare.h
+	src/key-compare.c src/key-compare.h \
+	src/decorate-functions.c src/decorate-functions.h
 decorate_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
 decorate_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DKEY_COMPARE_DECORATION \
