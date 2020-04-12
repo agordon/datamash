@@ -141,6 +141,7 @@ decorate_ipv4_dot_decimal (const char* in)
   return true;
 }
 
+
 bool
 decorate_ipv6 (const char* in)
 {
@@ -172,14 +173,12 @@ decorate_ipv6 (const char* in)
 
 
 struct conversions_t builtin_conversions[] = {
-  { "as-is",    decorate_as_is },     /* for debugging */
-  { "roman",    decorate_roman_numerals },
-  { "strlen",   decorate_strlen },
-  { "ipv4",     decorate_ipv4_dot_decimal },
-  { "ip4",      decorate_ipv4_dot_decimal }, /* alias */
-  { "ipv6",     decorate_ipv6 },
-  { "ip6",      decorate_ipv6 },             /* alias */
-  { "ipv4inet", decorate_ipv4_inet_addr },
-  { "ip4inet",  decorate_ipv4_inet_addr },   /* alias */
-  { NULL,       0 }
+  { "as-is",    "copy as-is", decorate_as_is },     /* for debugging */
+  { "roman",    "roman numerals", decorate_roman_numerals },
+  { "strlen",   "length (in bytes) of the specified field", decorate_strlen },
+  { "ipv4",     "dotted-decimal IPv4 addresses", decorate_ipv4_dot_decimal },
+  { "ipv6",     "IPv6 addresses", decorate_ipv6 },
+  { "ipv4inet", "number-and-dots IPv4 addresses (incl. octal, hex values)",
+    decorate_ipv4_inet_addr },
+  { NULL,       NULL, 0 }
 };

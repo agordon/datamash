@@ -116,52 +116,139 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION]... [INPUT [OUTPUT]]\n\
-"),
-              program_name);
-      fputs (_("\
-Convert fields to sortable format\n\
+Usage:\n\
+  %s [OPTION]... [INPUT]\n\
+  %s --decorate [OPTION]... [INPUT]\n\
+  %s --undecorate N [OPTION]... [INPUT]\n\
 \n\
-"), stdout);
-
-      //emit_mandatory_arg_note ();
+"),
+              program_name, program_name, program_name);
       fputs (_("\
-  -k, --key=KEYDEF      convert field KEYDEF in the input file to sortable\n\
-                        format; Converted form will be added to the end of\n\
-                        each line;\n\
-                        KEYDEF gives location and conversion function.\n\
+Converts (and optionally sorts) fields of various formats\n\
 "), stdout);
 
+     putchar('\n');
+
+     fputs (_("\
+  1. without --decorate and --undecorate: runs sort(1)\n\
+     automatically and outputs the sorted data.\n\
+     It is the easiest method to use.\n\
+"), stdout);
+
+     fputs (_("\
+  2. with --decorate: adds the converted fields to the start\n\
+     of each line and prints and prints it to STDOUT. sort(1) can then be\n\
+     used on the output.\n\
+     Use --print-sort-args to see the recommended arguments.\n\
+"), stdout);
+
+     fputs (_("\
+  3. with --undecorate: removes the first N fields from the\n\
+     input. It can be used as post-processing step after sort(1).\n\
+"), stdout);
+
+     putchar('\n');
+
+     fputs (_("\
+OPTIONS:\n\
+"), stdout);
+
+
+     fputs (_("\
+      --decorate             decorate/convert the specified fields and print\n\
+                             the output to STDOUT. Does not automatically run\n\
+                             sort(1) or undecorates the output.\n\
+"), stdout);
+      fputs (_("\
+  -k, --key=KEYDEF           key/field to sort; same syntax as sort(1),\n\
+                             optionally followed by ':method' to convert\n\
+                             to the field into a sortable value.\n\
+                             see below for details and examples.\n\
+"), stdout);
      fputs (_("\
   -t, --field-separator=SEP  use SEP instead of non-blank to blank transition\n\
 "), stdout);
+     fputs (_("\
+      --print-sort-args      print the adjusted parameters for sort(1)\n\
+"), stdout);
+     fputs (_("\
+      --undecorate=N         removes the first N fields.\n\
+"), stdout);
       fputs (_("\
-  -z, --zero-terminated     line delimiter is NUL, not newline\n\
+  -z, --zero-terminated      line delimiter is NUL, not newline\n\
 "), stdout);
      fputs (HELP_OPTION_DESCRIPTION, stdout);
      fputs (VERSION_OPTION_DESCRIPTION, stdout);
+
+     putchar('\n');
+
      fputs (_("\
-\n\
-A field is a run of blanks (usually spaces and/or TABs), then non-blank\n\
-characters.  Fields are skipped before chars.\n\
+The following options are passed to sort(1) as-is:\n\
 "), stdout);
-      fputs (_("\
-\n\
-KEYDEF is F[.C][,F[.C][:conversion][@command] for start and stop position,\n\
-where F is a field number and C a character position in the field; both are\n\
-origin 1, and the stop position defaults to the line's end.\n\
+
+     putchar('\n');
+
+     fputs (_("\
+  -c, --check\n\
+      --compress-program\n\
+      --random-source\n\
+  -s, --stable\n\
+      --batch-size\n\
+  -S, --buffer-size\n\
+  -T, --temporary-directory\n\
+  -u, --unique\n\
+      --parallel\n\
 "), stdout);
-      fputs (_("\
-\n\
-Available conversions:\n\
-  roman        roman numerals\n\
-  ipv4         dotted-decimal IPv4 addresses\n\
-  ipv4inet     number-and-dots IPv4 addresses (incl. octal, hex values)\n\
-  ipv6         IPv6 addresses\n\
-  strlen       length (in bytes) of the specified field\n\
-\n\
+
+
+
+     putchar('\n');
+
+     fputs (_("\
+Example: the following two commands are equivalent:\n\
 "), stdout);
-      //emit_ancillary_info (PROGRAM_NAME);
+
+     putchar('\n');
+
+     printf("   %s -k2,2:ipv4 -k3,3nr FILE.TXT\n", program_name);
+
+     putchar('\n');
+
+     printf("   %s --decorate -k2,2:ipv4 FILE.TXT | sort -k1,1 -k4,4nr \\\n \
+       | %s --undecorate 1\n", program_name, program_name);
+
+     putchar('\n');
+
+     fputs (_("\
+Example: decorated output of roman numerals:\n\
+"), stdout);
+
+     putchar('\n');
+
+     printf("  $ printf \"%%s\\n\" C V III IX XI | %s -k1,1:roman --decorate\n", program_name);
+     fputs ("\
+  0000100 C\n\
+  0000005 V\n\
+  0000003 III\n\
+  0000009 IX\n\
+  0000011 XI\n\
+", stdout);
+
+
+     putchar('\n');
+
+     fputs (_("\
+Available conversions methods:\n\
+"), stdout);
+     for (int i = 0 ; builtin_conversions[i].name; ++i)
+       printf ("  %-10s   %s\n", builtin_conversions[i].name,
+               builtin_conversions[i].description);
+     putchar('\n');
+
+      fputs (_("For detailed usage information and examples, see\n"),stdout);
+      printf ("  man %s\n", program_name);
+      fputs (_("The manual and more examples are available at\n"), stdout);
+      fputs ("  " PACKAGE_URL "\n\n", stdout);
     }
   exit (status);
 }

@@ -21,6 +21,7 @@
 struct conversions_t
 {
   const char* name;
+  const char* description;
   bool (*decorate_fn)(const char* in);
 };
 
