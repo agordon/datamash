@@ -53,25 +53,58 @@ static char eol_delimiter = '\n';
 /* List of key field to be decorated  */
 static struct keyfield *decorate_keylist = NULL;
 
+static char **sort_extra_args = NULL;
+static size_t sort_extra_args_used = 0;
+static size_t sort_extra_args_allocated = 0;
+
 enum
 {
   DEBUG_OPTION = CHAR_MAX + 1,
   DECORATE_OPTION,
-  UNDECORATE_OPTION
+  UNDECORATE_OPTION,
+
+  /* Sort options */
+  COMPRESS_PROGRAM_OPTION,
+  CHECK_OPTION,
+  NMERGE_OPTION,
+  RANDOM_SOURCE_OPTION,
+  PARALLEL_OPTION
 };
 
 static struct option const longopts[] =
 {
   {"key", required_argument, NULL, 'k'},
-  {"check-chars", required_argument, NULL, 'w'},
   {"decorate", no_argument, NULL, DECORATE_OPTION},
   {"undecorate", required_argument, NULL, UNDECORATE_OPTION},
-  {"zero-terminated", no_argument, NULL, 'z'},
   {"-debug", no_argument, NULL, DEBUG_OPTION},
+  {"zero-terminated", no_argument, NULL, 'z'},
+
+  /* sort options, passed as-is to the sort process */
+  {"check", optional_argument, NULL, CHECK_OPTION},
+  {"compress-program", required_argument, NULL, COMPRESS_PROGRAM_OPTION},
+  {"random-source", required_argument, NULL, RANDOM_SOURCE_OPTION},
+  {"stable", no_argument, NULL, 's'},
+  {"batch-size", required_argument, NULL, NMERGE_OPTION},
+  {"buffer-size", required_argument, NULL, 'S'},
+  {"field-separator", required_argument, NULL, 't'},
+  {"temporary-directory", required_argument, NULL, 'T'},
+  {"unique", no_argument, NULL, 'u'},
+  {"parallel", required_argument, NULL, PARALLEL_OPTION},
+
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
 };
+
+void
+add_sort_extra_args (char* s)
+{
+  if (sort_extra_args_used == sort_extra_args_allocated )
+    sort_extra_args = x2nrealloc (sort_extra_args,
+                                  &sort_extra_args_allocated,
+                                  sizeof *sort_extra_args);
+  sort_extra_args[sort_extra_args_used++] = xstrdup(s);
+}
 
 void
 usage (int status)
@@ -550,12 +583,11 @@ build_sort_process_args ()
   struct keyfield *key = keylist;
 
   /* step 1: count number of args */
-
   do {
     ++argc;
   }  while (key && ((key = key->next)));
 
-
+  argc += sort_extra_args_used;
 
   /* Step 2: allocate and build argv.
      The terminating NULL is implicit thanks to calloc. */
@@ -568,6 +600,11 @@ build_sort_process_args ()
   do {
     argv[i++] = debug_keyfield (key);
   }  while (key && ((key = key->next)));
+
+  for (size_t j=0;j<sort_extra_args_used;++j)
+    {
+      argv[i++] = sort_extra_args[j];
+    }
 
   return argv;
 }
@@ -615,12 +652,55 @@ main (int argc, char **argv)
 
   //atexit (close_stdout);
 
-  while ((opt = getopt_long (argc, argv, "k:t:z", longopts, NULL)) != -1)
+  while ((opt = getopt_long (argc, argv, "csS:T:uk:t:z", longopts, NULL)) != -1)
     {
       switch (opt)
         {
+        case 's':
+          add_sort_extra_args("-s");
+          break;
+
+        case 'u':
+          add_sort_extra_args("-u");
+          break;
+
+        case 'S':
+          add_sort_extra_args("-S");
+          add_sort_extra_args(optarg);
+          break;
+
+        case 'T':
+          add_sort_extra_args("-T");
+          add_sort_extra_args(optarg);
+          break;
+
         case 'k':
           parse_key_arg (optarg);
+          break;
+
+        case CHECK_OPTION:
+          add_sort_extra_args("--check");
+          add_sort_extra_args(optarg);
+          break;
+
+        case COMPRESS_PROGRAM_OPTION:
+          add_sort_extra_args("--compress-program");
+          add_sort_extra_args(optarg);
+          break;
+
+        case RANDOM_SOURCE_OPTION:
+          add_sort_extra_args("--random-source");
+          add_sort_extra_args(optarg);
+          break;
+
+        case NMERGE_OPTION:
+          add_sort_extra_args("--batch-size");
+          add_sort_extra_args(optarg);
+          break;
+
+        case PARALLEL_OPTION:
+          add_sort_extra_args("--parallel");
+          add_sort_extra_args(optarg);
           break;
 
         case 't':
@@ -647,9 +727,13 @@ main (int argc, char **argv)
               die (SORT_FAILURE, 0, _("incompatible tabs"));
             tab = newtab;
           }
+
+          add_sort_extra_args("-t");
+          add_sort_extra_args(optarg);
           break;
 
         case 'z':
+          add_sort_extra_args("-z");
           eol_delimiter = '\0';
           break;
 
