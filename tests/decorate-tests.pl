@@ -51,7 +51,6 @@ C   192.168.17.100
 L   192.168.17.10
 EOF
 
-
 my $out1_asis=<<'EOF';
 I I   1.20.30.41
 II II  1.20.30.1
@@ -63,7 +62,7 @@ C C   192.168.17.100
 L L   192.168.17.10
 EOF
 
-my $out1_strlen=<<'EOF';
+my $out1_strlen1=<<'EOF';
 000000000000000000001 000000000000000000010 I   1.20.30.41
 000000000000000000002 000000000000000000009 II  1.20.30.1
 000000000000000000002 000000000000000000010 IV  1.10.30.14
@@ -72,6 +71,43 @@ my $out1_strlen=<<'EOF';
 000000000000000000001 000000000000000000012 D   192.168.17.8
 000000000000000000001 000000000000000000014 C   192.168.17.100
 000000000000000000001 000000000000000000013 L   192.168.17.10
+EOF
+
+## strlen on the entire line
+my $out1_strlen2=<<'EOF';
+000000000000000000014 I   1.20.30.41
+000000000000000000013 II  1.20.30.1
+000000000000000000014 IV  1.10.30.14
+000000000000000000012 XI  1.2.10.3
+000000000000000000016 M   192.168.43.1
+000000000000000000016 D   192.168.17.8
+000000000000000000018 C   192.168.17.100
+000000000000000000017 L   192.168.17.10
+EOF
+
+## two strlens: first on a single field, second on the entire line
+my $out1_strlen3=<<'EOF';
+000000000000000000001 000000000000000000014 I   1.20.30.41
+000000000000000000002 000000000000000000013 II  1.20.30.1
+000000000000000000002 000000000000000000014 IV  1.10.30.14
+000000000000000000002 000000000000000000012 XI  1.2.10.3
+000000000000000000001 000000000000000000016 M   192.168.43.1
+000000000000000000001 000000000000000000016 D   192.168.17.8
+000000000000000000001 000000000000000000018 C   192.168.17.100
+000000000000000000001 000000000000000000017 L   192.168.17.10
+EOF
+
+## two strlens: first on a single field, second on the second field
+## but skipping the first 2 characters
+my $out1_strlen4=<<'EOF';
+000000000000000000001 000000000000000000009 I   1.20.30.41
+000000000000000000002 000000000000000000008 II  1.20.30.1
+000000000000000000002 000000000000000000009 IV  1.10.30.14
+000000000000000000002 000000000000000000007 XI  1.2.10.3
+000000000000000000001 000000000000000000011 M   192.168.43.1
+000000000000000000001 000000000000000000011 D   192.168.17.8
+000000000000000000001 000000000000000000013 C   192.168.17.100
+000000000000000000001 000000000000000000012 L   192.168.17.10
 EOF
 
 
@@ -164,9 +200,14 @@ my @Tests =
   {OUT => $out1_dec_ipv4_roman}],
  ['d5', '--decorate -k1,1:as-is' , {IN_PIPE=>$in1}, {OUT => $out1_asis}],
  ['d6', '--decorate -k1,1:strlen -k2,2:strlen' , {IN_PIPE=>$in1},
-  {OUT => $out1_strlen}],
+  {OUT => $out1_strlen1}],
  ['d7', '--decorate -k1,1:ipv4inet', {IN_PIPE=>$in2}, {OUT => $out2_ipv4inet}],
  ['d8', '--decorate -k1,1:ipv6',     {IN_PIPE=>$in3}, {OUT => $out3_ipv6}],
+ ['d9', '--decorate -k1:strlen' ,    {IN_PIPE=>$in1}, {OUT=>$out1_strlen2}],
+ ['d10', '--decorate -k1,1:strlen -k1:strlen' ,  {IN_PIPE=>$in1},
+  {OUT=>$out1_strlen3}],
+ ['d11', '--decorate -k1,1:strlen -k2.2,2:strlen' ,  {IN_PIPE=>$in1},
+  {OUT=>$out1_strlen4}],
 
  ## basic undecoration
  ['u1', '--undecorate 1' , {IN_PIPE=>$out1_dec_roman}, {OUT => $in1}],
@@ -192,10 +233,10 @@ my @Tests =
   {OUT=>"sort -k1,1r -S 2G -T /foo/bar -s -z -u\n"}],
  ['sa13', '--print-sort-args -k2,2r:ipv4 -t: -S 2G -T /foo/bar -szu ',
   {OUT=>"sort -k1,1r -t : -S 2G -T /foo/bar -s -z -u\n"}],
-# ['sa14', '--print-sort-args -k2,2r:ipv4 -c',
-#  {OUT=>"sort -k1,1r --check\n"}],
-# ['sa15', '--print-sort-args -k2,2r:ipv4 --check',
-#  {OUT=>"sort -k1,1r --check\n"}],
+ ['sa14', '--print-sort-args -k2,2r:ipv4 -t: -t:',
+  {OUT=>"sort -k1,1r -t : -t :\n"}],
+ ['sa15', '--print-sort-args -k2,2r:ipv4 -t "\\\\0"',
+  {OUT=>"sort -k1,1r -t \\0\n"}],
  ['sa16', '--print-sort-args -k2,2r:ipv4 --compress-program=ZOOP',
   {OUT=>"sort -k1,1r --compress-program ZOOP\n"}],
  ['sa17', '--print-sort-args -k2,2r:ipv4 --compress-program ZOOP',
@@ -204,8 +245,20 @@ my @Tests =
   {OUT=>"sort -k1,1r --random-source /foo/bar\n"}],
  ['sa19', '--print-sort-args -k2,2r:ipv4 --batch-size 9 --parallel=42',
   {OUT=>"sort -k1,1r --batch-size 9 --parallel 42\n"}],
- ['sa20', '--print-sort-args -k2b,2bgr',
-  {OUT=>"sort -k2b,2bgr\n"}],
+ ['sa21', '--print-sort-args -k2,2r:ipv4 -c',
+  {OUT=>"sort -k1,1r -c\n"}],
+ ['sa22', '--print-sort-args -k2,2r:ipv4 --check',
+  {OUT=>"sort -k1,1r --check\n"}],
+ ['sa23', '--print-sort-args -k2,2r:ipv4 -C',
+  {OUT=>"sort -k1,1r -C\n"}],
+ ['sa24', '--print-sort-args -k2,2r:ipv4 --check=diagnose-first',
+  {OUT=>"sort -k1,1r --check=diagnose-first\n"}],
+ ['sa25', '--print-sort-args -k2,2r:ipv4 --check=foobar12343124321123421432145',
+  {OUT=>"sort -k1,1r --check=foobar12343124321123421432145\n"}],
+ ['sa26', '--print-sort-args -k2,2r:ipv4 --check=quiet',
+  {OUT=>"sort -k1,1r --check=quiet\n"}],
+ ['sa27', '--print-sort-args -k7 -k2,2r:ipv4 -k5.3,6.2',
+  {OUT=>"sort -k8 -k1,1r -k6.3,7.2\n"}],
 
 
   # on a different architecture, would printf(%Lg) print something else?

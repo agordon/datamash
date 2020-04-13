@@ -98,6 +98,7 @@ static struct option const longopts[] =
   {NULL, 0, NULL, 0}
 };
 
+
 void
 add_sort_extra_args (char* s)
 {
@@ -275,6 +276,16 @@ decorate_fields (struct linebuffer *linebuf)
       /* TODO: is this the correct way to detect 'no limit' ?
        * (ie compare keys until the end of the line)*/
       l.keylim = l.keybeg + len - (l.keybeg - l.text);
+      if (l.length>0 && l.text[l.length-1]==eol_delimiter)
+        {
+          if (debug)
+            fprintf(stderr,"KO chomp");
+          l.length--;
+          l.keylim--;
+        }
+
+      if (debug)
+        fprintf(stderr,"YO keylim - keybeg = %zu\n", (l.keylim-l.keybeg));
     }
 
 
@@ -303,7 +314,8 @@ decorate_fields (struct linebuffer *linebuf)
 
       /* Process the extracted key in NUL-terminated string 'ta' */
 
-      //fprintf(stderr,"extracted field: '%s'\n", ta);
+      if (debug)
+        fprintf(stderr,"extracted field: '%s'\n", ta);
 
       if (key->decorate_fn)
         {
@@ -368,21 +380,16 @@ decorate_file (const char *infile)
 
       ++linenum;
 
-      size_t l = lb.length;
 
-      /* don't print EOL character, if any */
-      if (lb.length>0 && lb.buffer[lb.length-1]==eol_delimiter)
-        --l;
-
+      //fprintf(stderr,"before chomp: len %zu: '%.*s'\n", lb.length, (int)lb.length, lb.buffer);
       decorate_fields (&lb);
 
       if (debug)
-        fprintf(stderr,"decorate: writing line: '%.*s'\n", (int)l, lb.buffer);
+        fprintf(stderr,"decorate: writing line: '%.*s'\n", (int)lb.length, lb.buffer);
 
-      if (fwrite (lb.buffer, 1, l, stdout) != l)
+      if (fwrite (lb.buffer, 1, lb.length, stdout) != lb.length)
         die (EXIT_FAILURE, errno, _("decorate: fwrite failed"));
 
-      fputc (eol_delimiter, stdout);
     }
 
   // closefiles:
@@ -744,7 +751,7 @@ main (int argc, char **argv)
 
   //atexit (close_stdout);
 
-  while ((opt = getopt_long (argc, argv, "csS:T:uk:t:z", longopts, NULL)) != -1)
+  while ((opt = getopt_long (argc, argv, "cCsS:T:uk:t:z", longopts, NULL)) != -1)
     {
       switch (opt)
         {
@@ -770,10 +777,30 @@ main (int argc, char **argv)
           parse_key_arg (optarg);
           break;
 
+          /* pass the various check options as-is to sort - do not validate */
         case CHECK_OPTION:
-          add_sort_extra_args("--check");
-          add_sort_extra_args(optarg);
+          if (!optarg)
+            {
+              add_sort_extra_args("--check");
+            }
+          else
+            {
+              char *p = xcalloc (8 + strlen(optarg) + 1, 1);
+              strcpy (p, "--check=");
+              strcat (p, optarg);
+              add_sort_extra_args(p);
+              free (p);
+            }
           break;
+
+        case 'c':
+          add_sort_extra_args("-c");
+          break;
+
+        case 'C':
+          add_sort_extra_args("-C");
+          break;
+
 
         case COMPRESS_PROGRAM_OPTION:
           add_sort_extra_args("--compress-program");
@@ -866,12 +893,13 @@ main (int argc, char **argv)
   if (!keylist && !undecorate_fields)
     die (SORT_FAILURE, 0, _("missing -k/--key decoration or --undecorate options"));
 
-
   if (keylist)
     {
       if (debug)
         debug_keylist (stderr);
       num_decorate_fields = adjust_key_fields ();
+      if (!num_decorate_fields)
+        die (SORT_FAILURE, 0, _("no decorated keys specified. use standard sort(1) instead"));
       if (debug)
         debug_keylist (stderr);
     }

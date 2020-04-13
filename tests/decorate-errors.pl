@@ -46,9 +46,9 @@ my @Tests =
  ['e1','--foo-bar',{ERR=>"$prog: unrecognized option '--foo-bar'\n" .
                         "Try '$prog --help' for more information.\n"},
   {EXIT=>1}],
- ['e2','-k1,1 no-such-file.txt', {EXIT=>1},
+ ['e2','-k1,1:strlen no-such-file.txt', {EXIT=>1},
   {ERR=>"$prog: no-such-file.txt: No such file or directory\n"}],
- ['e3','--decorate -k1,1 no-such-file.txt', {EXIT=>1},
+ ['e3','--decorate -k1,1:strlen no-such-file.txt', {EXIT=>1},
   {ERR=>"$prog: no-such-file.txt: No such file or directory\n"}],
  ['e4','--undecorate 2 no-such-file.txt', {EXIT=>1},
   {ERR=>"$prog: no-such-file.txt: No such file or directory\n"}],
@@ -97,6 +97,8 @@ my @Tests =
   {ERR=>"$prog: ordering flags (b/d/i/h/n/g/M/R/V) can not be combined with a conversion function: invalid field specification '1h,1:foobar'\n"}],
  ['e28','-k1V,1:foobar', {EXIT=>2},
   {ERR=>"$prog: ordering flags (b/d/i/h/n/g/M/R/V) can not be combined with a conversion function: invalid field specification '1V,1:foobar'\n"}],
+ ['e29','-k1,1R:foobar', {EXIT=>2},
+  {ERR=>"$prog: ordering flags (b/d/i/h/n/g/M/R/V) can not be combined with a conversion function: invalid field specification '1,1R:foobar'\n"}],
 
 
  ['e40','-t "" -k1,1:foobar', {EXIT=>2},
