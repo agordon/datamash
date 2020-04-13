@@ -43,7 +43,7 @@ decorate_strlen (const char* in)
   return true;
 }
 
-int
+_GL_ATTRIBUTE_CONST int
 roman_numeral_to_value (char c)
 {
   switch (c)
