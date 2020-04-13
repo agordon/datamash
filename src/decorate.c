@@ -529,6 +529,8 @@ parse_external_conversion_spec (const char* optarg, const char *s, struct keyfie
 {
   ignore_value (key);
 
+  ++s; /* skip the '@' */
+
   if (*s == '\0')
     badfieldspec (optarg, N_("missing external conversion command"));
 
@@ -540,8 +542,8 @@ static void
 parse_builtin_conversion_spec (const char* optarg, const char *s, struct keyfield *key)
 {
   bool found = false;
-  /* built-in conversions */
-  ++s;
+
+  ++s; /* skip the ':' */
 
   if (*s == '\0')
     badfieldspec (optarg, N_("missing internal conversion function"));

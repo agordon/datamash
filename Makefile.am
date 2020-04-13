@@ -156,7 +156,8 @@ TESTS = \
 	tests/datamash-io-errors.sh \
 	tests/datamash-strbin.sh \
 	tests/datamash-valgrind.sh \
-	tests/decorate-tests.pl
+	tests/decorate-tests.pl \
+	tests/decorate-errors.pl
 
 EXTRA_DIST += \
 	tests/no-perl \
