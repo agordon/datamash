@@ -144,6 +144,15 @@ if sort -s < /dev/null > /dev/null 2>/dev/null ; then
             [Define to 1 if sort on this system supports -s for stable sorting])
 fi
 
+##
+## Check if the system's sort supports "-z" for NUL line delimiters
+##
+if sort -z < /dev/null > /dev/null 2>/dev/null ; then
+  AC_DEFINE([HAVE_ZERO_SORT],[1],
+            [Define to 1 if sort on this system supports -z
+             for NUL line delimiters])
+fi
+
 ## Are we building from git checked-out sources?
 ## (if not, assume it's from a tarball)
 ## This is used in "Makefile.am" to avoid re-generating the manpage

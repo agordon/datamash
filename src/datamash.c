@@ -1081,6 +1081,17 @@ open_input ()
          on GNU coreutils, Busybox, FreeBSD, MacOSX */
       strcat (cmd,"-s ");
 #endif
+      if (eolchar == '\0')
+        {
+#ifdef HAVE_ZERO_SORT
+          /* sort needs to understand -z to properly sort input using
+             NUL as the line delimiter */
+          strcat (cmd,"-z ");
+#else
+          die (EXIT_FAILURE, 0,
+                 _("-s and -z cannot be combined on this system"));
+#endif
+        }
       if (in_tab != TAB_WHITESPACE)
         {
           /* If the delimiter is a single-quote character, use
