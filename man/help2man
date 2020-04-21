@@ -1,8 +1,8 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 
 # Generate a short man page from --help and --version output.
 # Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2009,
-# 2010, 2011, 2012, 2013 Free Software Foundation, Inc.
+# 2010, 2011, 2012, 2013, 2014, 2015 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,17 +18,17 @@
 # along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 # Written by Brendan O'Dea <bod@debian.org>
-# Available from ftp://ftp.gnu.org/gnu/help2man/
+# Available from https://ftp.gnu.org/gnu/help2man/
 
 use 5.008;
 use strict;
-use warnings;
 use Getopt::Long;
+use Text::ParseWords qw(shellwords);
 use Text::Tabs qw(expand);
 use POSIX qw(strftime setlocale LC_ALL);
 
 my $this_program = 'help2man';
-my $this_version = '1.43.3';
+my $this_version = '1.47.3';
 
 sub _ { $_[0] }
 sub configure_locale
@@ -47,12 +47,13 @@ sub N_ { $_[0] }
 sub program_basename;
 sub get_option_value;
 sub convert_option;
+sub fix_italic_spacing;
 
 my $version_info = enc_user sprintf _(<<'EOT'), $this_program, $this_version;
 GNU %s %s
 
 Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2010,
-2011, 2012, 2013 Free Software Foundation, Inc.
+2011, 2012, 2013, 2014, 2015 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -126,7 +127,7 @@ my %include = ();
 my %replace = ();
 my %append = ();
 my %append_match = ();
-my @include = (); # retain order given in include file
+my @sections = ();  # retain order of include file or in-line *section*s
 
 # Process include file (if given).  Format is:
 #
@@ -142,6 +143,7 @@ my @include = (); # retain order given in include file
 #   Verbatim text to be inserted at the start of the named section.
 #
 #   [=section]
+
 #   Verbatim text to replace the named section.
 #
 #   [>section]
@@ -161,6 +163,7 @@ while (@opt_include)
 
     my $key;
     my $hash;
+
 
     while (<INC>)
     {
@@ -191,9 +194,7 @@ while (@opt_include)
 		$hash = \%include;
 	    }
 
-	    push @include, $key
-		unless $include{$key} or $replace{$key} or $append{$key};
-
+	    push @sections, $key;
 	    next;
 	}
 
@@ -222,7 +223,7 @@ while (@opt_include)
 	    # handle options
 	    if (/^-/)
 	    {
-		local @ARGV = split;
+		local @ARGV = shellwords $_;
 		GetOptions %opt_def;
 	    }
 
@@ -248,11 +249,23 @@ for my $hash (\(%include, %replace, %append, %append_match))
 my $help_text   = get_option_value $ARGV[0], $help_option;
 $version_text ||= get_option_value $ARGV[0], $version_option;
 
+# By default the generated manual pages will include the current date.  This may
+# however be overriden by setting the environment variable $SOURCE_DATE_EPOCH
+# to an integer value of the seconds since the UNIX epoch.  This is primarily
+# intended to support reproducible builds (wiki.debian.org/ReproducibleBuilds)
+# and will additionally ensure that the output date string is UTC.
+my $epoch_secs = time;
+if (exists $ENV{SOURCE_DATE_EPOCH} and $ENV{SOURCE_DATE_EPOCH} =~ /^(\d+)$/)
+{
+    $epoch_secs = $1;
+    $ENV{TZ} = 'UTC0';
+}
+
 # Translators: the following message is a strftime(3) format string, which in
 # the English version expands to the month as a word and the full year.  It
 # is used on the footer of the generated manual pages.  If in doubt, you may
 # just use %x as the value (which should be the full locale-specific date).
-my $date = enc strftime _("%B %Y"), localtime;
+my $date = enc strftime _("%B %Y"), localtime $epoch_secs;
 my $program = program_basename $ARGV[0];
 my $package = $program;
 my $version;
@@ -374,6 +387,7 @@ if ($help_text =~ s/^($PAT_USAGE):( +(\S+))(.*)((?:\n(?: {6}\1| *($PAT_USAGE_CON
 	s/\\fI$//;
 	s/^\./\\&./;
 
+	$_ = fix_italic_spacing $_;
 	$synopsis .= "$_\n";
     }
 
@@ -406,16 +420,19 @@ s/\\/\x82/g;
 # "(?:[\\w-]+ +)?" in the bug reporting pattern is used to indicate an
 # optional word, so that either "Report bugs" or "Report _program_ bugs" will
 # be matched.
-my $PAT_BUGS          = _('Report +(?:[\w-]+ +)?bugs|Email +bug +reports +to');
+my $PAT_BUGS          = _('Report +(?:[\w-]+ +)?bugs|' .
+                          'Email +bug +reports +to|' .
+                          '.* +online +help:');
 my $PAT_AUTHOR        = _('Written +by');
 my $PAT_OPTIONS       = _('Options');
 my $PAT_ENVIRONMENT   = _('Environment');
 my $PAT_FILES         = _('Files');
-my $PAT_EXAMPLES      = _('Examples?');
+my $PAT_EXAMPLES      = _('Examples');
 my $PAT_FREE_SOFTWARE = _('This +is +free +software');
+my $PAT_SEE_ALSO      = _('Full +documentation');
 
 # Start a new paragraph (if required) for these.
-s/([^\n])\n($PAT_BUGS|$PAT_AUTHOR) /$1\n\n$2 /og;
+s/([^\n])\n($PAT_BUGS|$PAT_AUTHOR|$PAT_SEE_ALSO) /$1\n\n$2 /og;
 
 # Convert iso-8859-1 copyright symbol or (c) to nroff
 # character.
@@ -424,28 +441,37 @@ s/^Copyright +(?:\xa9|\([Cc]\))/Copyright \\(co/mg;
 while (length)
 {
     # Convert some standard paragraph names.
-    if (s/^($PAT_OPTIONS): *\n//o)
+    if (s/^($PAT_OPTIONS): *\n+//o)
     {
 	$sect = _('OPTIONS');
 	next;
     }
-    if (s/^($PAT_ENVIRONMENT): *\n//o)
+    if (s/^($PAT_ENVIRONMENT): *\n+//o)
     {
 	$sect = _('ENVIRONMENT');
 	next;
     }
-    if (s/^($PAT_FILES): *\n//o)
+    if (s/^($PAT_FILES): *\n+//o)
     {
 	$sect = _('FILES');
 	next;
     }
-    elsif (s/^($PAT_EXAMPLES): *\n//o)
+    elsif (s/^($PAT_EXAMPLES): *\n+//o)
     {
 	$sect = _('EXAMPLES');
 	next;
     }
 
-    # Copyright section
+    # Custom section indicated by a line containing "*Section Name*".
+    if (s/^\*(\w(.*\w)?)\* *\n+//)
+    {
+	$sect = uc $1;
+	$sect =~ tr/*/ /;  # also accept *Section*Name*
+	push @sections, $sect;
+	next;
+    }
+
+    # Copyright section.
     if (/^Copyright /)
     {
 	$sect = _('COPYRIGHT');
@@ -461,6 +487,12 @@ while (length)
     elsif (/^($PAT_AUTHOR)/o)
     {
 	$sect = _('AUTHOR');
+    }
+
+    elsif (/^($PAT_SEE_ALSO)/o)
+    {
+	$sect = _('SEE ALSO');
+	$opt_no_info = 1;
     }
 
     # Examples, indicated by an indented leading $, % or > are
@@ -569,6 +601,8 @@ while (length)
 		)
 		($|[ ,;.)])			# space/punctuation after
 	    !$1\\fI$2\\fP$3!xmg;
+
+	    $_ = fix_italic_spacing $_;
 	}
 
 	# Escape remaining hyphens.
@@ -588,6 +622,17 @@ while (length)
 	    #   GNU <package> home page: <url>
 	    #   ...
 	    s/\n([[:upper:]])/\n.br\n$1/g;
+	}
+	elsif ($sect eq _('SEE ALSO'))
+	{
+	    # Handle external references of the form:
+	    #
+	    #   GNU <package> online resources: <addr>
+	    #   Full documentation at: <addr>
+	    #   or available locally via: info ...
+	    #
+	    s/\'/\\(aq/g;			# shell quotes for info command
+	    s/\n(.)/\n.br\n$1/g;		# separate lines for each item
 	}
     }
 
@@ -649,14 +694,17 @@ EOT
 
 # Section ordering.
 my @pre = (_('NAME'), _('SYNOPSIS'), _('DESCRIPTION'), _('OPTIONS'),
-    _('ENVIRONMENT'), _('FILES'), _('EXAMPLES'));
-
-my @post = (_('AUTHOR'), _('REPORTING BUGS'), _('COPYRIGHT'), _('SEE ALSO'));
-my $filter = join '|', @pre, @post;
+    _('EXAMPLES'));
+my @post = (_('ENVIRONMENT'), _('FILES'), _('AUTHOR'),
+    _('REPORTING BUGS'), _('COPYRIGHT'), _('SEE ALSO'));
+my %filter = map { $_ => 1 } @pre, @post;
 
 # Output content.
-for my $sect (@pre, (grep ! /^($filter)$/o, @include), @post)
+my %done;
+for my $sect (@pre, (grep !$filter{$_}, @sections), @post)
 {
+    next if $done{$sect}++;  # ignore duplicates
+    next unless $include{$sect};
     if ($include{$sect})
     {
 	my $quote = $sect =~ /\W/ ? '"' : '';
@@ -731,4 +779,13 @@ sub convert_option
     }
 
     $_;
+}
+
+# Insert spacing escape characters \, and \/ before and after italic text.  See
+# https://www.gnu.org/software/groff/manual/html_node/Ligatures-and-Kerning.html
+sub fix_italic_spacing
+{
+    local $_ = shift;
+    s!\\fI(.*?)\\f([BRP])!\\fI\\,$1\\/\\f$2!g;
+    return $_;
 }
