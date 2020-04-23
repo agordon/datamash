@@ -37,7 +37,8 @@ use CuTmpdir qw(datamash);
 ## Perl 5.8 and earlier do not have Digest::SHA as core module.
 ## Skip the test if it is not found.
 my $have_sha =
-   eval qq{use Digest::SHA qw(sha1_hex sha224_hex sha256_hex sha384_hex sha512_hex);1;};
+   eval qq{use Digest::SHA qw(sha1_hex sha224_hex sha256_hex
+           sha384_hex sha512_hex);1;};
 
 CuSkip::skip "requires Perl>5.8 with Digest::SHA module\nload error:\n$@"
    unless $have_sha;

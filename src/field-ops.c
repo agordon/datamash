@@ -404,7 +404,7 @@ field_op_collect (struct fieldop *op,
       break;
 
     case OP_GEOMEAN:
-      op->value += logl(num_value);
+      op->value += logl (num_value);
       break;
 
     case OP_HARMMEAN:
@@ -824,7 +824,7 @@ field_op_summarize (struct fieldop *op)
       break;
 
     case OP_GEOMEAN:
-      numeric_result = expl(op->value / op->count);
+      numeric_result = expl (op->value / op->count);
       break;
 
     case OP_HARMMEAN:
