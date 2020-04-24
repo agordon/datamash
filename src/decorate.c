@@ -806,6 +806,8 @@ main (int argc, char **argv)
   bool decorate_only = false;
   bool print_sort_args = false;
 
+  openbsd_pledge ();
+
   set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);

@@ -231,4 +231,13 @@ enum
   };
 
 
+static inline void
+openbsd_pledge ()
+{
+#ifdef HAVE_PLEDGE
+  /* On OpenBSD, use pledge (2) to limit privileges */
+  pledge ("stdio proc exec rpath", NULL);
+#endif
+}
+
 #endif /* __DATAMASH__SYSTEM_H__ */

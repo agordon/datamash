@@ -107,6 +107,8 @@ AC_DEFINE([HAVE_BROKEN_STRTOLD],[1],
           [Define to 1 if strtold does not work properly (e.g. in cygwin)])
 fi
 
+## Look for OpenBSD pledge(2)
+AC_CHECK_FUNCS([pledge])
 
 ## Check for bash-completion using pkg-config
 ##   ./configure --with-bash-completion-dir=[no|local|global|PATH] .

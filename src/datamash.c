@@ -1138,6 +1138,8 @@ int main (int argc, char* argv[])
   DECL_LONG_DOUBLE_ROUNDING
   BEGIN_LONG_DOUBLE_ROUNDING ();
 
+  openbsd_pledge ();
+
   set_program_name (argv[0]);
 
 #ifdef FORCE_C_LOCALE
