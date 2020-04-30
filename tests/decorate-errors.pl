@@ -46,8 +46,10 @@ my $ordering_flags_error_prefix="ordering flags (b/d/i/h/n/g/M/R/V) " .
 
 my @Tests =
 (
- ['e1','--foo-bar',{ERR=>"$prog: unrecognized option '--foo-bar'\n" .
-                        "Try '$prog --help' for more information.\n"},
+ ['e1','--foo-bar',
+  {ERR_SUBST=>'s/unknown/unrecognized/; s/-- foo-bar/\'--foo-bar\'/'},
+  {ERR=>"$prog: unrecognized option '--foo-bar'\n" .
+        "Try '$prog --help' for more information.\n"},
   {EXIT=>2}],
  ['e2','-k1,1:strlen no-such-file.txt', {EXIT=>2},
   {ERR=>"$prog: no-such-file.txt: No such file or directory\n"}],

@@ -198,6 +198,8 @@ my @Tests =
 
   # Invalid output delimiters
   ['e100', '--output-delimiter', {IN_PIPE=>""}, {EXIT=>1},
+   {ERR_SUBST=>'s/requires an argument -- output-delimiter/' .
+	       '\'--output-delimiter\' requires an argument/'},
    {ERR=>"$prog: option '--output-delimiter' requires an argument\n".
          "Try '$prog --help' for more information.\n"}],
   ['e101', '--output-delimiter ""', {IN_PIPE=>""}, {EXIT=>1},
