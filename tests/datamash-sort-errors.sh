@@ -31,7 +31,7 @@ fail=0
 require_paste_
 
 ## Ensure seq is useable
-## (not installed on OpenBSD by default)
+openbsd_seq_replacement_
 seq 10 >/dev/null 2>/dev/null ||
   skip_ "requires a working seq"
 

@@ -28,7 +28,8 @@
 
 fail=0
 
-## Ensure seq,awk are useable
+## Ensure seq is useable
+openbsd_seq_replacement_
 seq 10 >/dev/null 2>/dev/null \
     || skip_ "requires a working seq"
 
