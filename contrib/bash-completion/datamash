@@ -27,21 +27,23 @@ _datamash ()
   local groupby_ops="sum min max absmin absmax range \
 count first last rand \
 unique collapse countunique \
-mean trimmean median q1 q3 iqr perc mode antimode \
+mean geomean harmmean trimmean median q1 q3 iqr perc mode antimode \
 pstdev sstdev pvar svar mad madraw \
 pskew sskew pkurt skurt dpo jarque \
-pcov scov ppearson spearson strbin"
+pcov scov ppearson spearson"
  local groupby_ops_re=${groupby_ops// /|}
 
-  local line_ops="base64 debase64 md5 sha1 sha256 sha512 \
-round floor ceil trunc frac bin dirname basename extname barename cut"
+  local line_ops="base64 debase64 md5 sha1 sha224 sha256 sha384 sha512 \
+round floor ceil trunc frac bin strbin dirname basename extname barename \
+getnum cut"
   local line_ops_re=${line_ops// /|}
 
-  local datamash_short_options="-C -f -g -H -i -s -t -W -z"
+  local datamash_short_options="-c -C -f -g -H -i -s -t -R -W -z"
 
-  local datamash_long_options="--full --group --header-in --header-out --headers
-  --ignore-case --sort --no-strict --filler --field-separator --whitespace
-  --zero-terminated --help --version --output-delimiter --skip-comments"
+  local datamash_long_options=" --skip-comments --full --group --header-in
+  --header-out --headers --ignore-case --sort --no-strict --filler --format
+  --field-separator --narm --output-delimiter --round --whitespace
+  --zero-terminated --collapse-delimiter --help --version"
 
   local all_ops_re="$modes_re|$groupby_ops_re|$line_ops_re"
 

@@ -9,6 +9,10 @@
   -c/--collapse-delimiter=X argument uses character X instead of comma
   between values in collapse and unique lists.
 
+** Improvements
+
+  Updated the bash completion script to reflect recent additions.
+
 ** Bug Fixes
 
   Datamash now passes the -z/--zero-terminated flag to the sort(1) child
