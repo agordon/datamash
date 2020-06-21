@@ -51,12 +51,6 @@ PROG_ARGV0=$(datamash --foobar 2>&1 | head -n 1 | cut -f1 -d:)
 GROUPPARAM=$(seq 1000 2000 | paste -d "," -s -) ||
   framework_failure_ "failed to construct too-long group parameter"
 
-## The expected error message when the group parameter is too long
-## to pass to the 'sort' pipe
-echo "$PROG_ARGV0: sort command too-long" \
-     "(please report this bug)" > exp_err1 ||
-  framework_failure_ "failed to create exp_err1"
-
 ## The expected error message when 'sort' is not found
 printf 'sh: sort: not found\ndatamash: read error (on close)' > exp_err2 ||
   framework_failure_ "failed to create exp_err2"
@@ -97,24 +91,11 @@ chmod a+x "$BADDIR/sort" ||
 ##
 
 ##
-## piping to 'sort' uses a fixed-sized buffer for the command line (1024 bytes).
-## If the "--group" parameter is too long, we can't safely create it.
+## Test with non-existing 'sort' executable, by giving an invalid path
 ##
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-echo "" | datamash --sort --group "$GROUPPARAM" sum 1 2>err1 &&
-  { warn_ "datamash --sort (group too-long) failed to detect error" ;
-    fail=1 ; }
-compare_ err1 exp_err1 ||
-  { warn_ "group-too-long error message is incorrect" ; fail=1 ; }
-
-##
-## Test with non-existing 'sort' executable,
-## by removing all directories fromt he PATH
-##
-## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
-##
-seq 10 | PATH=$DATAMASHDIR datamash --sort -g 1 sum 1 &&
+seq 10 | datamash --sort --sort-cmd=/not/a/sort -g 1 sum 1 &&
   { warn_ "datamash --sort with non existing 'sort' did not fail " \
           "(it should have failed)" ; fail=1 ; }
 
@@ -122,7 +103,7 @@ seq 10 | PATH=$DATAMASHDIR datamash --sort -g 1 sum 1 &&
 ## Test with a 'sort' that crashes
 ## NOTE: This run SHOULD return an error, hence the "&&" instead of "||"
 ##
-seq 10 | PATH=$BADDIR:$DATAMASHDIR datamash --sort -g 1 sum 1 &&
+seq 10 | datamash --sort --sort-cmd="${BADDIR}/sort" -g 1 sum 1 &&
   { warn_ "datamash --sort with crashing 'sort' did not fail " \
           "(it should have failed)" ; fail=1 ; }
 

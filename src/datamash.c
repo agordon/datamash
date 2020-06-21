@@ -48,6 +48,7 @@
 #define Version VERSION
 #include "version-etc.h"
 #include "xalloc.h"
+#include "sh-quote.h"
 
 #include "text-options.h"
 #include "text-lines.h"
@@ -99,6 +100,9 @@ static size_t rmdup_initial_size = (1024*1024);
 /* Explicit output delimiter with --output-delimiter */
 static int explicit_output_delimiter = -1;
 
+/* Path to default sort program */
+static const char *sort_cmd = SORT_PATH;
+
 enum
 {
   INPUT_HEADER_OPTION = CHAR_MAX + 1,
@@ -107,6 +111,7 @@ enum
   REMOVE_NA_VALUES_OPTION,
   OUTPUT_DELIMITER_OPTION,
   CUSTOM_FORMAT_OPTION,
+  SORT_PROGRAM_OPTION,
   UNDOC_PRINT_INF_OPTION,
   UNDOC_PRINT_NAN_OPTION,
   UNDOC_PRINT_PROGNAME_OPTION,
@@ -134,6 +139,7 @@ static struct option const long_options[] =
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
   {"narm", no_argument, NULL, REMOVE_NA_VALUES_OPTION},
   {"round", required_argument, NULL, 'R'},
+  {"sort-cmd", required_argument, NULL, SORT_PROGRAM_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   /* Undocumented options */
@@ -279,6 +285,9 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 "), stdout);
       fputs (_("\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
+"), stdout);
+      fputs (_("\
+      --sort-cmd=/path/to/sort   Alternative sort(1) to use.\n\
 "), stdout);
 
       fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -1053,9 +1062,9 @@ open_input ()
 {
   if (pipe_through_sort && dm->num_grps>0)
     {
-      char tmp[INT_BUFSIZE_BOUND (size_t)*2+5];
-      char cmd[1024];
-      memset (cmd,0,sizeof (cmd));
+      char delim[2] = { 0, 0 };
+      char **args = xcalloc (dm->num_grps + 8, sizeof (char *));
+      int argc = 0;
 
       if (input_header)
         {
@@ -1065,52 +1074,60 @@ open_input ()
              the 'sort' child-process */
           process_input_header (stdin);
         }
+
 #ifdef SORT_WITHOUT_LOCALE
-      /* For mingw/windows systems */
-      strcat (cmd,"sort ");
-#else
-      strcat (cmd,"LC_ALL=C sort ");
+      args[argc++] = "LC_ALL=C";
 #endif
-      if (!case_sensitive)
-        strcat (cmd,"-f ");
+      args[argc++] = (char *)sort_cmd;
 #ifdef HAVE_STABLE_SORT
       /* stable sort (-s) is needed to support first/last operations
          (prevent sort from re-ordering lines which are not part of the group.
          '-s' is not standard POSIX, but very commonly supported, including
          on GNU coreutils, Busybox, FreeBSD, MacOSX */
-      strcat (cmd,"-s ");
+      args[argc++] = "-s";
 #endif
+
       if (eolchar == '\0')
         {
 #ifdef HAVE_ZERO_SORT
           /* sort needs to understand -z to properly sort input using
              NUL as the line delimiter */
-          strcat (cmd,"-z ");
+	  args[argc++] = "-z";
 #else
           die (EXIT_FAILURE, 0,
                  _("-s and -z cannot be combined on this system"));
 #endif
         }
+      if (!case_sensitive)
+	{
+	  args[argc++] = "-f";
+	}
+
       if (in_tab != TAB_WHITESPACE)
         {
-          /* If the delimiter is a single-quote character, use
-             double-quote to prevent shell quoting problems. */
-          const char qc = (in_tab=='\'')?'"':'\'';
-          snprintf (tmp,sizeof (tmp),"-t %c%c%c ",qc,in_tab,qc);
-          strcat (cmd,tmp);
-        }
-      for (size_t i = 0; i < dm->num_grps; ++i)
-        {
-          const size_t col_num = dm->grps[i].num;
-          snprintf (tmp,sizeof (tmp),"-k%"PRIuMAX",%"PRIuMAX" ",
-                    (uintmax_t)col_num,(uintmax_t)col_num);
-          if (strlen (tmp)+strlen (cmd)+1 >= sizeof (cmd))
-            die (EXIT_FAILURE, 0,
-                   _("sort command too-long (please report this bug)"));
-          strcat (cmd,tmp);
+	  args[argc++] = "-t";
+	  delim[0] = in_tab;
+	  args[argc++] = delim;
         }
 
+      int sort_spec = argc;
+      for (size_t i = 0; i < dm->num_grps; ++i)
+        {
+	  char tmp[INT_BUFSIZE_BOUND (size_t) * 2 + 5];
+          const size_t col_num = dm->grps[i].num;
+          snprintf (tmp,sizeof (tmp),"-k%"PRIuMAX",%"PRIuMAX,
+                    (uintmax_t)col_num,(uintmax_t)col_num);
+	  args[argc++] = xstrdup (tmp);
+        }
+
+      char *cmd = shell_quote_argv ((const char * const *) args);
+      while (sort_spec < argc)
+	{
+	  free (args[sort_spec++]);
+	}
+      free (args);
       input_stream = popen (cmd,"r");
+      free (cmd);
       if (input_stream == NULL)
         die (EXIT_FAILURE, 0, _("failed to run 'sort': popen failed"));
     }
@@ -1246,6 +1263,10 @@ int main (int argc, char* argv[])
           in_tab = TAB_WHITESPACE;
           out_tab = '\t';
           break;
+
+	case SORT_PROGRAM_OPTION:
+	  sort_cmd = xstrdup (optarg);
+	  break;
 
         case UNDOC_PRINT_INF_OPTION:
         case UNDOC_PRINT_NAN_OPTION:

@@ -255,7 +255,13 @@ $ cat FILE | sort -k1,1 | datamash --group 1 sum 1
 $ cat FILE | datamash --sort --group 1 sum 1
 @end example
 
+@item --sort-cmd=@var{PATH}
+@opindex --sort-cmd
+@cindex sorting
+Use the given program to sort instead of the system @command{sort}
+
 @end table
+
 
 @exdent File Operation options:
 

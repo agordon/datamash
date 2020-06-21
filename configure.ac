@@ -134,12 +134,18 @@ AM_CONDITIONAL([ENABLE_BASH_COMPLETION],
                [test "x$with_bash_completion_dir" != "xno"])
 
 
+## Prefer gsort over sort to get GNU coreutils version on non-GNU
+## userspace OSes if available.
+AC_PATH_PROGS([SORT_PATH], [gsort sort],
+		      [AC_MSG_ERROR([could not find a sort program])])
+AC_DEFINE_UNQUOTED([SORT_PATH], "$SORT_PATH", [Absolute path to sort command])
+
 ##
 ## Check if the system's sort support "-s" (stable) sort.
 ##  'sort' from GNU Coreutils, FreeBSD, OpenBSD, Busybox support it.
 ##  DilOS (illumos/opensolaris) does not.
 ##
-if sort -s < /dev/null > /dev/null 2>/dev/null ; then
+if ${SORT_PATH} -s < /dev/null > /dev/null 2>/dev/null ; then
   AC_DEFINE([HAVE_STABLE_SORT],[1],
             [Define to 1 if sort on this system supports -s for stable sorting])
 fi
@@ -147,7 +153,7 @@ fi
 ##
 ## Check if the system's sort supports "-z" for NUL line delimiters
 ##
-if sort -z < /dev/null > /dev/null 2>/dev/null ; then
+if ${SORT_PATH} -z < /dev/null > /dev/null 2>/dev/null ; then
   AC_DEFINE([HAVE_ZERO_SORT],[1],
             [Define to 1 if sort on this system supports -z
              for NUL line delimiters])

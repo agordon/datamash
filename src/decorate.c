@@ -31,6 +31,7 @@
 #define Version VERSION
 #include "version-etc.h"
 #include "ignore-value.h"
+#include "sh-quote.h"
 
 #include "decorate-functions.h"
 
@@ -39,6 +40,8 @@
 
 #define AUTHORS \
   proper_name ("Assaf Gordon")
+
+static const char *sort_cmd = SORT_PATH;
 
 static bool debug_print_pid = false;
 
@@ -89,7 +92,8 @@ enum
   NMERGE_OPTION,
   RANDOM_SOURCE_OPTION,
   HEADER_OPTION,
-  PARALLEL_OPTION
+  PARALLEL_OPTION,
+  SORT_PROGRAM_OPTION
 };
 
 static struct option const longopts[] =
@@ -101,6 +105,7 @@ static struct option const longopts[] =
   {"zero-terminated", no_argument, NULL, 'z'},
   {"print-sort-args", no_argument, NULL, PRINT_SORT_ARGS_OPTION},
   {"header", required_argument, NULL, HEADER_OPTION},
+  {"sort-cmd", required_argument, NULL, SORT_PROGRAM_OPTION},
 
   /* sort options, passed as-is to the sort process */
   {"check", optional_argument, NULL, CHECK_OPTION},
@@ -205,13 +210,17 @@ General Options:\n\
       fputs (_("\
   -z, --zero-terminated      line delimiter is NUL, not newline\n\
 "), stdout);
+      fputs (_("\
+      --sort-cmd=/path/to/sort   Alternative sort(1) to use.\n\
+"), stdout);
      fputs (HELP_OPTION_DESCRIPTION, stdout);
      fputs (VERSION_OPTION_DESCRIPTION, stdout);
 
      putchar ('\n');
 
      fputs (_("\
-The following options are passed to sort(1) as-is:\n\
+The following options are passed to sort as-is\
+ (Most of them assume GNU sort):\n\
 "), stdout);
 
      putchar ('\n');
@@ -741,7 +750,8 @@ adjust_key_fields ()
 char**
 build_sort_process_args ()
 {
-  int argc = 2 ; /* one 'sort' program name (argv[0]), one for NULL */
+  int argc = 3 ; /* one 'sort' program name (argv[0]), one extra arg on NetBSD,
+		    one for NULL */
   struct keyfield *key = keylist;
 
   /* step 1: count number of args */
@@ -756,7 +766,17 @@ build_sort_process_args ()
   char** argv = xcalloc (argc, sizeof (char*));
   int i = 0;
 
-  argv[i++] = xstrdup ("sort"); /* argv[0] */
+  argv[i++] = xstrdup (sort_cmd); /* argv[0] */
+
+#ifdef __NetBSD__
+  /* NetBSD's /usr/bin/sort is stable by default, unlike every other
+   * one I checked, causing test case failures. So make it unstable.
+   */
+  if (STREQ (sort_cmd, "/usr/bin/sort"))
+    {
+      argv[i++] = "-S";
+    }
+#endif
 
   key = keylist;
   do {
@@ -887,6 +907,10 @@ main (int argc, char **argv)
           add_sort_extra_args (optarg);
           break;
 
+	case SORT_PROGRAM_OPTION:
+	  sort_cmd = xstrdup (optarg);
+	  break;
+
         case RANDOM_SOURCE_OPTION:
           add_sort_extra_args ("--random-source");
           add_sort_extra_args (optarg);
@@ -994,16 +1018,8 @@ main (int argc, char **argv)
     {
       /* print and exit */
       char** sort_args = build_sort_process_args ();
-      char **p = sort_args;
-      while (*p)
-        {
-          /* TODO: shell quoting / escaping */
-          fputs (*p, stdout);
-          ++p;
-          if (*p)
-            fputc (' ', stdout);
-        }
-      fputc ('\n', stdout);
+      char *cmdline = shell_quote_argv ((const char * const*)sort_args);
+      puts (cmdline);
       exit (EXIT_SUCCESS);
     }
 
@@ -1124,7 +1140,7 @@ main (int argc, char **argv)
                   ++p;
                 }
             }
-          execvp ("sort", sort_args);
+          execvp (sort_cmd, sort_args);
 
           die (SORT_FAILURE, errno, _("failed to run the sort command"));
         }

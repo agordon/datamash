@@ -1,5 +1,11 @@
 * Noteworthy changes in release ?.? (?-?-?) []
 
+** New Features
+
+ --sort-cmd argument to specify the program used by the -s option to
+   sort input, plus enhancements to the security and portability of
+   building sort command lines.
+
 ** Bug Fixes
 
   Datamash now passes the -z/--zero-terminated flag to the sort(1) child

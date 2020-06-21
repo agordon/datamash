@@ -33,7 +33,7 @@ use MIME::Base64 ;
 
 (my $program_name = $0) =~ s|.*/||;
 my $prog = 'decorate';
-
+$prog .= " --sort-cmd=/usr/bin/sort" if $^O eq "netbsd";
 
 # TODO: add localization tests with "grouping"
 # Turn off localization of executable's output.
