@@ -1,5 +1,5 @@
 ." GNU decorate - manual page
-." Copyright (C) 2014-2020 Assaf Gordon <assafgordon@gmail.com>
+." Copyright (C) 2014-2021 Assaf Gordon <assafgordon@gmail.com>
 [NAME]
 decorate - command-line calculations
 

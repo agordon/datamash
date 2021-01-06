@@ -2,7 +2,7 @@
 =pod
   Unit Tests for decorate
 
-   Copyright (C) 2020 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2020-2021 Assaf Gordon <assafgordon@gmail.com>
 
    This file is part of GNU Datamash.
 
