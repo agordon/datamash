@@ -442,7 +442,8 @@ decorate_file (const char *infile)
         }
 
       if (!decorate_fields (&lb))
-        die (SORT_FAILURE, errno, _("conversion failed in line %zu"), linenum);
+        die (SORT_FAILURE, errno, _("conversion failed in line %"PRIdMAX),
+             linenum);
 
       if (debug)
         dbg_printf ("writing line: '%.*s'", (int)lb.length, lb.buffer);
