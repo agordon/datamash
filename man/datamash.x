@@ -337,7 +337,7 @@ $ cat example.txt | sort \-k1,1 | \fBdatamash\fR \-g 1 sum 2
 
 .SS "Header lines"
 .PP
-Use \fB\-h\fR \fB(\-\-headers)\fR if the input file has a header line:
+Use \fB\-H\fR \fB(\-\-headers)\fR if the input file has a header line:
 .PP
 .nf
 .RS
