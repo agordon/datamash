@@ -47,7 +47,6 @@
 #include "linebuffer.h"
 #define Version VERSION
 #include "version-etc.h"
-#include "xstrndup.h"
 #include "xalloc.h"
 
 #include "text-options.h"
@@ -332,7 +331,7 @@ safe_line_record_get_fieldz (const struct line_record_t *lr, const size_t n,
                              char * /* out */ buf, size_t len)
 {
   const char *p;
-  size_t l;
+  size_t l = 0;
   safe_line_record_get_field (lr, n, &p, &l);
   l = MIN (len-1,l);
   memcpy (buf, p, l);

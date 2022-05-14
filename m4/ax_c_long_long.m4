@@ -1,5 +1,5 @@
 # ===========================================================================
-#         http://www.nongnu.org/autoconf-archive/ax_c_long_long.html
+#      https://www.gnu.org/software/autoconf-archive/ax_c_long_long.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -20,7 +20,7 @@
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 4
+#serial 7
 
 AU_ALIAS([AC_C_LONG_LONG], [AX_C_LONG_LONG])
 AC_DEFUN([AX_C_LONG_LONG],
@@ -28,11 +28,11 @@ AC_DEFUN([AX_C_LONG_LONG],
 [if test "$GCC" = yes; then
   ac_cv_c_long_long=yes
   else
-        AC_TRY_COMPILE(,[long long int i;],
-   ac_cv_c_long_long=yes,
-   ac_cv_c_long_long=no)
-   fi])
-   if test $ac_cv_c_long_long = yes; then
-     AC_DEFINE([HAVE_LONG_LONG], 1, [compiler understands long long])
-   fi
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[long long int i;]])],
+      [ac_cv_c_long_long=yes],
+      [ac_cv_c_long_long=no])
+  fi])
+  if test $ac_cv_c_long_long = yes; then
+    AC_DEFINE(HAVE_LONG_LONG, 1, [compiler understands long long])
+  fi
 ])

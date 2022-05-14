@@ -61,9 +61,11 @@ datamash_LDADD = \
        $(LIB_CRYPTO) \
        $(LIB_HARD_LOCALE) \
        $(LIB_MBRTOWC) \
+       $(LIB_SETLOCALE) \
        $(LIB_SETLOCALE_NULL) \
        $(LIBICONV) \
        $(LIBINTL) \
+       $(LIBTHREAD) \
        $(LOG_LIBM) \
        $(LOGL_LIBM) \
        $(MODF_LIBM) \
@@ -73,7 +75,8 @@ datamash_LDADD = \
        $(SQRT_LIBM) \
        $(SQRTL_LIBM) \
        $(TRUNC_LIBM) \
-       $(TRUNCL_LIBM)
+       $(TRUNCL_LIBM) \
+       @INTL_MACOSX_LIBS@
 
 decorate_SOURCES = src/decorate.c \
 	src/key-compare.c src/key-compare.h \
@@ -89,6 +92,7 @@ decorate_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DKEY_COMPARE_VERSION
 
 decorate_LDADD = lib/lib$(PACKAGE).a \
+       $(INET_PTON_LIB) \
        $(LIBICONV) \
        $(LIBINTL)
 

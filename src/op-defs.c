@@ -20,7 +20,7 @@
 
 /* Written by Assaf Gordon */
 #include <config.h>
-
+#include <strings.h>
 #include "system.h"
 
 #include "op-defs.h"

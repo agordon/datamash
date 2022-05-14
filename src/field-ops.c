@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <string.h>
+#include <strings.h>
 #include <stdbool.h>
 #include <time.h>
 #include <libgen.h> /* for dirname & POSIX version of basename */
