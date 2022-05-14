@@ -8,6 +8,7 @@
   and exits. Previously it would omit the "-z" when running sort(1),
   resulting in incorrect results.
 
+  Documentation fixes.
 
 * Noteworthy changes in release 1.7 (2020-04-23) [testing]
 

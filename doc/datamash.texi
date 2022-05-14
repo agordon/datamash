@@ -589,7 +589,7 @@ Social-Sciences  27      90
 @end example
 
 @cindex mean, examples
-@cindex standard devian, examples
+@cindex standard deviation, examples
 @cindex examples, mean
 @cindex examples, standard deviation
 find the mean and (population) standard deviation in each subject:

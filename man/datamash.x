@@ -349,7 +349,7 @@ Caleb          Business         87
 Christian      Business         88
 Derek          Arts             60
 
-# Calculate the mean and standard devian for each major
+# Calculate the mean and standard deviation for each major
 $ \fBdatamash\fR \-\-sort \-\-headers \-\-group 2 mean 3 pstdev 3 < scores_h.txt
 
  (or use short form)
