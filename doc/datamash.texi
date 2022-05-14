@@ -124,7 +124,7 @@ and for automating tasks in shell scripts.
 
 @command{datamash} has a rich set of statistical functions to quickly assess
 information in textual input files. An example of calculating basic statistic
-(mean, 1st quartile, median, 3rd quarile, IQR, sample-standard-deviation,
+(mean, 1st quartile, median, 3rd quartile, IQR, sample-standard-deviation,
 and p-value of Jarque-Bera test for normal distribution:
 
 @cindex example, statistics
@@ -527,7 +527,7 @@ operators are compared to known results of the equivalent R functions.
 @menu
 * Summary Statistics::		  count,min,max,mean,stdev,median,quartiles
 * Header Lines and Column Names:: Using files with header lines
-* Field Delimiters::              Tabs, Whitespace, other delimiteres
+* Field Delimiters::              Tabs, Whitespace, other delimiters
 * Column Ranges::                 Operating on multiple columns
 * Reverse and Transpose::         swapping and transposing rows, columns
 * Groupby on @file{/etc/passwd}:: Groupby, count, collapse
@@ -576,7 +576,7 @@ Social-Sciences 15
 @cindex max, examples
 @cindex examples, min
 @cindex examples, max
-Similary, find the minimum and maximum score in each subject:
+Similarly, find the minimum and maximum score in each subject:
 
 @example
 $ datamash --sort groupby 2 @option{min} 3 @option{max} 3 < scores.txt
@@ -609,7 +609,7 @@ Social-Sciences   60.266  16.643
 @cindex examples, median
 @cindex quartiles, examples
 @cindex examples, quartiles
-Find the median, first, third quariles and the inter-quartile range in
+Find the median, first, third quartiles and the inter-quartile range in
 each subject:
 
 @example
@@ -766,22 +766,22 @@ $ datamash -H sum "FOO\\-BAR" < input.txt
 
 
 @node Field Delimiters
-@section Field Delimiteres
+@section Field Delimiters
 @cindex field delimiters
 @cindex whitespace delimiters
 @cindex delimiters, whitespace
 @cindex tab delimiters
 @cindex delimiters, tabs
 
-@command{datamash} uses tabs (ascii character 0x09) as default field
+@command{datamash} uses tabs (ASCII character 0x09) as default field
 delimiters.  Use @option{-W} to treat one or more consecutive
 whitespace characters as field delimiters. Use @option{-t},
 @option{--field-separator} to set a custom field delimiter.
 
 The following examples illustrate the various options.
 
-By default, fields are deparated by a single tab tab. Multiple tabs
-denotes multiple fields (this is consistent with GNU coreutil's
+By default, fields are separated by a single tab. Multiple tabs
+denotes multiple fields (this is consistent with GNU coreutils'
 @command{cut}):
 
 @example
@@ -955,7 +955,7 @@ Count   Year    Sample
 @cindex strict, reverse
 By default, reverse verifies the input has the same number of fields
 in each line, and fails with an error otherwise. Use
-@option{--no-strict} to disable this behaviour (see section
+@option{--no-strict} to disable this behavior (see section
 above for an example).
 
 
@@ -1011,7 +1011,7 @@ C       B       A
 @command{datamash} with the @option{groupby} operation mode
 can be used to aggregate information.
 
-Using this simuated @file{/etc/passwd} file as input:
+Using this simulated @file{/etc/passwd} file as input:
 
 @example
 $ cat passwd
