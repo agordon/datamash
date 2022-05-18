@@ -135,6 +135,7 @@ static struct option const long_options[] =
   {"filler", required_argument, NULL, 'F'},
   {"format", required_argument, NULL, CUSTOM_FORMAT_OPTION},
   {"output-delimiter", required_argument, NULL, OUTPUT_DELIMITER_OPTION},
+  {"collapse-delimiter", required_argument, NULL,'c'},
   {"sort", no_argument, NULL, 's'},
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
   {"narm", no_argument, NULL, REMOVE_NA_VALUES_OPTION},
@@ -250,6 +251,10 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs (_("\
   -s, --sort                sort the input before grouping; this removes the\n\
                               need to manually pipe the input through 'sort'\n\
+"), stdout);
+      fputs (_("\
+  -c, --collapse-delimiter=X  use X to separate elements in collapse and\n\
+                              unique lists (default: comma)\n\
 "), stdout);
 
       fputs (_("File Operation Options:\n"),stdout);
@@ -1267,6 +1272,12 @@ int main (int argc, char* argv[])
 	case SORT_PROGRAM_OPTION:
 	  sort_cmd = xstrdup (optarg);
 	  break;
+        case'c':
+          if (optarg[0] == '\0' || optarg[1] != '\0')
+            die (EXIT_FAILURE, 0,
+                 _("the delimiter must be a single character"));
+          collapse_separator = optarg[0];
+          break;
 
         case UNDOC_PRINT_INF_OPTION:
         case UNDOC_PRINT_NAN_OPTION:

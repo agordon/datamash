@@ -49,7 +49,6 @@ char* numeric_output_format = "%.14Lg";
 int   numeric_output_bufsize = 200;
 
 /* The character used to separate collapsed/uniqued strings */
-/* In the future: allow users to change this */
 char collapse_separator = ',';
 
 /* Should NA/NaN/empty values be silengtly ignored? */

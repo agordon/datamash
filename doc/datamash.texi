@@ -307,6 +307,14 @@ Use character @var{X} instead as output field delimiter.
 This option overrides @option{--field-separator}/@option{-t}/
 @option{--whitespace}/@option{-W}.
 
+@item --collapse-delimiter=@var{x}
+@itemx -c @var{x}
+@opindex --collapse-delimiter
+@opindex -c
+
+Use character @var{X} instead of comma to delimit items in a
+@samp{collapse} or @samp{unique} list.
+
 @item --round=@var{N}
 @itemx -R @var{N}
 @opindex --round
@@ -445,8 +453,16 @@ the last value of the group
 one random value from the group
 @item unique
 comma-separated sorted list of unique values
+
+@option{--collapse-delimiter} can be used to use a different character
+than comma.
+
 @item collapse
 comma-separated list of all input values
+
+@option{--collapse-delimiter} can be used to use a different character
+than comma.
+
 @item countunique
 number of unique/distinct values
 @end table
