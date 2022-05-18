@@ -19,6 +19,7 @@
   Incorrect format in a decorate(1) error breaking compilation on some
   systems.
 
+
 * Noteworthy changes in release 1.7 (2020-04-23) [testing]
 
 ** New Features

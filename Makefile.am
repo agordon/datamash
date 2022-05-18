@@ -76,7 +76,7 @@ datamash_LDADD = \
        $(SQRTL_LIBM) \
        $(TRUNC_LIBM) \
        $(TRUNCL_LIBM) \
-       @INTL_MACOSX_LIBS@
+       $(INTL_MACOSX_LIBS)
 
 decorate_SOURCES = src/decorate.c \
 	src/key-compare.c src/key-compare.h \
