@@ -1,12 +1,13 @@
-Authors of GNU datamash.
+GNU Datamash was originally authored by Assaf Gordon <assafgordon@gmail.com>.
+It is currently maintained by Assaf Gordon <assafgordon@gmail.com> and Tim Rice <trice@posteo.net>,
+with assistance from Shawn Wagner.
 
-  Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
+In addition, the following have provided patches and/or Git commits to Datamash:
 
-  Copying and distribution of this file, with or without modification,
-  are permitted in any medium without royalty provided the copyright
-  notice and this notice are preserved.
+    Barry Nisly
+    Benno Schulenberg
+    Erik Auerswald
+    Jeroen Roovers
+    Yu Fu
 
-The following contributions warranted legal paper exchanges with the
-Free Software Foundation.  See also the ChangeLog and THANKS files.
-
-(empty at the moment)
+See also the THANKS file.

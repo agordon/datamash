@@ -1,14 +1,22 @@
-Additional contributors to datamash.
-
-  Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
-
-  Copying and distribution of this file, with or without modification,
-  are permitted in any medium without royalty provided the copyright
-  notice and this notice are preserved.
-
 Thanks to:
 
     Aaron Quinlan ( http://quinlanlab.org/ ) whose 'groupBy' program
-    (https://github.com/arq5x/bedtools) was the inspiration for datamash.
+    (https://github.com/arq5x/bedtools) was the inspiration for GNU Datamash.
+
+The following people provided bug reports, feature requests and other suggestions which resulted in notable improvements to GNU Datamash:
+
+    Alejandro Garrido Mota
+    Benno Schulenberg
+    Bruno Haible
+    Dagobert Michelseni
+    Dave Myron
+    Khavish Bhundoo
+    Kingsley G. Morse Jr.
+    Mark van Rossum
+    Renan Valieris
+    Renato Alves
+    Sanjeev Kumar Sharma
+    Steve Ward
+    Torsten Seemann
 
 See also the AUTHORS and ChangeLog files.
