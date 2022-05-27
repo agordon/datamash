@@ -187,6 +187,14 @@ The datamash tests below should return the same results are thes R commands:
     trimmean40=function(x){mean(x,trim=0.4)}
     trimmean50=function(x){mean(x,trim=0.5)}
 
+    # Package for harmonic and geometric mean
+    library(psych)
+
+    # Helper function for ms
+    ms=function(x) { mean(x^2) }
+
+    # Helper function for rms
+    rms=function(x) { sqrt(mean(x^2)) }
 
     # Helper function for madraw
     madraw=function(x) { mad(x,constant=1.0) }
@@ -245,6 +253,8 @@ The datamash tests below should return the same results are thes R commands:
     # Run tests
     test(range)
     test(mean)
+    test(geometric.mean)
+    test(harmonic.mean)
     test(median)
     test(q1)
     test(q3)
@@ -257,7 +267,7 @@ The datamash tests below should return the same results are thes R commands:
     test(trimmean30)
     test(trimmean40)
     test(trimmean50)
-    test(iqr)
+    test(IQR)
     test(smp.sd)
     test(pop.sd)
     test(smp.var)
@@ -269,6 +279,8 @@ The datamash tests below should return the same results are thes R commands:
     test(pop.excess_kurtosis)
     test(smp.excess_kurtosis)
     test(jarque.bera.pvalue)
+    test(ms)
+    test(rms)
 
 =cut
 
@@ -329,6 +341,32 @@ my @Tests =
   ['harmmean10','harmmean 1' ,  {IN_PIPE=>$seq20}, {OUT => "99.122\n"},],
   ['harmmean11','harmmean 1' ,  {IN_PIPE=>$seq21}, {OUT => "19.563\n"},],
   ['harmmean12','harmmean 1' ,  {IN_PIPE=>$seq22}, {OUT => "67.322\n"},],
+
+  # Test mean square
+  ['ms1', 'ms 1', {IN_PIPE=>$seq1}, {OUT => "7.5\n"},],
+  ['ms2', 'ms 1', {IN_PIPE=>$seq2}, {OUT => "4.666\n"},],
+  ['ms3', 'ms 1', {IN_PIPE=>$seq3}, {OUT => "4\n"},],
+  ['ms4', 'ms 1', {IN_PIPE=>$seq9}, {OUT => "172.888\n"},],
+  ['ms5', 'ms 1', {IN_PIPE=>$seq10}, {OUT => "239.7\n"},],
+  ['ms6', 'ms 1', {IN_PIPE=>$seq11}, {OUT => "305.272\n"},],
+  ['ms7', 'ms 1', {IN_PIPE=>$seq12}, {OUT => "393.916\n"},],
+  ['ms8', 'ms 1', {IN_PIPE=>$seq20}, {OUT => "10102.8\n"},],
+  ['ms9', 'ms 1', {IN_PIPE=>$seq21}, {OUT => "2971.76\n"},],
+  ['ms10', 'ms 1', {IN_PIPE=>$seq22}, {OUT => "4558.03\n"},],
+  ['ms11', 'ms 1', {IN_PIPE=>$seq23}, {OUT => "42.689\n"},],
+
+  # Test root mean square
+  ['rms1', 'rms 1', {IN_PIPE=>$seq1}, {OUT => "2.738\n"},],
+  ['rms2', 'rms 1', {IN_PIPE=>$seq2}, {OUT => "2.160\n"},],
+  ['rms3', 'rms 1', {IN_PIPE=>$seq3}, {OUT => "2\n"},],
+  ['rms4', 'rms 1', {IN_PIPE=>$seq9}, {OUT => "13.148\n"},],
+  ['rms5', 'rms 1', {IN_PIPE=>$seq10}, {OUT => "15.482\n"},],
+  ['rms6', 'rms 1', {IN_PIPE=>$seq11}, {OUT => "17.472\n"},],
+  ['rms7', 'rms 1', {IN_PIPE=>$seq12}, {OUT => "19.847\n"},],
+  ['rms8', 'rms 1', {IN_PIPE=>$seq20}, {OUT => "100.512\n"},],
+  ['rms9', 'rms 1', {IN_PIPE=>$seq21}, {OUT => "54.513\n"},],
+  ['rms10', 'rms 1', {IN_PIPE=>$seq22}, {OUT => "67.513\n"},],
+  ['rms11', 'rms 1', {IN_PIPE=>$seq23}, {OUT => "6.533\n"},],
 
   # Test median
   ['med1', 'median 1' ,  {IN_PIPE=>$seq1},  {OUT => "2.5\n"}],

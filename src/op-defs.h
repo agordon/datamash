@@ -38,6 +38,8 @@ enum field_operation
   OP_MEAN,
   OP_GEOMEAN,
   OP_HARMMEAN,
+  OP_MS,
+  OP_RMS,
   OP_MEDIAN,
   OP_QUARTILE_1,
   OP_QUARTILE_3,

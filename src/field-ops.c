@@ -81,6 +81,10 @@ struct operation_data operations[] =
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_HARMMEAN */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_MS */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_RMS */
+  {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_MEDIAN */
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_QUARTILE_1 */
@@ -412,6 +416,11 @@ field_op_collect (struct fieldop *op,
       op->value += 1.0 / num_value;
       break;
 
+    case OP_MS:
+    case OP_RMS:
+      op->value += num_value * num_value;
+      break;
+
     case OP_COUNT:
       op->value++;
       break;
@@ -710,6 +719,8 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_MEAN:
     case OP_GEOMEAN:
     case OP_HARMMEAN:
+    case OP_MS:
+    case OP_RMS:
     case OP_S_SKEWNESS:
     case OP_P_SKEWNESS:
     case OP_S_EXCESS_KURTOSIS:
@@ -821,6 +832,7 @@ field_op_summarize (struct fieldop *op)
   switch (op->op)                                /* LCOV_EXCL_BR_LINE */
     {
     case OP_MEAN:
+    case OP_MS:
       numeric_result = op->value / op->count;
       break;
 
@@ -894,6 +906,10 @@ field_op_summarize (struct fieldop *op)
       field_op_sort_values (op);
       numeric_result = trimmed_mean_value ( op->values, op->num_values,
 					    op->params.trimmed_mean);
+      break;
+
+    case OP_RMS:
+      numeric_result = sqrtl (op->value / op->count);
       break;
 
     case OP_PSTDEV:

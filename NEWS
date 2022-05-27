@@ -9,6 +9,8 @@
   -c/--collapse-delimiter=X argument uses character X instead of comma
   between values in collapse and unique lists.
 
+  New operations: mean square (ms) and root mean square (rms)
+
 ** Improvements
 
   Updated the bash completion script to reflect recent additions.
