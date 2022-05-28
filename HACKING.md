@@ -39,7 +39,6 @@ To enable warnings-as-errors (`-Werror`), run:
 
     ./configure --enable-werror
 
-Warnings-as-errors is enabled automatically when building from git repository.  
 To disable, run:
 
     ./configure --disable-werror
@@ -74,7 +73,6 @@ To run a specific test:
 ### Expensive tests
 
 Expensive tests use valgrind to find memory usage errors, and use specially
-mounted file-system to emulate errors.  
 To create the special file systems, run:
 
     ./build-aux/create_corrupted_file_system.sh
@@ -137,7 +135,6 @@ To check coverage with expensive tests, run:
     make coverage-expensive
 
 It seems recent versions of `lcov` disabled branch coverage by default
-(checking only line and function coverage).  
 To re-enable branch coverage, either:
 
 * edit your `.lcovrc` file (e.g `/etc/lcovrc`) and change
@@ -157,7 +154,6 @@ To check the source code files against the most common syntax rules, run:
     make syntax-check
 
 Most syntax-check rules are defined in `maint.mk` (auto-generated from gnulib's
-`./gnulib/top/maint.mk`).  
 Few additional rules are defined in `cfg.mk` (copied
 from GNU Coreutils).
 
@@ -196,8 +192,6 @@ To show hide detailed build commands (showing only the file being built), run:
 
 ### Non-Recursive Make
 
-The build system uses **non recursive makefile** structure.  
-Search for the 1997 paper "Recursive Make Considered Harmful" by Peter Miller,  
 and see examples of switching to non-recursive make in
 [GNU Coreutils](https://git.savannah.gnu.org/cgit/coreutils.git/log/?qt=grep&q=recursive+make),
 [GNU Hello](https://git.savannah.gnu.org/cgit/hello.git/log/?qt=grep&q=recursive),
@@ -234,5 +228,4 @@ such as:
 
     ./configure --host=x86_64-w64-mingw32
 
-Compilation under Cygwin does not require this flag.  
 See related discussion: <https://lists.gnu.org/archive/html/bug-gnulib/2014-09/msg00052.html>
