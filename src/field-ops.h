@@ -80,8 +80,8 @@ struct fieldop
   /* Instance information */
   size_t field; /* field number.  1 = first field in input file. */
   bool   field_by_name; /* if true, user gave field name (instead of number),
-			   which needs to be resolved AFTER the header line
-			   is loaded */
+                           which needs to be resolved AFTER the header line
+                           is loaded */
   char* field_name;
 
   union {

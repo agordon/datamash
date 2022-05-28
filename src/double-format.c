@@ -46,7 +46,7 @@ validate_double_format (char const *fmt)
   for (i = 0; ! (fmt[i] == '%' && fmt[i + 1] != '%'); i += (fmt[i] == '%') + 1)
     if (!fmt[i])
       die (EXIT_FAILURE, 0,
-	   _("format %s has no %% directive"), quote (fmt));
+           _("format %s has no %% directive"), quote (fmt));
 
   i++;
   i += strspn (fmt + i, "-+#0 '");
@@ -64,7 +64,7 @@ validate_double_format (char const *fmt)
   if (! strchr ("efgaEFGA", fmt[i]))
     die (EXIT_FAILURE, 0,
          _("format %s has unknown/invalid type %%%c directive"),
-	 quote (fmt), fmt[i]);
+  quote (fmt), fmt[i]);
 
   /* Copy characters until the type character, add 'L', then the type,
      then the rest of the format string. */

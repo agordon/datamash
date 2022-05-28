@@ -101,11 +101,11 @@ x2nrealloc (void *p, size_t *pn, size_t s)
 #define STREQ_LEN(a, b, n) (strncmp (a, b, n) == 0)
 #define STRPREFIX(a, b) (strncmp(a, b, strlen (b)) == 0)
 
-#define case_GETOPT_VERSION_CHAR(Program_name, Authors)			\
-  case GETOPT_VERSION_CHAR:						\
-    version_etc (stdout, Program_name, PACKAGE_NAME, Version, Authors,	\
-                 (char *) NULL);					\
-    exit (EXIT_SUCCESS);						\
+#define case_GETOPT_VERSION_CHAR(Program_name, Authors)                 \
+  case GETOPT_VERSION_CHAR:                                             \
+    version_etc (stdout, Program_name, PACKAGE_NAME, Version, Authors,  \
+                 (char *) NULL);                                        \
+    exit (EXIT_SUCCESS);                                                \
     break;
 
 /* Factor out some of the common --help and --version processing code.  */
@@ -124,9 +124,9 @@ enum
 #define GETOPT_VERSION_OPTION_DECL \
   "version", no_argument, NULL, GETOPT_VERSION_CHAR
 
-#define case_GETOPT_HELP_CHAR			\
-  case GETOPT_HELP_CHAR:			\
-    usage (EXIT_SUCCESS);			\
+#define case_GETOPT_HELP_CHAR \
+  case GETOPT_HELP_CHAR:      \
+    usage (EXIT_SUCCESS);     \
     break;
 
 #define HELP_OPTION_DESCRIPTION \

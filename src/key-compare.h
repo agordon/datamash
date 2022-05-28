@@ -41,50 +41,50 @@ enum blanktype { bl_start, bl_end, bl_both };
 /* Lines are held in core as counted strings. */
 struct line
 {
-  char *text;			/* Text of the line. */
-  size_t length;		/* Length including final newline. */
-  char *keybeg;			/* Start of first key. */
-  char *keylim;			/* Limit of first key. */
+  char *text;      /* Text of the line. */
+  size_t length;    /* Length including final newline. */
+  char *keybeg;      /* Start of first key. */
+  char *keylim;      /* Limit of first key. */
 };
 
 /* Sort key.  */
 struct keyfield
 {
-  size_t sword;			/* Zero-origin 'word' to start at. */
-  size_t schar;			/* Additional characters to skip. */
-  size_t eword;			/* Zero-origin last 'word' of key. */
-  size_t echar;			/* Additional characters in field. */
-  bool const *ignore;		/* Boolean array of characters to ignore. */
-  char const *translate;	/* Translation applied to characters. */
-  bool skipsblanks;		/* Skip leading blanks when finding start.  */
-  bool skipeblanks;		/* Skip leading blanks when finding end.  */
-  bool numeric;			/* Flag for numeric comparison.  Handle
+  size_t sword;      /* Zero-origin 'word' to start at. */
+  size_t schar;      /* Additional characters to skip. */
+  size_t eword;      /* Zero-origin last 'word' of key. */
+  size_t echar;      /* Additional characters in field. */
+  bool const *ignore;    /* Boolean array of characters to ignore. */
+  char const *translate;  /* Translation applied to characters. */
+  bool skipsblanks;    /* Skip leading blanks when finding start.  */
+  bool skipeblanks;    /* Skip leading blanks when finding end.  */
+  bool numeric;      /* Flag for numeric comparison.  Handle
                                    strings of digits with optional decimal
                                    point, but no exponential notation. */
 #ifdef KEY_COMPARE_RANDOM
-  bool random;			/* Sort by random hash of key.  */
+  bool random;      /* Sort by random hash of key.  */
 #endif
-  bool general_numeric;		/* Flag for general, numeric comparison.
+  bool general_numeric;    /* Flag for general, numeric comparison.
                                    Handle numbers in exponential notation. */
 #ifdef KEY_COMPARE_HUMAN_NUMERIC
-  bool human_numeric;		/* Flag for sorting by human readable
+  bool human_numeric;    /* Flag for sorting by human readable
                                    units with either SI xor IEC prefixes. */
 #endif
 #ifdef KEY_COMPARE_MONTH
-  bool month;			/* Flag for comparison by month name. */
+  bool month;      /* Flag for comparison by month name. */
 #endif
 #ifdef KEY_COMPARE_REVERSE
-  bool reverse;			/* Reverse the sense of comparison. */
+  bool reverse;      /* Reverse the sense of comparison. */
 #endif
 #ifdef KEY_COMPARE_VERSION
-  bool version;			/* sort by version number */
+  bool version;      /* sort by version number */
 #endif
 #ifdef KEY_COMPARE_DECORATION
   bool (*decorate_fn)(const char* in);
   const char* decorate_cmd;
 #endif
-  bool traditional_used;	/* Traditional key option format is used. */
-  struct keyfield *next;	/* Next keyfield to try. */
+  bool traditional_used;  /* Traditional key option format is used. */
+  struct keyfield *next;  /* Next keyfield to try. */
 };
 
 /* If TAB has this value, blanks separate fields.  */

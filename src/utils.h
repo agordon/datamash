@@ -187,7 +187,7 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type);
  */
 long double
 trimmed_mean_value ( const long double * const values, size_t n,
-		     const long double trimmed_mean_percent);
+                     const long double trimmed_mean_percent);
 
 
 /*

@@ -205,7 +205,7 @@ set_op_params (struct fieldop *op)
         op->params.trimmed_mean = _params[0].f;
       if (op->params.trimmed_mean<0 || op->params.trimmed_mean>0.5)
         die (EXIT_FAILURE, 0, _("invalid trim mean value %Lg " \
-				"(expected 0 <= X <= 0.5)"),
+             "(expected 0 <= X <= 0.5)"),
              op->params.trimmed_mean);
       if (_params_used>1)
         die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
@@ -750,7 +750,7 @@ parse_mode_or_op ()
     }
 
   die (EXIT_FAILURE,0, _("invalid operation %s"),
-		  quote (scanner_identifier));
+       quote (scanner_identifier));
 }
 
 struct datamash_ops*

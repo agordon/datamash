@@ -905,7 +905,7 @@ field_op_summarize (struct fieldop *op)
     case OP_TRIMMED_MEAN:
       field_op_sort_values (op);
       numeric_result = trimmed_mean_value ( op->values, op->num_values,
-					    op->params.trimmed_mean);
+                                            op->params.trimmed_mean);
       break;
 
     case OP_RMS:

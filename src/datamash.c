@@ -434,14 +434,14 @@ print_input_line (const struct line_record_t* lb)
     }
 }
 
-#define SWAP_LINES(A, B)			\
-  do						\
-    {						\
-      struct line_record_t *_tmp;		\
-      _tmp = (A);				\
-      (A) = (B);				\
-      (B) = _tmp;				\
-    }						\
+#define SWAP_LINES(A, B)          \
+  do                              \
+    {                             \
+      struct line_record_t *_tmp; \
+      _tmp = (A);                 \
+      (A) = (B);                  \
+      (B) = _tmp;                 \
+    }                             \
   while (0)
 
 
@@ -1097,39 +1097,39 @@ open_input ()
 #ifdef HAVE_ZERO_SORT
           /* sort needs to understand -z to properly sort input using
              NUL as the line delimiter */
-	  args[argc++] = "-z";
+          args[argc++] = "-z";
 #else
           die (EXIT_FAILURE, 0,
                  _("-s and -z cannot be combined on this system"));
 #endif
         }
       if (!case_sensitive)
-	{
-	  args[argc++] = "-f";
-	}
+        {
+          args[argc++] = "-f";
+        }
 
       if (in_tab != TAB_WHITESPACE)
         {
-	  args[argc++] = "-t";
-	  delim[0] = in_tab;
-	  args[argc++] = delim;
+          args[argc++] = "-t";
+          delim[0] = in_tab;
+          args[argc++] = delim;
         }
 
       int sort_spec = argc;
       for (size_t i = 0; i < dm->num_grps; ++i)
         {
-	  char tmp[INT_BUFSIZE_BOUND (size_t) * 2 + 5];
+          char tmp[INT_BUFSIZE_BOUND (size_t) * 2 + 5];
           const size_t col_num = dm->grps[i].num;
           snprintf (tmp,sizeof (tmp),"-k%"PRIuMAX",%"PRIuMAX,
                     (uintmax_t)col_num,(uintmax_t)col_num);
-	  args[argc++] = xstrdup (tmp);
+          args[argc++] = xstrdup (tmp);
         }
 
       char *cmd = shell_quote_argv ((const char * const *) args);
       while (sort_spec < argc)
-	{
-	  free (args[sort_spec++]);
-	}
+        {
+          free (args[sort_spec++]);
+        }
       free (args);
       input_stream = popen (cmd,"r");
       free (cmd);
@@ -1193,9 +1193,9 @@ int main (int argc, char* argv[])
     {
       switch (optc)
         {
-	case 'C':
-	  skip_comments = true;
-	  break;
+        case 'C':
+          skip_comments = true;
+          break;
 
         case 'F':
           missing_field_filler = optarg;
@@ -1230,9 +1230,9 @@ int main (int argc, char* argv[])
           input_header = output_header = true;
           break;
 
-	case 'R':
-	  set_numeric_output_precision (optarg);
-	  break;
+        case 'R':
+          set_numeric_output_precision (optarg);
+          break;
 
         case 's':
           pipe_through_sort = true;
@@ -1257,21 +1257,22 @@ int main (int argc, char* argv[])
           in_tab = out_tab = optarg[0];
           break;
 
-	case OUTPUT_DELIMITER_OPTION:
+        case OUTPUT_DELIMITER_OPTION:
           if (optarg[0] == '\0' || optarg[1] != '\0')
             die (EXIT_FAILURE, 0,
-                   _("the delimiter must be a single character"));
-	  explicit_output_delimiter = (char)optarg[0];
-	  break;
+                 _("the delimiter must be a single character"));
+          explicit_output_delimiter = (char)optarg[0];
+          break;
 
         case 'W':
           in_tab = TAB_WHITESPACE;
           out_tab = '\t';
           break;
 
-	case SORT_PROGRAM_OPTION:
-	  sort_cmd = xstrdup (optarg);
-	  break;
+        case SORT_PROGRAM_OPTION:
+          sort_cmd = xstrdup (optarg);
+          break;
+
         case'c':
           if (optarg[0] == '\0' || optarg[1] != '\0')
             die (EXIT_FAILURE, 0,

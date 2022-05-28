@@ -751,7 +751,7 @@ char**
 build_sort_process_args ()
 {
   int argc = 3 ; /* one 'sort' program name (argv[0]), one extra arg on NetBSD,
-		    one for NULL */
+                    one for NULL */
   struct keyfield *key = keylist;
 
   /* step 1: count number of args */
@@ -907,9 +907,9 @@ main (int argc, char **argv)
           add_sort_extra_args (optarg);
           break;
 
-	case SORT_PROGRAM_OPTION:
-	  sort_cmd = xstrdup (optarg);
-	  break;
+        case SORT_PROGRAM_OPTION:
+          sort_cmd = xstrdup (optarg);
+          break;
 
         case RANDOM_SOURCE_OPTION:
           add_sort_extra_args ("--random-source");

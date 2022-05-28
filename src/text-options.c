@@ -113,7 +113,7 @@ set_numeric_output_precision (const char* digits)
   l = strtol (digits, &p, 10);
   if (errno != 0 || *p != '\0' || l <=0 || l> 50)
     die (EXIT_FAILURE, 0, _("invalid rounding digits value %s"),
-	 quote (digits));
+         quote (digits));
 
   snprintf (tmp, sizeof (tmp), "%%.%dLf", (int)l);
   numeric_output_format = xstrdup (tmp);

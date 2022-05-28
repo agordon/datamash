@@ -408,7 +408,7 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
 
 long double  _GL_ATTRIBUTE_PURE
 trimmed_mean_value ( const long double * const values, size_t n,
-		     const long double trimmed_mean_percent)
+                     const long double trimmed_mean_percent)
 {
   assert (trimmed_mean_percent >= 0); /* LCOV_EXCL_LINE */
   assert (trimmed_mean_percent <= 0.5); /* LCOV_EXCL_LINE */
