@@ -154,6 +154,30 @@ my @Tests =
  ['c5', '--decorate -k1,1:ipv6' , {IN_PIPE=>"FOO\n"}, {OUT => " "}, {EXIT=>2},
   {ERR=>"$prog: invalid IPv6 address 'FOO'\n" .
         "$prog: conversion failed in line 1\n" }],
+ ['c6', '--decorate -k1,1:ipv6v4map', {IN_PIPE=>"FOO\n"}, {OUT => " "},
+  {EXIT=>2},
+  {ERR=>"$prog: invalid IP address 'FOO'\n" .
+        "$prog: conversion failed in line 1\n" }],
+ ['c7', '--decorate -k1,1:ipv6v4comp', {IN_PIPE=>"FOO\n"}, {OUT => " "},
+  {EXIT=>2},
+  {ERR=>"$prog: invalid IP address 'FOO'\n" .
+        "$prog: conversion failed in line 1\n" }],
+ ['c8', '--decorate -k1,1:ipv6v4map', {IN_PIPE=>"0\n"}, {OUT => " "},
+  {EXIT=>2},
+  {ERR=>"$prog: invalid IP address '0'\n" .
+        "$prog: conversion failed in line 1\n" }],
+ ['c9', '--decorate -k1,1:ipv6v4comp', {IN_PIPE=>"0\n"}, {OUT => " "},
+  {EXIT=>2},
+  {ERR=>"$prog: invalid IP address '0'\n" .
+        "$prog: conversion failed in line 1\n" }],
+ ['c10', '--decorate -k1,1:ipv6v4map', {IN_PIPE=>"\n"}, {OUT => " "},
+  {EXIT=>2},
+  {ERR=>"$prog: invalid IP address ''\n" .
+        "$prog: conversion failed in line 1\n" }],
+ ['c11', '--decorate -k1,1:ipv6v4comp', {IN_PIPE=>"\n"}, {OUT => " "},
+  {EXIT=>2},
+  {ERR=>"$prog: invalid IP address ''\n" .
+        "$prog: conversion failed in line 1\n" }],
 
 
   # on a different architecture, would printf(%Lg) print something else?

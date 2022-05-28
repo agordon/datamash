@@ -178,14 +178,61 @@ decorate_ipv6 (const char* in)
 }
 
 
+static bool
+decorate_ipv6_ipv4 (const char* in, uint32_t mapping)
+{
+  struct in_addr adr4;
+  struct in6_addr adr6;
+  int s4, s6;
+
+  s4 = inet_pton (AF_INET, in, &adr4);
+  s6 = inet_pton (AF_INET6, in, &adr6);
+
+  if (s4 < 0 && s6 < 0)
+    die (SORT_FAILURE, errno, _("inet_pton failed for AF_INET and AF_INET6"));
+
+  if (!(s4 > 0 || s6 > 0))
+    {
+      error (0, 0, _("invalid IP address %s"), quote (in));
+      return false;
+    }
+
+  if (s6)
+    for (int i=0;i<16;++i)
+      printf ("%02X", adr6.s6_addr[i]);
+  else
+    printf ("%024X%08X", mapping, ntohl (adr4.s_addr));
+
+  return true;
+}
+
+
+bool
+decorate_ipv6_ipv4_mapped (const char* in)
+{
+  return decorate_ipv6_ipv4 (in, 0xFFFF);
+}
+
+
+bool
+decorate_ipv6_ipv4_compat (const char* in)
+{
+  return decorate_ipv6_ipv4 (in, 0);
+}
+
+
 
 struct conversions_t builtin_conversions[] = {
-  { "as-is",    "copy as-is", decorate_as_is },     /* for debugging */
-  { "roman",    "roman numerals", decorate_roman_numerals },
-  { "strlen",   "length (in bytes) of the specified field", decorate_strlen },
-  { "ipv4",     "dotted-decimal IPv4 addresses", decorate_ipv4_dot_decimal },
-  { "ipv6",     "IPv6 addresses", decorate_ipv6 },
-  { "ipv4inet", "number-and-dots IPv4 addresses (incl. octal, hex values)",
+  { "as-is",      "copy as-is", decorate_as_is },     /* for debugging */
+  { "roman",      "roman numerals", decorate_roman_numerals },
+  { "strlen",     "length (in bytes) of the specified field", decorate_strlen },
+  { "ipv4",       "dotted-decimal IPv4 addresses", decorate_ipv4_dot_decimal },
+  { "ipv6",       "IPv6 addresses", decorate_ipv6 },
+  { "ipv4inet",   "number-and-dots IPv4 addresses (incl. octal, hex values)",
     decorate_ipv4_inet_addr },
-  { NULL,       NULL, 0 }
+  { "ipv6v4map",  "IPv6 and IPv4 (as IPv4-Mapped IPv6) addresses",
+    decorate_ipv6_ipv4_mapped},
+  { "ipv6v4comp", "IPv6 and IPv4 (as IPv4-Compatible IPv6) addresses",
+    decorate_ipv6_ipv4_compat},
+  { NULL,         NULL, 0 }
 };
