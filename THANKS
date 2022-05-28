@@ -3,7 +3,8 @@ Thanks to:
     Aaron Quinlan ( http://quinlanlab.org/ ) whose 'groupBy' program
     (https://github.com/arq5x/bedtools) was the inspiration for GNU Datamash.
 
-The following people provided bug reports, feature requests and other suggestions which resulted in notable improvements to GNU Datamash:
+The following people provided bug reports, feature requests and other
+suggestions which resulted in notable improvements to GNU Datamash:
 
     Alejandro Garrido Mota
     Benno Schulenberg
