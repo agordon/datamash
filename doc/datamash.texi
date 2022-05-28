@@ -9,6 +9,7 @@
 @c Combine everything into one index (arbitrarily chosen to be the
 @c concept index).
 @syncodeindex op cp
+@syncodeindex vr cp
 @c %**end of header
 
 @copying
@@ -156,6 +157,10 @@ Where @var{op1} is the operation to perform on the values in @var{column1}.
 on the input data. If @option{--group} is used, each operation is performed
 on every group. If @option{--group} is not used, each operation is performed on
 all the values in the input file.
+
+@vindex LC_NUMERIC
+The @env{LC_NUMERIC} locale specifies the decimal-point character and the
+thousands separator.
 
 @exdent @command{datamash} supports the following operations:
 
