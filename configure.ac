@@ -10,7 +10,7 @@ dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_INIT([GNU datamash],
 	[m4_esyscmd([build-aux/git-version-gen .tarball-version])],
-	[assafgordon@gmail.com], [],
+	[bug-datamash@gnu.org], [],
 	[https://www.gnu.org/software/datamash])
 
 dnl Must come before AM_INIT_AUTOMAKE.
