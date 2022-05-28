@@ -1,7 +1,7 @@
 ." GNU decorate - manual page
 ." Copyright (C) 2014-2021 Assaf Gordon <assafgordon@gmail.com>
 [NAME]
-decorate - command-line calculations
+decorate - convert fields of various formats
 
 
 [>OVERVIEW]
