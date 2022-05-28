@@ -79,7 +79,7 @@ hashes the input and returns a numeric integer value between zero and
 .TP
 .B round/floor/ceil/trunc/frac
 numeric rounding operations. round (round half away from zero),
-floor (round up), ceil (ceiling, round down), trunc (truncate, round towards
+floor (round down), ceil (ceiling, round up), trunc (truncate, round towards
 zero), frac (fraction, return fraction part of a decimal-point value).
 
 .TP
