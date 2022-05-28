@@ -2,19 +2,19 @@
 
 ** New Features
 
+  New datamash option --sort-cmd argument to specify the program used
+  by the -s option to sort input, plus enhancements to the security and
+  portability of building sort command lines.
+
+  New datamash option -c/--collapse-delimiter=X argument uses character
+  X instead of comma between values in collapse and unique lists.
+
+  New datamash operations: mean square (ms) and root mean square (rms).
+
   Decorate now supports sorting IP addresses of both versions 4 and 6
   together. IPv4 addresses are logically converted to IPv6 addresses,
   either as IPv4-Mapped (ipv6v4map) or IPv4-Compatible (ipv6v4comp)
   addresses.
-
-   --sort-cmd argument to specify the program used by the -s option to
-   sort input, plus enhancements to the security and portability of
-   building sort command lines.
-
-  -c/--collapse-delimiter=X argument uses character X instead of comma
-  between values in collapse and unique lists.
-
-  New operations: mean square (ms) and root mean square (rms)
 
 ** Improvements
 
