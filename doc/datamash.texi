@@ -199,6 +199,12 @@ thousands separator.
 @exdent Grouping options:
 
 @table @option
+@item --skip-comments
+@itemx -C
+@opindex --skip-comments
+@opindex -C
+Skip comment lines (starting with '#' or ';' and optional whitespace).
+
 @item --full
 @itemx -f
 @opindex --full
