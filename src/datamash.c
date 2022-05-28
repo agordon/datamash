@@ -315,7 +315,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 \n", program_name);
 
       fputs (_("For detailed usage information and examples, see\n"),stdout);
-      printf ("  man %s\n", PACKAGE_NAME);
+      printf ("  man %s\n", PROGRAM_NAME);
       fputs (_("The manual and more examples are available at\n"), stdout);
       fputs ("  " PACKAGE_URL "\n\n", stdout);
     }

@@ -294,7 +294,7 @@ Decorated output of roman numerals:\n\
 
 
      fputs (_("For detailed usage information and examples, see\n"),stdout);
-     printf ("  man %s\n", program_name);
+     printf ("  man %s\n", PROGRAM_NAME);
      fputs (_("The manual and more examples are available at\n"), stdout);
      fputs ("  " PACKAGE_URL "\n\n", stdout);
     }
