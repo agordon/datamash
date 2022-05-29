@@ -337,6 +337,7 @@ Round numeric output to @var{N} decimal places.
 @opindex --whitespace
 @opindex -W
 Use whitespace (one or more spaces and/or tabs) for field delimiters.
+Leading whitespace is ignored, trailing whitespace results in an empty field.
 TAB character will be used as output field separator.
 If @option{--output-delimiter} is also used, it will override the output
 field delimiter.
