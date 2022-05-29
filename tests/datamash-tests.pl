@@ -349,8 +349,12 @@ my @Tests =
   ['b10', 'unique 1',   {IN_PIPE=>$in1},  {OUT => "1,10,2,3,4,5,6,7,8,9\n"}],
   ['b11', '--collapse-delimiter=^ unique 1',
    {IN_PIPE=>$in1},  {OUT => "1^10^2^3^4^5^6^7^8^9\n"}],
+  ['b11.1', '-c^ unique 1',
+   {IN_PIPE=>$in1},  {OUT => "1^10^2^3^4^5^6^7^8^9\n"}],
   ['b12', 'collapse 1', {IN_PIPE=>$in1},  {OUT => "1,2,3,4,5,6,7,5,8,9,10\n"}],
   ['b13', '--collapse-delimiter=^ collapse 1',
+   {IN_PIPE=>$in1}, {OUT => "1^2^3^4^5^6^7^5^8^9^10\n"}],
+  ['b13.1', '-c ^ collapse 1',
    {IN_PIPE=>$in1}, {OUT => "1^2^3^4^5^6^7^5^8^9^10\n"}],
 
   # on a different architecture, would printf(%Lg) print something else?
@@ -437,6 +441,8 @@ my @Tests =
   ['e25',  '-g 1,,2 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: missing field for operation 'groupby'\n"}],
   ['e26',   '--collapse-delimiter=foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
+      {ERR=>"$prog: the delimiter must be a single character\n"}],
+  ['e27',   '-c foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
       {ERR=>"$prog: the delimiter must be a single character\n"}],
 
   # No newline at the end of the lines
