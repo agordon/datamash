@@ -4,7 +4,7 @@
 decorate - convert fields of various formats
 
 
-[>OVERVIEW]
+[>DESCRIPTION]
 The \fBdecorate\fR program allows sorting input according to various
 ordering, e.g. IP addresses, roman numerals, etc.
 It works in tandem with sort(1) to perform the actual sorting.
@@ -19,6 +19,7 @@ Pádraig Brady in https://lists.gnu.org/r/bug-coreutils/2015-06/msg00076.html:
 .br
 3. Undecorate: remove the inserted fields
 
+[=EXAMPLES]
 Example of preparing to sort by roman numerals:
 .PP
 .nf
@@ -71,7 +72,6 @@ C
 
 
 
-[=EXAMPLES]
 
 [ADDITIONAL INFORMATION]
 See

@@ -177,6 +177,12 @@ runs sort(1) and undecorates the result; This is the easiest method to use.\n\
      putchar ('\n');
 
      fputs (_("\
+Options:\n\
+"), stdout);
+
+     putchar ('\n');
+
+     fputs (_("\
 General Options:\n\
 "), stdout);
 

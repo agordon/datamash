@@ -222,6 +222,8 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 \n", stdout);
       fputs ("\n", stdout);
 
+      fputs (_("Options:\n"),stdout);
+      fputs ("\n", stdout);
       fputs (_("Grouping Options:\n"),stdout);
       fputs (_("\
   -C, --skip-comments       skip comment lines (starting with '#' or ';'\n\
@@ -297,6 +299,14 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+
+      fputs ("\n\n", stdout);
+
+      fputs (_("Environment:"), stdout);
+      fputs ("\n", stdout);
+      fputs (_("\
+  LC_NUMERIC        decimal-point character and thousands separator\n\
+"), stdout);
 
       fputs ("\n\n", stdout);
 
