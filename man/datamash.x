@@ -166,7 +166,7 @@ number of unique/distinct values
 
 
 .SS "Statistical Grouping operations"
-A \fBp/s\fR prefix indicates the varient: \fBp\fRopulation or \fBs\fRample.
+A \fBp/s\fR prefix indicates the variant: \fBp\fRopulation or \fBs\fRample.
 Typically, the \fBs\fRample variant is equivalent with \fBGNU R\fR's
 internal functions (e.g datamash's \fBsstdev\fR operation is equivalent
 to R's \fBsd()\fR function).
@@ -388,8 +388,8 @@ $ datamash -H sum "FOO\\\\\-BAR" < input.txt
 
 
 .SS "Skipping comment lines"
-Use \fB\-C\fR \fB(\-\-skip\-comments)\fR to skip lines starting with \'#\'
-or \'\;\' characters (and optional whitespace before them):
+Use \fB\-C\fR \fB(\-\-skip\-comments)\fR to skip lines starting with '#'
+or '\;' characters (and optional whitespace before them):
 .PP
 .nf
 .RS
