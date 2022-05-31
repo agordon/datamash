@@ -81,7 +81,6 @@ To create the special file systems, run:
     ./build-aux/create_corrupted_file_system.sh
     mkdir /tmp/badfs/
     sudo mount -o sync bad_disk.img /tmp/badfs/
-    sudo chown $USER /tmp/fullfs/
 
     ./build-aux/create_small_file_system.sh
     mkdir /tmp/fullfs/
@@ -188,7 +187,7 @@ To show detailed build commands, run:
     # or during make
     make V=1
 
-To show hide detailed build commands (showing only the file being built), run:
+To hide detailed build commands (showing only the file being built), run:
 
     # During configure
     ./configure --enable-silent-rules

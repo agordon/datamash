@@ -35,7 +35,7 @@ die()
 # Reset log
 echo > $LOG
 
-## Ugly hack: Add common places were required programs might be.
+## Ugly hack: Add common places where required programs might be.
 ## This script is run as a non-root user, so these directories
 ##  might not be on the $PATH
 PATH=$PATH:/sbin:/usr/sbin:/usr/local/sbin
