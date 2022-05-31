@@ -798,6 +798,9 @@ datamash_ops_free ( struct datamash_ops* p )
   free (p->ops);
   p->ops = NULL;
 
+  for  (size_t i=0; i<_fields_used; ++i) {
+    free (_fields[i].name);
+  }
   free (_fields);
   _fields = NULL;
   _fields_alloc = 0;
