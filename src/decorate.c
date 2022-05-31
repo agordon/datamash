@@ -797,6 +797,14 @@ build_sort_process_args ()
   return argv;
 }
 
+void
+free_sort_args (char **args)
+{
+  for (char **arg = args; *arg; ++arg) {
+    free (*arg);
+  }
+  free (args);
+}
 
 static void
 do_decorate (int optind, int argc, char** argv)
@@ -1026,6 +1034,9 @@ main (int argc, char **argv)
       char** sort_args = build_sort_process_args ();
       char *cmdline = shell_quote_argv ((const char * const*)sort_args);
       puts (cmdline);
+      /* Not freeing these causes false positives with leak detectors */
+      free (cmdline);
+      free_sort_args (sort_args);
       exit (EXIT_SUCCESS);
     }
 
