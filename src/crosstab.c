@@ -26,7 +26,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "ignore-value.h"
 #include "hash.h"
 #include "hash-pjw.h"
 #include "xalloc.h"
@@ -82,7 +81,7 @@ new_datacell (const char* row, const char* col, const char* data)
   struct crosstab_datacell *dc = xmalloc (sizeof (struct crosstab_datacell));
   dc->row_name = row;
   dc->col_name = col;
-  dc->data = data;
+  dc->data = xstrdup (data);
   return dc;
 }
 
@@ -92,6 +91,10 @@ crosstab_datacell_free (void *a)
   struct crosstab_datacell *dc = (struct crosstab_datacell*)a;
   dc->row_name = NULL;
   dc->col_name = NULL;
+  /* syntax-check doesn't like casting the argument to free; free
+     doesn't like const values passed to it. */
+  void *data = (void*)dc->data;
+  free (data);
   dc->data = NULL;
   free (dc);
 }
@@ -136,8 +139,11 @@ crosstab_add_result (struct crosstab* ct,
   if (c==NULL)
     c = hash_insert (ct->columns, xstrdup (col));
 
-  struct crosstab_datacell *ctdc = new_datacell (r,c,xstrdup (data));
-  ignore_value (hash_insert (ct->data, ctdc));
+  struct crosstab_datacell *ctdc = new_datacell (r,c,data);
+  struct crosstab_datacell *existing_ctdc = hash_insert (ct->data, ctdc);
+  if (ctdc != existing_ctdc) {
+    crosstab_datacell_free (ctdc);
+  }
 }
 
 
@@ -182,8 +188,8 @@ crosstab_print (const struct crosstab* ct)
       print_line_separator ();
     }
 
-  IF_LINT (free (rows_list));
-  IF_LINT (free (cols_list));
+  free (rows_list);
+  free (cols_list);
 }
 /* vim: set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1: */
 /* vim: set shiftwidth=2: */
