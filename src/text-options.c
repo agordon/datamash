@@ -43,7 +43,7 @@ int out_tab= '\t';
 bool case_sensitive = true;
 
 /* In the future: allow users to change this */
-char* numeric_output_format = "%.14Lg";
+char numeric_output_format[MAX_NUMERIC_FORMAT_LEN + 1] = "%.14Lg";
 
 /* number of bytes to allocate for output buffer */
 int   numeric_output_bufsize = 200;
@@ -104,7 +104,6 @@ set_numeric_output_precision (const char* digits)
 {
   long int l;
   char *p;
-  char tmp[100];
 
   if (digits == NULL || digits[0] == '\0')
     die (EXIT_FAILURE, 0, _("missing rounding digits value"));
@@ -115,8 +114,8 @@ set_numeric_output_precision (const char* digits)
     die (EXIT_FAILURE, 0, _("invalid rounding digits value %s"),
          quote (digits));
 
-  snprintf (tmp, sizeof (tmp), "%%.%dLf", (int)l);
-  numeric_output_format = xstrdup (tmp);
+  snprintf (numeric_output_format, sizeof (numeric_output_format), "%%.%dLf",
+            (int)l);
 
   finalize_numeric_output_buffer ();
 }
@@ -124,6 +123,9 @@ set_numeric_output_precision (const char* digits)
 void
 set_numeric_printf_format (const char* format)
 {
-  numeric_output_format = validate_double_format (format);
+  char *new_format = validate_double_format (format);
+  snprintf (numeric_output_format, sizeof (numeric_output_format), "%s",
+            new_format);
+  free (new_format);
   finalize_numeric_output_buffer ();
 }

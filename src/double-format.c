@@ -30,6 +30,7 @@ hence FSF copyright.
 #include "quote.h"
 #include "xalloc.h"
 
+#include "text-options.h"
 
 char*
 validate_double_format (char const *fmt)
@@ -39,6 +40,10 @@ validate_double_format (char const *fmt)
   char *out;
 
   len = strlen (fmt);
+
+  if (len > MAX_NUMERIC_FORMAT_LEN - 1) {
+    die (EXIT_FAILURE, 0, _("numeric format too large"));
+  }
 
   /* extra space for NUL and 'L' printf-modifier */
   out = xmalloc (len+2);

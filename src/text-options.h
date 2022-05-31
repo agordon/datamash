@@ -42,8 +42,10 @@ extern int out_tab ;
 /* Global case-sensitivity option. Defaults to 'true' . */
 extern bool case_sensitive ;
 
+/* Largest possible format string */
+#define MAX_NUMERIC_FORMAT_LEN 100
 /* Numeric output format (default: "%.14Lg" */
-extern char* numeric_output_format;
+extern char numeric_output_format[MAX_NUMERIC_FORMAT_LEN + 1];
 /* number of bytes to allocate for output buffer */
 extern int   numeric_output_bufsize;
 
