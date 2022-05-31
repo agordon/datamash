@@ -24,6 +24,7 @@ git sources:
     pkg-config
     makeinfo (part of GNU texinfo)
     perl
+    wget
 
 These programs are for development from git but are not needed when
 building from the released tar archives found on
@@ -236,3 +237,76 @@ such as:
 
 Compilation under Cygwin does not require this flag.
 See related discussion: <https://lists.gnu.org/archive/html/bug-gnulib/2014-09/msg00052.html>
+
+### OpenBSD
+
+Bootstrap instructions for OpenBSD (Tested with 7.1).
+
+#### Install prerequisites
+
+Make sure the following packages are installed with `pkg_add`
+
+* autoconf 2.71
+* automake 1.16.3
+* gettext-tools
+* git
+* gperf
+* wget
+
+#### Bootstrap, configure and compile
+
+First, of course, get the source:
+
+    $ git clone git://git.sv.gnu.org/datamash
+    $ cd datamash
+
+Then run the bootstrap script (This can take a while):
+
+    $ AUTOCONF_VERSION=1.72 AUTOMAKE_VERSION=1.16 ./bootstrap
+
+Then configure and make like usual:
+
+    $ ./configure --disable-werror
+    $ make
+    $ make check
+
+### NetBSD
+
+Bootstrap instructions for NetBSD (Tested with 9.2).
+
+#### Install prerequisites
+
+Make sure the following packages are installed with `pkgin` or another
+pkgsrc interface:
+
+* autoconf
+* automake
+* ca-certificates
+* gettext
+* git
+* gmake
+* gperf
+* perl
+* pkgconf
+* wget
+
+#### Bootstrap, configure and compile
+
+First, of course, get the source:
+
+    $ git clone git://git.sv.gnu.org/datamash
+    $ cd datamash
+
+Then run the bootstrap script (This can take a while):
+
+    $ PATH="/usr/pkg/bin:$PATH" ./bootstrap
+
+(NetBSD has a `/usr/bin/gettext` that isn't compatible with the GNU
+gettext one installed as `/usr/pkg/bin/gettext` so the latter needs to
+come first in the path)
+
+Then configure and make like usual:
+
+    $ ./configure --disable-werror
+    $ gmake
+    $ gmake check
