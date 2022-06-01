@@ -48,7 +48,7 @@ done
 
 ## Create a tiny ext3 file system image
 dd if=/dev/zero of=$IMGFILE bs=1k count=64 1>$LOG 2>&1 || die "dd failed"
-yes | mkfs.ext3 -b ${BLOCK_SIZE} $IMGFILE 1>$LOG 2>&1 ||
+yes | mkfs.ext3 -T small -b ${BLOCK_SIZE} $IMGFILE 1>$LOG 2>&1 ||
 	die "mkfs.ext3 failed"
 
 echo "
