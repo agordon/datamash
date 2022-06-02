@@ -188,9 +188,11 @@ cmp wide wide_orig ||
     fail=1 ; }
 
 ## Test large output formats
+## datamash exits with an error on x86, because some numbers in the file "wide"
+## are too big for "long double" 80-bit floating point
 cat wide | valgrind --track-origins=yes  --leak-check=full \
-                  --show-reachable=yes  --error-exitcode=1 \
+                  --show-reachable=yes  --error-exitcode=2 \
                   datamash --format "%05000.5000f" sum 1 > /dev/null ||
-  { warn_ "custom-format failed" ; fail=1 ; }
+  { test $? -eq 2 && { warn_ "custom-format failed" ; fail=1 ; } ; }
 
 Exit $fail
