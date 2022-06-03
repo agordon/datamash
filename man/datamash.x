@@ -101,8 +101,9 @@ extract a number from the field. \fBTYPE\fR is optional single letter option
 n/i/d/p/h/o (see examples below).
 
 .TP
-.B cut
+.B cut/echo
 copy input field to output field (similar to cut(1)).
+The echo command is simply an alias to cut.
 .PP
 
 
@@ -152,8 +153,9 @@ the last value of the group
 one random value from the group
 
 .TP
-.B unique
+.B unique/uniq
 comma-separated sorted list of unique values
+The uniq command is simply an alias to unique.
 
 .TP
 .B collapse

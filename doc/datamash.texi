@@ -177,13 +177,14 @@ thousands separator.
 @code{sha224}, @code{sha256}, @code{sha384}, @code{sha512}, @code{bin},
 @code{strbin}, @code{round}, @code{floor}, @code{ceil}, @code{trunc},
 @code{frac}, @code{dirname}, @code{basename}, @code{extname}, @code{barename},
-@code{getnum}, @code{cut}
+@code{getnum}, @code{cut}, @code{echo}
 
 @item Group-by Numeric operations:
 @code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}, @code{range}
 
 @item Group-by Textual/Numeric operations:
-@code{count}, @code{first}, @code{last}, @code{rand}, @code{unique},
+@code{count}, @code{first}, @code{last}, @code{rand},
+@code{unique}, @code{uniq},
 @code{collapse}, @code{countunique}
 
 @item Group-by Statistical operations:
@@ -249,7 +250,8 @@ file has a header line, and the output should contain a header line as well.
 @opindex --ignore-case
 @opindex -i
 Ignore upper/lower case when comparing text for grouping, sorting, and comparing
-unique values in the @samp{countunique} and @samp{unique} operations.
+unique values in the @samp{countunique} and @samp{unique}
+(or @samp{uniq}) operations.
 
 @item --sort
 @itemx -s
@@ -324,7 +326,7 @@ This option overrides @option{--field-separator}/@option{-t}/
 @opindex -c
 
 Use character @var{X} instead of comma to delimit items in a
-@samp{collapse} or @samp{unique} list.
+@samp{collapse} or @samp{unique} (aka @samp{uniq}) list.
 
 @item --round=@var{N}
 @itemx -R @var{N}
@@ -429,6 +431,8 @@ extract a number from the field. @code{getnum} accepts an optional single
 letter option @samp{n/i/d/p/h/o} affecting the detected value.
 @item cut
 copy input field to output field (similar to @command{cut(1)}).
+@item echo
+an alias for @code{cut}.
 @end table
 
 @item Group-by Numeric operations:
@@ -465,6 +469,8 @@ the last value of the group
 one random value from the group
 @item unique
 comma-separated sorted list of unique values
+@item uniq
+an alias for @code{unique}.
 
 @option{--collapse-delimiter} can be used to use a different character
 than comma.

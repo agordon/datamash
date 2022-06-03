@@ -70,6 +70,7 @@ struct field_operation_definition field_operations[] =
   {"mode",    OP_MODE,    MODE_GROUPBY},
   {"antimode",OP_ANTIMODE,MODE_GROUPBY},
   {"unique",  OP_UNIQUE,  MODE_GROUPBY},
+  {"uniq",    OP_UNIQUE,  MODE_GROUPBY},
   {"collapse",OP_COLLAPSE,MODE_GROUPBY},
   {"countunique", OP_COUNT_UNIQUE, MODE_GROUPBY},
   {"base64",  OP_BASE64,  MODE_PER_LINE},
@@ -98,6 +99,7 @@ struct field_operation_definition field_operations[] =
   {"trimmean",OP_TRIMMED_MEAN,   MODE_GROUPBY},
   {"getnum",  OP_GETNUM,   MODE_PER_LINE},
   {"cut",     OP_CUT,     MODE_PER_LINE},
+  {"echo",    OP_CUT,     MODE_PER_LINE},
   {NULL,      OP_INVALID, MODE_INVALID}
 };
 

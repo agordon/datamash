@@ -16,6 +16,10 @@
   either as IPv4-Mapped (ipv6v4map) or IPv4-Compatible (ipv6v4comp)
   addresses.
 
+  Add two command aliases:
+    'echo' may now be used instead of 'cut'.
+    'uniq' may now be used instead of 'unique'.
+
 ** Improvements
 
   Updated the bash completion script to reflect recent additions.
