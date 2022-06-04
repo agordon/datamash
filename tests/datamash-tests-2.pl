@@ -653,9 +653,11 @@ my @Tests =
   ['cut1','-t, cut 3,1,2', {IN_PIPE=>$in1_cut}, {OUT=>"c,a,b\n6,1,X\n"}],
   ['cut2','-t, -H cut c,a', {IN_PIPE=>$in1_cut}, {OUT=>"cut(c),cut(a)\n6,1\n"}],
 
-  # Aliases (more-or-less: copy-paste above tests and s/orig/alias/ the command names.)
+  # Aliases (more-or-less: copy-paste above tests and s/orig/alias/ the
+  # command names.)
   ['alias1','-t, echo 3,1,2', {IN_PIPE=>$in1_cut}, {OUT=>"c,a,b\n6,1,X\n"}],
-  ['alias2','-t, -H echo c,a', {IN_PIPE=>$in1_cut}, {OUT=>"cut(c),cut(a)\n6,1\n"}],
+  ['alias2','-t, -H echo c,a', {IN_PIPE=>$in1_cut},
+    {OUT=>"cut(c),cut(a)\n6,1\n"}],
   ['alias3', '-t: --narm uniq 2', {IN_PIPE=>$na_mid1},
     {OUT=>"2,8\n"}],
   ['alias4', '-t: uniq 2', {IN_PIPE=>$na_mid1},
