@@ -72,6 +72,19 @@ my $in3 = "1 \t  2\t\t\t3\t\t\n" .
 my $ws1 = "\t\t\t\n";
 my $ws2 = " \t \n";
 
+# Leading whitespace
+my $lws1 = "\t\t1\n";
+my $lws2 = "\t 1\n";
+
+# trailing whitespace
+my $tws1 = "1\t\t\n";
+my $tws2 = "1 \t\n";
+
+# both leading and trailing whitespace
+my $ltws1 = "\t\t1\t\t\n";
+my $ltws2 = " \t1\t \n";
+my $ltws3 = "\t 1:2 \t\n";
+
 my $in_g1=<<'EOF';
 A 100
 A 10
@@ -506,6 +519,33 @@ my @Tests =
   ['ws2.1', 'check',     {IN_PIPE=>$ws2}, {OUT=>"1 line, 2 fields\n"}],
   ['ws2.2', '-W check',  {IN_PIPE=>$ws2}, {OUT=>"1 line, 1 field\n"}],
   ['ws2.3', '-t: check', {IN_PIPE=>$ws2}, {OUT=>"1 line, 1 field\n"}],
+
+  # leading whitespace, different field delimiters
+  ['lws1.1', 'check',     {IN_PIPE=>$lws1}, {OUT=>"1 line, 3 fields\n"}],
+  ['lws1.2', '-W check',  {IN_PIPE=>$lws1}, {OUT=>"1 line, 1 field\n"}],
+  ['lws1.3', '-t: check', {IN_PIPE=>$lws1}, {OUT=>"1 line, 1 field\n"}],
+  ['lws2.1', 'check',     {IN_PIPE=>$lws2}, {OUT=>"1 line, 2 fields\n"}],
+  ['lws2.2', '-W check',  {IN_PIPE=>$lws2}, {OUT=>"1 line, 1 field\n"}],
+  ['lws2.3', '-t: check', {IN_PIPE=>$lws2}, {OUT=>"1 line, 1 field\n"}],
+
+  # trailing whitespace, different field delimiters
+  ['tws1.1', 'check',     {IN_PIPE=>$tws1}, {OUT=>"1 line, 3 fields\n"}],
+  ['tws1.2', '-W check',  {IN_PIPE=>$tws1}, {OUT=>"1 line, 2 fields\n"}],
+  ['tws1.3', '-t: check', {IN_PIPE=>$tws1}, {OUT=>"1 line, 1 field\n"}],
+  ['tws2.1', 'check',     {IN_PIPE=>$tws2}, {OUT=>"1 line, 2 fields\n"}],
+  ['tws2.2', '-W check',  {IN_PIPE=>$tws2}, {OUT=>"1 line, 2 fields\n"}],
+  ['tws2.3', '-t: check', {IN_PIPE=>$tws2}, {OUT=>"1 line, 1 field\n"}],
+
+  # both leading and trailing whitespace, different field delimiters
+  ['ltws1.1', 'check',     {IN_PIPE=>$ltws1}, {OUT=>"1 line, 5 fields\n"}],
+  ['ltws1.2', '-W check',  {IN_PIPE=>$ltws1}, {OUT=>"1 line, 2 fields\n"}],
+  ['ltws1.3', '-t: check', {IN_PIPE=>$ltws1}, {OUT=>"1 line, 1 field\n"}],
+  ['ltws2.1', 'check',     {IN_PIPE=>$ltws2}, {OUT=>"1 line, 3 fields\n"}],
+  ['ltws2.2', '-W check',  {IN_PIPE=>$ltws2}, {OUT=>"1 line, 2 fields\n"}],
+  ['ltws2.3', '-t: check', {IN_PIPE=>$ltws2}, {OUT=>"1 line, 1 field\n"}],
+  ['ltws3.1', 'check',     {IN_PIPE=>$ltws3}, {OUT=>"1 line, 3 fields\n"}],
+  ['ltws3.2', '-W check',  {IN_PIPE=>$ltws3}, {OUT=>"1 line, 2 fields\n"}],
+  ['ltws3.3', '-t: check', {IN_PIPE=>$ltws3}, {OUT=>"1 line, 2 fields\n"}],
 
   # Test Absolute min/max
   ['mm1', 'min 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
