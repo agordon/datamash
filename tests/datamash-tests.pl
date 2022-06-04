@@ -660,14 +660,6 @@ my @Tests =
   ['sort5', '-s -g 1 sum 2 -t "\"" ', {IN_PIPE=>$in_sort_quote2},
      {OUT=>"A\"4\nB\"6\n"}],
 
-#my $in_sort_quote1=<<"EOF";
-#A'1
-#B'2
-#A'3
-#B'4
-#EOF
-
-
   # Test Case-sensitivity, on sorted input (no 'sort' piping)
   # on both grouping and string operations
   ['case1', '-t" " -g 1 sum 3', {IN_PIPE=>$in_case_sorted},
