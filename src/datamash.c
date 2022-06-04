@@ -620,7 +620,7 @@ process_group (const struct line_record_t* line)
 /*
     Process each line in the input.
 
-    If the key fo the current line is different from the prevopis one,
+    If the key fo the current line is different from the previous one,
     summarize the previous group and start a new one.
  */
 static void
