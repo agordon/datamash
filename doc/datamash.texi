@@ -431,6 +431,8 @@ extract a number from the field. @code{getnum} accepts an optional single
 letter option @samp{n/i/d/p/h/o} affecting the detected value.
 @item cut
 copy input field to output field (similar to @command{cut(1)}).
+When the @code{cut} operation is given a list of fields, the fields are copied
+in the given order (in contrast to @command{cut(1)}).
 @item echo
 an alias for @code{cut}.
 @end table
@@ -835,6 +837,9 @@ $ printf '1\t\t2\n' | cut -f3
 2
 @end example
 
+Every tab separates two fields.  A line starting with a tab thus starts
+with an empty field, and a line ending with a tab ends with an empty field.
+
 Using @option{-W}, one or more consecutive whitespace characters
 are treated as a single field delimiter:
 
@@ -844,6 +849,12 @@ $ printf '1  \t  2\n' | datamash -W sum 2
 $ printf '1  \t  2\n' | datamash -W sum 3
 datamash: invalid input: field 3 requested, line 1 has only 2 fields
 @end example
+
+With @option{-W}, leading whitespace is ignored, but trailing whitespace
+is significant.  A line starting with one or more consecutive whitespace
+characters followed by a non-whitespace character starts with a non-empty
+field.  A line ending with one or more consecutive whitespace characters
+ends with an empty field.
 
 Using @option{-t}, a custom field delimiter character can be specified.
 Multiple consecutive delimiters are treated as multiple fields:
@@ -1534,7 +1545,7 @@ better to include too much than to leave out something important.
 
 @cindex patches, contributing
 Patches are welcome; if possible, please make them with @samp{@w{diff
--c}} (@pxref{Top,, Overview, diff, Comparing and Merging Files}) and
+-u}} (@pxref{Top,, Overview, diff, Comparing and Merging Files}) and
 include @file{ChangeLog} entries (@pxref{Change Log,,, emacs, The GNU
 Emacs Manual}).  Please follow the existing coding style.
 
