@@ -68,6 +68,10 @@ my $in_minmax = join("\n", qw/5 90 -7e2 3 200 0.1e-3 42/) . "\n";
 my $in3 = "1 \t  2\t\t\t3\t\t\n" .
           "4\t\t\t5   6\n";
 
+# Only whitespace
+my $ws1 = "\t\t\t\n";
+my $ws2 = " \t \n";
+
 my $in_g1=<<'EOF';
 A 100
 A 10
@@ -495,6 +499,13 @@ my @Tests =
   ['f23', '-t: -g1 sum 2', {IN_PIPE=>$in_empty1}, {EXIT=>1},
     {ERR=>"$prog: invalid numeric value in line 1 field 2: ''\n"}],
 
+  # whitespace only, different field delimiters
+  ['ws1.1', 'check',     {IN_PIPE=>$ws1}, {OUT=>"1 line, 4 fields\n"}],
+  ['ws1.2', '-W check',  {IN_PIPE=>$ws1}, {OUT=>"1 line, 1 field\n"}],
+  ['ws1.3', '-t: check', {IN_PIPE=>$ws1}, {OUT=>"1 line, 1 field\n"}],
+  ['ws2.1', 'check',     {IN_PIPE=>$ws2}, {OUT=>"1 line, 2 fields\n"}],
+  ['ws2.2', '-W check',  {IN_PIPE=>$ws2}, {OUT=>"1 line, 1 field\n"}],
+  ['ws2.3', '-t: check', {IN_PIPE=>$ws2}, {OUT=>"1 line, 1 field\n"}],
 
   # Test Absolute min/max
   ['mm1', 'min 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
