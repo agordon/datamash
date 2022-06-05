@@ -216,7 +216,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs (_("Statistical Grouping operations:\n"),stdout);
       fputs ("\
   mean, geomean, harmmean, trimmean, median, q1, q3, iqr, perc,\n\
-  mode, antimode, pstdev, sstdev, pvar, svar, mad, madraw,\n\
+  mode, antimode, pstdev, sstdev, pvar, svar, ms, rms, mad, madraw,\n\
   pskew, sskew, pkurt, skurt, dpo, jarque,\n\
   scov, pcov, spearson, ppearson\n\
 \n", stdout);

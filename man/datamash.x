@@ -193,6 +193,14 @@ trimmed mean of the values. \fBPERCENT\fR should be between 0 and 0.5.
 to \fBmedian\fR).
 
 .TP
+.B ms
+mean square of the values
+
+.TP
+.B rms
+root mean square of the values
+
+.TP
 .B median
 median value
 
