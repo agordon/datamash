@@ -39,6 +39,11 @@
 
   datamash(1), decorate(1): Fix some minor memory leaks.
 
+  datamash(1) no longer crashes when the unique or countunique operations
+  are used with input data containing NUL bytes.  The problem was reported
+  in https://lists.gnu.org/archive/html/bug-datamash/2020-11/msg00001.html
+  by Catalin Patulea.
+
 
 * Noteworthy changes in release 1.7 (2020-04-23) [testing]
 

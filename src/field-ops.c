@@ -286,7 +286,7 @@ field_op_get_string_ptrs ( struct fieldop *op, bool sort,
   char *p = op->str_buf;
   const char* pend = op->str_buf + op->str_buf_used;
   size_t idx=0;
-  while (p < pend)
+  while (p < pend && idx < op->count)
     {
       ptrs[idx++] = p;
       while ( p<pend && *p != '\0' )
