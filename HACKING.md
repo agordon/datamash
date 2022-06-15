@@ -175,6 +175,8 @@ re-checking all syntax-check rules), use:
 
     make sc_traling_blank
 
+Running the script `hooks/setup-hooks.sh` will install a git
+pre-commit hook that automatically runs a syntax check.
 
 ## Make tips
 
