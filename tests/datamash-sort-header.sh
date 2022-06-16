@@ -56,11 +56,6 @@ A 3
 B 4" > exp_no_sort_headers ||
   framework_failure_ "failed to write exp_no_sort_headers file"
 
-
-echo "A % 1 1,3
-B ( 2 2,4" > exp_sort_in_header_full ||
-  framework_failure_ "failed to write exp_sort_in_header_full file"
-
 echo "GroupBy(x) unique(z)
 A 1,3
 B 2,4" > exp_sort_headers ||
@@ -70,17 +65,6 @@ echo "GroupBy(field-1) unique(field-3)
 A 1,3
 B 2,4" > exp_sort_out_header ||
   framework_failure_ "failed to write exp_sort_out_header"
-
-echo "field-1 field-2 field-3 unique(field-3)
-A % 1 1,3
-B ( 2 2,4" > exp_sort_out_header_full ||
-  framework_failure_ "failed to write exp_sort_out_header_full"
-
-echo "x y z unique(z)
-A % 1 1,3
-B ( 2 2,4" > exp_sort_headers_full ||
-  framework_failure_ "failed to write exp_sort_headers_full"
-
 
 echo "$INFILE" | datamash -t ' ' -g 1 unique 3 > out1 ||
   framework_failure_ "datamash failed"
@@ -118,25 +102,6 @@ echo "$INFILE" | sed 1d |
 compare_ out7 exp_sort_out_header ||
   { warn_ "sort-header-out failed" ; fail=1 ; }
 
-echo "$INFILE" | sed 1d |
-  datamash -t ' ' --sort --full --header-out -g 1 unique 3 > out8 ||
-    framework_failure_ "datamash failed"
-compare_ out8 exp_sort_out_header_full ||
-  { warn_ "sort-header-out-full failed" ; fail=1 ; }
-
-echo "$INFILE" |
-  datamash -t ' ' -g 1 --sort --full --header-in unique 3 > out9 ||
-    framework_failure_ "datamash failed"
-compare_ out9 exp_sort_in_header_full ||
-  { warn_ "sort-in-header-full failed" ; fail=1 ; }
-
-echo "$INFILE" |
-  datamash -t ' ' -g 1 --sort --full --headers unique 3 > out10 ||
-    framework_failure_ "datamash failed"
-compare_ out10 exp_sort_headers_full ||
-  { warn_ "sort-headers-full failed" ; fail=1 ; }
-
-
 ## Check sort-piping with empty input - should always produce empty output
 printf "" | datamash -t ' ' --sort unique 3 > emp1 ||
   framework_failure_ "datamash failed"
@@ -156,10 +121,5 @@ printf "" | datamash -t ' ' --sort --headers unique 3 > emp4 ||
   framework_failure_ "datamash failed"
 compare_ /dev/null "emp4" ||
   { warn_ "sort+headers on empty file failed" ; fail=1; }
-
-printf "" | datamash -t ' ' --sort --full unique 3 > emp5 ||
-  framework_failure_ "datamash failed"
-compare_ /dev/null "emp5" ||
-  { warn_ "sort+full on empty file failed" ; fail=1; }
 
 Exit $fail

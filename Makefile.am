@@ -157,7 +157,9 @@ endif
 TESTS = \
 	tests/datamash-show-env.sh \
 	tests/datamash-tests.pl \
+	tests/datamash-tests-deprecated.pl \
 	tests/datamash-tests-2.pl \
+	tests/datamash-tests-2-deprecated.pl \
 	tests/datamash-parser.pl \
 	tests/datamash-error-msgs.pl \
 	tests/datamash-md5.pl \
@@ -171,6 +173,7 @@ TESTS = \
 	tests/datamash-check-tabular.pl \
 	tests/datamash-output-format.pl \
 	tests/datamash-sort-header.sh \
+	tests/datamash-sort-header-deprecated.sh \
 	tests/datamash-sort-errors.sh \
 	tests/datamash-io-errors.sh \
 	tests/datamash-io-errors-cheap.sh \

@@ -212,6 +212,9 @@ Skip comment lines (starting with '#' or ';' and optional whitespace).
 @opindex -f
 Print entire input line before op results (default: print only the grouped
 keys).
+While using this option with non-linewise operations was historically permitted,
+it never produced very sensible output. Such usage has been deprecated, and in a
+future release it will result in an error.
 
 @item --group=@var{X[,Y,X]}
 @itemx -g @var{X[,Y,X]}

@@ -56,16 +56,6 @@ die "test infrastructure failed: can't determine 'nan' string" unless $nan;
 my $inf = `$prog_bin ---print-inf`;
 die "test infrastructure failed: can't determine 'inf' string" unless $inf;
 
-## Portability hack
-## Check if the system's sort supports stable sorting ('-s').
-## If it doesn't - skip some tests
-my $rc = system("sort -s < /dev/null > /dev/null 2>/dev/null");
-die "testing framework failure: failed to execute sort -s"
-  if ( ($rc == -1) || ($rc & 127) );
-my $sort_exit_code = ($rc >> 8);
-my $have_stable_sort = ($sort_exit_code==0);
-
-
 # TODO: add localization tests with "grouping"
 # Turn off localization of executable's output.
 @ENV{qw(LANGUAGE LANG LC_ALL)} = ('C') x 3;
@@ -371,44 +361,24 @@ a,b,c
 1,X,6
 EOF
 
-
-
 my @Tests =
 (
   # Test 'min' + --full
   # first, verify test without "--full"
   ['slct1', '-t" " -g1 min 2', {IN_PIPE=>$in_full1}, {OUT=>"A 3\nB 0\n"}],
-  # Test with "--full", "i2" and "i6" should be displayed
-  ['slct2', '-t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 3 i2 3\nB 0 i6 0\n"}],
- # --full with --sort => should not change results
-  ['slct3', '-s -t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 3 i2 3\nB 0 i6 0\n"}],
 
   # Test 'max' + --full
   # first, verify test without "--full"
   ['slct4', '-t" " -g1 max 2', {IN_PIPE=>$in_full1}, {OUT=>"A 5\nB 8\n"}],
-  # Test with "--full", "i3" and "i7" should be displayed
-  ['slct5', '-t" " -f -g1 max 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 5 i3 5\nB 8 i5 8\n"}],
-  # --full with --sort => should not change results
-  ['slct6', '-s -t" " -f -g1 max 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 5 i3 5\nB 8 i5 8\n"}],
 
   # Test 'first' + --full
   # first, verify test without "--full"
   ['slct7', '-t" " -g1 first 2', {IN_PIPE=>$in_full1}, {OUT=>"A 4\nB 1\n"}],
-  # Test with "--full", "i1" and "i4" should be displayed
-  ['slct8', '-t" " -f -g1 first 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 4 i1 4\nB 1 i4 1\n"}],
   # more --full with --sort => see test 'sortslct1' below
 
   # Test 'last' + --full
   # first, verify test without "--full"
   ['slct9', '-t" " -g1 last 2', {IN_PIPE=>$in_full1}, {OUT=>"A 5\nB 3\n"}],
-  # Test with "--full", "i1" and "i4" should be displayed
-  ['slct10', '-t" " -f -g1 last 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 5 i3 5\nB 3 i7 3\n"}],
   # more --full with --sort => see test 'sortslct2' below
 
 
@@ -617,7 +587,6 @@ my @Tests =
      {OUT=>$exp_barename_extname}],
 
 
-
   ## GetNum variants
   ['gn1', 'getnum 1',   {IN_PIPE=>"moo-123.45"}, {OUT=>"123.45\n"}],
   # Integer
@@ -673,26 +642,6 @@ my @Tests =
   ['regr002', 'unique 1',      {IN_PIPE=>"\x00" x 100}, {OUT=>"\n"}],
 
 );
-
-
-if ($have_stable_sort) {
-  push @Tests, (
-  # Test 'first' + --full + --sort
-  # NOTE: This is subtle:
-  #       Sorting should be stable: only ordering the column which is used
-  #       for grouping (column 1 in this test). This means that the second
-  #       column (containing numbers) should NOT affect sorting, and the order
-  #       of the lines should not change. The results of this test
-  #       should be the same as 'slct8'. If the system doesn't have stable
-  #       'sort', then the order will change.
-  ['sortslct1', '-s -t" " -f -g1 first 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 4 i1 4\nB 1 i4 1\n"}],
-  # Test 'last' + --full + --sort
-  # See note above regarding 'first' - applies to 'last' as well.
-  ['sortslct2', '-s -t" " -f -g1 last 2', {IN_PIPE=>$in_full1},
-    {OUT=>"A 5 i3 5\nB 3 i7 3\n"}],
-  )
-}
 
 my $save_temps = $ENV{SAVE_TEMPS};
 my $verbose = $ENV{VERBOSE};

@@ -468,15 +468,8 @@ my @Tests =
 
   # empty input = empty output, regardless of options
   [ 'emp1', 'count 1', {IN_PIPE=>""}, {OUT=>""}],
-  [ 'emp2', '--full count 2', {IN_PIPE=>""},{OUT=>""}],
   [ 'emp3', '--header-in count 2', {IN_PIPE=>""},{OUT=>""}],
   [ 'emp4', '--header-out count 2', {IN_PIPE=>""},{OUT=>""}],
-  [ 'emp5', '--full --header-in count 2', {IN_PIPE=>""},{OUT=>""}],
-  [ 'emp6', '--full --header-out count 2', {IN_PIPE=>""},{OUT=>""}],
-  [ 'emp7', '--full --header-in --header-out count 2',
-     {IN_PIPE=>""},{OUT=>""}],
-  [ 'emp8', '-g3,4 --full --header-in --header-out count 2',
-     {IN_PIPE=>""},{OUT=>""}],
   [ 'emp9', '-g3 count 2', {IN_PIPE=>""},{OUT=>""}],
 
   ## Field extraction
@@ -577,13 +570,6 @@ my @Tests =
      {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
 
 
-  # --full option - without grouping, returns the first line
-  ['fl1', '-t" " --full sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"A 3 W 98\n"}],
-  # --full with grouping - print entire line of each group
-  ['fl2', '-t" " --full -g3 sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"A 3 W 15\nA 11 X 24\nB 17 Y 17\nB 19 Z 42\n"}],
-
   # count on non-numeric fields
   ['cnt1', '-t" " -g 1 count 1', {IN_PIPE=>$in_g2},
      {OUT=>"A 4\nB 3\n"}],
@@ -596,19 +582,9 @@ my @Tests =
   ['hdr2', '-t" " -g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
      {OUT=>"GroupBy(x) count(y)\nA 5\nB 3\nC 4\n"}],
 
-  # Input and output header, with full line
-  ['hdr3', '-t" " -g 1 --full --header-in --header-out count 2',
-     {IN_PIPE=>$in_hdr1},
-     {OUT=>"x y z count(y)\nA 1 10 5\nB 5 10 3\nC 8 11 4\n"}],
-
   # Output Header
   ['hdr4', '-t" " -g 1 --header-out count 2', {IN_PIPE=>$in_g3},
      {OUT=>"GroupBy(field-1) count(field-2)\nA 5\nB 2\nC 1\n"}],
-
-  # Output Header with --full
-  ['hdr5', '-t" " -g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
-     {OUT=>"field-1 field-2 field-3 count(field-2)\n" .
-           "A 3 W 5\nB 17 Y 2\nC 23 Z 1\n"}],
 
   # Header without grouping
   ['hdr6', '-t" " --header-out count 2', {IN_PIPE=>$in_g3},
@@ -646,12 +622,8 @@ my @Tests =
   # header-in and header-out => header line should be printed
   ['hdr14', '-t: -H sum 1', {IN_PIPE=>$in_hdr_only},
      {OUT=>"sum(X)\n"}],
-  ['hdr15', '-t: --full -H sum 1', {IN_PIPE=>$in_hdr_only},
-     {OUT=>"X:Y:Z:sum(X)\n"}],
   ['hdr16', '-t: -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
      {OUT=>"GroupBy(X):sum(Y)\n"}],
-  ['hdr17', '-t: --full -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
-     {OUT=>"X:Y:Z:sum(Y)\n"}],
   ['hdr18', '-t: --header-in sum 1', {IN_PIPE=>$in_hdr_only},
      {OUT=>""}],
   ['hdr19', '-t: -H reverse', {IN_PIPE=>$in_hdr_only},
@@ -675,8 +647,6 @@ my @Tests =
   # Test single line per group
   ['sl1', '-t" " -g 1 mean 2', {IN_PIPE=>$in_g4},
      {OUT=>"A 5\nK 6\nP 2\n"}],
-  ['sl2', '-t" " --full -g 1 mean 2', {IN_PIPE=>$in_g4},
-     {OUT=>"A 5 5\nK 6 6\nP 2 2\n"}],
 
   # Test countunique operation
   ['cuq1', '-t" " -g 1 countunique 3', {IN_PIPE=>$in_g3},

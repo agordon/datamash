@@ -1,5 +1,13 @@
 * Noteworthy changes in release ?.? (?-?-?) []
 
+** Changes in Behavior
+
+  Schedule -f/--full combined with non-linewise operations for deprecation.
+  In a future release, -f/--full will only be usable with operations where
+  it makes sense. For now, we print a warning to stderr when -f/--full is
+  used with non-linewise operations, and such usage will no longer be
+  supported.
+
 ** New Features
 
   New datamash option --sort-cmd argument to specify the program used

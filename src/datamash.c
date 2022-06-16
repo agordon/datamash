@@ -232,6 +232,9 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs (_("\
   -f, --full                print entire input line before op results\n\
                               (default: print only the grouped keys)\n\
+                            This option is only sensible for linewise operations.\n\
+                            Other uses are deprecated and will be removed in a\n\
+                            future version of GNU Datamash.\n\
 "), stdout);
       fputs (_("\
   -g, --group=X[,Y,Z]       group via fields X,[Y,Z];\n\
@@ -639,6 +642,10 @@ process_file ()
      in 'open_input' - read it now */
   if (input_header && line_number==0)
     process_input_header (input_stream);
+
+  if (print_full_line && !line_mode)
+    fputs (_("datamash: Using -f/--full with non-linewise operations \
+is deprecated and will be disabled in a future release.\n"), stderr);
 
   /* If there is an input header line, and the user requested an output
      header line, and the input line was read successfully, print headers */
