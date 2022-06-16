@@ -94,34 +94,34 @@ my @Tests =
 (
   # Test 'min' + --full
   # Test with "--full", "i2" and "i6" should be displayed
-  ['slct2', '-t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
+  ['slct2dep', '-t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 3 i2 3\nB 0 i6 0\n"},
     {ERR=>"$full_deprecation"}],
  # --full with --sort => should not change results
-  ['slct3', '-s -t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
+  ['slct3dep', '-s -t" " -f -g1 min 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 3 i2 3\nB 0 i6 0\n"},
     {ERR=>"$full_deprecation"}],
 
   # Test 'max' + --full
   # Test with "--full", "i3" and "i7" should be displayed
-  ['slct5', '-t" " -f -g1 max 2', {IN_PIPE=>$in_full1},
+  ['slct5dep', '-t" " -f -g1 max 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 5 i3 5\nB 8 i5 8\n"},
     {ERR=>"$full_deprecation"}],
   # --full with --sort => should not change results
-  ['slct6', '-s -t" " -f -g1 max 2', {IN_PIPE=>$in_full1},
+  ['slct6dep', '-s -t" " -f -g1 max 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 5 i3 5\nB 8 i5 8\n"},
     {ERR=>"$full_deprecation"}],
 
   # Test 'first' + --full
   # Test with "--full", "i1" and "i4" should be displayed
-  ['slct8', '-t" " -f -g1 first 2', {IN_PIPE=>$in_full1},
+  ['slct8dep', '-t" " -f -g1 first 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 4 i1 4\nB 1 i4 1\n"},
     {ERR=>"$full_deprecation"}],
   # more --full with --sort => see test 'sortslct1' below
 
   # Test 'last' + --full
   # Test with "--full", "i1" and "i4" should be displayed
-  ['slct10', '-t" " -f -g1 last 2', {IN_PIPE=>$in_full1},
+  ['slct10dep', '-t" " -f -g1 last 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 5 i3 5\nB 3 i7 3\n"},
     {ERR=>"$full_deprecation"}],
 );
@@ -136,12 +136,12 @@ if ($have_stable_sort) {
   #       of the lines should not change. The results of this test
   #       should be the same as 'slct8'. If the system doesn't have stable
   #       'sort', then the order will change.
-  ['sortslct1', '-s -t" " -f -g1 first 2', {IN_PIPE=>$in_full1},
+  ['sortslct1dep', '-s -t" " -f -g1 first 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 4 i1 4\nB 1 i4 1\n"},
     {ERR=>"$full_deprecation"}],
   # Test 'last' + --full + --sort
   # See note above regarding 'first' - applies to 'last' as well.
-  ['sortslct2', '-s -t" " -f -g1 last 2', {IN_PIPE=>$in_full1},
+  ['sortslct2dep', '-s -t" " -f -g1 last 2', {IN_PIPE=>$in_full1},
     {OUT=>"A 5 i3 5\nB 3 i7 3\n"},
     {ERR=>"$full_deprecation"}],
   )

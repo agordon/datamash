@@ -99,51 +99,51 @@ my $full_deprecation = "$prog: Using -f/--full with non-linewise operations " .
 my @Tests =
 (
   # empty input = empty output, regardless of options
-  ['emp2', '--full count 2', {IN_PIPE=>""},{OUT=>""},
+  ['emp2dep', '--full count 2', {IN_PIPE=>""},{OUT=>""},
     {ERR=>"$full_deprecation"}],
-  ['emp5', '--full --header-in count 2', {IN_PIPE=>""},{OUT=>""},
+  ['emp5dep', '--full --header-in count 2', {IN_PIPE=>""},{OUT=>""},
     {ERR=>"$full_deprecation"}],
-  ['emp6', '--full --header-out count 2', {IN_PIPE=>""},{OUT=>""},
+  ['emp6dep', '--full --header-out count 2', {IN_PIPE=>""},{OUT=>""},
     {ERR=>"$full_deprecation"}],
-  ['emp7', '--full --header-in --header-out count 2',
+  ['emp7dep', '--full --header-in --header-out count 2',
     {IN_PIPE=>""},{OUT=>""},
     {ERR=>"$full_deprecation"}],
-  ['emp8', '-g3,4 --full --header-in --header-out count 2',
+  ['emp8dep', '-g3,4 --full --header-in --header-out count 2',
     {IN_PIPE=>""},{OUT=>""},
     {ERR=>"$full_deprecation"}],
 
   # --full option - without grouping, returns the first line
-  ['fl1', '-t" " --full sum 2', {IN_PIPE=>$in_g3},
+  ['fl1dep', '-t" " --full sum 2', {IN_PIPE=>$in_g3},
     {OUT=>"A 3 W 98\n"},
     {ERR=>"$full_deprecation"}],
   # --full with grouping - print entire line of each group
-  ['fl2', '-t" " --full -g3 sum 2', {IN_PIPE=>$in_g3},
+  ['fl2dep', '-t" " --full -g3 sum 2', {IN_PIPE=>$in_g3},
     {OUT=>"A 3 W 15\nA 11 X 24\nB 17 Y 17\nB 19 Z 42\n"},
     {ERR=>"$full_deprecation"}],
 
   # Input and output header, with full line
-  ['hdr3', '-t" " -g 1 --full --header-in --header-out count 2',
+  ['hdr3dep', '-t" " -g 1 --full --header-in --header-out count 2',
     {IN_PIPE=>$in_hdr1},
     {OUT=>"x y z count(y)\nA 1 10 5\nB 5 10 3\nC 8 11 4\n"},
     {ERR=>"$full_deprecation"}],
 
   # Output Header with --full
-  ['hdr5', '-t" " -g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
+  ['hdr5dep', '-t" " -g 1 --full --header-out count 2', {IN_PIPE=>$in_g3},
     {OUT=>"field-1 field-2 field-3 count(field-2)\n" .
           "A 3 W 5\nB 17 Y 2\nC 23 Z 1\n"},
     {ERR=>"$full_deprecation"}],
 
   # Input has only one header line (no data lines), and the user requested
   # header-in and header-out => header line should be printed
-  ['hdr15', '-t: --full -H sum 1', {IN_PIPE=>$in_hdr_only},
+  ['hdr15dep', '-t: --full -H sum 1', {IN_PIPE=>$in_hdr_only},
     {OUT=>"X:Y:Z:sum(X)\n"},
     {ERR=>"$full_deprecation"}],
-  ['hdr17', '-t: --full -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
+  ['hdr17dep', '-t: --full -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
      {OUT=>"X:Y:Z:sum(Y)\n"},
     {ERR=>"$full_deprecation"}],
 
   # Test single line per group
-  ['sl2', '-t" " --full -g 1 mean 2', {IN_PIPE=>$in_g4},
+  ['sl2dep', '-t" " --full -g 1 mean 2', {IN_PIPE=>$in_g4},
     {OUT=>"A 5 5\nK 6 6\nP 2 2\n"},
     {ERR=>"$full_deprecation"}],
 );
