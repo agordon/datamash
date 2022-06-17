@@ -169,22 +169,22 @@ my @Tests =
 
   # Test wrong usage
   ['e1',  'ct',  {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing field for operation 'crosstab'\n"}],
+    {ERR=>"$prog: missing field for operation 'crosstab'\n"}],
   ['e2',  'ct 1',  {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: crosstab requires exactly 2 fields, found 1\n"}],
+    {ERR=>"$prog: crosstab requires exactly 2 fields, found 1\n"}],
   ['e3',  'ct 1,2,3,4',  {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: crosstab requires exactly 2 fields, found 4\n"}],
+    {ERR=>"$prog: crosstab requires exactly 2 fields, found 4\n"}],
   ['e4',  'ct 1,2 md5 4', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: conflicting operation found: expecting crosstab " .
-            "operations, but found line operation 'md5'\n"}],
+    {ERR=>"$prog: conflicting operation found: expecting crosstab " .
+          "operations, but found line operation 'md5'\n"}],
   ['e5',  'ct 1,2 sum 1,2', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: crosstab supports one operation, found 2\n"}],
+    {ERR=>"$prog: crosstab supports one operation, found 2\n"}],
   ['e6',  'ct 1,2 min 2 max 2', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: crosstab supports one operation, found 2\n"}],
+    {ERR=>"$prog: crosstab supports one operation, found 2\n"}],
   ['e7',  'ct 1:2', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field pair for operation 'crosstab'\n"}],
+    {ERR=>"$prog: invalid field pair for operation 'crosstab'\n"}],
   ['e8',  'ct 1-2', {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range for operation 'crosstab'\n"}],
+    {ERR=>"$prog: invalid field range for operation 'crosstab'\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

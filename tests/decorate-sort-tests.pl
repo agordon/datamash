@@ -219,32 +219,32 @@ EOF
 
 my @Tests =
 (
- ['s1', '-k1,1:roman', {IN_PIPE=>$in1}, {OUT => $out1_dec_roman}],
- ['s2', '-k2,2:ipv4',  {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4}],
- ['s3', '-k2,2:ipv4 --stable', {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4_stable}],
- ['s4', '-k2,2r:ipv4',  {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4_rev}],
+  ['s1', '-k1,1:roman', {IN_PIPE=>$in1}, {OUT => $out1_dec_roman}],
+  ['s2', '-k2,2:ipv4',  {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4}],
+  ['s3', '-k2,2:ipv4 --stable', {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4_stable}],
+  ['s4', '-k2,2r:ipv4',  {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4_rev}],
 
- ['s5', '-k1,1:roman -k2,2r:ipv4' , {IN_PIPE=>$in1},
-  {OUT => $out1_dec_roman_ipv4rev}],
- ['s6', '-k2,2:ipv4 -k1r,1:roman' , {IN_PIPE=>$in1},
-  {OUT => $out1_dec_ipv4_romanrev}],
+  ['s5', '-k1,1:roman -k2,2r:ipv4' , {IN_PIPE=>$in1},
+    {OUT => $out1_dec_roman_ipv4rev}],
+  ['s6', '-k2,2:ipv4 -k1r,1:roman' , {IN_PIPE=>$in1},
+    {OUT => $out1_dec_ipv4_romanrev}],
 
- ['s10', '-k1,1:roman -k2,2' , {IN_PIPE=>$in1},
-  {OUT => $out1_dec_roman_k2}],
- ['s11', '-k2n,2 -k1,1:roman' , {IN_PIPE=>$in1},
-  {OUT => $out1_dec_k2n_roman}],
+  ['s10', '-k1,1:roman -k2,2' , {IN_PIPE=>$in1},
+    {OUT => $out1_dec_roman_k2}],
+  ['s11', '-k2n,2 -k1,1:roman' , {IN_PIPE=>$in1},
+    {OUT => $out1_dec_k2n_roman}],
 
- ['s12', '-k1,1:ipv6v4map',  {IN_PIPE=>$in2}, {OUT => $out2_ipv6v4map}],
- ['s13', '-k1,1:ipv6v4comp', {IN_PIPE=>$in2}, {OUT => $out2_ipv6v4comp}],
+  ['s12', '-k1,1:ipv6v4map',  {IN_PIPE=>$in2}, {OUT => $out2_ipv6v4map}],
+  ['s13', '-k1,1:ipv6v4comp', {IN_PIPE=>$in2}, {OUT => $out2_ipv6v4comp}],
 
 
- # Sort with header lines
- ['sh1', '-H -k2,2r:ipv4', {IN_PIPE=>$in1}, {OUT=>$out1_dec_ipv4_rev_header1}],
- ['sh2', '--header=2 -k2,2r:ipv4',  {IN_PIPE=>$in1},
-  {OUT => $out1_dec_ipv4_rev_header2}],
- # More header lines than in the input
- ['sh3', '--header=9 -k2,2r:ipv4',  {IN_PIPE=>$in1}, {OUT => $in1}],
- ['sh4', '--header=10 -k2,2r:ipv4',  {IN_PIPE=>$in1}, {OUT => $in1}],
+  # Sort with header lines
+  ['sh1', '-H -k2,2r:ipv4', {IN_PIPE=>$in1}, {OUT=>$out1_dec_ipv4_rev_header1}],
+  ['sh2', '--header=2 -k2,2r:ipv4',  {IN_PIPE=>$in1},
+    {OUT => $out1_dec_ipv4_rev_header2}],
+  # More header lines than in the input
+  ['sh3', '--header=9 -k2,2r:ipv4',  {IN_PIPE=>$in1}, {OUT => $in1}],
+  ['sh4', '--header=10 -k2,2r:ipv4',  {IN_PIPE=>$in1}, {OUT => $in1}],
 
 );
 

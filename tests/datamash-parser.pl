@@ -82,10 +82,10 @@ my @Tests =
 
   # group by multiple columns
   ['p5', 'gb 1,3 sum 2',        {IN_PIPE=>$in1},
-                         {OUT=>"A\tx\t110\nB\tx\t10\nB\ty\t35\n"}],
+    {OUT=>"A\tx\t110\nB\tx\t10\nB\ty\t35\n"}],
   # operate by multiple columns with comma
   ['p6', 'gb 1 last 2,3',        {IN_PIPE=>$in1},
-                         {OUT=>"A\t10\tx\nB\t35\ty\n"}],
+    {OUT=>"A\t10\tx\nB\t35\ty\n"}],
 
   # many groupby columns, force the parser to allocate more array items
   ['p7', 'gb 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23' .
@@ -104,7 +104,7 @@ my @Tests =
 
   # invalid operation after valid mode
   ['p11','groupby 1 foobar 2', {IN_PIPE=>""}, {EXIT=>1},
-        {ERR_SUBST=>'s/.*//s'}],
+    {ERR_SUBST=>'s/.*//s'}],
 
   # missing field number after processing mode
   ['p12','groupby', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
@@ -119,9 +119,9 @@ my @Tests =
   ['p24','sum 1-4,5',     {IN_PIPE=>$in2}, {OUT=>$out2}],
   ['p25','sum 1-5',       {IN_PIPE=>$in2}, {OUT=>$out2}],
   ['p26','sum 1 sum 2 sum 3 sum 4 sum 5',
-                          {IN_PIPE=>$in2}, {OUT=>$out2}],
+    {IN_PIPE=>$in2}, {OUT=>$out2}],
   ['p27','sum 1,2 sum 3-5',
-                          {IN_PIPE=>$in2}, {OUT=>$out2}],
+    {IN_PIPE=>$in2}, {OUT=>$out2}],
 
   # 'check' options
   ['p30','check',      {IN_PIPE=>""}, {OUT=>"0 lines, 0 fields\n"}],
@@ -129,9 +129,8 @@ my @Tests =
   ['p32','check 10',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['p33','check lines lines', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['p34','check 1 line fields', {IN_PIPE=>""}, {EXIT=>1},
-                                {ERR_SUBST=>'s/.*//s'}],
+    {ERR_SUBST=>'s/.*//s'}],
   ['p35','check 10 foo',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
-
 
 
   # Field range with invalid syntax
@@ -167,7 +166,7 @@ my @Tests =
 
   # Overflow strtol
   ['e64','sum 1234567890123456789012345678901234567', {IN_PIPE=>""}, {EXIT=>1},
-        {ERR_SUBST=>'s/.*//s'}],
+    {ERR_SUBST=>'s/.*//s'}],
 
   # Invalid charcters
   ['e65','sum "foo^bar"', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],

@@ -120,13 +120,13 @@ my @Tests =
   # and dependant on the input. Then only the last line of error message
   # is checked.
   ['e1', 'check', {IN_PIPE=>$in2}, {EXIT=>1},
-      {ERR_SUBST => 's/^(li|  ).*$//'},
-      {ERR => "\n\n\n\n$prog: check failed: line 2 has 2 fields " .
-                             "(previous line had 3)\n"}],
+    {ERR_SUBST => 's/^(li|  ).*$//'},
+    {ERR => "\n\n\n\n$prog: check failed: line 2 has 2 fields " .
+                           "(previous line had 3)\n"}],
   ['e1ws', '-W check', {IN_PIPE=>$in2_ws}, {EXIT=>1},
-      {ERR_SUBST => 's/^(li|  ).*$//'},
-      {ERR => "\n\n\n\n$prog: check failed: line 2 has 2 fields " .
-                             "(previous line had 3)\n"}],
+    {ERR_SUBST => 's/^(li|  ).*$//'},
+    {ERR => "\n\n\n\n$prog: check failed: line 2 has 2 fields " .
+                           "(previous line had 3)\n"}],
 
   ['e2', 'check', {IN_PIPE=>$in6}, {EXIT=>1},
     {ERR_SUBST => 's/^(li|  ).*$//'},
@@ -136,7 +136,6 @@ my @Tests =
     {ERR_SUBST => 's/^(li|  ).*$//'},
     {ERR => "\n\n\n\n$prog: check failed: line 4 has 0 fields " .
                            "(previous line had 1)\n"}],
-
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

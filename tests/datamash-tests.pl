@@ -365,102 +365,102 @@ my @Tests =
   ['b9', 'antimode 1', {IN_PIPE=>$in1},   {OUT => "1\n"}],
   ['b10', 'unique 1',   {IN_PIPE=>$in1},  {OUT => "1,10,2,3,4,5,6,7,8,9\n"}],
   ['b11', '--collapse-delimiter=^ unique 1',
-   {IN_PIPE=>$in1},  {OUT => "1^10^2^3^4^5^6^7^8^9\n"}],
+    {IN_PIPE=>$in1},  {OUT => "1^10^2^3^4^5^6^7^8^9\n"}],
   ['b11.1', '-c^ unique 1',
-   {IN_PIPE=>$in1},  {OUT => "1^10^2^3^4^5^6^7^8^9\n"}],
+    {IN_PIPE=>$in1},  {OUT => "1^10^2^3^4^5^6^7^8^9\n"}],
   ['b12', 'collapse 1', {IN_PIPE=>$in1},  {OUT => "1,2,3,4,5,6,7,5,8,9,10\n"}],
   ['b13', '--collapse-delimiter=^ collapse 1',
-   {IN_PIPE=>$in1}, {OUT => "1^2^3^4^5^6^7^5^8^9^10\n"}],
+    {IN_PIPE=>$in1}, {OUT => "1^2^3^4^5^6^7^5^8^9^10\n"}],
   ['b13.1', '-c ^ collapse 1',
-   {IN_PIPE=>$in1}, {OUT => "1^2^3^4^5^6^7^5^8^9^10\n"}],
+    {IN_PIPE=>$in1}, {OUT => "1^2^3^4^5^6^7^5^8^9^10\n"}],
 
   # on a different architecture, would printf(%Lg) print something else?
   # Use OUT_SUBST to trim output to 1.3 digits
   ['b14', 'mean 1',     {IN_PIPE=>$in1},  {OUT => "5.454\n"},
-      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+    {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b15', 'pstdev 1',   {IN_PIPE=>$in1},  {OUT => "2.742\n"},
-      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+    {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b16', 'sstdev 1',   {IN_PIPE=>$in1},  {OUT => "2.876\n"},
-      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+    {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b17', 'pvar 1',     {IN_PIPE=>$in1},  {OUT => "7.520\n"},
-      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+    {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b18', 'svar 1',     {IN_PIPE=>$in1},  {OUT => "8.272\n"},
-      {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
+    {OUT_SUBST=>'s/^(\d\.\d{3}).*/\1/'}],
   ['b19', 'countunique 1', {IN_PIPE=>$in1}, {OUT => "10\n"}],
   ['b20', 'first 1',    {IN_PIPE=>$in1},  {OUT => "1\n"}],
   ['b21', 'last 1',     {IN_PIPE=>$in1},  {OUT => "10\n"}],
   # This test just ensures the 'rand' operation is functioning.
   # It does not verify randomness (see datamash-rand.sh test for that).
   ['b22', 'rand 1',     {IN_PIPE=>$in1},  {OUT => "\n"},
-      {OUT_SUBST=>'s/[0-9]+//'}],
+    {OUT_SUBST=>'s/[0-9]+//'}],
 
   ## Some error checkings
   ['e1',  'sum',  {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing field for operation 'sum'\n"}],
+    {ERR=>"$prog: missing field for operation 'sum'\n"}],
   ['e2',  'foobar',  {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: invalid operation 'foobar'\n"}],
+    {ERR=>"$prog: invalid operation 'foobar'\n"}],
   ['e3',  '',  {IN_PIPE=>""}, {EXIT=>1},
-      {ERR=>"$prog: missing operation specifiers\n" .
-             "Try '$prog --help' for more information.\n"}],
+    {ERR=>"$prog: missing operation specifiers\n" .
+          "Try '$prog --help' for more information.\n"}],
   ['e4',  'sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 1 field 1: 'a'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 1 field 1: 'a'\n"}],
   ['e5',  '-g 4, sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: missing field for operation 'groupby'\n"}],
+    {ERR=>"$prog: missing field for operation 'groupby'\n"}],
   ['e6',  '-g 4,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e7',  '-g ,x sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: missing field for operation 'groupby'\n"}],
+    {ERR=>"$prog: missing field for operation 'groupby'\n"}],
   ['e8',  '-g 1,0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid field '0' for operation 'groupby'\n"}],
+    {ERR=>"$prog: invalid field '0' for operation 'groupby'\n"}],
   ['e9',  '-g 1X0 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value '1X0'\n"}],
+    {ERR=>"$prog: invalid numeric value '1X0'\n"}],
   ['e10',  '-g 1 -t XX sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: the delimiter must be a single character\n"}],
+    {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e10.1',  '-g 1 -t "" sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: the delimiter must be a single character\n"}],
+    {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e11',  '--foobar' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: unrecognized option foobar\n" .
-                "Try '$prog --help' for more information.\n"},
-          # This ERR_SUBST is needed because on some systems (e.g. OpenBSD),
-          # The error message from 'getopt_long' is slightly
-          # different than GNU libc's.
-          {ERR_SUBST=>'s/(unknown|unrecognized) option.*(foobar).*' .
-                      '/unrecognized option $2/'}],
+    {ERR=>"$prog: unrecognized option foobar\n" .
+          "Try '$prog --help' for more information.\n"},
+    # This ERR_SUBST is needed because on some systems (e.g. OpenBSD),
+    # The error message from 'getopt_long' is slightly
+    # different than GNU libc's.
+    {ERR_SUBST=>'s/(unknown|unrecognized) option.*(foobar).*' .
+                '/unrecognized option $2/'}],
   ['e12',  '-t" " -H unique 4' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-      {ERR=>"$prog: invalid input: field 4 requested, " .
-            "line 1 has only 3 fields\n"}],
+    {ERR=>"$prog: invalid input: field 4 requested, " .
+          "line 1 has only 3 fields\n"}],
   ['e13',  '-t" " sum 6' ,  {IN_PIPE=>$in_g3}, {EXIT=>1},
-      {ERR=>"$prog: invalid input: field 6 requested, " .
-            "line 1 has only 3 fields\n"}],
+    {ERR=>"$prog: invalid input: field 6 requested, " .
+          "line 1 has only 3 fields\n"}],
   ['e14',  '--header-in -t: sum 6' ,  {IN_PIPE=>$in_hdr2}, {EXIT=>1},
-      {ERR=>"$prog: invalid input: field 6 requested, " .
-            "line 2 has only 3 fields\n"}],
+    {ERR=>"$prog: invalid input: field 6 requested, " .
+          "line 2 has only 3 fields\n"}],
   ['e15',  'sum foo' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e16',  '-t" " sum 2' ,  {IN_PIPE=>$in_invalid_num1}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 3 field 2: '3a'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 3 field 2: '3a'\n"}],
   ['e17',  'sum 1' ,  {IN_PIPE=>"1e-20000\n"}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 1 field 1: '1e-20000'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 1 field 1: '1e-20000'\n"}],
   ['e18',  'sum 0' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: invalid field '0' for operation 'sum'\n"}],
+    {ERR=>"$prog: invalid field '0' for operation 'sum'\n"}],
   ['e19',  '-- sum -2' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: invalid field range for operation 'sum'\n"}],
+    {ERR=>"$prog: invalid field range for operation 'sum'\n"}],
   ['e21',  'sum ""' ,  {IN_PIPE=>"a"}, {EXIT=>1},
-      {ERR=>"$prog: missing field for operation 'sum'\n"}],
+    {ERR=>"$prog: missing field for operation 'sum'\n"}],
   ['e22',  '-t" " -g 7 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-      {ERR=>"$prog: invalid input: field 7 requested, " .
-            "line 2 has only 3 fields\n"}],
+    {ERR=>"$prog: invalid input: field 7 requested, " .
+          "line 2 has only 3 fields\n"}],
   ['e23',  '-t" " -g -2 unique 1' ,  {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-      {ERR=>"$prog: invalid field '-' for operation 'groupby'\n"}],
+    {ERR=>"$prog: invalid field '-' for operation 'groupby'\n"}],
   ['e24',  '-t" " --header-out -g 5 count 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-      {ERR=>"$prog: invalid input: field 5 requested, " .
-            "line 1 has only 3 fields\n"}],
+    {ERR=>"$prog: invalid input: field 5 requested, " .
+          "line 1 has only 3 fields\n"}],
   ['e25',  '-g 1,,2 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: missing field for operation 'groupby'\n"}],
+    {ERR=>"$prog: missing field for operation 'groupby'\n"}],
   ['e26',   '--collapse-delimiter=foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: the delimiter must be a single character\n"}],
+    {ERR=>"$prog: the delimiter must be a single character\n"}],
   ['e27',   '-c foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
-      {ERR=>"$prog: the delimiter must be a single character\n"}],
+    {ERR=>"$prog: the delimiter must be a single character\n"}],
 
   # No newline at the end of the lines
   ['nl1', 'sum 1', {IN_PIPE=>"99"}, {OUT=>"99\n"}],
@@ -554,86 +554,86 @@ my @Tests =
   ['g1.1', '-t" " -g1 sum 2',    {IN_PIPE=>$in_g1}, {OUT=>"A 195\n"}],
   ['g2.1', '-t" " -g1 median 2', {IN_PIPE=>$in_g1}, {OUT=>"A 42.5\n"}],
   ['g3.1', '-t" " -g1 collapse 2', {IN_PIPE=>$in_g1},
-     {OUT=>"A 100,10,50,35\n"}],
+    {OUT=>"A 100,10,50,35\n"}],
   ['g4.1', '-t" " -g1 count 2',    {IN_PIPE=>$in_g5},
-     {OUT=>"A 1\nAA 1\nAAA 1\n"}],
+    {OUT=>"A 1\nAA 1\nAAA 1\n"}],
   # Group on the last column
   ['grp5', '-t" " -g3 count 1',    {IN_PIPE=>$in_hdr1},
-     {OUT=>"z 1\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
+    {OUT=>"z 1\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
 
   # 3 groups, single line per group, custom delimiter
   ['g7.1', '-g2 -t= mode 1', {IN_PIPE=>"1=A\n2=B\n3=C\n"},
-     {OUT=>"A=1\nB=2\nC=3\n"}],
+    {OUT=>"A=1\nB=2\nC=3\n"}],
 
   # Multiple keys (from different columns)
   ['g8.1',     '-t" " -g1,3 sum 2', {IN_PIPE=>$in_g3},
-     {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
+    {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
 
 
   # count on non-numeric fields
   ['cnt1', '-t" " -g 1 count 1', {IN_PIPE=>$in_g2},
-     {OUT=>"A 4\nB 3\n"}],
+    {OUT=>"A 4\nB 3\n"}],
 
   # Input Header
   ['hdr1', '-t" " -g 1 --header-in count 2',{IN_PIPE=>$in_hdr1},
-     {OUT=>"A 5\nB 3\nC 4\n"}],
+    {OUT=>"A 5\nB 3\nC 4\n"}],
 
   # Input and output header
   ['hdr2', '-t" " -g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr1},
-     {OUT=>"GroupBy(x) count(y)\nA 5\nB 3\nC 4\n"}],
+    {OUT=>"GroupBy(x) count(y)\nA 5\nB 3\nC 4\n"}],
 
   # Output Header
   ['hdr4', '-t" " -g 1 --header-out count 2', {IN_PIPE=>$in_g3},
-     {OUT=>"GroupBy(field-1) count(field-2)\nA 5\nB 2\nC 1\n"}],
+    {OUT=>"GroupBy(field-1) count(field-2)\nA 5\nB 2\nC 1\n"}],
 
   # Header without grouping
   ['hdr6', '-t" " --header-out count 2', {IN_PIPE=>$in_g3},
-     {OUT=>"count(field-2)\n8\n"}],
+    {OUT=>"count(field-2)\n8\n"}],
 
   # Output Header, multiple ops
   ['hdr7', '-t" " -g 1 --header-out count 2 unique 3', {IN_PIPE=>$in_g3},
-     {OUT=>"GroupBy(field-1) count(field-2) unique(field-3)\n" .
-           "A 5 W,X\nB 2 Y,Z\nC 1 Z\n"}],
+    {OUT=>"GroupBy(field-1) count(field-2) unique(field-3)\n" .
+          "A 5 W,X\nB 2 Y,Z\nC 1 Z\n"}],
 
   # Headers, non white-space separator
   ['hdr8', '-g 1 -H -t: count 2 unique 3', {IN_PIPE=>$in_hdr2},
-     {OUT=>"GroupBy(x):count(y):unique(z)\nA:5:W,X\nB:2:Y,Z\nC:1:Z\n"}],
+    {OUT=>"GroupBy(x):count(y):unique(z)\nA:5:W,X\nB:2:Y,Z\nC:1:Z\n"}],
 
   # Headers, non white-space separator, 3 operations
   ['hdr9', '-g 1 -H -t: count 2 unique 3 sum 2', {IN_PIPE=>$in_hdr2},
-     {OUT=>"GroupBy(x):count(y):unique(z):sum(y)\n" .
-           "A:5:W,X:39\nB:2:Y,Z:36\nC:1:Z:23\n"}],
+    {OUT=>"GroupBy(x):count(y):unique(z):sum(y)\n" .
+          "A:5:W,X:39\nB:2:Y,Z:36\nC:1:Z:23\n"}],
 
   # Headers, white-space separator, 3 operations
   ['hdr10', '-W -g 1 --header-in --header-out count 2',{IN_PIPE=>$in_hdr3},
-     {OUT=>"GroupBy(x)\tcount(y)\nA\t5\nB\t3\nC\t4\n"}],
+    {OUT=>"GroupBy(x)\tcount(y)\nA\t5\nB\t3\nC\t4\n"}],
 
   # Group + output headers on the last column
   ['hdr11', '-t" " --header-out -g3 count 1',    {IN_PIPE=>$in_hdr1},
-     {OUT=>"GroupBy(field-3) count(field-1)\n" .
-           "z 1\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
+    {OUT=>"GroupBy(field-3) count(field-1)\n" .
+          "z 1\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
   # Group + input headers on last column
   ['hdr12', '-t" " --header-in -g3 count 1',    {IN_PIPE=>$in_hdr1},
-     {OUT=>"10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
+    {OUT=>"10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
   # Group + input/output headers on last column
   ['hdr13', '-t" " -H -g3 count 1',    {IN_PIPE=>$in_hdr1},
-     {OUT=>"GroupBy(z) count(x)\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
+    {OUT=>"GroupBy(z) count(x)\n10 6\n20 1\n30 1\n11 1\n22 1\n33 1\n44 1\n"}],
   # Input has only one header line (no data lines), and the user requested
   # header-in and header-out => header line should be printed
   ['hdr14', '-t: -H sum 1', {IN_PIPE=>$in_hdr_only},
-     {OUT=>"sum(X)\n"}],
+    {OUT=>"sum(X)\n"}],
   ['hdr16', '-t: -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
-     {OUT=>"GroupBy(X):sum(Y)\n"}],
+    {OUT=>"GroupBy(X):sum(Y)\n"}],
   ['hdr18', '-t: --header-in sum 1', {IN_PIPE=>$in_hdr_only},
-     {OUT=>""}],
+    {OUT=>""}],
   ['hdr19', '-t: -H reverse', {IN_PIPE=>$in_hdr_only},
-     {OUT=>"Z:Y:X\n"}],
+    {OUT=>"Z:Y:X\n"}],
   ['hdr20', '-t: --header-in reverse', {IN_PIPE=>$in_hdr_only},
-     {OUT=>""}],
+    {OUT=>""}],
   ['hdr21', '-t: -H rmdup 1', {IN_PIPE=>$in_hdr_only},
-     {OUT=>$in_hdr_only}],
+    {OUT=>$in_hdr_only}],
   ['hdr22', '-t: --header-in rmdup 1', {IN_PIPE=>$in_hdr_only},
-     {OUT=>""}],
+    {OUT=>""}],
   ['hdr23', '-t: --header-in rmdup 1', {IN_PIPE=>""}, {OUT=>""}],
   ['hdr24', '-t: -H rmdup 1', {IN_PIPE=>""}, {OUT=>""}],
 
@@ -646,20 +646,20 @@ my @Tests =
 
   # Test single line per group
   ['sl1', '-t" " -g 1 mean 2', {IN_PIPE=>$in_g4},
-     {OUT=>"A 5\nK 6\nP 2\n"}],
+    {OUT=>"A 5\nK 6\nP 2\n"}],
 
   # Test countunique operation
   ['cuq1', '-t" " -g 1 countunique 3', {IN_PIPE=>$in_g3},
-     {OUT=>"A 2\nB 2\nC 1\n"}],
+    {OUT=>"A 2\nB 2\nC 1\n"}],
   ['cuq2', '-t" " -g 1 countunique 2', {IN_PIPE=>$in_g4},
-     {OUT=>"A 1\nK 1\nP 1\n"}],
+    {OUT=>"A 1\nK 1\nP 1\n"}],
   ['cuq3', '-t" " --header-in -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq1},
-     {OUT=>"A 2\nB 2\n"}],
+    {OUT=>"A 2\nB 2\n"}],
   # countunique, case-insensitive
   ['cuq4', '-t" " -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq2},
-     {OUT=>"a 1\nA 3\n"}],
+    {OUT=>"a 1\nA 3\n"}],
   ['cuq5', '-i -t" " -g 1 countunique 2', {IN_PIPE=>$in_cnt_uniq2},
-     {OUT=>"a 2\n"}],
+    {OUT=>"a 2\n"}],
 
   # Test Tab vs White-space field separator
   ['tab1', "sum 2", {IN_PIPE=>$in_tab1}, {OUT=>"60\n"}],
@@ -668,50 +668,50 @@ my @Tests =
   # Test Auto-Sorting
   # With default separator (White-space), the second column is A,B,C,D
   ['sort1', '-W -s -g 2 unique 3', {IN_PIPE=>$in_sort1},
-     {OUT=>"A\tx\nB\tk,x\nC\tg,j\nD\tj\n"}],
+    {OUT=>"A\tx\nB\tk,x\nC\tg,j\nD\tj\n"}],
   # With TAB separator, the second column is g,j,k,x
   ['sort2', '-s -g 2 unique 3', {IN_PIPE=>$in_sort1},
-     {OUT=>"g\t6\nj\t3,4\nk\t2\nx\t1,5\n"}],
+    {OUT=>"g\t6\nj\t3,4\nk\t2\nx\t1,5\n"}],
   # Control check: if we do not sort, the some groups will appear twice
   # because the input is not sorted.
   ['sort3', '-g 2 unique 3', {IN_PIPE=>$in_sort1},
-     {OUT=>"x\t1\nk\t2\nj\t3\nx\t5\nj\t4\ng\t6\n"}],
+    {OUT=>"x\t1\nk\t2\nj\t3\nx\t5\nj\t4\ng\t6\n"}],
   ['sort4', '-s -g 1 sum 2 -t "\'" ', {IN_PIPE=>$in_sort_quote1},
-     {OUT=>"A'4\nB'6\n"}],
+    {OUT=>"A'4\nB'6\n"}],
   ['sort5', '-s -g 1 sum 2 -t "\"" ', {IN_PIPE=>$in_sort_quote2},
-     {OUT=>"A\"4\nB\"6\n"}],
+    {OUT=>"A\"4\nB\"6\n"}],
 
   # Test Case-sensitivity, on sorted input (no 'sort' piping)
   # on both grouping and string operations
   ['case1', '-t" " -g 1 sum 3', {IN_PIPE=>$in_case_sorted},
-     {OUT=>"a 4\nA 7\nb 4\nB 6\n"}],
+    {OUT=>"a 4\nA 7\nb 4\nB 6\n"}],
   ['case2', '-t" " -i -g 1 sum 3', {IN_PIPE=>$in_case_sorted},
-     {OUT=>"a 11\nb 10\n"}],
+    {OUT=>"a 11\nb 10\n"}],
   ['case3', '-t" " -g 1 unique 2', {IN_PIPE=>$in_case_sorted},
-     {OUT=>"a X,x\nA X,x\nb Y\nB Y\n"}],
+    {OUT=>"a X,x\nA X,x\nb Y\nB Y\n"}],
   ['case4', '-t" " -i -g 1 unique 2', {IN_PIPE=>$in_case_sorted},
-     {OUT=>"a X\nb Y\n"}],
+    {OUT=>"a X\nb Y\n"}],
   ['case4.1', '-i -t" " -g 1 unique 2', {IN_PIPE=>$in_cnt_uniq2},
-     {OUT=>"a B,C\n"}],
+    {OUT=>"a B,C\n"}],
 
   # Test Case-sensitivity, on non-sorted input (with 'sort' piping)
   # on both grouping and string operations.
   ['case5', '-t" " -s -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
-     {OUT=>"A 7\nB 6\na 4\nb 4\n"}],
+    {OUT=>"A 7\nB 6\na 4\nb 4\n"}],
   ['case6', '-t" " -s -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
-     {OUT=>"A X,x\nB Y\na X,x\nb Y\n"}],
+    {OUT=>"A X,x\nB Y\na X,x\nb Y\n"}],
 
   ## Test nul-terminated lines
   ['nul1', '-t" " -z -g 1 sum 2', {IN_PIPE=>$in_nul1},
-     {OUT=>"A 3\x00B 7\x00"}],
+    {OUT=>"A 3\x00B 7\x00"}],
   ['nul2', '-t" " --zero-terminated -g 1 sum 2', {IN_PIPE=>$in_nul1},
-     {OUT=>"A 3\x00B 7\x00"}],
+    {OUT=>"A 3\x00B 7\x00"}],
 
   # Test --help (but don't verify the output)
   ['help1', '--help',     {IN_PIPE=>""},  {OUT => ""},
-      {OUT_SUBST=>'s/^.*//gms'}],
+    {OUT_SUBST=>'s/^.*//gms'}],
   ['ver1', '--version',     {IN_PIPE=>""},  {OUT => ""},
-      {OUT_SUBST=>'s/^.*//gms'}],
+    {OUT_SUBST=>'s/^.*//gms'}],
 
   # Test output precision (number of digits) for numerical operations.
   # The current precision is 14 digits (hard-coded).
@@ -733,31 +733,31 @@ my @Tests =
   ['fst3',   '-t" " -g 1 first 2', {IN_PIPE=>$in_g2}, {OUT=>"A 100\nB 66\n"}],
   ['fst4',   '-t" " -g 1 first 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
   ['fst5',   '-t" " -g 1 first 2', {IN_PIPE=>$in_large_buffer1},
-            {OUT=>"A 1\nB 3\n"}],
+    {OUT=>"A 1\nB 3\n"}],
   ['fst6',   '-t" " -g 1 first 2', {IN_PIPE=>$in_large_buffer2},
-            {OUT=>$out_large_buffer_first}],
+    {OUT=>$out_large_buffer_first}],
 
   ['lst1',   '-t" " last 2', {IN_PIPE=>$in_g1}, {OUT=>"35\n"}],
   ['lst2',   '-t" " -g 1 last 2', {IN_PIPE=>$in_g1}, {OUT=>"A 35\n"}],
   ['lst3',   '-t" " -g 1 last 2', {IN_PIPE=>$in_g2}, {OUT=>"A 35\nB 55\n"}],
   ['lst4',   '-t" " -g 1 last 2', {IN_PIPE=>$in_g4}, {OUT=>"A 5\nK 6\nP 2\n"}],
   ['lst5',   '-t" " -g 1 last 2', {IN_PIPE=>$in_large_buffer1},
-            {OUT=>"A 2\nB 4\n"}],
+    {OUT=>"A 2\nB 4\n"}],
   ['lst6',   '-t" " -g 1 last 2', {IN_PIPE=>$in_large_buffer2},
-            {OUT=>$out_large_buffer_last}],
+    {OUT=>$out_large_buffer_last}],
 
   ## Test md5/sha1/sha256/sha512 operations.
   ## NOTE: this just ensures the operations don't fail, and produces the
   ##       expected length of output strings.
   ##       validation of the calculation is tested in datamash-{md5,sha}.pl.
   ['md5-1',   '-W md5 2',    {IN_PIPE=>$in_g1},
-      {OUT_SUBST=>'s/^[a-f0-9]{32}$//'}, {OUT=>"\n\n\n\n"}],
+    {OUT_SUBST=>'s/^[a-f0-9]{32}$//'}, {OUT=>"\n\n\n\n"}],
   ['sha1-1',   '-W sha1 2',    {IN_PIPE=>$in_g1},
-      {OUT_SUBST=>'s/^[a-f0-9]{40}$//'}, {OUT=>"\n\n\n\n"}],
+    {OUT_SUBST=>'s/^[a-f0-9]{40}$//'}, {OUT=>"\n\n\n\n"}],
   ['sha256-1',   '-W sha256 2',    {IN_PIPE=>$in_g1},
-      {OUT_SUBST=>'s/^[a-f0-9]{64}$//'}, {OUT=>"\n\n\n\n"}],
+    {OUT_SUBST=>'s/^[a-f0-9]{64}$//'}, {OUT=>"\n\n\n\n"}],
   ['sha512-1',   '-W sha512 2',    {IN_PIPE=>$in_g1},
-      {OUT_SUBST=>'s/^[a-f0-9]{128}$//'}, {OUT=>"\n\n\n\n"}],
+    {OUT_SUBST=>'s/^[a-f0-9]{128}$//'}, {OUT=>"\n\n\n\n"}],
 
   ## Test Base64
   ['base64-1','-W base64 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_base64}],
@@ -792,13 +792,13 @@ my @Tests =
   ['rmdp5', '-t: --header-in rmdup 1', {IN_PIPE=>$in_dup1},
     {OUT=>"1:a\n2:b\n3:a\n"}],
   ['rmdp6', '-t: rmdup 4', {IN_PIPE=>$in_dup1}, {EXIT=>1},
-      {ERR=>"$prog: invalid input: field 4 requested, " .
-            "line 1 has only 2 fields\n"}],
+    {ERR=>"$prog: invalid input: field 4 requested, " .
+          "line 1 has only 2 fields\n"}],
   ## rmdup with named columns
   ['rmdp7', '-t: -H rmdup X', {IN_PIPE=>$in_dup1},
     {OUT=>"X:Y\n1:a\n2:b\n3:a\n"}],
   ['rmdp8', '-t: rmdup X', {IN_PIPE=>$in_dup1}, {EXIT=>1},
-     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
 
   # Test noop operation
   ['noop1', 'noop', {IN_PIPE=>""}, {OUT=>""}],
@@ -812,20 +812,20 @@ my @Tests =
   ['nc3',   '--header-in sum foo', {IN_PIPE=>""}, {OUT=>""}],
   ## with named columns, -H or --header-in are required.
   ['nc1',   'sum foo', {IN_PIPE=>""}, {EXIT=>1},
-     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['nc4',   'sum foo', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ## Invalid column name
   ['nc5',   '--header-in sum foo', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+    {ERR=>"$prog: column name 'foo' not found in input file\n"}],
   ['nc6',   '-H sum foo', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+    {ERR=>"$prog: column name 'foo' not found in input file\n"}],
   ## Valid column names, and identical column number
   ['nc7',   '-t" " -H sum y sum 2', {IN_PIPE=>$in_hdr1},
-     {OUT=>"sum(y) sum(y)\n52 52\n"}],
+    {OUT=>"sum(y) sum(y)\n52 52\n"}],
   ## Valid column names + sorting
   ['nc8',   '-s -g 1 -t" " -H sum y', {IN_PIPE=>$in_hdr1},
-     {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
+    {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
 
   # Test named columns - for grouping
   ## with empty input, invalid column name is not an error
@@ -833,53 +833,53 @@ my @Tests =
   ['ng2',   '--header-in -g foo sum foo', {IN_PIPE=>""}, {OUT=>""}],
   ## with named columns, -H or --header-in are required
   ['ng3',   '-g foo count 1', {IN_PIPE=>""}, {EXIT=>1},
-     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['ng4',   '-g foo count 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ## Invalid column name
   ['ng5',   '--header-in -g foo sum 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+    {ERR=>"$prog: column name 'foo' not found in input file\n"}],
   ['ng6',   '-H -g foo sum 1', {IN_PIPE=>$in_hdr1}, {EXIT=>1},
-     {ERR=>"$prog: column name 'foo' not found in input file\n"}],
+    {ERR=>"$prog: column name 'foo' not found in input file\n"}],
   ## Valid column names in grouping
   ['ng7',   '-t" " -H -g x sum 2', {IN_PIPE=>$in_hdr1},
-     {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
+    {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
   ## group by name+number
   ['ng8',   '-t":" -H -g x,3 sum 2', {IN_PIPE=>$in_hdr2},
-     {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
-	   "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
+    {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
+          "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
   ## group by name+name
   ['ng9',   '-t":" -H -g x,z sum 2', {IN_PIPE=>$in_hdr2},
-     {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
-	   "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
+    {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
+          "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
   ## group by number+name
   ['ng10',  '-t":" -H -g 1,z sum 2', {IN_PIPE=>$in_hdr2},
-     {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
-	   "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
+    {OUT=>"GroupBy(x):GroupBy(z):sum(y)\n" .
+          "A:W:15\nA:X:24\nB:Y:17\nB:Z:19\nC:Z:23\n"}],
   ## group by name + sorting
   ['ng11',   '-s -t" " -H -g x sum 2', {IN_PIPE=>$in_hdr1},
-     {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
+    {OUT=>"GroupBy(x) sum(y)\nA 14\nB 18\nC 20\n"}],
 );
 
 if ($have_stable_sort) {
   push @Tests, (
     # last with sort, test the 'stable' sort
     ['lst7',   '-t" " --sort -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
-       {OUT=>"A 5\nB 6\na 3\nb 4\n"}],
+      {OUT=>"A 5\nB 6\na 3\nb 4\n"}],
     ['lst8',   '-t" " --sort -i -g 1 last 3',  {IN_PIPE=>$in_case_unsorted},
-       {OUT=>"A 5\nB 6\n"}],
+      {OUT=>"A 5\nB 6\n"}],
     # First with sort, test the 'stable' sort
     ['fst7',   '-t" " --sort -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
-       {OUT=>"A 2\nB 6\na 1\nb 4\n"}],
+      {OUT=>"A 2\nB 6\na 1\nb 4\n"}],
     ['fst8',   '-t" " --sort -i -g 1 first 3',  {IN_PIPE=>$in_case_unsorted},
-       {OUT=>"a 1\nb 4\n"}],
+      {OUT=>"a 1\nb 4\n"}],
     # NOTE: 'sort' is used with '-s' (stable sort),
     #       so with case-insensitive sort, the first appearing letter is
     #       reported (the lowercase a/b in case7 & case8).
     ['case7', '-t" " -s -i -g 1 sum 3', {IN_PIPE=>$in_case_unsorted},
-       {OUT=>"a 11\nb 10\n"}],
+      {OUT=>"a 11\nb 10\n"}],
     ['case8', '-t" " -s -i -g 1 unique 2', {IN_PIPE=>$in_case_unsorted},
-       {OUT=>"a X\nb Y\n"}],
+      {OUT=>"a X\nb Y\n"}],
  );
 }
 

@@ -100,7 +100,7 @@ my $out_g1_md5 = transform_column ($in_g1, 2, \&md5_hex);
 
 my @Tests =
 (
-   ['md5-1',   '-W md5 2',    {IN_PIPE=>$in_g1}, {OUT=>$out_g1_md5}],
+  ['md5-1',   '-W md5 2',    {IN_PIPE=>$in_g1}, {OUT=>$out_g1_md5}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

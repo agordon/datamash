@@ -139,7 +139,7 @@ my @Tests =
     {OUT=>"X:Y:Z:sum(X)\n"},
     {ERR=>"$full_deprecation"}],
   ['hdr17dep', '-t: --full -s -g1 -H sum 2', {IN_PIPE=>$in_hdr_only},
-     {OUT=>"X:Y:Z:sum(Y)\n"},
+    {OUT=>"X:Y:Z:sum(Y)\n"},
     {ERR=>"$full_deprecation"}],
 
   # Test single line per group

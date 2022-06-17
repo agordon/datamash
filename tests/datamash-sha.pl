@@ -105,11 +105,11 @@ my $out_g1_sha512 = transform_column ($in_g1, 2, \&sha512_hex);
 
 my @Tests =
 (
-   ['sha1-1',  '-W sha1 2',   {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha1}],
-   ['sha224-1','-W sha224 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha224}],
-   ['sha256-1','-W sha256 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha256}],
-   ['sha384-1','-W sha384 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha384}],
-   ['sha512-1','-W sha512 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha512}],
+  ['sha1-1',  '-W sha1 2',   {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha1}],
+  ['sha224-1','-W sha224 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha224}],
+  ['sha256-1','-W sha256 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha256}],
+  ['sha384-1','-W sha384 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha384}],
+  ['sha512-1','-W sha512 2', {IN_PIPE=>$in_g1}, {OUT=>$out_g1_sha512}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

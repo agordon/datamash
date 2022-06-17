@@ -97,7 +97,7 @@ my @Tests =
 
   # Custom formats can use lots of memory
   ['m1', '--format "%04000.0f"   sum 1',  {IN_PIPE=>$in1},
-   {OUT => "0" x 3999 . "1\n"}],
+    {OUT => "0" x 3999 . "1\n"}],
 
   # due to binary floating representation, some decimal point digits won't be
   # zero (e.g. 1.0000090000000000000000000000000523453254320000000... or
@@ -105,9 +105,8 @@ my @Tests =
   # The OUT_SUBST replaces exactly 3995 digits (as expected from the format)
   # with an "X".
   ['m2', '--format "%.4000f"   sum 1',  {IN_PIPE=>$in1},
-   {OUT => "1.00000X\n"},
-   {OUT_SUBST => 's/^(1\.00000)([0-9]{3995})$/\1X/'}],
-
+    {OUT => "1.00000X\n"},
+    {OUT_SUBST => 's/^(1\.00000)([0-9]{3995})$/\1X/'}],
 );
 
 

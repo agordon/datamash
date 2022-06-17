@@ -389,42 +389,42 @@ my @Tests =
   ['narm2', '--narm mean 1', {IN_PIPE=>$na1}, {OUT=>"2\n"}],
   # without --narm, these should fail with invalid input
   ['narm3', 'sum 1',         {IN_PIPE=>$na1}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NA'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NA'\n"}],
 
   ## Test with 'nA'
   ['narm4', '--narm sum 1',  {IN_PIPE=>$na2}, {OUT=>"6\n"}],
   ['narm5', '--narm mean 1', {IN_PIPE=>$na2}, {OUT=>"2\n"}],
   # without --narm, these should fail with invalid input
   ['narm6', 'sum 1',         {IN_PIPE=>$na2}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'nA'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 3 field 1: 'nA'\n"}],
 
   ## Test with 'N/A'
   ['narm7', '--narm sum 1',  {IN_PIPE=>$na3}, {OUT=>"6\n"}],
   ['narm8', '--narm mean 1', {IN_PIPE=>$na3}, {OUT=>"2\n"}],
   # without --narm, these should fail with invalid input
   ['narm9', 'sum 1',         {IN_PIPE=>$na3}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'N/A'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 3 field 1: 'N/A'\n"}],
 
   ## Test with 'NaN'
   ['narm10', '--narm sum 1',  {IN_PIPE=>$na4}, {OUT=>"6\n"}],
   ['narm11', '--narm mean 1', {IN_PIPE=>$na4}, {OUT=>"2\n"}],
   # without --narm, 'nan' should be processed, not skipped
   ['narm12', 'sum 1',         {IN_PIPE=>$na4}, {OUT=>"$nan\n"},
-      {OUT_SUBST=>'s/^-//'}],
+    {OUT_SUBST=>'s/^-//'}],
 
   ## Test with 'nan'
   ['narm13', '--narm sum 1',  {IN_PIPE=>$na5}, {OUT=>"6\n"}],
   ['narm14', '--narm mean 1', {IN_PIPE=>$na5}, {OUT=>"2\n"}],
   # without --narm, 'nan' should be processed, not skipped
   ['narm15', 'sum 1',         {IN_PIPE=>$na5}, {OUT=>"$nan\n"},
-      {OUT_SUBST=>'s/^-//'}],
+    {OUT_SUBST=>'s/^-//'}],
 
   # These input have strings starting with 'NA' or 'NAN' but should not
   # be mistaken for them.
   ['narm16', '--narm sum 1',         {IN_PIPE=>$not_na1}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NAK'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NAK'\n"}],
   ['narm17', '--narm sum 1',         {IN_PIPE=>$not_na2}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NANA'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 3 field 1: 'NANA'\n"}],
 
   ## NA value as first/last line
   ['narm18', '--narm mean 1',  {IN_PIPE=>$na_first}, {OUT=>"5\n"}],
@@ -434,13 +434,13 @@ my @Tests =
   ['narm20', '-t: --narm sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1},
     {OUT=>"12:10:18\n"}],
   ['narm21', '-t:        sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 2 field 2: 'NA'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 2 field 2: 'NA'\n"}],
 
   ## NA as the last field
   ['narm22', '-t: --narm sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1},
     {OUT=>"12:10:18\n"}],
   ['narm23', '-t:        sum 1 sum 2 sum 3', {IN_PIPE=>$na_mid1}, {EXIT=>1},
-      {ERR=>"$prog: invalid numeric value in line 2 field 2: 'NA'\n"}],
+    {ERR=>"$prog: invalid numeric value in line 2 field 2: 'NA'\n"}],
 
   # N/A affect counts
   ['narm24', '-t: count 1 count 2 count 3', {IN_PIPE=>$na_last1},
@@ -533,30 +533,30 @@ my @Tests =
   # Test output-delimiter
   ['odlm1', '-t: last 1 last 2', {IN_PIPE=>$na_mid1}, {OUT=>"7:8\n"}],
   ['odlm2', '-t: --output-delimiter "%" last 1 last 2',
-   {IN_PIPE=>$na_mid1}, {OUT=>"7%8\n"}],
+    {IN_PIPE=>$na_mid1}, {OUT=>"7%8\n"}],
   ['odlm3', '--output-delimiter "%" -t: last 1 last 2',
-   {IN_PIPE=>$na_mid1}, {OUT=>"7%8\n"}],
+    {IN_PIPE=>$na_mid1}, {OUT=>"7%8\n"}],
 
   # output-delimiter with whitespace
   ['odlm4', '-t " " last 1 last 2', {IN_PIPE=>$in_full1}, {OUT=>"B 3\n"}],
   ['odlm5', '-W     last 1 last 2', {IN_PIPE=>$in_full1}, {OUT=>"B\t3\n"}],
   ['odlm6', '-W --output-delimiter ":" last 1 last 2',
-   {IN_PIPE=>$in_full1}, {OUT=>"B:3\n"}],
+    {IN_PIPE=>$in_full1}, {OUT=>"B:3\n"}],
   ['odlm7', '--output-delimiter ":" -W last 1 last 2',
-   {IN_PIPE=>$in_full1}, {OUT=>"B:3\n"}],
+    {IN_PIPE=>$in_full1}, {OUT=>"B:3\n"}],
 
   # Multiple output delimiters
   ['odlm8', '--output-delimiter "x" -W --output-delimiter "y" last 1 last 2',
-   {IN_PIPE=>$in_full1}, {OUT=>"By3\n"}],
+    {IN_PIPE=>$in_full1}, {OUT=>"By3\n"}],
 
 
   # Test -C/--skip-comments option
   ['sc1', 'sum 2',      {IN_PIPE=>$in_comments}, {OUT=>"15\n"}],
   ['sc2', '-C sum 2',   {IN_PIPE=>$in_comments}, {OUT=>"5\n"}],
   ['sc3', 'reverse',    {IN_PIPE=>$in_comments},
-   {OUT=>"3	 #foo\n" .
-	 "5	bar\n" .
-	 "7	;baz\n"}],
+    {OUT=>"3	 #foo\n" .
+          "5	bar\n" .
+          "7	;baz\n"}],
   ['sc4', '-C reverse', {IN_PIPE=>$in_comments}, {OUT=>"5	bar\n"}],
 
 
@@ -569,22 +569,22 @@ my @Tests =
 
   ## minus in field name
   ['esc1', '-W -H sum "A_Chlor_T1h_r1\\-metaG"', {IN_PIPE=>$in_esc_ident},
-     {OUT=>"sum(A_Chlor_T1h_r1-metaG)\n11\n"}],
+    {OUT=>"sum(A_Chlor_T1h_r1-metaG)\n11\n"}],
   # field name starting with an identifier
   ['esc2', '-W -H sum "\\9C"', {IN_PIPE=>$in_esc_ident},
-   {OUT=>"sum(9C)\n33\n"}],
+    {OUT=>"sum(9C)\n33\n"}],
   # field name starting with minus
   ['esc3', '-W -H sum "\\-bar"', {IN_PIPE=>$in_esc_ident},
-     {OUT=>"sum(-bar)\n44\n"}],
+    {OUT=>"sum(-bar)\n44\n"}],
 
 
   # dirname and basename
   ['dnbn1', 'dirname 1 basename 1', {IN_PIPE=>$in_dirname_basename},
-     {OUT=>$exp_dirname_basename}],
+    {OUT=>$exp_dirname_basename}],
 
   # barename and extname
   ['bnen1', 'barename 1 extname 1', {IN_PIPE=>$in_barename_extname},
-     {OUT=>$exp_barename_extname}],
+    {OUT=>$exp_barename_extname}],
 
 
   ## GetNum variants
@@ -609,13 +609,13 @@ my @Tests =
   ['gn12', 'getnum:i 1', {IN_PIPE=>"moo---4"}, {OUT=>"0\n"}],
   ['gn13', 'getnum:d 1', {IN_PIPE=>"moo...4"}, {OUT=>"0\n"}],
   ['gn14', 'getnum:i 1',
-   {IN_PIPE=>"moo999999999999999999999999999991234312341432123451541341312431"},
-   {OUT=>"0\n"}],
+    {IN_PIPE=>"moo999999999999999999999999999991234312341432123451541341312431"},
+    {OUT=>"0\n"}],
   ['gn15', 'getnum:d 1',
-   {IN_PIPE=>"moo" . "9" x 10000},
-   {OUT=>"0\n"}],
+    {IN_PIPE=>"moo" . "9" x 10000},
+    {OUT=>"0\n"}],
   ['gn16', 'getnum:n 1', {IN_PIPE=>"moo" x 4000 . "42" . "bar" x 1000},
-   {OUT=>"42\n"}],
+    {OUT=>"42\n"}],
 
 
   # cut operation

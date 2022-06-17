@@ -149,75 +149,75 @@ EOF
 
 my @Tests =
 (
-    # Simple transpose and reverse
-    ['tr1',  'transpose', {IN_PIPE=>$in1}, {OUT=>$out1_tr}],
-    ['rev1', 'reverse',   {IN_PIPE=>$in1}, {OUT=>$out1_rev}],
+  # Simple transpose and reverse
+  ['tr1',  'transpose', {IN_PIPE=>$in1}, {OUT=>$out1_tr}],
+  ['rev1', 'reverse',   {IN_PIPE=>$in1}, {OUT=>$out1_rev}],
 
-    # non-tab delimiter
-    ['tr2',  '-t: transpose', {IN_PIPE=>$in2}, {OUT=>$out2_tr}],
-    ['rev2', '-t: reverse',   {IN_PIPE=>$in2}, {OUT=>$out2_rev}],
+  # non-tab delimiter
+  ['tr2',  '-t: transpose', {IN_PIPE=>$in2}, {OUT=>$out2_tr}],
+  ['rev2', '-t: reverse',   {IN_PIPE=>$in2}, {OUT=>$out2_rev}],
 
-    # missing fields, strict mode
-    ['tr3',  'transpose', {IN_PIPE=>$in3}, {EXIT=>1},
-      {OUT_SUBST=>'s/.*//'},
-      {ERR=>"$prog: transpose input error: line 2 has 1 fields ".
-	    "(previous lines had 2);\nsee --help to disable strict mode\n"}],
-    ['rev3', 'reverse',   {IN_PIPE=>$in3}, {EXIT=>1},
-      {OUT_SUBST=>'s/.*//s'},
-      {ERR=>"$prog: reverse-field input error: line 2 has 1 fields ".
-	    "(previous lines had 2);\nsee --help to disable strict mode\n"}],
+  # missing fields, strict mode
+  ['tr3',  'transpose', {IN_PIPE=>$in3}, {EXIT=>1},
+    {OUT_SUBST=>'s/.*//'},
+    {ERR=>"$prog: transpose input error: line 2 has 1 fields ".
+	        "(previous lines had 2);\nsee --help to disable strict mode\n"}],
+  ['rev3', 'reverse',   {IN_PIPE=>$in3}, {EXIT=>1},
+    {OUT_SUBST=>'s/.*//s'},
+    {ERR=>"$prog: reverse-field input error: line 2 has 1 fields ".
+	        "(previous lines had 2);\nsee --help to disable strict mode\n"}],
 
-    # missing fields, non-strict mode
-    ['tr4',  '--no-strict transpose', {IN_PIPE=>$in3}, {OUT=>$out3_tr}],
-    ['rev4', '--no-strict reverse',   {IN_PIPE=>$in3}, {OUT=>$out3_rev}],
-    ['tr4.1', '--no-strict --filler xxx transpose',
-        {IN_PIPE=>$in3}, {OUT=>$out3_filler_tr}],
+  # missing fields, non-strict mode
+  ['tr4',  '--no-strict transpose', {IN_PIPE=>$in3}, {OUT=>$out3_tr}],
+  ['rev4', '--no-strict reverse',   {IN_PIPE=>$in3}, {OUT=>$out3_rev}],
+  ['tr4.1', '--no-strict --filler xxx transpose',
+    {IN_PIPE=>$in3}, {OUT=>$out3_filler_tr}],
 
 
-    # Single column
-    ['tr5',  'transpose', {IN_PIPE=>$in4}, {OUT=>$out4_tr}],
-    ['rev5', 'reverse',   {IN_PIPE=>$in4}, {OUT=>$out4_rev}],
+  # Single column
+  ['tr5',  'transpose', {IN_PIPE=>$in4}, {OUT=>$out4_tr}],
+  ['rev5', 'reverse',   {IN_PIPE=>$in4}, {OUT=>$out4_rev}],
 
-    # Single row
-    ['tr6',  'transpose', {IN_PIPE=>$in5}, {OUT=>$out5_tr}],
-    ['rev6', 'reverse',   {IN_PIPE=>$in5}, {OUT=>$out5_rev}],
+  # Single row
+  ['tr6',  'transpose', {IN_PIPE=>$in5}, {OUT=>$out5_tr}],
+  ['rev6', 'reverse',   {IN_PIPE=>$in5}, {OUT=>$out5_rev}],
 
-    # Single field
-    ['tr7',  'transpose', {IN_PIPE=>$in6}, {OUT=>$in6}],
-    ['rev7', 'reverse',   {IN_PIPE=>$in6}, {OUT=>$in6}],
+  # Single field
+  ['tr7',  'transpose', {IN_PIPE=>$in6}, {OUT=>$in6}],
+  ['rev7', 'reverse',   {IN_PIPE=>$in6}, {OUT=>$in6}],
 
-    # Empty input
-    ['tr8',  'transpose', {IN_PIPE=>$in7}, {OUT=>""}],
-    ['rev8', 'reverse',   {IN_PIPE=>$in7}, {OUT=>""}],
+  # Empty input
+  ['tr8',  'transpose', {IN_PIPE=>$in7}, {OUT=>""}],
+  ['rev8', 'reverse',   {IN_PIPE=>$in7}, {OUT=>""}],
 
-    # Extra operands
-    ['tr9',  'transpose aaa', {IN_PIPE=>''}, {EXIT=>1},
-      {ERR=>"$prog: extra operand 'aaa'\n"}],
-    ['rev9', 'reverse aaa', {IN_PIPE=>''}, {EXIT=>1},
-      {ERR=>"$prog: extra operand 'aaa'\n"}],
+  # Extra operands
+  ['tr9',  'transpose aaa', {IN_PIPE=>''}, {EXIT=>1},
+    {ERR=>"$prog: extra operand 'aaa'\n"}],
+  ['rev9', 'reverse aaa', {IN_PIPE=>''}, {EXIT=>1},
+    {ERR=>"$prog: extra operand 'aaa'\n"}],
 
-    # empty input
-    ['tr10',  'transpose', {IN_PIPE=>""}, {OUT=>""}],
-    ['rev10', 'reverse',   {IN_PIPE=>""}, {OUT=>""}],
+  # empty input
+  ['tr10',  'transpose', {IN_PIPE=>""}, {OUT=>""}],
+  ['rev10', 'reverse',   {IN_PIPE=>""}, {OUT=>""}],
 
-    # Reverse with header combinations
-    ['rev-hdr1','-H reverse', {IN_PIPE=>""}, {OUT=>""}],
-    ['rev-hdr2','--header-in reverse', {IN_PIPE=>""}, {OUT=>""}],
-    ['rev-hdr3','-t: reverse', {IN_PIPE=>$in_hdr1},
-       {OUT=>"Y:X\na:1\nb:2\n"}],
-    ['rev-hdr4','-t: -H reverse', {IN_PIPE=>$in_hdr1},
-       {OUT=>"Y:X\na:1\nb:2\n"}],
-    # first line is header line, discard it (there's no --header-out).
-    ['rev-hdr5','-t: --header-in reverse', {IN_PIPE=>$in_hdr1},
-       {OUT=>"a:1\nb:2\n"}],
-    # Generate a new header, assuming the first line is a NOT header line.
-    ['rev-hdr6','-t: --header-out reverse', {IN_PIPE=>$in_hdr1},
-       {OUT=>"field-2:field-1\nY:X\na:1\nb:2\n"}],
+  # Reverse with header combinations
+  ['rev-hdr1','-H reverse', {IN_PIPE=>""}, {OUT=>""}],
+  ['rev-hdr2','--header-in reverse', {IN_PIPE=>""}, {OUT=>""}],
+  ['rev-hdr3','-t: reverse', {IN_PIPE=>$in_hdr1},
+    {OUT=>"Y:X\na:1\nb:2\n"}],
+  ['rev-hdr4','-t: -H reverse', {IN_PIPE=>$in_hdr1},
+    {OUT=>"Y:X\na:1\nb:2\n"}],
+  # first line is header line, discard it (there's no --header-out).
+  ['rev-hdr5','-t: --header-in reverse', {IN_PIPE=>$in_hdr1},
+    {OUT=>"a:1\nb:2\n"}],
+  # Generate a new header, assuming the first line is a NOT header line.
+  ['rev-hdr6','-t: --header-out reverse', {IN_PIPE=>$in_hdr1},
+    {OUT=>"field-2:field-1\nY:X\na:1\nb:2\n"}],
 
-    # bug uncovered by report in:
-    # http://lists.gnu.org/archive/html/bug-datamash/2016-09/msg00000.html
-    ['msg1', '--no-strict transpose', {IN_PIPE=>$in_missing1},
-       {OUT=>$out_missing1}],
+  # bug uncovered by report in:
+  # http://lists.gnu.org/archive/html/bug-datamash/2016-09/msg00000.html
+  ['msg1', '--no-strict transpose', {IN_PIPE=>$in_missing1},
+    {OUT=>$out_missing1}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
