@@ -47,7 +47,8 @@ B ( 2 2,4" > exp_sort_headers_full ||
 
 
 cat > full_deprecation.txt << EOF
-datamash: Using -f/--full with non-linewise operations is deprecated and will be disabled in a future release.
+datamash: Using -f/--full with non-linewise operations \
+is deprecated and will be disabled in a future release.
 EOF
 
 echo "$INFILE" | sed 1d |
