@@ -101,7 +101,8 @@ my @Tests =
   ['e1', 'check rows 5 lines 6',  {IN_PIPE=>$in1}, {EXIT=>1},
     {ERR=>"$prog: number of lines/rows already set in operation 'check'\n"}],
   ['e2', 'check fields 6 fields 1',  {IN_PIPE=>$in1}, {EXIT=>1},
-    {ERR=>"$prog: number of fields/columns already set in operation 'check'\n"}],
+    {ERR=>"$prog: number of fields/columns already set " .
+          "in operation 'check'\n"}],
 
   # Invalid values
   ['e3', 'check 0 lines',  {IN_PIPE=>$in1}, {EXIT=>1},

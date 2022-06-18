@@ -127,7 +127,8 @@ my @Tests =
     {ERR=>"$prog: invalid number of fields to undecorate '-4'\n"}],
 
   ['e60','--decorate -k1,1:roman --undecorate 4', {EXIT=>2},
-    {ERR=>"$prog: --decorate and --undecorate options are mutually exclusive\n"}],
+    {ERR=>"$prog: --decorate and --undecorate options " .
+          "are mutually exclusive\n"}],
   ['e61','-k1,1:roman --undecorate 4', {EXIT=>2},
     {ERR=>"$prog: --undecorate cannot be used with --keys or --decorate\n"}],
   ['e62','', {EXIT=>2},

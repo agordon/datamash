@@ -221,7 +221,8 @@ my @Tests =
 (
   ['s1', '-k1,1:roman', {IN_PIPE=>$in1}, {OUT => $out1_dec_roman}],
   ['s2', '-k2,2:ipv4',  {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4}],
-  ['s3', '-k2,2:ipv4 --stable', {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4_stable}],
+  ['s3', '-k2,2:ipv4 --stable', {IN_PIPE=>$in1},
+    {OUT => $out1_dec_ipv4_stable}],
   ['s4', '-k2,2r:ipv4',  {IN_PIPE=>$in1}, {OUT => $out1_dec_ipv4_rev}],
 
   ['s5', '-k1,1:roman -k2,2r:ipv4' , {IN_PIPE=>$in1},

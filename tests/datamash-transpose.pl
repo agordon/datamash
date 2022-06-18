@@ -161,11 +161,13 @@ my @Tests =
   ['tr3',  'transpose', {IN_PIPE=>$in3}, {EXIT=>1},
     {OUT_SUBST=>'s/.*//'},
     {ERR=>"$prog: transpose input error: line 2 has 1 fields ".
-	        "(previous lines had 2);\nsee --help to disable strict mode\n"}],
+	        "(previous lines had 2);\n" .
+          "see --help to disable strict mode\n"}],
   ['rev3', 'reverse',   {IN_PIPE=>$in3}, {EXIT=>1},
     {OUT_SUBST=>'s/.*//s'},
     {ERR=>"$prog: reverse-field input error: line 2 has 1 fields ".
-	        "(previous lines had 2);\nsee --help to disable strict mode\n"}],
+	        "(previous lines had 2);\n" .
+          "see --help to disable strict mode\n"}],
 
   # missing fields, non-strict mode
   ['tr4',  '--no-strict transpose', {IN_PIPE=>$in3}, {OUT=>$out3_tr}],
