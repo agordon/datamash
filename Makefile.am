@@ -172,8 +172,8 @@ TESTS = \
 	tests/datamash-pair-tests.pl \
 	tests/datamash-check-tabular.pl \
 	tests/datamash-output-format.pl \
-	tests/datamash-sort-header.sh \
-	tests/datamash-sort-header-deprecated.sh \
+	tests/datamash-sort-header.pl \
+	tests/datamash-sort-header-deprecated.pl \
 	tests/datamash-sort-errors.sh \
 	tests/datamash-io-errors.sh \
 	tests/datamash-io-errors-cheap.sh \
