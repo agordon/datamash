@@ -8,6 +8,12 @@
   used with non-linewise operations, and such usage will no longer be
   supported.
 
+  The bin operation now uses more intuitive bins. Previously, a command
+  such as `datamash bin 1 <<< -0` would output -100; and -100 did not fall
+  in its own bin. We now require all bins to take the form `[nx,(n+1)x)`
+  with integer n and bin width x. We discard the sign on -0 and gate such
+  inputs into the [0,x) bin.
+
 ** New Features
 
   New datamash option --sort-cmd argument to specify the program used

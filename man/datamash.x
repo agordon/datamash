@@ -624,9 +624,9 @@ Bin input values into buckets of size 5:
 $  ( echo X ; seq \-10 2.5 10 ) \\
       | \fBdatamash\fR \-H \-\-full bin:5 1
     X  bin(X)
-\-10.0    \-15
+\-10.0    \-10
  \-7.5    \-10
- \-5.0    \-10
+ \-5.0     \-5
  \-2.5     \-5
   0.0      0
   2.5      0

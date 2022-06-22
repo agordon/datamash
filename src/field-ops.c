@@ -566,10 +566,12 @@ field_op_collect (struct fieldop *op,
     case OP_BIN_BUCKETS:
       {
         const long double val = num_value / op->params.bin_bucket_size;
-        modfl (val, & op->value);
-        /* signbit will take care of negative-zero as well. */
-        if (signbit (op->value))
+        const long double frac = modfl (val, & op->value);
+        /* Buckets should follow this pattern:
+           ..., [-3x,-2x), [-2x,-x), [-x,0), [0, x), [x,2x), [2x, 3x), ... */
+        if (signbit (op->value) && !is_zero (frac))
           --op->value;
+        op->value = pos_zero (op->value);
         op->value *= op->params.bin_bucket_size;
       }
       break;
