@@ -780,7 +780,7 @@ build_sort_process_args ()
    */
   if (STREQ (sort_cmd, "/usr/bin/sort"))
     {
-      argv[i++] = "-S";
+      argv[i++] = xstrdup ("-S");
     }
 #endif
 
