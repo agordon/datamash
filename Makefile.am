@@ -172,6 +172,7 @@ TESTS = \
 	tests/datamash-pair-tests.pl \
 	tests/datamash-check-tabular.pl \
 	tests/datamash-output-format.pl \
+	tests/datamash-i18n-de.pl \
 	tests/datamash-sort-header.pl \
 	tests/datamash-sort-header-deprecated.pl \
 	tests/datamash-sort-errors.sh \
