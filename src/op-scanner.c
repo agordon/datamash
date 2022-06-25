@@ -59,7 +59,7 @@ set_identifier (const char* data, size_t n)
   scanner_identifier[n]=0;
 }
 
-/* Concatante argv into one (space separated) string */
+/* Concatenate argv into one (space separated) string */
 void
 scanner_set_input_from_argv (int argc, const char* argv[])
 {
