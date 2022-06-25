@@ -61,10 +61,6 @@ my $have_stable_sort = ($sort_exit_code==0);
 
 
 # Deutsche Prüfungen
-
-# TODO: mix-and-match different locales,
-# eg LC_ALL=C combined with LC_NUMERIC=de_DE.utf8.
-# LC_NUMERIC is currently ignored; this is a bug.
 @ENV{qw(LANGUAGE LANG LC_ALL)} = ('de_DE.utf8') x 3;
 
 my @Prufungen =
