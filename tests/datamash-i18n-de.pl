@@ -67,6 +67,7 @@ my @Prufungen =
 (
   # Prüfen Sie, ob das Komma als Dezimaltrennzeichen funktioniert
   ['de1', 'sum 1',     {IN_PIPE=>"1,1\n"},  {OUT=>"1,1\n"}],
+  ['de2', 'sum 1,2',   {IN_PIPE=>"1,1\t2,2\n"},  {OUT=>"1,1\t2,2\n"}],
 
   # There is a bug where the bin operation does not respect
   # the locale's choice of decimal separator.
