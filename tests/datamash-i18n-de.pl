@@ -32,6 +32,13 @@ use CuSkip;
 use CuTmpdir qw(datamash);
 use MIME::Base64 ;
 
+## Skip this test if Deutsche (German) locale not found.
+use POSIX qw(locale_h);
+use locale;
+my $lc_de = setlocale(LC_ALL, "de_DE.utf8");
+CuSkip::skip "requires de_DE.utf8 locale\n"
+   if $lc_de eq undef;
+
 (my $program_name = $0) =~ s|.*/||;
 my $prog_bin = 'datamash';
 
