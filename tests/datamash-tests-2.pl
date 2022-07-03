@@ -528,6 +528,11 @@ my @Tests =
   ['bin3', 'bin:5.5 1', {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_5_5}],
   ['bin4', 'bin 1',     {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_100}],
   ['bin5', 'bin:3 1',   {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
+  ['bin6', 'bin:3. 1',     {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
+  ['bin7', 'bin:3.0 1',    {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
+  ['bin8', 'bin:3.e0 1',   {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
+  ['bin9', 'bin:0.3e1 1',  {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
+  ['bin10','bin:30.e-1 1', {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
 
   # Test rounding functions
   ['rnd1', '-H --full round 1 floor 1 ceil 1 trunc 1 frac 1',
