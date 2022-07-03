@@ -185,6 +185,9 @@ my @Tests =
   # Binning, and optional parameters
   ['b31','bin 1',       {IN_PIPE=>""}, {OUT=>""}],
   ['b32','bin:10 1',    {IN_PIPE=>""}, {OUT=>""}],
+  ['b33','bin:1.5 1',   {IN_PIPE=>""}, {OUT=>""}],
+  ['b34','bin 1,2',     {IN_PIPE=>""}, {OUT=>""}],
+  ['b35','bin:1 1,2',   {IN_PIPE=>""}, {OUT=>""}],
   ['e70','bin:10:30 1', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e71','bin: 1',      {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e72','sum: 1',      {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
@@ -195,6 +198,12 @@ my @Tests =
   ['e77','bin,  1',     {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e78','bin:-  1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e79','sum:10 1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e30','bin :10 1',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e31','bin : 10 1',  {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e32','bin : 1',     {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e33','bin:1,2 1',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e34','bin:-2 1',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e35','bin 1:2',     {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
 
   # Field specifications for primary operations
