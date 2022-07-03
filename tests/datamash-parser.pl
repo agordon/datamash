@@ -209,6 +209,22 @@ my @Tests =
   # Field specifications for primary operations
   ['e90',  'groupby 1:2', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e91',  'groupby 1-2', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
+  # Test corner cases to avoid introducing unintended changes in behavior
+  # The parser allows some optional whitespace
+  ['cc0',  '" sum 1 , 2"',      {IN_PIPE=>""}, {OUT=>""}],
+  ['cc1',  '" sum 1, 2"',       {IN_PIPE=>""}, {OUT=>""}],
+  ['cc2',  '" sum 1 ,2"',       {IN_PIPE=>""}, {OUT=>""}],
+  ['cc3',  '" sum 1 - 3"',      {IN_PIPE=>""}, {OUT=>""}],
+  ['cc4',  '" sum 1- 3"',       {IN_PIPE=>""}, {OUT=>""}],
+  ['cc5',  '" sum 1 -3"',       {IN_PIPE=>""}, {OUT=>""}],
+  ['cc6',  '" pcov 1 : 2"',     {IN_PIPE=>""}, {OUT=>""}],
+  ['cc7',  '" gb 1 , 2 sum 3"', {IN_PIPE=>""}, {OUT=>""}],
+  # Trailing whitespace leads to failures (could be seen as parser bug)
+  ['cce0', '"sum 1 "',        {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['cce1', "'sum 1\t'",       {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['cce2', '"pcov 1:2  "',    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['cce3', '"gb 1,2 sum 3 "', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
