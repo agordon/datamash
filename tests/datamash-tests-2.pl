@@ -523,11 +523,11 @@ my @Tests =
 
 
   # Test binning
-  ['bin1', 'bin 1',     {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_100}],
-  ['bin2', 'bin:5 1',   {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_5}],
-  ['bin3', 'bin:5.5 1', {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_5_5}],
-  ['bin4', 'bin 1',     {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_100}],
-  ['bin5', 'bin:3 1',   {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
+  ['bin1', 'bin 1',        {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_100}],
+  ['bin2', 'bin:5 1',      {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_5}],
+  ['bin3', 'bin:5.5 1',    {IN_PIPE=>$bin_in1}, {OUT=>$bin_out1_5_5}],
+  ['bin4', 'bin 1',        {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_100}],
+  ['bin5', 'bin:3 1',      {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
   ['bin6', 'bin:3. 1',     {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
   ['bin7', 'bin:3.0 1',    {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
   ['bin8', 'bin:3.e0 1',   {IN_PIPE=>$bin_in2}, {OUT=>$bin_out2_3}],
