@@ -183,8 +183,8 @@ my @Tests =
   ['s67','--header-in sum _bar',    {IN_PIPE=>"_bar\n1\n"},    {OUT=>"1\n"}],
 
   # Binning, and optional parameters
-  ['b1', 'bin 1',       {IN_PIPE=>""}, {OUT=>""}],
-  ['b2', 'bin:10 1',    {IN_PIPE=>""}, {OUT=>""}],
+  ['b31','bin 1',       {IN_PIPE=>""}, {OUT=>""}],
+  ['b32','bin:10 1',    {IN_PIPE=>""}, {OUT=>""}],
   ['e70','bin:10:30 1', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e71','bin: 1',      {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e72','sum: 1',      {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
