@@ -39,7 +39,7 @@
 #define PROGRAM_NAME "decorate"
 
 #define AUTHORS \
-  proper_name ("Assaf Gordon")
+  proper_name ("Assaf Gordon, Shawn Wagner and Erik Auerswald")
 
 static const char *sort_cmd = SORT_PATH;
 
