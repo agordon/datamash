@@ -62,10 +62,12 @@
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "datamash"
 
-#define AUTHORS proper_name ("Assaf Gordon, Tim Rice, Shawn Wagner, Erik Auerswald")
+#define AUTHORS proper_name \
+  ("Assaf Gordon, Tim Rice, Shawn Wagner, Erik Auerswald")
 
 /* Until someone better comes along */
-const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon and Tim Rice" ;
+const char version_etc_copyright[]
+  = "Copyright %s %d Assaf Gordon and Tim Rice" ;
 
 /* Line number in the input file */
 static size_t line_number = 0 ;
