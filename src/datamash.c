@@ -1026,9 +1026,18 @@ remove_dups_in_file ()
 
           if (output_header)
             {
-              ignore_value (fwrite (line_record_buffer (thisline),
-                                    line_record_length (thisline),
-                                    sizeof (char), stdout));
+              const size_t num_fields = line_record_num_fields (thisline);
+              for (size_t i = 1 ; i <= num_fields ; ++i) {
+                if (i>1)
+                  print_field_separator ();
+
+                const char *str;
+                size_t len;
+                if (line_record_get_field (thisline, i, &str, &len))
+                  {
+                    ignore_value (fwrite (str, len, sizeof (char), stdout));
+                  }
+              }
               print_line_separator ();
             }
         }
@@ -1074,9 +1083,18 @@ remove_dups_in_file ()
          {
            /* This string was not found in the hash - new key */
            next_key_pos += len+1;
-           ignore_value (fwrite (line_record_buffer (thisline),
-                                 line_record_length (thisline), sizeof (char),
-                                 stdout));
+           const size_t num_fields = line_record_num_fields (thisline);
+           for (size_t i = 1 ; i <= num_fields ; ++i) {
+             if (i>1)
+               print_field_separator ();
+
+             const char *str;
+             size_t len;
+             if (line_record_get_field (thisline, i, &str, &len))
+               {
+                 ignore_value (fwrite (str, len, sizeof (char), stdout));
+               }
+           }
            print_line_separator ();
          }
     }

@@ -19,6 +19,8 @@
   produce an output header like `pcov(y)`, discarding the `x`. The new
   behavior will output header `pcov(x,y)`.
 
+  datamash(1) no longer ignores --output-delimiter with the rmdup operation.
+
 ** New Features
 
   New datamash option --sort-cmd argument to specify the program used

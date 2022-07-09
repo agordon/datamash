@@ -799,6 +799,9 @@ my @Tests =
     {OUT=>"X:Y\n1:a\n2:b\n3:a\n"}],
   ['rmdp8', '-t: rmdup X', {IN_PIPE=>$in_dup1}, {EXIT=>1},
     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
+  # rmdup with different output delimiter
+  ['rmdp9', '-t: --output-delimiter % rmdup 1', {IN_PIPE=>$in_dup1},
+    {OUT=>"X%Y\n1%a\n2%b\n3%a\n"}],
 
   # Test noop operation
   ['noop1', 'noop', {IN_PIPE=>""}, {OUT=>""}],
