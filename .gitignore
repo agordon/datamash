@@ -142,3 +142,6 @@ cyclo-datamash.html
 /log.txt
 /numbers.txt
 /tiny_disk.img
+
+# Side-effects of syntax checks
+/.sc-start-sc_*
