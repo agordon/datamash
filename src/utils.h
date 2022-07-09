@@ -27,7 +27,11 @@
  Print the current file, line number and function.
  Useful for debugging.
  */
-#define WHEREAMI() { printf("In %s:%d, function '%s'\n", __FILE__, __LINE__, __func__); }
+#define WHEREAMI()                        \
+  {                                       \
+    printf ("In %s:%d, function '%s'\n",  \
+           __FILE__, __LINE__, __func__); \
+  }
 
 /*
  Generate Utility Functions module.

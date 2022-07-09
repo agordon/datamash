@@ -180,7 +180,8 @@ my @Tests =
 
   # Pair with output headers - only one field and header should be printed
   ['c3', '--header-out pcov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_pcov_hdr}],
-  ['c3_hin', '-W --header-in --header-out pcov x:y', {IN_PIPE=>$in6}, {OUT=>$out6_pcov_hdr}],
+  ['c3_hin', '-W --header-in --header-out pcov x:y',
+    {IN_PIPE=>$in6}, {OUT=>$out6_pcov_hdr}],
 
   ['p1', 'ppearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_p}],
   ['p2', 'spearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_s}],
