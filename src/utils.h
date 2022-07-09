@@ -1,6 +1,7 @@
 /* GNU Datamash - perform simple calculation on input data
 
    Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2022-     Tim Rice     <trice@posteo.net>
 
    This file is part of GNU Datamash.
 
@@ -18,9 +19,15 @@
    along with GNU Datamash.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/* Written by Assaf Gordon */
+/* Written by Assaf Gordon and Tim Rice */
 #ifndef __UTILS_H__
 #define __UTILS_H__
+
+/*
+ Print the current file, line number and function.
+ Useful for debugging.
+ */
+#define WHEREAMI() { printf("In %s:%d, function '%s'\n", __FILE__, __LINE__, __func__); }
 
 /*
  Generate Utility Functions module.
