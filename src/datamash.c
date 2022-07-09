@@ -1055,48 +1055,48 @@ remove_dups_in_file ()
         break;
       line_number++;
 
-       if (!line_record_get_field (thisline, key_col, &str, &len))
-         error_not_enough_fields (key_col, line_record_num_fields (thisline));
+      if (!line_record_get_field (thisline, key_col, &str, &len))
+        error_not_enough_fields (key_col, line_record_num_fields (thisline));
 
-       /* Add key to the key buffer */
-       if (next_key_pos + len + 1 > keys_buffer_alloc)
-         {
-           keys_buffer = xmalloc ( keys_buffer_alloc ) ;
-           next_key_pos = 0;
+      /* Add key to the key buffer */
+      if (next_key_pos + len + 1 > keys_buffer_alloc)
+        {
+          keys_buffer = xmalloc ( keys_buffer_alloc ) ;
+          next_key_pos = 0;
 
-           /* Add new key-buffer to the list */
-           if (buffer_list_size == buffer_list_alloc)
-              buffer_list = x2nrealloc (buffer_list,
-                                        &buffer_list_alloc, sizeof (char*));
-           buffer_list[buffer_list_size++] = keys_buffer;
-         }
-       char *next_key = keys_buffer+next_key_pos;
-       memcpy (next_key, str, len);
-       next_key[len] = 0;
+          /* Add new key-buffer to the list */
+          if (buffer_list_size == buffer_list_alloc)
+             buffer_list = x2nrealloc (buffer_list,
+                                       &buffer_list_alloc, sizeof (char*));
+          buffer_list[buffer_list_size++] = keys_buffer;
+        }
+      char *next_key = keys_buffer+next_key_pos;
+      memcpy (next_key, str, len);
+      next_key[len] = 0;
 
-       /* Add key to buffer (if not found) */
-       const int i = hash_insert_if_absent (ht, next_key, NULL);
-       if ( i == -1 )
-         die (EXIT_FAILURE, errno, _("hash memory allocation error"));
+      /* Add key to buffer (if not found) */
+      const int i = hash_insert_if_absent (ht, next_key, NULL);
+      if ( i == -1 )
+        die (EXIT_FAILURE, errno, _("hash memory allocation error"));
 
-       if ( i == 1 )
-         {
-           /* This string was not found in the hash - new key */
-           next_key_pos += len+1;
-           const size_t num_fields = line_record_num_fields (thisline);
-           for (size_t i = 1 ; i <= num_fields ; ++i) {
-             if (i>1)
-               print_field_separator ();
+      if ( i == 1 )
+        {
+          /* This string was not found in the hash - new key */
+          next_key_pos += len+1;
+          const size_t num_fields = line_record_num_fields (thisline);
+          for (size_t i = 1 ; i <= num_fields ; ++i) {
+            if (i>1)
+              print_field_separator ();
 
-             const char *str;
-             size_t len;
-             if (line_record_get_field (thisline, i, &str, &len))
-               {
-                 ignore_value (fwrite (str, len, sizeof (char), stdout));
-               }
-           }
-           print_line_separator ();
-         }
+            const char *str;
+            size_t len;
+            if (line_record_get_field (thisline, i, &str, &len))
+              {
+                ignore_value (fwrite (str, len, sizeof (char), stdout));
+              }
+          }
+          print_line_separator ();
+        }
     }
   line_record_free (&lr);
   hash_free (ht);
