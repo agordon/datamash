@@ -141,6 +141,23 @@ a	1	2
 b	3	XX
 EOF
 
+my $in4=<<'EOF';
+x y
+1 0.5
+2 1
+3 1.5
+4 2
+EOF
+
+my $out4=<<'EOF';
+GroupBy(x)	GroupBy(y)	count(x)
+	0.5	1	1.5	2
+1	1	N/A	N/A	N/A
+2	N/A	1	N/A	N/A
+3	N/A	N/A	1	N/A
+4	N/A	N/A	N/A	1
+EOF
+
 my @Tests =
 (
   ['c1','crosstab 1,2 first 3', {IN_PIPE=>$in1}, {OUT=>$out1_first}],
@@ -162,6 +179,9 @@ my @Tests =
   # test default operation (count) on unsorted data
   ['c15','   ct 1,2 count 3',    {IN_PIPE=>$in2}, {OUT=>$out2_count_unsorted}],
   ['c16','-s ct 1,2 count 3',    {IN_PIPE=>$in2}, {OUT=>$out2_count_sorted}],
+
+  # test headers
+  ['c17','-W --header-in --header-out ct x,y', {IN_PIPE=>$in4}, {OUT=>$out4}],
 
   # Test missing values
   ['c30','ct 1,2 first 3',       {IN_PIPE=>$in3}, {OUT=>$out3_na}],

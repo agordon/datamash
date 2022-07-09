@@ -63,6 +63,10 @@
   in https://lists.gnu.org/archive/html/bug-datamash/2020-11/msg00001.html
   by Catalin Patulea.
 
+  datamash(1) no longer crashes when crosstab with --header-in is called
+  by field name instead of index. I.e. `datamash --header-in ct x,y` now
+  works as expected.
+
 
 * Noteworthy changes in release 1.7 (2020-04-23) [testing]
 

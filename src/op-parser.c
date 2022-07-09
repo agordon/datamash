@@ -697,7 +697,13 @@ parse_mode ()
     if (dm->num_ops==0)
       {
         const uintmax_t grp_col = dm->grps[0].num;
-        struct parser_field_t dummy = {grp_col,false,NULL,false,false};
+        struct parser_field_t dummy = {
+          grp_col,              /* uintmax_t num;      */
+          dm->grps[0].by_name,  /* bool      by_name;  */
+          dm->grps[0].name,     /* char*     name;     */
+          false,                /* bool      range;    */
+          false                 /* bool      pair;     */
+        };
         add_op (OP_COUNT, &dummy);
       }
     else if (dm->num_ops>1)
