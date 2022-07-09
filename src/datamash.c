@@ -494,8 +494,6 @@ print_column_headers ()
   for (size_t i=0; i<dm->num_ops; ++i)
     {
       struct fieldop *op = &dm->ops[i];
-      if (op->slave)
-        continue;
 
       if (op->field > get_num_column_headers ())
         error_not_enough_fields (op->field, get_num_column_headers ());
@@ -509,7 +507,15 @@ print_column_headers ()
         printf (":%Lg", op->params.trimmed_mean);
       }
 
-      printf ("(%s)", get_input_field_name (op->field));
+      printf ("(%s", get_input_field_name (op->field));
+      while (dm->ops[i].slave)
+        {
+          /* print subsequent arguments to the same operation,
+             e.g. 'pcov (x,y)' */
+          ++i;
+          printf (",%s", get_input_field_name (dm->ops[i].field));
+        }
+      printf (")");
 
       if (i != dm->num_ops-1)
         print_field_separator ();

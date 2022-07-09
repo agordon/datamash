@@ -111,7 +111,7 @@ my $out1_pcov=<<'EOF';
 EOF
 
 my $out1_pcov_hdr=<<'EOF';
-pcov(field-2)
+pcov(field-1,field-2)
 1.622
 EOF
 
@@ -158,6 +158,19 @@ my $in5=<<'EOF';
 1	2
 2	NA
 3	6
+EOF
+
+my $in6=<<'EOF';
+x y
+1 0.5
+2 1
+3 1.5
+4 2
+EOF
+
+my $out6_pcov=<<'EOF';
+pcov(x,y)
+0.625
 EOF
 
 my @Tests =

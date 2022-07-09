@@ -14,6 +14,11 @@
   with integer n and bin width x. We discard the sign on -0 and gate such
   inputs into the [0,x) bin.
 
+  Operations taking more than one argument now provide more complete output
+  with --header-out. Previously, an operation such as `pcov x:y` would
+  produce an output header like `pcov(y)`, discarding the `x`. The new
+  behavior will output header `pcov(x,y)`.
+
 ** New Features
 
   New datamash option --sort-cmd argument to specify the program used
