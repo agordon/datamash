@@ -524,7 +524,7 @@ parse_operations (enum processing_mode pm)
       tok = scanner_peek_token ();
     }
 
-  /* After adding all operations, see of there are master/slave ops
+  /* After adding all operations, see if there are master/slave ops
    * that need resolving - caching their pointer instead of index */
   for (size_t i=0; i<dm->num_ops; ++i)
      {
