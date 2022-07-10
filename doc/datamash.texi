@@ -1355,6 +1355,19 @@ a    3,40 7
 b    21   N/A
 @end example
 
+@opindex --header-out
+@cindex --header-out, crosstab and
+@cindex crosstab and --header-out
+Note that using @option{--header-out} with crosstab prints a line showing
+how to interpret the rows and columns, and what operation was used.
+
+@example
+$ datamash -s --header-in --header-out crosstab 1,2 < input.txt
+GroupBy(a) GroupBy(x) count(a)
+     x    y
+a    1    1
+b    1    N/A
+@end example
 
 @node Rounding numbers
 @section Rounding numbers
