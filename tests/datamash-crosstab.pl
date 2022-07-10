@@ -149,8 +149,16 @@ x y
 4 2
 EOF
 
-my $out4=<<'EOF';
+my $out4_hdr=<<'EOF';
 GroupBy(x)	GroupBy(y)	count(x)
+	0.5	1	1.5	2
+1	1	N/A	N/A	N/A
+2	N/A	1	N/A	N/A
+3	N/A	N/A	1	N/A
+4	N/A	N/A	N/A	1
+EOF
+
+my $out4_no_hdr=<<'EOF';
 	0.5	1	1.5	2
 1	1	N/A	N/A	N/A
 2	N/A	1	N/A	N/A
@@ -181,7 +189,10 @@ my @Tests =
   ['c16','-s ct 1,2 count 3',    {IN_PIPE=>$in2}, {OUT=>$out2_count_sorted}],
 
   # test headers
-  ['c17','-W --header-in --header-out ct x,y', {IN_PIPE=>$in4}, {OUT=>$out4}],
+  ['c17','-W --header-in --header-out ct x,y',
+    {IN_PIPE=>$in4}, {OUT=>$out4_hdr}],
+  ['c18','-W --header-in ct x,y',
+    {IN_PIPE=>$in4}, {OUT=>$out4_no_hdr}],
 
   # Test missing values
   ['c30','ct 1,2 first 3',       {IN_PIPE=>$in3}, {OUT=>$out3_na}],
