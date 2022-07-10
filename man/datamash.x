@@ -10,11 +10,9 @@ datamash - command-line calculations
 
 .SS "Primary Operations"
 Primary operations affect the way the file is processed. If used, the
-primary operation must be listed first. Some operations require field
-numbers (groupby, crosstab) while others do not (reverse,check,transpose).
-If primary operation is not listed the entire file is processed -
-either line-by-line (for 'per-line' operations) or all lines as one group
-(for grouping operations). See Examples section below.
+primary operation must be listed first. If primary operation is not listed
+the entire file is processed - either line-by-line (for 'per-line' operations)
+or all lines as one group (for grouping operations). See Examples section below.
 .PP
 
 .TP "\w'\fBcountunique\fR'u+1n"
