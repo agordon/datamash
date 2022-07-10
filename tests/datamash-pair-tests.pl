@@ -173,6 +173,21 @@ pcov(x,y)
 0.625
 EOF
 
+my $out6_scov_hdr=<<'EOF';
+scov(x,y)
+0.833
+EOF
+
+my $out6_ppears_hdr=<<'EOF';
+ppearson(x,y)
+1
+EOF
+
+my $out6_spears_hdr=<<'EOF';
+spearson(x,y)
+1
+EOF
+
 my @Tests =
 (
   ['c1', 'scov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_scov}],
@@ -182,9 +197,15 @@ my @Tests =
   ['c3', '--header-out pcov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_pcov_hdr}],
   ['c3_hin', '-W --header-in --header-out pcov x:y',
     {IN_PIPE=>$in6}, {OUT=>$out6_pcov_hdr}],
+  ['c3_hin_s', '-W --header-in --header-out scov x:y',
+    {IN_PIPE=>$in6}, {OUT=>$out6_scov_hdr}],
 
   ['p1', 'ppearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_p}],
+  ['p1_hin', '-W --header-in --header-out ppearson x:y',
+    {IN_PIPE=>$in6}, {OUT=>$out6_ppears_hdr}],
   ['p2', 'spearson 1:2', {IN_PIPE=>$in2}, {OUT=>$out2_s}],
+  ['p2_hin', '-W --header-in --header-out spearson x:y',
+    {IN_PIPE=>$in6}, {OUT=>$out6_spears_hdr}],
 
   # Test operations on edge-cases of input (one items, no items,
   # different number of items)
