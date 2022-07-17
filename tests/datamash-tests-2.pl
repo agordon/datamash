@@ -577,8 +577,15 @@ my @Tests =
   ['sc4', '-C reverse', {IN_PIPE=>$in_comments}, {OUT=>"5	bar\n"}],
 
 
+  # Regression tests
+  # TODO: Move regression tests into a separate file when sufficiently many
+  #       have accumulated to warrant the overhead of another test file.
   # Bug in mode/antimode in 1.4 and earlier
   ['bug_mode1', 'mode 1', {IN_PIPE=>"-1"}, {OUT=>"-1\n"}],
+  # "Segmentation fault" when input contains embedded NUL characters
+  # (see https://lists.gnu.org/archive/html/bug-datamash/2020-11/msg00001.html)
+  ['regr001', 'countunique 1', {IN_PIPE=>"\x00" x 100}, {OUT=>"1\n"}],
+  ['regr002', 'unique 1',      {IN_PIPE=>"\x00" x 100}, {OUT=>"\n"}],
 
   ##
   ## Backslash escaping in identifiers
@@ -650,14 +657,6 @@ my @Tests =
   ['alias4', '-t: uniq 2', {IN_PIPE=>$na_mid1},
     {OUT=>"2,8,NA\n"}],
   ['alias5', '--narm uniq 1',  {IN_PIPE=>$na_all}, {OUT=>"\n"}],
-
-  # Regression tests
-  # TODO: Move regression tests into a separate file when sufficiently many
-  #       have accumulated to warrant the overhead of another test file.
-  # "Segmentation fault" when input contains embedded NUL characters
-  # (see https://lists.gnu.org/archive/html/bug-datamash/2020-11/msg00001.html)
-  ['regr001', 'countunique 1', {IN_PIPE=>"\x00" x 100}, {OUT=>"1\n"}],
-  ['regr002', 'unique 1',      {IN_PIPE=>"\x00" x 100}, {OUT=>"\n"}],
 
 );
 
