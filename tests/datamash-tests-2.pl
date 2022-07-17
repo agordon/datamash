@@ -671,8 +671,10 @@ my @Tests =
   ['ifdl10', '-t. rmdup 2',           {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
   ['ifdl11', '-t. rmdup 3',           {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
   # TODO: fix bug for numeric operations
-  #['ifdl12', '-t. sum 1,2',         {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
-  #['ifdl13', '-t. sum 1,2,3',       {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
+  #['ifdl12', '-t. sum 1,2',           {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
+  #['ifdl13', '-t. sum 1,2,3',         {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
+  # TODO: fix bug for "getnum" operation
+  #['ifdl14', '-t. getnum 1,2',        {IN_PIPE=>"x1.2y\n"}, {OUT=>"1.2\n"}],
 
 );
 
