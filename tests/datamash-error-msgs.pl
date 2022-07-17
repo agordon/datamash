@@ -258,6 +258,15 @@ my @Tests =
     {ERR=>"$prog: backslash at end of identifier\n"}],
   ['e141',"-H sum $ident_too_long", {IN_PIPE=>""}, {EXIT=>1},
     {ERR=>"$prog: identifier name too long\n"}],
+
+  # invalid numeric input data
+  ['e150', 'sum 1', {IN_PIPE=>"1.2.3\n"},      {EXIT=>1},
+    {ERR=>"$prog: invalid numeric value in line 1 field 1: '1.2.3'\n"}],
+  ['e151', 'sum 1', {IN_PIPE=>"1.2.3\t4.5\n"}, {EXIT=>1},
+    {ERR=>"$prog: invalid numeric value in line 1 field 1: '1.2.3'\n"}],
+  ['e152', 'sum 2', {IN_PIPE=>"1.2\t3.4.5\n"}, {EXIT=>1},
+    {ERR=>"$prog: invalid numeric value in line 1 field 2: '3.4.5'\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
