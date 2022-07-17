@@ -86,6 +86,11 @@ my @Prufungen =
   #['de11', '-t, sum 1,2',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
   #['de12', '-t, sum 1,2,3',       {IN_PIPE=>"1,2,3\n"}, {OUT=>"1,2,3\n"}],
 
+  # TODO: make the getnum operation locale-aware
+  #['de13', 'getnum 1',   {IN_PIPE=>"bar-1,2\n"}, {OUT=>"1,2\n"}],
+  #['de14', 'getnum:p 1', {IN_PIPE=>"bar-1,2\n"}, {OUT=>"1,2\n"}],
+  #['de15', 'getnum:d 1', {IN_PIPE=>"bar-1,2\n"}, {OUT=>"-1,2\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
