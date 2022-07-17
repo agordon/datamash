@@ -74,6 +74,18 @@ my @Prufungen =
   # the locale's choice of decimal separator.
   # TODO: Be able to uncomment the following line.
   #['de4', 'bin:0,1 1'    {IN_PIPE=>"1,15\n"},          {OUT=>"1,1\n"}],
+
+  # Comma as field separator is problematic for numeric operations
+  ['de5',  '-t, cut 2,1',         {IN_PIPE=>"1,2\n"},   {OUT=>"2,1\n"}],
+  ['de6',  '-t, unique 1,2',      {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
+  ['de7',  '-t, count 1,2',       {IN_PIPE=>"1,2\n"},   {OUT=>"1,1\n"}],
+  ['de8',  '-t, countunique 1,2', {IN_PIPE=>"1,2\n"},   {OUT=>"1,1\n"}],
+  ['de9',  '-t, rmdup 1',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
+  ['de10', '-t, rmdup 2',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
+  # TODO: fix bug for numeric operations
+  #['de11', '-t, sum 1,2',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
+  #['de12', '-t, sum 1,2,3',       {IN_PIPE=>"1,2,3\n"}, {OUT=>"1,2,3\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

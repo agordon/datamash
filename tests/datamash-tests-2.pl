@@ -658,6 +658,22 @@ my @Tests =
     {OUT=>"2,8,NA\n"}],
   ['alias5', '--narm uniq 1',  {IN_PIPE=>$na_all}, {OUT=>"\n"}],
 
+  # Decimal separator used as input field delimiter
+  ['ifdl01', '-t. cut 2,1',           {IN_PIPE=>"1.2\n"},   {OUT=>"2.1\n"}],
+  ['ifdl02', '-t. cut 3,2,1',         {IN_PIPE=>"1.2.3\n"}, {OUT=>"3.2.1\n"}],
+  ['ifdl03', '-t. unique 1,2',        {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
+  ['ifdl04', '-t. unique 1,2,3',      {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
+  ['ifdl05', '-t. count 1,2',         {IN_PIPE=>"1.2\n"},   {OUT=>"1.1\n"}],
+  ['ifdl06', '-t. count 1,2,3',       {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.1.1\n"}],
+  ['ifdl07', '-t. countunique 1,2',   {IN_PIPE=>"1.2\n"},   {OUT=>"1.1\n"}],
+  ['ifdl08', '-t. countunique 1,2,3', {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.1.1\n"}],
+  ['ifdl09', '-t. rmdup 1',           {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
+  ['ifdl10', '-t. rmdup 2',           {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
+  ['ifdl11', '-t. rmdup 3',           {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
+  # TODO: fix bug for numeric operations
+  #['ifdl12', '-t. sum 1,2',         {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
+  #['ifdl13', '-t. sum 1,2,3',       {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
