@@ -73,7 +73,7 @@ my @Prufungen =
   # There is a bug where the bin operation does not respect
   # the locale's choice of decimal separator.
   # TODO: Be able to uncomment the following line.
-  #['de2', 'bin:0,1 1'  {IN_PIPE=>"1,15\n"},  {OUT=>"1,1\n"}]
+  #['de4', 'bin:0,1 1'    {IN_PIPE=>"1,15\n"},          {OUT=>"1,1\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
