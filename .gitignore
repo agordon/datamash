@@ -145,3 +145,6 @@ cyclo-datamash.html
 
 # Side-effects of syntax checks
 /.sc-start-sc_*
+
+# Side-effects of make release
+/vc-diffs
