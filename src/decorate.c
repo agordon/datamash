@@ -442,7 +442,7 @@ decorate_file (const char *infile)
           if (debug)
             dbg_printf ("skipping header line");
 
-          if (fwrite (lb.buffer, 1, lb.length, header_out) != lb.length)
+          if ((idx_t)fwrite (lb.buffer, 1, lb.length, header_out) != lb.length)
             die (SORT_FAILURE, errno, _("fwrite (header line) failed"));
 
           --skip_header_lines;
@@ -463,7 +463,7 @@ decorate_file (const char *infile)
       if (debug)
         dbg_printf ("writing line: '%.*s'", (int)lb.length, lb.buffer);
 
-      if (fwrite (lb.buffer, 1, lb.length, stdout) != lb.length)
+      if ((idx_t)fwrite (lb.buffer, 1, lb.length, stdout) != lb.length)
         die (SORT_FAILURE, errno, _("decorate: fwrite failed"));
 
     }

@@ -218,3 +218,9 @@
 /xstrndup.m4
 /xstrtol.m4
 /zzgnulib.m4
+/ctype_h.m4
+/free.m4
+/reallocarray.m4
+/ungetc.m4
+/vararrays.m4
+/year2038.m4

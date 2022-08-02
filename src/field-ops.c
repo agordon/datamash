@@ -494,7 +494,7 @@ field_op_collect (struct fieldop *op,
          and report any errors back to the caller. */
       {
         /* safe to assume decoded base64 is never larger than encoded base64 */
-        size_t decoded_size = slen;
+        idx_t decoded_size = slen;
         field_op_reserve_out_buf (op, decoded_size);
         if (!base64_decode ( str, slen, op->out_buf, &decoded_size ))
           return FLOCR_INVALID_BASE64;
