@@ -56,6 +56,7 @@
 #include "op-defs.h"
 #include "op-parser.h"
 #include "utils.h"
+#include "randutils.h"
 #include "field-ops.h"
 #include "crosstab.h"
 

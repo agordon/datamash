@@ -32,6 +32,7 @@ datamash_SOURCES = src/system.h \
 	       src/die.h \
 	       src/text-options.c src/text-options.h \
 	       src/utils.c src/utils.h \
+	       src/randutils.c src/randutils.h \
 	       src/text-lines.c src/text-lines.h \
 	       src/column-headers.c src/column-headers.h \
 	       src/op-defs.c src/op-defs.h \

@@ -165,10 +165,6 @@ field_op_reset (struct fieldop *op);
 /* Output precision, to be used with "printf ("%.*Lg",)" */
 extern int field_op_output_precision;
 
-/* Initialize random number source */
-void
-init_random (void);
-
 /* Helper function to print to stdout the 'empty value' of a numeric
    operation (e.g. what's printed by 'OP_MEAN' with empty input).
    Used in some of the tests. */
