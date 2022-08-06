@@ -97,6 +97,16 @@ my @Tests =
     {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
   ['e47','sum 1:3', {IN_PIPE=>""}, {EXIT=>1},
     {ERR=>"$prog: operation 'sum' cannot use pair of fields\n"}],
+  ['e50','dotprod 1', {IN_PIPE=>""}, {EXIT=>1},
+    {ERR=>"$prog: operation 'dotprod' requires field pairs\n"}],
+  ['e51','dotprod 1:', {IN_PIPE=>""}, {EXIT=>1},
+    {ERR=>"$prog: invalid field pair for operation 'dotprod'\n"}],
+  ['e52','dotprod :', {IN_PIPE=>""}, {EXIT=>1},
+    {ERR=>"$prog: invalid field pair for operation 'dotprod'\n"}],
+  ['e53','dotprod :1', {IN_PIPE=>""}, {EXIT=>1},
+    {ERR=>"$prog: invalid field pair for operation 'dotprod'\n"}],
+  ['e54','dotprod hello:world', {IN_PIPE=>""}, {EXIT=>1},
+    {ERR=>"$prog: -H or --header-in must be used with named columns\n"}],
 
   # Test scanner edge-cases
   # Floating point value

@@ -152,6 +152,13 @@ my @Tests =
   ['e46','pcov hello:world', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
   ['e47','sum 1:3', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
+  ['p50','dotprod 1:2',      {IN_PIPE=>""}, {OUT=>""}],
+  ['e51','dotprod 1', {IN_PIPE=>""}, {EXIT=>1},   {ERR_SUBST=>'s/.*//s'}],
+  ['e52','dotprod 1:', {IN_PIPE=>""}, {EXIT=>1},  {ERR_SUBST=>'s/.*//s'}],
+  ['e53','dotprod :', {IN_PIPE=>""}, {EXIT=>1},   {ERR_SUBST=>'s/.*//s'}],
+  ['e54','dotprod :1', {IN_PIPE=>""}, {EXIT=>1},  {ERR_SUBST=>'s/.*//s'}],
+  ['e56','dotprod hello:world', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+
   # Test scanner edge-cases
   # Floating point value
   ['e60','sum 4.5',   {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],

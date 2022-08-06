@@ -30,7 +30,7 @@ unique uniq collapse countunique \
 mean geomean harmmean trimmean median q1 q3 iqr perc mode antimode \
 pstdev sstdev pvar svar mad madraw \
 pskew sskew pkurt skurt dpo jarque \
-pcov scov ppearson spearson"
+pcov scov ppearson spearson dotprod"
  local groupby_ops_re=${groupby_ops// /|}
 
   local line_ops="base64 debase64 md5 sha1 sha224 sha256 sha384 sha512 \

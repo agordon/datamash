@@ -193,7 +193,8 @@ thousands separator.
 @code{antimode}, @code{pstdev}, @code{sstdev}, @code{pvar}, @code{svar},
 @code{ms}, @code{rms}, @code{mad}, @code{madraw}, @code{sskew},
 @code{pskew}, @code{skurt}, @code{pkurt}, @code{jarque}, @code{dpo},
-@code{scov}, @code{pcov}, @code{spearson}, @code{ppearson}
+@code{scov}, @code{pcov}, @code{spearson}, @code{ppearson},
+@code{dotprod}
 
 @end table
 

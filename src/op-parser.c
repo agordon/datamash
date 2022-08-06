@@ -112,7 +112,8 @@ alloc_next_field ()
 #define OP_NEED_PAIR_PARAMS(x) (((x)==OP_P_COVARIANCE)||\
                                 ((x)==OP_S_COVARIANCE)||\
                                 ((x)==OP_P_PEARSON_COR)||\
-                                ((x)==OP_S_PEARSON_COR))
+                                ((x)==OP_S_PEARSON_COR)||\
+                                ((x)==OP_DOT_PRODUCT))
 
 #define ADD_NAMED_GROUP(name)  (add_group_col (true,0,(name)))
 #define ADD_NUMERIC_GROUP(num) (add_group_col (false,num,NULL))

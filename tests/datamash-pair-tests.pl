@@ -115,6 +115,11 @@ pcov(field-1,field-2)
 1.622
 EOF
 
+my $out1_dotprod_hdr=<<'EOF';
+dotprod(field-1,field-2)
+34.896
+EOF
+
 my $in2=<<'EOF';
 1.599	1
 -1.011	2
@@ -188,10 +193,16 @@ spearson(x,y)
 1
 EOF
 
+my $out6_dotprod_hdr=<<'EOF';
+dotprod(x,y)
+15
+EOF
+
 my @Tests =
 (
   ['c1', 'scov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_scov}],
   ['c2', 'pcov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_pcov}],
+  ['dp1', 'dotprod 1:2', {IN_PIPE=>$in1}, {OUT=>"34.896\n"}],
 
   # Pair with output headers - only one field and header should be printed
   ['c3', '--header-out pcov 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_pcov_hdr}],
@@ -207,6 +218,10 @@ my @Tests =
   ['p2_hin', '-W --header-in --header-out spearson x:y',
     {IN_PIPE=>$in6}, {OUT=>$out6_spears_hdr}],
 
+  ['dp2', '--header-out dotprod 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_dotprod_hdr}],
+  ['dp3', '-W --header-in --header-out dotprod x:y',
+    {IN_PIPE=>$in6}, {OUT=>$out6_dotprod_hdr}],
+
   # Test operations on edge-cases of input (one items, no items,
   # different number of items)
   ['c4', 'scov 1:2',     {IN_PIPE=>$in3}, {OUT=>"$nan\n"}],
@@ -214,12 +229,16 @@ my @Tests =
 
   ['c5', '--narm scov 1:2',     {IN_PIPE=>$in4}, {OUT=>"$nan\n"}],
   ['p5', '--narm spearson 1:2', {IN_PIPE=>$in4}, {OUT=>"$nan\n"}],
+  ['dp5', '--narm dotprod 1:2', {IN_PIPE=>$in4}, {OUT=>"$nan\n"}],
 
   ['c6', '--narm scov 1:2',     {IN_PIPE=>$in5}, {EXIT=>1},
     {ERR=>"$prog: input error for operation 'scov': " .
           "fields 1,2 have different number of items\n"}],
   ['p6', '--narm spearson 1:2', {IN_PIPE=>$in5}, {EXIT=>1},
     {ERR=>"$prog: input error for operation 'spearson': " .
+          "fields 1,2 have different number of items\n"}],
+  ['dp6', '--narm dotprod 1:2', {IN_PIPE=>$in5}, {EXIT=>1},
+    {ERR=>"$prog: input error for operation 'dotprod': " .
           "fields 1,2 have different number of items\n"}],
 );
 

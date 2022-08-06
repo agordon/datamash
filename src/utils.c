@@ -195,6 +195,18 @@ pearson_corr_value ( const long double * const valuesA,
   return cor;
 }
 
+long double _GL_ATTRIBUTE_PURE
+dot_product_value ( const long double * const valuesA,
+                    const long double * const valuesB, size_t n )
+{
+  long double sum=0;
+
+  for (size_t i = 0; i < n; i++)
+    sum += valuesA[i] * valuesB[i];
+
+  return sum;
+}
+
 
 long double
 stdev_value (const long double * const values, size_t n, int df)

@@ -153,6 +153,8 @@ struct operation_data operations[] =
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_S_PEARSON_COR */
   {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_DOT_PRODUCT */
+  {NUMERIC_VECTOR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_BIN_BUCKETS */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_STRBIN */
@@ -553,6 +555,7 @@ field_op_collect (struct fieldop *op,
     case OP_S_COVARIANCE:
     case OP_P_PEARSON_COR:
     case OP_S_PEARSON_COR:
+    case OP_DOT_PRODUCT:
     case OP_TRIMMED_MEAN:
       field_op_add_value (op, num_value);
       break;
@@ -750,6 +753,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_S_COVARIANCE:
     case OP_P_PEARSON_COR:
     case OP_S_PEARSON_COR:
+    case OP_DOT_PRODUCT:
     case OP_BIN_BUCKETS:
     case OP_STRBIN:
     case OP_FLOOR:
@@ -995,6 +999,14 @@ field_op_summarize (struct fieldop *op)
                                            op->num_values,
                                            (op->op==OP_P_PEARSON_COR)?
                                                 DF_POPULATION:DF_SAMPLE);
+      break;
+
+    case OP_DOT_PRODUCT:
+      assert (!op->slave);                       /* LCOV_EXCL_LINE */
+      assert (op->slave_op);                     /* LCOV_EXCL_LINE */
+      verify_slave_num_values (op);
+      numeric_result = dot_product_value (op->values, op->slave_op->values,
+                                          op->num_values );
       break;
 
     case OP_MODE:

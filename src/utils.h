@@ -118,6 +118,13 @@ pearson_corr_value ( const long double * const valuesA,
                      const long double * const valuesB, size_t n, int df);
 
 /*
+ Given two columns of doubles, return their scalar product value.
+ */
+long double
+dot_product_value ( const long double * const valuesA,
+                    const long double * const valuesB, size_t n );
+
+/*
  Given an array of doubles, return the standard-deviation value.
  'df' is degrees-of-freedom. Use DF_POPULATION or DF_SAMPLE (see above).
  */

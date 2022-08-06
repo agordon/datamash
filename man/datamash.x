@@ -277,6 +277,10 @@ covariance of fields X and Y
 Pearson product-moment correlation coefficient [Pearson's R]
 of fields X and Y
 
+.TP
+.B  dotprod [X:Y]
+Scalar product (aka dot product or Euclidean inner product)
+of fields X and Y
 
 
 [=EXAMPLES]

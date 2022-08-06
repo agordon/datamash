@@ -75,6 +75,7 @@ enum field_operation
   OP_S_COVARIANCE,  /* Sample Covariance */
   OP_P_PEARSON_COR, /* Pearson Correlation Coefficient (population) */
   OP_S_PEARSON_COR, /* Pearson Correlation Coefficient (sample) */
+  OP_DOT_PRODUCT,   /* Scalar Product */
   OP_BIN_BUCKETS,   /* numeric binning operation */
   OP_STRBIN,        /* String hash/binning */
   OP_FLOOR,         /* Floor */

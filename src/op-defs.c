@@ -89,6 +89,7 @@ struct field_operation_definition field_operations[] =
   {"scov",        OP_S_COVARIANCE,      MODE_GROUPBY},
   {"ppearson",    OP_P_PEARSON_COR,     MODE_GROUPBY},
   {"spearson",    OP_S_PEARSON_COR,     MODE_GROUPBY},
+  {"dotprod",     OP_DOT_PRODUCT,       MODE_GROUPBY},
   {"bin",         OP_BIN_BUCKETS,       MODE_PER_LINE},
   {"strbin",      OP_STRBIN,            MODE_PER_LINE},
   {"floor",       OP_FLOOR,             MODE_PER_LINE},

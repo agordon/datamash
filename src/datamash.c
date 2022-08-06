@@ -221,7 +221,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
   mean, geomean, harmmean, trimmean, median, q1, q3, iqr, perc,\n\
   mode, antimode, pstdev, sstdev, pvar, svar, ms, rms, mad, madraw,\n\
   pskew, sskew, pkurt, skurt, dpo, jarque,\n\
-  scov, pcov, spearson, ppearson\n\
+  scov, pcov, spearson, ppearson, dotprod\n\
 \n", stdout);
       fputs ("\n", stdout);
 
