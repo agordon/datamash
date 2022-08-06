@@ -6,7 +6,7 @@
   respectively.
 
   datamash(1): the rand operation now uses getrandom(2) for generating a random
-  seed, instead of relying on data/time/pid mixing.
+  seed, instead of relying on date/time/pid mixing.
 
 ** New Features
 
