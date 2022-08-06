@@ -20,33 +20,25 @@
 */
 
 #include <config.h>
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/random.h>
 
 #include "randutils.h"
-
-/* long mix function, from:
-   Robert Jenkins' 96 bit Mix Function
-   http://burtleburtle.net/bob/hash/doobs.html */
-static unsigned long
-mix (unsigned long a, unsigned long b, unsigned long c)
-{
-  a=a-b;  a=a-c;  a=a^(c >> 13);
-  b=b-c;  b=b-a;  b=b^(a << 8);
-  c=c-a;  c=c-b;  c=c^(b >> 13);
-  a=a-b;  a=a-c;  a=a^(c >> 12);
-  b=b-c;  b=b-a;  b=b^(a << 16);
-  c=c-a;  c=c-b;  c=c^(b >> 5);
-  a=a-b;  a=a-c;  a=a^(c >> 3);
-  b=b-c;  b=b-a;  b=b^(a << 10);
-  c=c-a;  c=c-b;  c=c^(b >> 15);
-  return c;
-}
 
 void
 init_random (void)
 {
-  unsigned long seed = mix (clock (), time (NULL), getpid ());
+  unsigned long seed = 0;
+  errno = 0;
+  ssize_t nbytes = getrandom (&seed, sizeof (seed), 0);
+  if (nbytes == -1 || errno != 0)
+    {
+      fprintf (stderr, "Error %d: %s\n", errno, strerror (errno));
+    }
   srandom (seed);
 }
