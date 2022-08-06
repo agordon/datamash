@@ -354,12 +354,16 @@ field delimiter.
 End lines with a 0 byte, not newline.
 
 @item --help
+@itemx -h
 @opindex --help
+@opindex -h
 Print an informative help message on standard output and exit
 successfully.
 
 @item --version
+@itemx -V
 @opindex --version
+@opindex -V
 Print the version number and licensing information of Datamash on
 standard output and then exit successfully.
 

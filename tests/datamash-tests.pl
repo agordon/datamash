@@ -710,7 +710,11 @@ my @Tests =
   # Test --help (but don't verify the output)
   ['help1', '--help',     {IN_PIPE=>""},  {OUT => ""},
     {OUT_SUBST=>'s/^.*//gms'}],
+  ['help2', '-h',         {IN_PIPE=>""},  {OUT => ""},
+    {OUT_SUBST=>'s/^.*//gms'}],
   ['ver1', '--version',     {IN_PIPE=>""},  {OUT => ""},
+    {OUT_SUBST=>'s/^.*//gms'}],
+  ['ver2', '-V',            {IN_PIPE=>""},  {OUT => ""},
     {OUT_SUBST=>'s/^.*//gms'}],
 
   # Test output precision (number of digits) for numerical operations.

@@ -852,7 +852,7 @@ main (int argc, char **argv)
 
   //atexit (close_stdout);
 
-  while ((opt = getopt_long (argc, argv, "cCHsS:T:uk:t:z",
+  while ((opt = getopt_long (argc, argv, "cCHsS:T:uk:t:zhV",
                              longopts, NULL)) != -1)
     {
       switch (opt)

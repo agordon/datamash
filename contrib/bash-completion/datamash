@@ -38,7 +38,7 @@ round floor ceil trunc frac bin strbin dirname basename extname barename \
 getnum cut echo"
   local line_ops_re=${line_ops// /|}
 
-  local datamash_short_options="-c -C -f -g -H -i -s -t -R -W -z"
+  local datamash_short_options="-c -C -f -g -h -H -i -s -t -R -V -W -z"
 
   local datamash_long_options=" --skip-comments --full --group --header-in
   --header-out --headers --ignore-case --sort --no-strict --filler --format

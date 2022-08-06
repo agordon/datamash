@@ -110,13 +110,10 @@ x2nrealloc (void *p, size_t *pn, size_t s)
 
 /* Factor out some of the common --help and --version processing code.  */
 
-/* These enum values cannot possibly conflict with the option values
-   ordinarily used by commands, including CHAR_MAX + 1, etc.  Avoid
-   CHAR_MIN - 1, as it may equal -1, the getopt end-of-options value.  */
 enum
 {
-  GETOPT_HELP_CHAR = (CHAR_MIN - 2),
-  GETOPT_VERSION_CHAR = (CHAR_MIN - 3)
+  GETOPT_HELP_CHAR = 'h',
+  GETOPT_VERSION_CHAR = 'V'
 };
 
 #define GETOPT_HELP_OPTION_DECL \
@@ -130,9 +127,9 @@ enum
     break;
 
 #define HELP_OPTION_DESCRIPTION \
-  _("      --help     display this help and exit\n")
+  _("  -h, --help     display this help and exit\n")
 #define VERSION_OPTION_DESCRIPTION \
-  _("      --version  output version information and exit\n")
+  _("  -V, --version  output version information and exit\n")
 
 static inline void
 emit_try_help (void)

@@ -120,7 +120,7 @@ enum
   UNDOC_RMDUP_TEST
 };
 
-static char const short_options[] = "sfF:izg:t:HWR:Cc:";
+static char const short_options[] = "sfF:izg:t:HWR:Cc:hV";
 
 static struct option const long_options[] =
 {
