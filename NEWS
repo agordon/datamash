@@ -5,6 +5,9 @@
   datamash(1), decorate(1): Add short options -h and -V for --help and --version
   respectively.
 
+  datamash(1): the rand operation now uses getrandom(2) for generating a random
+  seed, instead of relying on data/time/pid mixing.
+
 
 * Noteworthy changes in release 1.8 (2022-07-23) [stable]
 
