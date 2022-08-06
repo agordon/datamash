@@ -84,7 +84,7 @@ my @Tests =
   ['e25','sum 1--5',   {IN_PIPE=>""}, {EXIT=>1},
     {ERR=>"$prog: invalid field range for operation 'sum'\n"}],
 
-  # Test field pair syntaax
+  # Test field pair syntax
   ['e41','pcov 1', {IN_PIPE=>""}, {EXIT=>1},
     {ERR=>"$prog: operation 'pcov' requires field pairs\n"}],
   ['e42','pcov 1:', {IN_PIPE=>""}, {EXIT=>1},
