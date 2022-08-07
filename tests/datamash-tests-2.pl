@@ -301,6 +301,20 @@ bar	5
 ;baz	7
 EOF
 
+my $in_comments2=<<'EOF';
+ #foo	3
+bar	5
+;baz	7
+frob	9;
+EOF
+
+my $in_comments3=<<'EOF';
+ #foo	3
+bar	5
+;baz	7
+frob	9#
+EOF
+
 my $in_esc_ident=<<'EOF';
 A_Chlor_T1h_r1-metaG B 9C -bar
 1 2 3 4
@@ -575,6 +589,11 @@ my @Tests =
           "5	bar\n" .
           "7	;baz\n"}],
   ['sc4', '-C reverse', {IN_PIPE=>$in_comments}, {OUT=>"5	bar\n"}],
+  # datamash supports only comment lines, but not inline comments
+  ['sce1', '-C sum 2',  {IN_PIPE=>$in_comments2}, {EXIT=>1},
+    {ERR=>"$prog: invalid numeric value in line 2 field 2: '9;'\n"}],
+  ['sce2', '-C sum 2',  {IN_PIPE=>$in_comments3}, {EXIT=>1},
+    {ERR=>"$prog: invalid numeric value in line 2 field 2: '9#'\n"}],
 
 
   # Regression tests
