@@ -157,7 +157,8 @@ my @Tests =
   ['e52','dotprod 1:', {IN_PIPE=>""}, {EXIT=>1},  {ERR_SUBST=>'s/.*//s'}],
   ['e53','dotprod :', {IN_PIPE=>""}, {EXIT=>1},   {ERR_SUBST=>'s/.*//s'}],
   ['e54','dotprod :1', {IN_PIPE=>""}, {EXIT=>1},  {ERR_SUBST=>'s/.*//s'}],
-  ['e56','dotprod hello:world', {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
+  ['e56','dotprod hello:world',
+    {IN_PIPE=>""}, {EXIT=>1}, {ERR_SUBST=>'s/.*//s'}],
 
   # Test scanner edge-cases
   # Floating point value

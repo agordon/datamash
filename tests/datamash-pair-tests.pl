@@ -218,7 +218,8 @@ my @Tests =
   ['p2_hin', '-W --header-in --header-out spearson x:y',
     {IN_PIPE=>$in6}, {OUT=>$out6_spears_hdr}],
 
-  ['dp2', '--header-out dotprod 1:2', {IN_PIPE=>$in1}, {OUT=>$out1_dotprod_hdr}],
+  ['dp2', '--header-out dotprod 1:2',
+    {IN_PIPE=>$in1}, {OUT=>$out1_dotprod_hdr}],
   ['dp3', '-W --header-in --header-out dotprod x:y',
     {IN_PIPE=>$in6}, {OUT=>$out6_dotprod_hdr}],
 
