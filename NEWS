@@ -10,6 +10,10 @@
 
 ** New Features
 
+  rand(1): new program - simulate random variables from popular probability
+  distributions, analgous to functions like runif, rexp and rnorm in the R
+  statistical programming language.
+
   datamash(1): add operation dotprod for calculating the scalar product of two
   columns.
 
