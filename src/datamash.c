@@ -121,7 +121,7 @@ enum
   UNDOC_RMDUP_TEST
 };
 
-static char const short_options[] = "sfF:izg:t:HWR:Cc:hV";
+static char const short_options[] = "sS:fF:izg:t:HWR:Cc:hV";
 
 static struct option const long_options[] =
 {
@@ -140,6 +140,7 @@ static struct option const long_options[] =
   {"output-delimiter", required_argument, NULL, OUTPUT_DELIMITER_OPTION},
   {"collapse-delimiter", required_argument, NULL,'c'},
   {"sort", no_argument, NULL, 's'},
+  {"seed", no_argument, NULL, 'S'},
   {"no-strict", no_argument, NULL, NO_STRICT_OPTION},
   {"narm", no_argument, NULL, REMOVE_NA_VALUES_OPTION},
   {"round", required_argument, NULL, 'R'},
@@ -260,6 +261,9 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs (_("\
   -s, --sort                sort the input before grouping; this removes the\n\
                               need to manually pipe the input through 'sort'\n\
+"), stdout);
+      fputs (_("\
+  -S, --seed                set a seed for operations that use randomization\n\
 "), stdout);
       fputs (_("\
   -c, --collapse-delimiter=X  use X to separate elements in collapse and\n\
@@ -1211,6 +1215,8 @@ int main (int argc, char* argv[])
   int optc;
   enum processing_mode premode = MODE_INVALID;
   const char* premode_group_spec = NULL;
+  bool force_seed = false;
+  unsigned long int seed = 0;
 
   DECL_LONG_DOUBLE_ROUNDING
   BEGIN_LONG_DOUBLE_ROUNDING ();
@@ -1229,7 +1235,6 @@ int main (int argc, char* argv[])
   textdomain (PACKAGE);
 
   init_blank_table ();
-  init_random ();
 
   atexit (close_stdout);
 
@@ -1281,6 +1286,17 @@ int main (int argc, char* argv[])
 
         case 's':
           pipe_through_sort = true;
+          break;
+
+        case 'S':
+          force_seed = true;
+          char *endptr;
+          errno = 0;
+          long proposed_seed = strtol (optarg, &endptr, 10);
+          if (errno || *endptr != '\0' || proposed_seed < 0)
+            die (EXIT_FAILURE, 0,
+                 _("invalid seed"));
+          seed = proposed_seed;
           break;
 
         case NO_STRICT_OPTION:
@@ -1355,6 +1371,8 @@ int main (int argc, char* argv[])
       error (0, 0, _("missing operation specifiers"));
       usage (EXIT_FAILURE);
     }
+
+  init_random (force_seed, seed);
 
   /* If --output-delimiter=X was used, override any previous output delimiter */
   if (explicit_output_delimiter != -1)

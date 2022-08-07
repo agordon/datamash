@@ -348,6 +348,15 @@ TAB character will be used as output field separator.
 If @option{--output-delimiter} is also used, it will override the output
 field delimiter.
 
+@item --seed
+@itemx -S
+@opindex --seed
+@opindex -S
+Select a specific random seed. By default, GNU Datamash uses getrandom(2),
+which should be suitable for most purposes. You may wish to force a specific
+seed if you either wish to draw on a specific entropy source or for ensuring
+the reproducibility of a specific test.
+
 @item --zero-terminated
 @itemx -z
 @opindex --zero-terminated

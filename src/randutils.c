@@ -31,14 +31,16 @@
 #include "randutils.h"
 
 void
-init_random (void)
+init_random (bool force_seed, unsigned long seed)
 {
-  unsigned long seed = 0;
-  errno = 0;
-  ssize_t nbytes = getrandom (&seed, sizeof (seed), 0);
-  if (nbytes == -1 || errno != 0)
+  if (!force_seed)
     {
-      fprintf (stderr, "Error %d: %s\n", errno, strerror (errno));
+      errno = 0;
+      ssize_t nbytes = getrandom (&seed, sizeof (seed), 0);
+      if (nbytes == -1 || errno != 0)
+        {
+          fprintf (stderr, "Error %d: %s\n", errno, strerror (errno));
+        }
     }
   srandom (seed);
 }

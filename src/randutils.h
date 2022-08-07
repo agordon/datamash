@@ -22,8 +22,10 @@
 #ifndef __RANDUTILS_H__
 #define __RANDUTILS_H__
 
+# include <stdbool.h>
+
 /* Initialize random number source */
 void
-init_random (void);
+init_random (bool force_seed, unsigned long seed);
 
 #endif // __RANDUTILS_H__

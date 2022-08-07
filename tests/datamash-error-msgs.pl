@@ -277,6 +277,16 @@ my @Tests =
   ['e152', 'sum 2', {IN_PIPE=>"1.2\t3.4.5\n"}, {EXIT=>1},
     {ERR=>"$prog: invalid numeric value in line 1 field 2: '3.4.5'\n"}],
 
+  # bad seeds
+  ['e153', '-S1.1 rand 1',
+    {IN_PIPE=>"1\n"}, {EXIT=>1},
+    {ERR=>"$prog: invalid seed\n"}],
+  ['e154', '-S-1 rand 1',
+    {IN_PIPE=>"1\n"}, {EXIT=>1},
+    {ERR=>"$prog: invalid seed\n"}],
+  ['e155', '-Sa rand 1',
+    {IN_PIPE=>"1\n"}, {EXIT=>1},
+    {ERR=>"$prog: invalid seed\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

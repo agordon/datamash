@@ -166,6 +166,7 @@ TESTS = \
 	tests/datamash-md5.pl \
 	tests/datamash-sha.pl \
 	tests/datamash-rand.sh \
+	tests/datamash-rand.pl \
 	tests/datamash-stats.pl \
 	tests/datamash-transpose.pl \
 	tests/datamash-crosstab.pl \
