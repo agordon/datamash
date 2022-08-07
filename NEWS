@@ -10,7 +10,7 @@
 
 ** New Features
 
-  New datamash operation dotprod for calculating the scalar product of two
+  datamash(1): add operation dotprod for calculating the scalar product of two
   columns.
 
   datamash(1): Add option -S/--seed to set a specific seed for pseudo-random
