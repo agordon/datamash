@@ -115,6 +115,7 @@ enum
   OUTPUT_DELIMITER_OPTION,
   CUSTOM_FORMAT_OPTION,
   SORT_PROGRAM_OPTION,
+  VNLOG_OPTION,
   UNDOC_PRINT_INF_OPTION,
   UNDOC_PRINT_NAN_OPTION,
   UNDOC_PRINT_PROGNAME_OPTION,
@@ -134,6 +135,7 @@ static struct option const long_options[] =
   {"header-in", no_argument, NULL, INPUT_HEADER_OPTION},
   {"header-out", no_argument, NULL, OUTPUT_HEADER_OPTION},
   {"headers", no_argument, NULL, 'H'},
+  {"vnlog", no_argument, NULL, VNLOG_OPTION},
   {"full", no_argument, NULL, 'f'},
   {"filler", required_argument, NULL, 'F'},
   {"format", required_argument, NULL, CUSTOM_FORMAT_OPTION},
@@ -253,6 +255,10 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
 "), stdout);
       fputs (_("\
   -H, --headers             same as '--header-in --header-out'\n\
+"), stdout);
+      fputs (_("\
+  --vnlog                   Reads and writes data in the vnlog format.\n\
+                              Implies -C -H -W\n\
 "), stdout);
       fputs (_("\
   -i, --ignore-case         ignore upper/lower case when comparing text;\n\
@@ -469,6 +475,9 @@ print_input_line (const struct line_record_t* lb)
 static void
 print_column_headers ()
 {
+  if ( vnlog )
+    printf ("# ");
+
   if (print_full_line)
     {
       /* Print the headers of all the input fields */
@@ -556,7 +565,8 @@ process_input_header (FILE *stream)
   struct line_record_t lr;
 
   line_record_init (&lr);
-  if (line_record_fread (&lr, stream, eolchar, skip_comments))
+
+  if (line_record_fread (&lr, stream, eolchar, skip_comments, vnlog))
     {
       build_input_line_headers (&lr, true);
       line_number++;
@@ -667,12 +677,11 @@ is deprecated and will be disabled in a future release.\n"), stderr);
     print_column_headers ();
 
 
-  while (true)
+  while (line_record_fread (thisline, input_stream, eolchar,
+                            skip_comments, false))
     {
       bool new_group = false;
 
-      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
-        break;
       line_number++;
 
       /* If there's no input header line, and the user requested an output
@@ -747,7 +756,8 @@ transpose_file ()
       num_lines++;
       line_record_init (thisline);
 
-      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
+      if (!line_record_fread (thisline, input_stream, eolchar,
+                              skip_comments, false))
         break;
       line_number++;
 
@@ -802,10 +812,9 @@ reverse_fields_in_file ()
   thisline = &lr;
   line_record_init (thisline);
 
-  while (true)
+  while (line_record_fread (thisline, input_stream, eolchar, skip_comments,
+                            vnlog && line_number==0))
     {
-      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
-        break;
       line_number++;
 
       const size_t num_fields = line_record_num_fields (thisline);
@@ -823,6 +832,31 @@ reverse_fields_in_file ()
       /* Special handling for header line */
       if (line_number == 1)
         {
+          if (vnlog)
+            {
+              /* If using named-columns, find the column numbers after reading
+                 the header line. */
+              build_input_line_headers (&lr, true);
+              group_columns_find_named_columns ();
+
+              fprintf (stdout, "# ");
+              const size_t num_fields = line_record_num_fields (thisline);
+              for (size_t i = num_fields ; i >= 1 ; --i) {
+                if (i<num_fields)
+                  print_field_separator ();
+
+                const char *str;
+                size_t len;
+                if (line_record_get_field (thisline, i, &str, &len))
+                {
+                  ignore_value (fwrite (str, len, sizeof (char), stdout));
+                }
+              }
+              print_line_separator ();
+
+              continue;
+            }
+
           /* If there is an header line (first line), and the user did not
              request printing the header, skip it */
           if (input_header && !output_header)
@@ -871,10 +905,9 @@ noop_file ()
 
   thisline = &lr;
   line_record_init (thisline);
-  while (true)
+  while (line_record_fread (thisline, input_stream, eolchar,
+                            skip_comments, false))
     {
-      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
-        break;
       line_number++;
 
       if (print_full_line)
@@ -908,10 +941,9 @@ tabular_check_file ()
   line_record_init (thisline);
   line_record_init (prevline);
 
-  while (true)
+  while (line_record_fread (thisline, input_stream, eolchar,
+                            skip_comments, false))
     {
-      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
-        break;
       line_number++;
 
       const size_t num_fields = line_record_num_fields (thisline);
@@ -1017,7 +1049,8 @@ remove_dups_in_file ()
 
   if (input_header)
     {
-      if (line_record_fread (thisline, input_stream, eolchar, skip_comments))
+      if (line_record_fread (thisline, input_stream, eolchar,
+                             skip_comments, vnlog))
         {
           line_number++;
 
@@ -1031,6 +1064,8 @@ remove_dups_in_file ()
 
           if (output_header)
             {
+              if (vnlog)
+                fprintf (stdout, "# ");
               const size_t num_fields = line_record_num_fields (thisline);
               for (size_t i = 1 ; i <= num_fields ; ++i) {
                 if (i>1)
@@ -1054,10 +1089,9 @@ remove_dups_in_file ()
   /* TODO: handle (output_header && !input_header) by generating dummy headers
            after the first line is read, and the number of fields is known. */
 
-  while (true)
+  while (line_record_fread (thisline, input_stream, eolchar,
+                            skip_comments, false))
     {
-      if (!line_record_fread (thisline, input_stream, eolchar, skip_comments))
-        break;
       line_number++;
 
       if (!line_record_get_field (thisline, key_col, &str, &len))
@@ -1264,6 +1298,15 @@ int main (int argc, char* argv[])
           case_sensitive = false;
           break;
 
+        case VNLOG_OPTION:
+          skip_comments        = true;
+          input_header         = output_header = true;
+          missing_field_filler = "-";
+          in_tab               = TAB_WHITESPACE;
+          out_tab              = ' ';
+          vnlog                = true;
+          break;
+
         case 'z':
           eolchar = 0;
           break;
@@ -1389,6 +1432,34 @@ int main (int argc, char* argv[])
   if (dm->header_required && !input_header)
     die (EXIT_FAILURE, 0,
            _("-H or --header-in must be used with named columns"));
+
+  if (vnlog)
+    {
+      if (!skip_comments)
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing always skips comments"));
+      if (!input_header)
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing always reads field labels"));
+      if (!output_header)
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing always reads field labels"));
+      if (!STREQ (missing_field_filler, "-"))
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing always uses '-' for empty fields"));
+      if (in_tab != TAB_WHITESPACE)
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing is whitespace-delimited"));
+      if (out_tab != ' ')
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing always uses ' ' to separate output fields"));
+      if (explicit_output_delimiter != -1)
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing always uses the default output delimiter"));
+      if (eolchar != '\n')
+        die (EXIT_FAILURE, 0,
+             _("vnlog processing always uses '\\n' to terminate output lines"));
+    }
 
   open_input ();
   switch (dm->mode)                              /* LCOV_EXCL_BR_LINE */

@@ -82,7 +82,8 @@ line_record_init (struct line_record_t* lr);
 
 bool
 line_record_fread (struct /* in/out */ line_record_t* lr,
-                   FILE *stream, char delimiter, bool skip_comments);
+                   FILE *stream, char delimiter, bool skip_comments,
+                   bool vnlog_prologue);
 
 void
 line_record_free (struct line_record_t* lr);

@@ -182,6 +182,7 @@ TESTS = \
 	tests/datamash-io-errors-cheap.sh \
 	tests/datamash-strbin.sh \
 	tests/datamash-valgrind.sh \
+	tests/datamash-vnlog.pl \
 	tests/decorate-tests.pl \
 	tests/decorate-errors.pl \
 	tests/decorate-sort-tests.pl

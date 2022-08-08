@@ -15,4 +15,5 @@ src/key-compare.c
 src/op-parser.c
 src/op-scanner.c
 src/system.h
+src/text-lines.c
 src/text-options.c

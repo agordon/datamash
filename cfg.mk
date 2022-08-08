@@ -60,12 +60,14 @@ coverage-expensive:
 # Exclude markdown (*.md) files from no-trailing-blanks rule.
 # Exclude the second unit test file - some of the expected tests
 # have trailing spaces.
+# Exclude the vnlog unit test file - some of the expected tests
+# have trailing spaces.
 # The exclusion list is initially defined in ./gnulib/cfg.mk ,
 #   and is overridden here.
 # The 'sc_trailing_blank' rule is defined in ./maint.mk
 #    (which is auto-generated from gnulib).
 exclude_file_name_regexp--sc_trailing_blank = \
-  ^(.*\.md|.*datamash-tests-2\.pl)$$
+  ^(.*\.md|.*datamash-tests-2\.pl|.*datamash-vnlog\.pl)$$
 
 
 # Scan-Build: use clang's static analysis tool

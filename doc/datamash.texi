@@ -249,6 +249,11 @@ operation and the field number (e.g. @samp{mean(field-3)}).
 Same as @samp{--header-in --header-out}. A short option indicating the input
 file has a header line, and the output should contain a header line as well.
 
+@item --vnlog
+@opindex --vnlog
+Enable experimental support for the vnlog data file format. This format is
+explained at https://github.com/dkogan/vnlog.
+
 @item --ignore-case
 @itemx -i
 @opindex --ignore-case
