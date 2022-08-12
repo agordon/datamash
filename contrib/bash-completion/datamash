@@ -41,8 +41,8 @@ getnum cut echo"
   local datamash_short_options="-c -C -f -g -h -H -i -s -t -R -V -W -z"
 
   local datamash_long_options=" --skip-comments --full --group --header-in
-  --header-out --headers --ignore-case --sort --no-strict --filler --format
-  --field-separator --narm --output-delimiter --round --whitespace
+  --header-out --headers --vnlog --ignore-case --sort --no-strict --filler
+  --format --field-separator --narm --output-delimiter --round --whitespace
   --zero-terminated --collapse-delimiter --help --version"
 
   local all_ops_re="$modes_re|$groupby_ops_re|$line_ops_re"
