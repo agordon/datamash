@@ -67,6 +67,14 @@ my $in3=<<'EOF';
 A
 EOF
 
+my $in4=<<'EOF';
+#comment
+A
+;comment
+
+B
+EOF
+
 
 my @Tests =
 (
@@ -140,6 +148,25 @@ my @Tests =
     {ERR=>"line 2 (1 fields):\n" .
           "  B\n" .
           "$prog: check failed: line 2 has 1 fields (expecting 2)\n"}],
+
+  # no special treatment for comments or empty lines by default
+  ['c63', 'check', {IN_PIPE=>$in4}, {EXIT=>1},
+    {ERR=>"line 3 (1 fields):\n" .
+          "  ;comment\n" .
+          "line 4 (0 fields):\n" .
+          "  \n" .
+          "$prog: check failed: line 4 has 0 fields (previous line had 1)\n"}],
+  # --skip-comments skips only comment lines, but not empty lines
+  ['c64', '--skip-comments check', {IN_PIPE=>$in4}, {EXIT=>1},
+    {ERR=>"line 1 (1 fields):\n" .
+          "  A\n" .
+          "line 2 (0 fields):\n" .
+          "  \n" .
+          "$prog: check failed: line 2 has 0 fields (previous line had 1)\n"}],
+  # --vnlog skips both comment and empty lines, but only '#' starts a comment
+  # (the first line is actually the vnlog header and requires the same number
+  #  of fields as the data lines, but this test is about ignoring empty lines)
+  ['c65', '--vnlog check', {IN_PIPE=>$in4}, {OUT=>"3 lines, 1 field\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};

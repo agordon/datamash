@@ -60,7 +60,7 @@ my $in_basic=<<'EOF';
 #x y z
    
 
-4 2 3
+4 2 3 # comment
 4 - 6# comment
 ## comment
 - 8 9
@@ -70,6 +70,13 @@ my $in_fake_comment=<<'EOF';
 # w x y z
 1 2 3 4
 ; not a comment
+EOF
+
+my $in_fake_comment2=<<'EOF';
+# w x y z
+1 2 3 4;no_comment
+5 6 7 ;no_comment
+8 9 ; no_comment
 EOF
 
 my $in_numeric_columns=<<'EOF';
@@ -92,6 +99,12 @@ my $in_xy=<<'EOF';
 2 1
 3 1.5
 4 2
+EOF
+
+my $in_header_comment=<<'EOF';
+# x y # this is not a comment
+a 1
+b 2
 EOF
 
 my $out_groupby=<<'EOF';
@@ -214,6 +227,14 @@ my @Tests =
   # Check that semicolon is *not* a comment.
   ['vnl-semicolon', '--vnlog unique w',
     {IN_PIPE=>$in_fake_comment}, {EXIT=>0}, {OUT=>"# unique(w)\n1,;\n"}],
+  ['vnl-semicolon2', '--vnlog check',
+    {IN_PIPE=>$in_fake_comment2},{EXIT=>0}, {OUT=>"3 lines, 4 fields\n"}],
+  ['vnl-semicolon3', '--vnlog unique y',
+    {IN_PIPE=>$in_fake_comment2},{EXIT=>0},
+    {OUT=>"# unique(y)\n3,7,;\n"}],
+  ['vnl-semicolon4', '--vnlog unique z',
+    {IN_PIPE=>$in_fake_comment2},{EXIT=>0},
+    {OUT=>"# unique(z)\n4;no_comment,;no_comment,no_comment\n"}],
 
   # Commandline errors
   ['vnl-option-parsing-error1', '--vnlog -t: sum x',
@@ -235,6 +256,17 @@ my @Tests =
     {IN_PIPE=>$in_xy}, {OUT=>$out_ct1}],
   ['vnl-ct2', '--vnlog crosstab x,y sum y',
     {IN_PIPE=>$in_xy}, {OUT=>$out_ct2}],
+
+  # the header line does not recognize trailing comments
+  ['vnl-no-header-comment1', '--vnlog check',
+    {IN_PIPE=>$in_header_comment}, {OUT=>"2 lines, 2 fields\n"}],
+  ['vnl-no-header-comment2', '--vnlog sum y',
+    {IN_PIPE=>$in_header_comment}, {OUT=>"# sum(y)\n3\n"}],
+  ['vnl-no-header-comment3', '--vnlog sum comment',
+    {IN_PIPE=>$in_header_comment},
+    {EXIT=>1}, {OUT=>"# sum(comment)\n"},
+    {ERR=>"$prog: invalid input:" .
+          " field 8 requested, line 2 has only 2 fields\n"}],
 
 );
 
