@@ -251,8 +251,8 @@ file has a header line, and the output should contain a header line as well.
 
 @item --vnlog
 @opindex --vnlog
-Enable experimental support for the vnlog data file format. This format is
-explained at https://github.com/dkogan/vnlog.
+Enable experimental support for the vnlog data file format for both input
+and output.  This format is explained at @url{https://github.com/dkogan/vnlog}.
 
 @item --ignore-case
 @itemx -i
