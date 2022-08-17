@@ -185,8 +185,6 @@ my @Tests =
   # Invalid field specifications for primary operations
   ['e90',  'groupby 1:2', {IN_PIPE=>""}, {EXIT=>1},
     {ERR=>"$prog: invalid field pair for operation 'groupby'\n"}],
-  ['e91',  'groupby 1-2', {IN_PIPE=>""}, {EXIT=>1},
-    {ERR=>"$prog: invalid field range for operation 'groupby'\n"}],
 
   # values for strbin operation
   ['e92','strbin:-  1',    {IN_PIPE=>""}, {EXIT=>1},

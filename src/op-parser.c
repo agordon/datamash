@@ -567,7 +567,27 @@ parse_mode_column (enum processing_mode pm)
     case TOK_INTEGER:
       if (scan_val_int>0)
         {
-          ADD_NUMERIC_GROUP (scan_val_int);
+          int begin_range = scan_val_int, end_range;
+          if (scanner_peek_token () != TOK_DASH)
+            {
+              ADD_NUMERIC_GROUP (scan_val_int);
+            }
+          else
+            {
+              scanner_get_token ();
+              if (scanner_get_token () != TOK_INTEGER
+                  || scan_val_int < (uintmax_t) begin_range)
+                {
+                  die (EXIT_FAILURE, 0,
+                       _("invalid field range for operation %s"),
+                       quote (get_processing_mode_name (pm)));
+                }
+              end_range = scan_val_int;
+              for (int i = begin_range; i <= end_range; i++)
+                {
+                  ADD_NUMERIC_GROUP (i);
+                }
+            }
           break;
         }
       /* fallthrough */

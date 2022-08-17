@@ -323,6 +323,54 @@ my $in_hdr_only=<<'EOF';
 X:Y:Z
 EOF
 
+my $in_multiple_groups=<<'EOF';
+a a a foo
+a a a bar
+a a b baz
+a b b alice
+a b c bob
+b b c eve
+b c d frank
+b c d foo
+b c d bar
+b d d baz
+c d a alice
+c d a bob
+c e b eve
+c e b frank
+c e c foo
+d a c bar
+d a d baz
+d a d alice
+d b e bob
+d b e eve
+e b a frank
+e c a foo
+e c b bar
+e c b baz
+e d c alice
+EOF
+
+my $out_multiple_groups=<<'EOF';
+a	a	a	bar,foo
+a	a	b	baz
+a	b	b	alice
+a	b	c	bob
+b	b	c	eve
+b	c	d	bar,foo,frank
+b	d	d	baz
+c	d	a	alice,bob
+c	e	b	eve,frank
+c	e	c	foo
+d	a	c	bar
+d	a	d	alice,baz
+d	b	e	bob,eve
+e	b	a	frank
+e	c	a	foo
+e	c	b	bar,baz
+e	d	c	alice
+EOF
+
 =pod
   Example:
   my $data = "a 1\nb 2\n";
@@ -456,10 +504,14 @@ my @Tests =
     {ERR=>"$prog: invalid input: field 5 requested, " .
           "line 1 has only 3 fields\n"}],
   ['e25',  '-g 1,,2 sum 1' ,  {IN_PIPE=>"a\n"}, {EXIT=>1},
-    {ERR=>"$prog: missing field for operation 'groupby'\n"}],
-  ['e26',   '--collapse-delimiter=foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
+      {ERR=>"$prog: missing field for operation 'groupby'\n"}],
+  ['e26',  '-g 4-1 sum 1', {IN_PIPE=>"a\n"}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range for operation 'groupby'\n"}],
+  ['e27',  '-g 1- sum 1', {IN_PIPE=>"a\n"}, {EXIT=>1},
+      {ERR=>"$prog: invalid field range for operation 'groupby'\n"}],
+  ['e28',   '--collapse-delimiter=foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
     {ERR=>"$prog: the delimiter must be a single character\n"}],
-  ['e27',   '-c foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
+  ['e29',   '-c foo', {IN_PIPE=>"a\n"}, {EXIT=>1},
     {ERR=>"$prog: the delimiter must be a single character\n"}],
 
   # No newline at the end of the lines
@@ -504,6 +556,10 @@ my @Tests =
   # Numeric operation on an empty field should not work
   ['f23', '-t: -g1 sum 2', {IN_PIPE=>$in_empty1}, {EXIT=>1},
     {ERR=>"$prog: invalid numeric value in line 1 field 2: ''\n"}],
+  ['f24', '-W -g1,2,3 uniq 4',
+    {IN_PIPE=>$in_multiple_groups}, {OUT=>$out_multiple_groups}],
+  ['f25', '-W -g1-3 uniq 4',
+    {IN_PIPE=>$in_multiple_groups}, {OUT=>$out_multiple_groups}],
 
   # whitespace only, different field delimiters
   ['ws1.1', 'check',     {IN_PIPE=>$ws1}, {OUT=>"1 line, 4 fields\n"}],
@@ -567,8 +623,9 @@ my @Tests =
 
   # Multiple keys (from different columns)
   ['g8.1',     '-t" " -g1,3 sum 2', {IN_PIPE=>$in_g3},
-    {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
-
+     {OUT=>"A W 15\nA X 24\nB Y 17\nB Z 19\nC Z 23\n"}],
+  ['g8.2',     '-t" " -g1-2 count 2', {IN_PIPE=>$in_g4},
+     {OUT=>"A 5 1\nK 6 1\nP 2 1\n"}],
 
   # count on non-numeric fields
   ['cnt1', '-t" " -g 1 count 1', {IN_PIPE=>$in_g2},

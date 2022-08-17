@@ -23,6 +23,8 @@
   datamash(1): Add option --vnlog to enable experimental support for the vnlog
   format. More about vnlog is at https://github.com/dkogan/vnlog.
 
+  datamash(1): -g/groupby takes ranges of columns (e.g. 1-4)
+
 
 * Noteworthy changes in release 1.8 (2022-07-23) [stable]
 

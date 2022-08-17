@@ -217,8 +217,8 @@ While using this option with non-linewise operations was historically permitted,
 it never produced very sensible output. Such usage has been deprecated, and in a
 future release it will result in an error.
 
-@item --group=@var{X[,Y,X]}
-@itemx -g @var{X[,Y,X]}
+@item --group=@var{X[,Y,Z]}
+@itemx -g @var{X[,Y,Z]}
 @opindex --group
 @opindex -g
 @cindex grouping
@@ -228,6 +228,7 @@ must be sorted by the same fields @var{X[,Y,Z]}. Use @option{--sort}
 to automatically sort the input.
 If @option{--group} is not specified, each operation is performed
 in the entire input file.
+Ranges of field numbers like @var{X-Z} are also supported.
 
 @item --header-in
 @opindex --header-in

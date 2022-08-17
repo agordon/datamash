@@ -171,9 +171,10 @@ my @Tests =
   ['c1','crosstab 1,2 first 3', {IN_PIPE=>$in1}, {OUT=>$out1_first}],
   ['c2','ct 1,2 first 3',       {IN_PIPE=>$in1}, {OUT=>$out1_first}],
   ['c3','ct 1,2 count 1',       {IN_PIPE=>$in1}, {OUT=>$out1_count}],
+  ['c4','ct 1-2 count 1',       {IN_PIPE=>$in1}, {OUT=>$out1_count}],
 
   # Default operation is count
-  ['c4','ct 1,2',               {IN_PIPE=>$in1}, {OUT=>$out1_count}],
+  ['c5','ct 1,2',               {IN_PIPE=>$in1}, {OUT=>$out1_count}],
 
   # test unsorted input with duplicates
   ['c10','ct 1,2 first 3',       {IN_PIPE=>$in2}, {OUT=>$out2_first}],
@@ -214,8 +215,8 @@ my @Tests =
     {ERR=>"$prog: crosstab supports one operation, found 2\n"}],
   ['e7',  'ct 1:2', {IN_PIPE=>""}, {EXIT=>1},
     {ERR=>"$prog: invalid field pair for operation 'crosstab'\n"}],
-  ['e8',  'ct 1-2', {IN_PIPE=>""}, {EXIT=>1},
-    {ERR=>"$prog: invalid field range for operation 'crosstab'\n"}],
+  ['e8',  'ct 1-3', {IN_PIPE=>""}, {EXIT=>1},
+    {ERR=>"$prog: crosstab requires exactly 2 fields, found 3\n"}],
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
