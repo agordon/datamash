@@ -248,7 +248,9 @@ line_record_fread (struct /* in/out */ line_record_t *lr,
                   /* Strip the comment characters.
                      Skip leading regex '^\s*#\s*' */
                   const char* pch = line_record_buffer (lr);
-                  size_t s = strspn (pch, " \t#");
+                  size_t s = strspn (pch, " \t");
+                  s += strspn (pch + s, "#");
+                  s += strspn (pch + s, " \t");
                   struct linebuffer lbuf = lr->lbuf;
                   lbuf.buffer += s;
                   lbuf.length -= s;

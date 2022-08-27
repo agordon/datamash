@@ -107,6 +107,78 @@ a 1
 b 2
 EOF
 
+my $in_header_comment2=<<'EOF';
+
+# x y # z
+bar     5 1 2
+bbb     4 7 8
+
+
+EOF
+
+my $in_header_comment3=<<'EOF';
+
+# ##
+3
+15
+EOF
+
+my $in_header_comment4=<<'EOF';
+# # a
+1 2
+EOF
+
+my $in_legend1=<<'EOF';
+#!/my/interpreter
+##regular vnlog pre-legend comment
+#!unusual vnlog pre-legend comment
+##
+## lines matching regex [ \t]*#[ \t]* are also ignored
+#
+#x
+42
+EOF
+
+my $in_legend2=<<'EOF';
+#!/my/interpreter
+##regular vnlog pre-legend comment
+#!unusual vnlog pre-legend comment
+##
+## lines matching regex [ \t]*#[ \t]* are also ignored
+ #
+#x
+42
+EOF
+
+my $in_legend3=<<'EOF';
+#!/my/interpreter
+##regular vnlog pre-legend comment
+#!unusual vnlog pre-legend comment
+##
+## lines matching regex [ \t]*#[ \t]* are also ignored
+ # 
+#x
+42
+EOF
+
+my $in_legend4=<<'EOF';
+#!/my/interpreter
+##regular vnlog pre-legend comment
+#!unusual vnlog pre-legend comment
+##
+## lines matching regex [ \t]*#[ \t]* are also ignored
+#
+      #  
+	# 
+ #			 
+		#		
+			#
+#			
+ # 
+     #         x
+42
+EOF
+
 my $out_groupby=<<'EOF';
 # GroupBy(x) sum(z)
 4 9
@@ -154,6 +226,26 @@ EOF
 my $out_pcov=<<'EOF';
 # pcov(x,x) pcov(x,y) pcov(y,y)
 1.25 0.625 0.3125
+EOF
+
+my $out_header_comment2_sum=<<'EOF';
+# sum(#) sum(z)
+8 10
+EOF
+
+my $out_header_comment3_sum=<<'EOF';
+# sum(##)
+18
+EOF
+
+my $out_header_comment4_sum=<<'EOF';
+# sum(#)
+1
+EOF
+
+my $out_legend_sum=<<'EOF';
+# sum(x)
+42
 EOF
 
 my @Tests =
@@ -267,6 +359,22 @@ my @Tests =
     {EXIT=>1}, {OUT=>"# sum(comment)\n"},
     {ERR=>"$prog: invalid input:" .
           " field 8 requested, line 2 has only 2 fields\n"}],
+  ['vnl-no-header-comment4', '--vnlog sum "\\#",z',
+    {IN_PIPE=>$in_header_comment2}, {OUT=>$out_header_comment2_sum}],
+  ['vnl-no-header-comment5', '--vnlog sum "\\#\\#"',
+    {IN_PIPE=>$in_header_comment3}, {OUT=>$out_header_comment3_sum}],
+  ['vnl-no-header-comment6', '--vnlog sum "\\#"',
+    {IN_PIPE=>$in_header_comment4}, {OUT=>$out_header_comment4_sum}],
+
+  # ignore specific lines before the legend
+  ['vnl-legend1', '--vnlog sum x',
+    {IN_PIPE=>$in_legend1}, {OUT=>$out_legend_sum}],
+  ['vnl-legend2', '--vnlog sum x',
+    {IN_PIPE=>$in_legend2}, {OUT=>$out_legend_sum}],
+  ['vnl-legend3', '--vnlog sum x',
+    {IN_PIPE=>$in_legend3}, {OUT=>$out_legend_sum}],
+  ['vnl-legend4', '--vnlog sum x',
+    {IN_PIPE=>$in_legend4}, {OUT=>$out_legend_sum}],
 
 );
 
