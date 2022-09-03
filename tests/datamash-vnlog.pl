@@ -179,6 +179,22 @@ my $in_legend4=<<'EOF';
 42
 EOF
 
+# unusual field names are allowed in vnlog legends
+my $in_legend5=<<'EOF';
+#  #  7 1+  -  ,  :  ;  .. %CPU TIME+
+   1  2  3  4  5  6  7   8    9    10
+  10 20 30 40 50 60 70  80   90   100
+EOF
+
+# duplicate field names are not prohibited in vnlog legends, but how
+# they are processed is not specified -- datamash uses the first field
+# with the specified name
+my $in_legend6=<<'EOF';
+#  a  a
+   1  2
+  10 20
+EOF
+
 my $out_groupby=<<'EOF';
 # GroupBy(x) sum(z)
 4 9
@@ -246,6 +262,16 @@ EOF
 my $out_legend_sum=<<'EOF';
 # sum(x)
 42
+EOF
+
+my $out_legend_sum2=<<'EOF';
+# sum(#) sum(7) sum(1+) sum(-) sum(,) sum(:) sum(;) sum(..) sum(%CPU) sum(TIME+)
+11 22 33 44 55 66 77 88 99 110
+EOF
+
+my $out_legend_sum3=<<'EOF';
+# sum(a)
+11
 EOF
 
 my @Tests =
@@ -375,6 +401,14 @@ my @Tests =
     {IN_PIPE=>$in_legend3}, {OUT=>$out_legend_sum}],
   ['vnl-legend4', '--vnlog sum x',
     {IN_PIPE=>$in_legend4}, {OUT=>$out_legend_sum}],
+
+  # vnlog allows unusual field names
+  ['vnl-legend5',
+    "--vnlog sum '\\#,7,\\1\\+,\\-,\\,,\\:,\\;,\\.\\.,\\%CPU,TIME\\+'",
+    {IN_PIPE=>$in_legend5}, {OUT=>$out_legend_sum2}],
+  # duplicate field names are not an error in vnlog
+  ['vnl-legend6', '--vnlog sum a',
+    {IN_PIPE=>$in_legend6}, {OUT=>$out_legend_sum3}],
 
 );
 
