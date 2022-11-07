@@ -105,6 +105,7 @@ rand_SOURCES = src/rand.c \
 rand_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
 rand_LDADD = lib/lib$(PACKAGE).a \
        $(LOGL_LIBM) \
+       $(LIB_GETRANDOM) \
        $(LIB_HARD_LOCALE) \
        $(LIB_MBRTOWC) \
        $(LIB_SETLOCALE) \

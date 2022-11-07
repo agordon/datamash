@@ -1,3 +1,4 @@
+/extern-inline.m4~
 /00gnulib.m4
 /absolute-header.m4
 /af_alg.m4
@@ -224,3 +225,5 @@
 /ungetc.m4
 /vararrays.m4
 /year2038.m4
+/getrandom.m4
+/sys_random_h.m4
