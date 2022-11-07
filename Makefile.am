@@ -10,6 +10,8 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
+AUTOMAKE_OPTIONS=subdir-objects
+
 AM_CPPFLAGS = -Ilib -I$(top_srcdir)/lib -Isrc -I$(top_srcdir)/src
 
 EXTRA_DIST = \
