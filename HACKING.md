@@ -241,14 +241,14 @@ See related discussion: <https://lists.gnu.org/archive/html/bug-gnulib/2014-09/m
 
 ### OpenBSD
 
-Bootstrap instructions for OpenBSD (Tested with 7.1).
+Bootstrap instructions for OpenBSD (Tested with 7.2).
 
 #### Install prerequisites
 
 Make sure the following packages are installed with `pkg_add`
 
 * autoconf 2.71
-* automake 1.16.3
+* automake 1.16.5
 * gettext-tools
 * git
 * gperf
@@ -263,11 +263,11 @@ First, of course, get the source:
 
 Then run the bootstrap script (This can take a while):
 
-    $ AUTOCONF_VERSION=1.72 AUTOMAKE_VERSION=1.16 ./bootstrap
+    $ AUTOCONF_VERSION=2.71 AUTOMAKE_VERSION=1.16 ./bootstrap
 
 Then configure and make like usual:
 
-    $ ./configure --disable-werror
+    $ CC=clang ./configure --disable-werror
     $ make
     $ make check
 
