@@ -31,7 +31,6 @@ AC_CONFIG_SRCDIR([src/datamash.c])
 dnl Checks for programs.
 # We need a C compiler.
 AC_PROG_CC
-AC_PROG_CC_STDC
 AM_PROG_CC_C_O
 AC_PROG_CPP
 
