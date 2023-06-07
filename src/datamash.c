@@ -382,7 +382,7 @@ safe_line_record_get_fieldz (const struct line_record_t *lr, const size_t n,
 /* returns TRUE if the lines are different, false if identical.
  * comparison is based on the specified keys */
 /* copied from coreutils's src/uniq.c (in the key-spec branch) */
-static bool
+static bool _GL_ATTRIBUTE_PURE
 different (const struct line_record_t* l1, const struct line_record_t* l2)
 {
   for (size_t i = 0; i < dm->num_grps; ++i)
