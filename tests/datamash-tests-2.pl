@@ -695,6 +695,45 @@ my @Tests =
   # TODO: fix bug for "getnum" operation
   #['ifdl14', '-t. getnum 1,2',        {IN_PIPE=>"x1.2y\n"}, {OUT=>"1.2\n"}],
 
+  # Test mode operation
+  ['mode01', 'mode 1', {IN_PIPE=>"1\n1\n2\n"},                    {OUT=>"1\n"}],
+  ['mode02', 'mode 1', {IN_PIPE=>"1\n2\n2\n"},                    {OUT=>"2\n"}],
+  ['mode03', 'mode 1', {IN_PIPE=>"1\n2\n2\n3\n3\n3\n"},           {OUT=>"3\n"}],
+  ['mode04', 'mode 1', {IN_PIPE=>"1\n1\n1\n2\n2\n3\n"},           {OUT=>"1\n"}],
+  ['mode05', 'mode 1', {IN_PIPE=>"1\n1\n2\n2\n2\n3\n"},           {OUT=>"2\n"}],
+  ['mode06', 'mode 1', {IN_PIPE=>"1\n2\n2\n3\n3\n3\n"},           {OUT=>"3\n"}],
+  ['mode07', 'mode 1', {IN_PIPE=>"1\n1\n1\n2\n3\n3\n"},           {OUT=>"1\n"}],
+  ['mode08', 'mode 1',{IN_PIPE=>"1\n2\n2\n3\n3\n3\n4\n4\n4\n4\n"},{OUT=>"4\n"}],
+  ['mode09', 'mode 1',{IN_PIPE=>"1\n2\n2\n3\n3\n3\n3\n4\n4\n4\n"},{OUT=>"3\n"}],
+  ['mode10', 'mode 1',{IN_PIPE=>"1\n2\n2\n2\n2\n3\n3\n4\n4\n4\n"},{OUT=>"2\n"}],
+  ['mode11', 'mode 1',{IN_PIPE=>"1\n1\n1\n1\n2\n2\n3\n3\n3\n4\n"},{OUT=>"1\n"}],
+
+  # Test antimode operation
+  #['antimode01', 'antimode 1', {IN_PIPE=>"1\n1\n2\n"},          {OUT=>"2\n"}],
+  ['antimode02', 'antimode 1', {IN_PIPE=>"1\n2\n2\n"},          {OUT=>"1\n"}],
+  ['antimode03', 'antimode 1', {IN_PIPE=>"1\n2\n2\n3\n3\n3\n"}, {OUT=>"1\n"}],
+  ['antimode04', 'antimode 1', {IN_PIPE=>"1\n1\n2\n3\n3\n3\n"}, {OUT=>"2\n"}],
+  #['antimode05', 'antimode 1', {IN_PIPE=>"1\n1\n1\n2\n2\n3\n"}, {OUT=>"3\n"}],
+  #['antimode06', 'antimode 1', {IN_PIPE=>"1\n1\n2\n2\n2\n3\n"}, {OUT=>"3\n"}],
+  ['antimode07', 'antimode 1', {IN_PIPE=>"1\n2\n2\n3\n3\n3\n"}, {OUT=>"1\n"}],
+  ['antimode08', 'antimode 1', {IN_PIPE=>"1\n1\n1\n2\n3\n3\n"}, {OUT=>"2\n"}],
+  ['antimode09', 'antimode 1',
+    {IN_PIPE=>"1\n2\n2\n3\n3\n3\n4\n4\n4\n4\n"}, {OUT=>"1\n"}],
+  ['antimode10', 'antimode 1',
+    {IN_PIPE=>"1\n2\n2\n3\n3\n3\n3\n4\n4\n4\n"}, {OUT=>"1\n"}],
+  ['antimode11', 'antimode 1',
+    {IN_PIPE=>"1\n2\n2\n2\n2\n3\n3\n4\n4\n4\n"}, {OUT=>"1\n"}],
+  #['antimode12', 'antimode 1',
+  #  {IN_PIPE=>"1\n1\n1\n1\n2\n2\n3\n3\n3\n4\n"}, {OUT=>"4\n"}],
+  ['antimode13', 'antimode 1',
+    {IN_PIPE=>"1\n1\n1\n1\n2\n3\n3\n3\n4\n4\n"}, {OUT=>"2\n"}],
+  ['antimode14', 'antimode 1',
+    {IN_PIPE=>"1\n1\n1\n1\n2\n2\n3\n4\n4\n4\n"}, {OUT=>"3\n"}],
+  ['antimode15', 'antimode 1',
+    {IN_PIPE=>"1\n1\n2\n2\n2\n3\n4\n4\n4\n4\n"}, {OUT=>"3\n"}],
+  #['antimode16', 'antimode 1',
+  #  {IN_PIPE=>"1\n1\n2\n2\n3\n3\n4\n"},          {OUT=>"4\n"}],
+
 );
 
 my $save_temps = $ENV{SAVE_TEMPS};
