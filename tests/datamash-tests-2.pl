@@ -600,7 +600,8 @@ my @Tests =
   # TODO: Move regression tests into a separate file when sufficiently many
   #       have accumulated to warrant the overhead of another test file.
   # Bug in mode/antimode in 1.4 and earlier
-  ['bug_mode1', 'mode 1', {IN_PIPE=>"-1"}, {OUT=>"-1\n"}],
+  ['bug_mode1',     'mode 1',     {IN_PIPE=>"-1"}, {OUT=>"-1\n"}],
+  ['bug_antimode1', 'antimode 1', {IN_PIPE=>"-1"}, {OUT=>"-1\n"}],
   # "Segmentation fault" when input contains embedded NUL characters
   # (see https://lists.gnu.org/archive/html/bug-datamash/2020-11/msg00001.html)
   ['regr001', 'countunique 1', {IN_PIPE=>"\x00" x 100}, {OUT=>"1\n"}],
@@ -707,6 +708,7 @@ my @Tests =
   ['mode09', 'mode 1',{IN_PIPE=>"1\n2\n2\n3\n3\n3\n3\n4\n4\n4\n"},{OUT=>"3\n"}],
   ['mode10', 'mode 1',{IN_PIPE=>"1\n2\n2\n2\n2\n3\n3\n4\n4\n4\n"},{OUT=>"2\n"}],
   ['mode11', 'mode 1',{IN_PIPE=>"1\n1\n1\n1\n2\n2\n3\n3\n3\n4\n"},{OUT=>"1\n"}],
+  ['mode12', 'mode 1', {IN_PIPE=>"9\n"},                          {OUT=>"9\n"}],
 
   # Test antimode operation
   #['antimode01', 'antimode 1', {IN_PIPE=>"1\n1\n2\n"},          {OUT=>"2\n"}],
@@ -733,6 +735,7 @@ my @Tests =
     {IN_PIPE=>"1\n1\n2\n2\n2\n3\n4\n4\n4\n4\n"}, {OUT=>"3\n"}],
   #['antimode16', 'antimode 1',
   #  {IN_PIPE=>"1\n1\n2\n2\n3\n3\n4\n"},          {OUT=>"4\n"}],
+  ['antimode17', 'antimode 1', {IN_PIPE=>"9\n"}, {OUT=>"9\n"}],
 
 );
 
