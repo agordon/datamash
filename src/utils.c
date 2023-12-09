@@ -385,6 +385,17 @@ dagostino_pearson_omnibus_pvalue (const long double * const values, size_t n)
   return pval;
 }
 
+static void
+update_best_seq( enum MODETYPE type, size_t seq_size, long double last_value,
+                 size_t * best_seq_size, long double * best_value)
+{
+  if ( ((type==MODE) && (seq_size > *best_seq_size))
+       || ((type==ANTIMODE) && (seq_size < *best_seq_size)))
+    {
+      *best_seq_size = seq_size;
+      *best_value = last_value;
+    }
+}
 
 long double _GL_ATTRIBUTE_PURE
 mode_value ( const long double * const values, size_t n, enum MODETYPE type)
@@ -401,20 +412,18 @@ mode_value ( const long double * const values, size_t n, enum MODETYPE type)
       bool eq = (cmp_long_double (&values[i],&last_value)==0);
 
       if (eq)
-        seq_size++;
-
-      if ( ((type==MODE) && (seq_size > best_seq_size))
-           || ((type==ANTIMODE) && (seq_size < best_seq_size)))
         {
-          best_seq_size = seq_size;
-          best_value = last_value;
+          seq_size++;
         }
-
-      if (!eq)
+      else
+        {
+          update_best_seq (type, seq_size, last_value, &best_seq_size,
+                           &best_value);
           seq_size = 1;
-
+        }
       last_value = values[i];
     }
+  update_best_seq (type, seq_size, last_value, &best_seq_size, &best_value);
   return best_value;
 }
 
