@@ -709,6 +709,8 @@ my @Tests =
   ['mode10', 'mode 1',{IN_PIPE=>"1\n2\n2\n2\n2\n3\n3\n4\n4\n4\n"},{OUT=>"2\n"}],
   ['mode11', 'mode 1',{IN_PIPE=>"1\n1\n1\n1\n2\n2\n3\n3\n3\n4\n"},{OUT=>"1\n"}],
   ['mode12', 'mode 1', {IN_PIPE=>"9\n"},                          {OUT=>"9\n"}],
+  ['mode13', 'mode 1',
+    {IN_PIPE=>"1\n1\n1\n2\n2\n2\n2\n3\n3\n4\n4\n4\n4\n4\n"},      {OUT=>"4\n"}],
 
   # Test antimode operation
   #['antimode01', 'antimode 1', {IN_PIPE=>"1\n1\n2\n"},          {OUT=>"2\n"}],
@@ -736,6 +738,8 @@ my @Tests =
   #['antimode16', 'antimode 1',
   #  {IN_PIPE=>"1\n1\n2\n2\n3\n3\n4\n"},          {OUT=>"4\n"}],
   ['antimode17', 'antimode 1', {IN_PIPE=>"9\n"}, {OUT=>"9\n"}],
+  #['antimode18', 'antimode 1',
+  #  {IN_PIPE=>"1\n1\n1\n2\n2\n2\n2\n3\n3\n4\n4\n4\n4\n4\n"}, {OUT=>"3\n"}],
 
 );
 
