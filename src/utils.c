@@ -386,8 +386,8 @@ dagostino_pearson_omnibus_pvalue (const long double * const values, size_t n)
 }
 
 static void
-update_best_seq( enum MODETYPE type, size_t seq_size, long double last_value,
-                 size_t * best_seq_size, long double * best_value)
+update_best_seq ( enum MODETYPE type, size_t seq_size, long double last_value,
+                  size_t * best_seq_size, long double * best_value)
 {
   if ( ((type==MODE) && (seq_size > *best_seq_size))
        || ((type==ANTIMODE) && (seq_size < *best_seq_size)))

@@ -91,11 +91,13 @@ static-analysis: static-analysis-configure static-analysis-make
 # - the help2man script copied from upstream,
 # - example files
 # - Markdown files
+# - GNU Free Documentation License in Texinfo format
 LINE_LEN_MAX = 80
 FILTER_LONG_LINES =						\
   \|^[^:]*man/help2man:| d;			\
   \|^[^:]*examples/.*| d;			\
-  \|^HACKING\.md| d;
+  \|^HACKING\.md| d;				\
+  \|^doc/fdl\.texi| d;
 sc_long_lines:
 	@files=$$($(VC_LIST_EXCEPT))					\
 	halt='line(s) with more than $(LINE_LEN_MAX) characters; reindent'; \
