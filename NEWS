@@ -27,7 +27,7 @@
 
 ** Bug Fixes
 
-  datamash(1) now correctly calculates the "antimode" for a set
+  datamash(1) now correctly calculates the "antimode" for a sequence
   of numbers.  Problem reported by Kingsley G. Morse Jr. in
   <https://lists.gnu.org/archive/html/bug-datamash/2023-12/msg00003.html>.
 
