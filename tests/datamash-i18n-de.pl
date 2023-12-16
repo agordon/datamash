@@ -82,14 +82,15 @@ my @Prufungen =
   ['de8',  '-t, countunique 1,2', {IN_PIPE=>"1,2\n"},   {OUT=>"1,1\n"}],
   ['de9',  '-t, rmdup 1',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
   ['de10', '-t, rmdup 2',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
-  # TODO: fix bug for numeric operations
-  #['de11', '-t, sum 1,2',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
-  #['de12', '-t, sum 1,2,3',       {IN_PIPE=>"1,2,3\n"}, {OUT=>"1,2,3\n"}],
+  ['de11', '-t, sum 1,2',         {IN_PIPE=>"1,2\n"},   {OUT=>"1,2\n"}],
+  ['de12', '-t, sum 1,2,3',       {IN_PIPE=>"1,2,3\n"}, {OUT=>"1,2,3\n"}],
+  ['de13', '-st, groupby 1 sum 2,3',
+    {IN_PIPE=>"a,14,1\nb,1,14\na,2,1\n"}, {OUT=>"a,16,2\nb,1,14\n"}],
 
   # TODO: make the getnum operation locale-aware
-  #['de13', 'getnum 1',   {IN_PIPE=>"bar-1,2\n"}, {OUT=>"1,2\n"}],
-  #['de14', 'getnum:p 1', {IN_PIPE=>"bar-1,2\n"}, {OUT=>"1,2\n"}],
-  #['de15', 'getnum:d 1', {IN_PIPE=>"bar-1,2\n"}, {OUT=>"-1,2\n"}],
+  #['de14', 'getnum 1',   {IN_PIPE=>"bar-1,2\n"}, {OUT=>"1,2\n"}],
+  #['de15', 'getnum:p 1', {IN_PIPE=>"bar-1,2\n"}, {OUT=>"1,2\n"}],
+  #['de16', 'getnum:d 1', {IN_PIPE=>"bar-1,2\n"}, {OUT=>"-1,2\n"}],
 
 );
 

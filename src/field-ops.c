@@ -364,9 +364,7 @@ field_op_collect (struct fieldop *op,
 {
   char *endptr=NULL;
   long double num_value = 0;
-#ifdef HAVE_BROKEN_STRTOLD
   char tmpbuf[512];
-#endif
   enum FIELD_OP_COLLECT_RESULT rc = FLOCR_OK;
 
   assert (str != NULL); /* LCOV_EXCL_LINE */
@@ -376,25 +374,36 @@ field_op_collect (struct fieldop *op,
 
   if (op->numeric)
     {
-      errno = 0;
-#ifdef HAVE_BROKEN_STRTOLD
-      /* On Cygwin, strtold doesn't stop at a tab character,
-         and returns invalid value.
-         Make a copy of the input buffer and NULL-terminate it */
-      if (slen >= sizeof (tmpbuf))
-        die (EXIT_FAILURE, 0,
-                "internal error: input field too long (%zu)", slen);
-      memcpy (tmpbuf,str,slen);
-      tmpbuf[slen]=0;
-      num_value = strtold (tmpbuf, &endptr);
-      if (errno==ERANGE || endptr==tmpbuf || endptr!=(tmpbuf+slen))
-        return FLOCR_INVALID_NUMBER;
-#else
       if (slen == 0)
         return FLOCR_INVALID_NUMBER;
+#ifndef HAVE_BROKEN_STRTOLD
+      /* Usually, strtold stops at the field delimiter, but not always.
+         Optimistically try to avoid an extra copy, unless the strtold
+         implementation is known to be problematic. */
+      errno = 0;
       num_value = strtold (str, &endptr);
-      if (errno==ERANGE || endptr==str || endptr!=(str+slen))
+      if (errno==ERANGE || endptr==str || endptr<(str+slen))
         return FLOCR_INVALID_NUMBER;
+      /* On Cygwin, strtold doesn't stop at a tab character,
+         and returns invalid value.
+         Generally, strtold doesn't stop on field separators
+         that can be part of long double representations.
+         If strtold continued past the field delimiter, make
+         a copy of the input buffer and NUL-terminate it. */
+      if (endptr > (str+slen))
+        {
+#endif
+          if (slen >= sizeof (tmpbuf))
+            die (EXIT_FAILURE, 0,
+                    "internal error: input field too long (%zu)", slen);
+          memcpy (tmpbuf,str,slen);
+          tmpbuf[slen]=0;
+          errno = 0;
+          num_value = strtold (tmpbuf, &endptr);
+          if (errno==ERANGE || endptr==tmpbuf || endptr!=(tmpbuf+slen))
+            return FLOCR_INVALID_NUMBER;
+#ifndef HAVE_BROKEN_STRTOLD
+        }
 #endif
     }
 
