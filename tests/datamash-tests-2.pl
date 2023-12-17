@@ -661,6 +661,12 @@ my @Tests =
     {OUT=>"0\n"}],
   ['gn16', 'getnum:n 1', {IN_PIPE=>"moo" x 4000 . "42" . "bar" x 1000},
     {OUT=>"42\n"}],
+  ['gn17', 'getnum 1',      {IN_PIPE=>"abc\t123\n"}, {OUT=>"0\n"}],
+  ['gn18', 'getnum 2',      {IN_PIPE=>"abc\t123\n"}, {OUT=>"123\n"}],
+  ['gn19', '-t, getnum 1',  {IN_PIPE=>"abc,123\n"},  {OUT=>"0\n"}],
+  ['gn20', '-t, getnum 2',  {IN_PIPE=>"abc,123\n"},  {OUT=>"123\n"}],
+  ['gn21', '-t: getnum 1',  {IN_PIPE=>"abc:123\n"},  {OUT=>"0\n"}],
+  ['gn22', '-t: getnum 2',  {IN_PIPE=>"abc:123\n"},  {OUT=>"123\n"}],
 
 
   # cut operation
@@ -692,8 +698,9 @@ my @Tests =
   ['ifdl11', '-t. rmdup 3',           {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
   ['ifdl12', '-t. sum 1,2',           {IN_PIPE=>"1.2\n"},   {OUT=>"1.2\n"}],
   ['ifdl13', '-t. sum 1,2,3',         {IN_PIPE=>"1.2.3\n"}, {OUT=>"1.2.3\n"}],
-  # TODO: fix bug for "getnum" operation
-  #['ifdl14', '-t. getnum 1,2',        {IN_PIPE=>"x1.2y\n"}, {OUT=>"1.2\n"}],
+  ['ifdl14', '-t. getnum 1,2',        {IN_PIPE=>"x1.2y\n"}, {OUT=>"1.2\n"}],
+  ['ifdl15', '-t. getnum 1',          {IN_PIPE=>"x2.3y\n"}, {OUT=>"2\n"}],
+  ['ifdl16', '-t. getnum 2',          {IN_PIPE=>"x2.3y\n"}, {OUT=>"3\n"}],
 
   # Test mode operation
   ['mode01', 'mode 1', {IN_PIPE=>"1\n1\n2\n"},                    {OUT=>"1\n"}],

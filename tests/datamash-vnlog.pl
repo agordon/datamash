@@ -322,6 +322,10 @@ my @Tests =
     {IN_PIPE=>$in_basic}, {OUT=>$out_rmdup_y}],
   ['vnl-reverse', '--vnlog reverse',
     {IN_PIPE=>$in_basic}, {OUT=>$out_reverse}],
+  ['vnl-getnum1', '--vnlog getnum A',
+    {IN_PIPE=>"# A B\nx 1\ny 2\n"}, {OUT=>"# getnum(A)\n0\n0\n"}],
+  ['vnl-getnum2', '--vnlog getnum B',
+    {IN_PIPE=>"# A B\nx 1\ny 2\n"}, {OUT=>"# getnum(B)\n1\n2\n"}],
 
   # empty input = empty output
   ['vnl-empty1', '--vnlog count x',

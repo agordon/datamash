@@ -38,6 +38,8 @@
   and by Jeroen Hoek in
   <https://lists.gnu.org/archive/html/bug-datamash/2023-11/msg00000.html>.
 
+  datamash(1): The "getnum" operation now stays inside the specified field.
+
 
 * Noteworthy changes in release 1.8 (2022-07-23) [stable]
 

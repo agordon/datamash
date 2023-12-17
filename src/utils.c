@@ -586,17 +586,18 @@ extract_number (const char* s, size_t len, enum extract_number_type type)
       buf = xrealloc (buf, len+1);
       buf_alloc = len + 1;
     }
+  memcpy (buf, s, len);
+  buf[len] = '\0';
 
-  size_t skip = strcspn (s, pattern);
-  size_t span = strspn (s+skip, pattern);
+  size_t skip = strcspn (buf, pattern);
+  size_t span = strspn (buf+skip, pattern);
 
-  memcpy (buf, s+skip, span);
-  buf[span] = '\0';
+  buf[skip+span] = '\0';
 
   if (!fp)
     {
       errno = 0;
-      long long int val = strtoll (buf, &endptr, base);
+      long long int val = strtoll (buf+skip, &endptr, base);
       if (errno != 0)
         {
           /* failed to parse value */
@@ -607,7 +608,7 @@ extract_number (const char* s, size_t len, enum extract_number_type type)
   else
     {
       errno = 0;
-      r = strtold (buf, &endptr);
+      r = strtold (buf+skip, &endptr);
       if (errno != 0)
         r = 0;
     }
