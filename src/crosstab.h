@@ -47,7 +47,7 @@ crosstab_add_result (struct crosstab* ct,
                       const char* row, const char* col, const char* data);
 
 void
-crosstab_print ();
+crosstab_print (const struct crosstab* ct);
 
 void
 crosstab_free (struct crosstab* ct);
