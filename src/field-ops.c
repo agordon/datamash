@@ -239,7 +239,7 @@ field_op_to_hex ( struct fieldop* op, const char *buffer, const size_t inlen )
 }
 
 /* Add a string to the strings vector, allocating memory as needed */
-void
+static void
 field_op_add_string (struct fieldop *op, const char* str, size_t slen)
 {
   if (op->str_buf_used + slen+1 >= op->str_buf_alloc)
@@ -256,7 +256,7 @@ field_op_add_string (struct fieldop *op, const char* str, size_t slen)
 
 /* Replace the current string in the string buffer.
    This function assumes only one string is stored in the buffer. */
-void
+static void
 field_op_replace_string (struct fieldop *op, const char* str, size_t slen)
 {
   if (slen+1 >= op->str_buf_alloc)
@@ -677,7 +677,7 @@ unique_value ( struct fieldop *op, bool case_sensitive )
 }
 
 /* Returns the number of unique string values in the given field operation */
-size_t
+static size_t
 count_unique_values ( struct fieldop *op, bool case_sensitive )
 {
   const char *last_str, **cur_str;
@@ -709,7 +709,7 @@ count_unique_values ( struct fieldop *op, bool case_sensitive )
 
 /* Returns a nul-terimated string, composed of all the values
    of the input strings. The return string must be free'd. */
-void
+static void
 collapse_value ( struct fieldop *op )
 {
   /* Copy the string buffer as-is */

@@ -157,7 +157,7 @@ static struct option const long_options[] =
   {NULL, 0, NULL, 0},
 };
 
-void
+static void
 group_columns_find_named_columns ()
 {
   for (size_t i = 0; i < dm->num_grps; ++i)
@@ -176,7 +176,7 @@ group_columns_find_named_columns ()
     }
 }
 
-void
+static void
 usage (int status)
 {
   if (status != EXIT_SUCCESS)
@@ -539,7 +539,7 @@ print_column_headers ()
   print_line_separator ();
 }
 
-void
+static void
 field_op_find_named_columns ()
 {
   for (size_t i=0; i<dm->num_ops; ++i)
@@ -578,7 +578,7 @@ process_input_header (FILE *stream)
   line_record_free (&lr);
 }
 
-void
+static void
 summarize_field_ops ()
 {
   for (size_t i=0;i<dm->num_ops;++i)
@@ -599,7 +599,7 @@ summarize_field_ops ()
   print_line_separator ();
 }
 
-void
+static void
 reset_field_ops ()
 {
   for (size_t i=0;i<dm->num_ops;++i)

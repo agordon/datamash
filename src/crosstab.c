@@ -75,7 +75,7 @@ crosstab_datacell_comparator (const void* a, const void* b)
 }
 
 
-struct crosstab_datacell*
+static struct crosstab_datacell*
 new_datacell (const char* row, const char* col, const char* data)
 {
   struct crosstab_datacell *dc = xmalloc (sizeof (struct crosstab_datacell));

@@ -125,7 +125,7 @@ static struct option const longopts[] =
 };
 
 
-void
+static void
 add_sort_extra_args (char* s)
 {
   if (sort_extra_args_used == sort_extra_args_allocated )
@@ -135,7 +135,7 @@ add_sort_extra_args (char* s)
   sort_extra_args[sort_extra_args_used++] = xstrdup (s);
 }
 
-void
+static void
 usage (int status)
 {
   if (status != EXIT_SUCCESS)
@@ -540,7 +540,7 @@ undecorate_file (const char *infile, int num_fields)
 
 
 /* this code was copied from src/sort.c */
-struct keyfield*
+static struct keyfield*
 parse_sort_key_arg (const char* optarg, char const** endpos)
 {
   char const *s;
@@ -646,7 +646,7 @@ parse_builtin_conversion_spec (const char* optarg, const char *s,
     badfieldspec (optarg, N_("invalid built-in conversion option"));
 }
 
-void check_allowed_key_flags (const struct keyfield* key)
+static void check_allowed_key_flags (const struct keyfield* key)
 {
   /* key->reverse is the only ordering flag allowed */
   if (key->skipsblanks || key->skipeblanks
@@ -658,7 +658,7 @@ void check_allowed_key_flags (const struct keyfield* key)
                              "not be combined with a conversion function"));
 }
 
-void parse_key_arg (const char* optarg)
+static void parse_key_arg (const char* optarg)
 {
   char const *s;
   struct keyfield *key = parse_sort_key_arg (optarg, &s);
@@ -690,7 +690,7 @@ void parse_key_arg (const char* optarg)
     }
 }
 
-void
+static void
 insert_decorate_key (struct keyfield *key_arg)
 {
   struct keyfield **p;
@@ -706,7 +706,7 @@ insert_decorate_key (struct keyfield *key_arg)
 }
 
 
-int
+static int
 adjust_key_fields ()
 {
   struct keyfield *key = keylist;
@@ -753,7 +753,7 @@ adjust_key_fields ()
   return cnt;
 }
 
-char**
+static char**
 build_sort_process_args ()
 {
   int argc = 3 ; /* one 'sort' program name (argv[0]), one extra arg on NetBSD,
@@ -797,7 +797,7 @@ build_sort_process_args ()
   return argv;
 }
 
-void
+static void
 free_sort_args (char **args)
 {
   for (char **arg = args; *arg; ++arg) {

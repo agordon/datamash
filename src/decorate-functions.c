@@ -30,14 +30,14 @@
 #include "decorate-functions.h"
 
 
-bool
+static bool
 decorate_as_is (const char* in)
 {
   fprintf (stdout, "%s", in);
   return true;
 }
 
-bool
+static bool
 decorate_strlen (const char* in)
 {
   uintmax_t u = (uintmax_t)strlen (in);
@@ -45,7 +45,7 @@ decorate_strlen (const char* in)
   return true;
 }
 
-_GL_ATTRIBUTE_CONST int
+static _GL_ATTRIBUTE_CONST int
 roman_numeral_to_value (char c)
 {
   switch (c)
@@ -66,7 +66,7 @@ roman_numeral_to_value (char c)
    Does not support alternative forms such as
     XIIX,IIXX for 18,
     IIC for 98.  */
-bool
+static bool
 decorate_roman_numerals (const char* in)
 {
   intmax_t result = 0;
@@ -107,7 +107,7 @@ decorate_roman_numerals (const char* in)
   return true;
 }
 
-bool
+static bool
 decorate_ipv4_inet_addr (const char* in)
 {
   struct in_addr adr;
@@ -127,7 +127,7 @@ decorate_ipv4_inet_addr (const char* in)
 }
 
 
-bool
+static bool
 decorate_ipv4_dot_decimal (const char* in)
 {
   struct in_addr adr;
@@ -149,7 +149,7 @@ decorate_ipv4_dot_decimal (const char* in)
 }
 
 
-bool
+static bool
 decorate_ipv6 (const char* in)
 {
   struct in6_addr adr;
@@ -207,14 +207,14 @@ decorate_ipv6_ipv4 (const char* in, uint32_t mapping)
 }
 
 
-bool
+static bool
 decorate_ipv6_ipv4_mapped (const char* in)
 {
   return decorate_ipv6_ipv4 (in, 0xFFFF);
 }
 
 
-bool
+static bool
 decorate_ipv6_ipv4_compat (const char* in)
 {
   return decorate_ipv6_ipv4 (in, 0);
