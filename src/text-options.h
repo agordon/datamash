@@ -62,7 +62,7 @@ extern bool strict;
 
 /* if 'strict' is false, lines with fewer-than-expected fields
    will be filled with this value */
-extern char* missing_field_filler;
+extern const char* missing_field_filler;
 
 /* if true, skip comments line (lines starting with optional whitespace
    followed by '#' or ';'. See line_record_is_comment.  */

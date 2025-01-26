@@ -61,7 +61,7 @@ bool strict = true;
 
 /* if 'strict' is false, lines with fewer-than-expected fields
    will be filled with this value */
-char* missing_field_filler = "N/A";
+const char* missing_field_filler = "N/A";
 
 /* if true, skip comments line (lines starting with optional whitespace
    followed by '#' or ';'. See line_record_is_comment.  */

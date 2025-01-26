@@ -538,7 +538,7 @@ guess_file_extension (const char*s, size_t len)
 
 struct EXTRACT_NUMBER_TYPE
 {
-  char *pattern;
+  const char *pattern;
   int base;
   bool floating_point;
 };
@@ -573,7 +573,7 @@ extract_number (const char* s, size_t len, enum extract_number_type type)
   static size_t buf_alloc;
 
   long double r = 0;
-  char *pattern;
+  const char *pattern;
   int base ;
   bool fp;
 
