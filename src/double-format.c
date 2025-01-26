@@ -31,6 +31,7 @@ hence FSF copyright.
 #include "xalloc.h"
 
 #include "text-options.h"
+#include "double-format.h"
 
 char*
 validate_double_format (char const *fmt)
