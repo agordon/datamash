@@ -30,7 +30,7 @@ old_NEWS_hash = 172bdd20a78c5f43b5154e7856983cb9
 
 update-copyright-env = \
   env \
-  UPDATE_COPYRIGHT_HOLDER='Assaf Gordon' \
+  UPDATE_COPYRIGHT_HOLDER='Timothy Rice' \
   UPDATE_COPYRIGHT_USE_INTERVALS=2
 
 
