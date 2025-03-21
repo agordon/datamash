@@ -28,7 +28,7 @@ SUBDIRS = po
 ##
 ## Main Program
 ##
-bin_PROGRAMS = datamash decorate rand
+bin_PROGRAMS = datamash decorate
 
 datamash_SOURCES = src/system.h \
 	       src/die.h \
@@ -100,23 +100,6 @@ decorate_LDADD = lib/lib$(PACKAGE).a \
        $(LIBINTL) \
        $(LIB_MBRTOWC)
 
-rand_SOURCES = src/rand.c \
-  src/randutils.c src/randutils.h \
-	src/die.h src/system.h
-
-rand_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS) $(MINGW_CFLAGS)
-rand_LDADD = lib/lib$(PACKAGE).a \
-       $(LOGL_LIBM) \
-       $(LIB_GETRANDOM) \
-       $(LIB_HARD_LOCALE) \
-       $(LIB_MBRTOWC) \
-       $(LIB_SETLOCALE) \
-       $(LIB_SETLOCALE_NULL) \
-       $(LIBICONV) \
-       $(LIBINTL) \
-       $(LIBTHREAD) \
-       $(INTL_MACOSX_LIBS)
-
 # Add LOCALDIR for gettext
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
@@ -126,11 +109,10 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 ## Man Page
 ##
 
-man_MANS = datamash.1 decorate.1 rand.1
+man_MANS = datamash.1 decorate.1
 EXTRA_DIST += $(man_MANS) \
 		man/datamash.x \
 		man/decorate.x \
-		man/rand.x     \
 		man/help2man
 
 CLEANFILES =
@@ -158,14 +140,6 @@ decorate.1: decorate $(top_srcdir)/man/decorate.x
 	   perl $(abs_top_srcdir)/man/help2man \
 	       --include=$(top_srcdir)/man/decorate.x \
 	       decorate -o $@-t
-	chmod u=rw,go=r $@-t
-	mv -f $@-t $@
-
-rand.1: rand $(top_srcdir)/man/rand.x
-	PATH='$(abs_top_builddir)$(PATH_SEPARATOR)'$$PATH \
-	   perl $(abs_top_srcdir)/man/help2man \
-	       --include=$(top_srcdir)/man/rand.x \
-	       rand -o $@-t
 	chmod u=rw,go=r $@-t
 	mv -f $@-t $@
 
@@ -213,8 +187,7 @@ TESTS = \
 	tests/datamash-vnlog.pl \
 	tests/decorate-tests.pl \
 	tests/decorate-errors.pl \
-	tests/decorate-sort-tests.pl \
-	tests/rand-tests.pl
+	tests/decorate-sort-tests.pl
 
 EXTRA_DIST += \
 	tests/no-perl \

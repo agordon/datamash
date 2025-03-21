@@ -22,55 +22,7 @@
 #ifndef __RANDUTILS_H__
 #define __RANDUTILS_H__
 
-#include <stdbool.h>
-
-enum distribution
-{
-  DISTR_INVALID = -1,
-  DISTR_UNIF    = 0,  /* Continuous uniform distribution U (a,b)    */
-  DISTR_EXP,          /* Exponential distribution Exp (λ)           */
-  DISTR_NORM,         /* Normal distribution N (μ,σ)                */
-  DISTR_N_DISTR       /* Not a distribution, just counts the enum.  */
-};
-
-struct distribution_definition
-{
-  const char *name;
-  enum distribution distr;
-  void (*generator)(long reps);
-};
-
-struct distribution_parameter_definition
-{
-  char *name;
-  bool is_set;
-  long double value;
-};
-
-enum distribution_parameter
-{
-  not_a_parameter = -1,
-  alpha = 0,
-  beta,
-  degf,
-  degf2,
-  mean,
-  min,
-  max,
-  number,
-  population,
-  prob,
-  rate,
-  scale,
-  stdev,
-  successes,
-  n_parameters
-};
-
-extern struct distribution_parameter_definition
-distribution_parameters[n_parameters];
-extern struct distribution_definition
-distributions[DISTR_N_DISTR];
+# include <stdbool.h>
 
 /* Initialize random number source */
 void

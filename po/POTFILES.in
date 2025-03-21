@@ -14,8 +14,6 @@ src/field-ops.c
 src/key-compare.c
 src/op-parser.c
 src/op-scanner.c
-src/rand.c
-src/randutils.c
 src/system.h
 src/text-lines.c
 src/text-options.c
