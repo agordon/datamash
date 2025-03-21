@@ -1,4 +1,5 @@
 dnl Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
+dnl Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
 dnl
 dnl This file is free software; as a special exception the author gives
 dnl unlimited permission to copy and/or distribute it, with or without

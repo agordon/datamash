@@ -2,7 +2,7 @@
 =pod
   Unit Tests for GNU Datamash - perform simple calculation on input data
 
-   Copyright (C) 2022      Timothy Rice <trice@posteo.net>
+   Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
    Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
 
    This file is part of GNU Datamash.

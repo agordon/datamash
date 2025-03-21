@@ -1,6 +1,7 @@
 #!/bin/sh
 
 #    Copyright (C) 2014-2021 Assaf Gordon <assafgordon@gmail.com>
+#    Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
 #
 #    datamash I/O error testing module
 #

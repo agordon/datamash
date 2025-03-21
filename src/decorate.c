@@ -1,5 +1,6 @@
 /* decorate -- auxiliary program for sort preprocessing
    Copyright (C) 2020-2021 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,7 +40,7 @@
 #define PROGRAM_NAME "decorate"
 
 #define AUTHORS \
-  proper_name ("Assaf Gordon, Shawn Wagner and Erik Auerswald")
+  proper_name ("Assaf Gordon, Timothy Rice, Shawn Wagner and Erik Auerswald")
 
 static const char *sort_cmd = SORT_PATH;
 
@@ -62,7 +63,7 @@ dbg_printf (char const *msg, ...)
 }
 
 /* Until someone better comes along */
-const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon" ;
+const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon and Timothy Rice" ;
 
 /* if true, enable developer's debug messages */
 static bool debug = false;

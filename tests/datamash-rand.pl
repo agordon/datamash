@@ -2,7 +2,7 @@
 =pod
    Unit Tests for GNU Datamash - tests rand operations
 
-   Copyright (C) 2022 Timothy Rice <trice@posteo.net>
+   Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
 
    This file is part of GNU Datamash.
 

@@ -3,7 +3,7 @@
   Unit Tests for GNU Datamash - check German locale (de_DE.UTF-8).
 
    Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
-   Copyright (C) 2022-     Timothy Rice <trice@posteo.net>
+   Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
 
    This file is part of GNU Datamash.
 

@@ -4,6 +4,7 @@
   Tests for 'check' operation mode
 
    Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
+   Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
 
    This file is part of GNU Datamash.
 
