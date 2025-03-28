@@ -47,7 +47,7 @@ sort -n -u < out1 > out2 || framework_failure_ "failed to sort out1"
 
 
 # Default binning to 10 bins, accept only single digits
-grep -q '^[^0-9]$' < out2 \
+grep '^[^0-9]$' < out2 > /dev/null \
     &&  { warn_ "'datamash strbin 1' generated invalid output (out2):" ;
          cat out2 >&2 ;
          fail=1 ; }

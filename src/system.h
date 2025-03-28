@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <error.h>
 #include <getopt.h>
 #include <limits.h>
 #include <locale.h>
@@ -73,7 +74,6 @@ x2nrealloc (void *p, size_t *pn, size_t s)
 #  include "xalloc.h"
 #  include "c-ctype.h"
 #  include "quote.h"
-#  include "error.h"
 
 /* Take care of NLS matters.  */
 #include "gettext.h"

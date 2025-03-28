@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <error.h>
 #include <getopt.h>
 #include <locale.h>
 #include <math.h>
@@ -40,7 +41,6 @@
 #include "closeout.h"
 #include "hash.h"
 #include "hash-pjw.h"
-#include "error.h"
 #include "lib/intprops.h"
 #include "quote.h"
 #include "ignore-value.h"

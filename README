@@ -1,3 +1,13 @@
+  Copyright (C) 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
+  2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023 Free Software Foundation, Inc.
+
+  Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
+  Copyright (C) 2022-2025 Timothy Rice <trice@posteo.net>
+
+  Copying and distribution of this file, with or without modification,
+  are permitted in any medium without royalty provided the copyright
+  notice and this notice are preserved.
+
 GNU Datamash
 ============
 
@@ -70,6 +80,8 @@ General installation commands:
     $ make check
     $ sudo make install
 
+Also see INSTALL.
+
 See Platform/OS-specific download instructions at
   https://www.gnu.org/software/datamash/download/
 
@@ -130,7 +142,7 @@ Copyright and License
 =====================
 Copyright (C) 2013-2021 Assaf Gordon <assafgordon@gmail.com>
 
-License: GPL Version 3 (or later).
+License: GPL Version 3 (or later). See COPYING.
 
 For any copyright year range specified as YYYY-ZZZZ in this package
 note that the range specifies every single year in that closed interval.

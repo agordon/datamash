@@ -63,7 +63,8 @@ dbg_printf (char const *msg, ...)
 }
 
 /* Until someone better comes along */
-const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon and Timothy Rice" ;
+const char version_etc_copyright[] = "Copyright %s %d Assaf Gordon and \
+Timothy Rice";
 
 /* if true, enable developer's debug messages */
 static bool debug = false;
