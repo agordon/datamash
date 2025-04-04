@@ -26,7 +26,7 @@ local-checks-to-skip = \
 # Hash of the current/old NEWS file.
 # checked by 'sc_immutable_NEWS' rule.
 # updated by 'update-NEWS-hash' rule.
-old_NEWS_hash = 172bdd20a78c5f43b5154e7856983cb9
+old_NEWS_hash = 46784a3a1a2511c3e09e20436f6fe6ce
 
 update-copyright-env = \
   env \
