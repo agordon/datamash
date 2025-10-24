@@ -228,3 +228,9 @@
 /xstrtol.m4
 /year2038.m4
 /zzgnulib.m4
+/fseterr.m4
+/gettext_h.m4
+/lstat.m4
+/stdckdint_h.m4
+/stringeq.m4
+/unitypes_h.m4
