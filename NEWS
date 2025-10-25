@@ -2,6 +2,12 @@
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Bug Fixes
+
+  decorate(1): Fix buffer under-read (CWE-127) when undecorating an empty
+  line.  The problem was reported by Frank Busse in
+  <https://lists.gnu.org/archive/html/bug-datamash/2025-10/msg00000.html>.
+
 
 * Noteworthy changes in release 1.9 (2025-04-05) [stable]
 

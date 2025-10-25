@@ -147,6 +147,9 @@ begfield (struct line const *line, struct keyfield const *key)
   size_t sword = key->sword;
   size_t schar = key->schar;
 
+  if (lim < ptr)
+    lim = ptr;
+
   /* The leading field separator itself is included in a field when -t
      is absent.  */
 

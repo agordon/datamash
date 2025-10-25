@@ -293,6 +293,7 @@ my @Tests =
   ['u2', '--undecorate 1' , {IN_PIPE=>$out1_dec_ipv4}, {OUT => $in1}],
   ['u3', '--undecorate 2' , {IN_PIPE=>$out1_dec_roman_ipv4}, {OUT => $in1}],
   ['u4', '--undecorate 2' , {IN_PIPE=>$out1_dec_ipv4_roman}, {OUT => $in1}],
+  ['u5', '--undecorate 1' , {IN_PIPE=>"\n"}, {OUT => "\n"}],
 
   ## sort arguments adjustment
   ['sa1', '--print-sort-args -k1,1:roman',

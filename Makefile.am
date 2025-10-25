@@ -188,7 +188,8 @@ TESTS = \
 	tests/datamash-vnlog.pl \
 	tests/decorate-tests.pl \
 	tests/decorate-errors.pl \
-	tests/decorate-sort-tests.pl
+	tests/decorate-sort-tests.pl \
+	tests/decorate-valgrind.sh
 
 EXTRA_DIST += \
 	tests/no-perl \
