@@ -40,7 +40,7 @@
 #include "fpucw.h"
 #include "closeout.h"
 #include "hash.h"
-#include "hash-pjw.h"
+#include "hashcode-string2.h"
 #include "lib/intprops.h"
 #include "quote.h"
 #include "ignore-value.h"

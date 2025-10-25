@@ -45,7 +45,7 @@
 #include "sha512.h"
 #include "base64.h"
 #include "xalloc.h"
-#include "hash-pjw-bare.h"
+#include "hashcode-mem.h"
 
 #include "utils.h"
 #include "text-options.h"
