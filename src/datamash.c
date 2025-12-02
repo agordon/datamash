@@ -1101,6 +1101,10 @@ remove_dups_in_file ()
       /* Add key to the key buffer */
       if (next_key_pos + len + 1 > keys_buffer_alloc)
         {
+          /* Guard against really long keys. */
+          if (len + 1 > keys_buffer_alloc)
+            keys_buffer_alloc = len + 1;
+
           keys_buffer = xmalloc ( keys_buffer_alloc ) ;
           next_key_pos = 0;
 
