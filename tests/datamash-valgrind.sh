@@ -81,6 +81,11 @@ do
 done > wide ||
     framework_failure_ "failed to prepare 'wide' file"
 
+## Prepare a file with very wide fields for rmdup
+seq 300000 | paste -s -d "" - > wide_line ||
+  framework_failure_ "failed to prepare 'wide_line' file"
+cat wide_line wide_line > two_wide_lines ||
+  framework_failure_ "failed to prepare 'two_wide_lines' file"
 fail=0
 
 seq 10000 | valgrind --track-origins=yes  --show-reachable=yes \
@@ -165,6 +170,15 @@ sort < rmdup_1M_2.t > rmdup_1M_2 \
     || framework_failure_ "failed to sort rmdup_1M_2.t"
 cmp rmdup_1M_2 1M1K ||
   { warn_ "rmdup (2) failed on 4M (output differences)" ;
+    fail=1 ; }
+
+## Test remove-duplicates (using gnulib's hash) with large keys
+cat two_wide_lines | valgrind --track-origins=yes  --leak-check=full \
+                              --show-reachable=yes  --error-exitcode=1 \
+                              datamash rmdup 1 > rmdup_wide_lines ||
+  { warn_ "rmdup failed on two_wide_lines" ; fail=1 ; }
+cmp rmdup_wide_lines wide_line ||
+  { warn_ "rmdup failed on two_wide_lines (output differences)" ;
     fail=1 ; }
 
 ## Test Base64 encode/decode

@@ -8,6 +8,11 @@
   line.  The problem was reported by Frank Busse in
   <https://lists.gnu.org/archive/html/bug-datamash/2025-10/msg00000.html>.
 
+  datamash(1): Fix crash caused by a heap-based buffer overflow (CWE-122)
+  when using the "rmpdup" operation with field content larger than 1MiB.
+  The problem was reported by wheat MAX in
+  <https://lists.gnu.org/archive/html/bug-datamash/2025-12/msg00006.html>.
+
 
 * Noteworthy changes in release 1.9 (2025-04-05) [stable]
 
