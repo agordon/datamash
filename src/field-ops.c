@@ -1214,4 +1214,5 @@ field_op_print_empty_value (enum field_operation mode)
   op.res_type = NUMERIC_RESULT;
   field_op_summarize_empty (&op);
   fputs (op.out_buf, stdout);
+  field_op_free (&op);
 }
