@@ -209,4 +209,18 @@ cat wide | valgrind --track-origins=yes  --leak-check=full \
                   datamash --format "%05000.5000f" sum 1 > /dev/null ||
   { test $? -eq 2 && { warn_ "custom-format failed" ; fail=1 ; } ; }
 
+## Test undocumented flags
+valgrind --track-origins=yes  --show-reachable=yes \
+    --leak-check=full  --error-exitcode=1 \
+    datamash ---print-inf > /dev/null ||
+  { warn_ "print-inf - failed" ; fail=1 ; }
+valgrind --track-origins=yes  --show-reachable=yes \
+    --leak-check=full  --error-exitcode=1 \
+    datamash ---print-nan > /dev/null ||
+  { warn_ "print-nan - failed" ; fail=1 ; }
+valgrind --track-origins=yes  --show-reachable=yes \
+    --leak-check=full  --error-exitcode=1 \
+    datamash ---print-progname > /dev/null ||
+  { warn_ "print-progname - failed" ; fail=1 ; }
+
 Exit $fail
