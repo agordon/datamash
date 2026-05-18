@@ -478,6 +478,8 @@ minimum of the absolute values
 maximum of the absolute values
 @item range
 range of values (maximum - minimum)
+@item dotprod
+scalar product (aka dot product or Euclidean inner product) of two columns
 @end table
 
 @item Group-By Textual/Numeric operations:
@@ -567,6 +569,14 @@ Excess Kurtosis of the (population) group
 p-value of the Jarque-Beta test for normality
 @item dpo
 p-value of the D'Agostino-Pearson Omnibus test for normality.
+@item scov
+covariance of two samples
+@item pcov
+covariance of two populations
+@item spearson
+Pearson product-moment correlation coefficient of two samples
+@item ppearson
+Pearson product-moment correlation coefficient of two populations
 @end table
 
 @end table
