@@ -110,7 +110,7 @@ The echo command is simply an alias to cut.
 
 .TP "\w'\fBcountunique\fR'u+1n"
 .B sum
-sum the of values
+sum of the values
 
 .TP
 .B min

@@ -467,7 +467,7 @@ an alias for @code{cut}.
 
 @table @option
 @item sum
-sum the of values
+sum of the values
 @item min
 minimum value
 @item max
