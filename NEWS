@@ -13,6 +13,10 @@
   The problem was reported by wheat MAX in
   <https://lists.gnu.org/archive/html/bug-datamash/2025-12/msg00006.html>.
 
+  datamash(1): Fix memory leak in --print-nan.
+  Reported and implemented by George Sauthoff in
+  <https://lists.gnu.org/archive/html/bug-datamash/2026-02/msg00007.html>
+
 
 * Noteworthy changes in release 1.9 (2025-04-05) [stable]
 
