@@ -133,6 +133,12 @@ maximum of the absolute values
 the values range (max-min)
 .PP
 
+.TP
+.B  dotprod [X:Y]
+Scalar product (aka dot product or Euclidean inner product)
+of fields X and Y
+
+
 .SS "Textual/Numeric Grouping operations"
 
 .TP "\w'\fBcountunique\fR'u+1n"
@@ -276,11 +282,6 @@ covariance of fields X and Y
 .TP
 .B  ppearson/spearson [X:Y]
 Pearson product-moment correlation coefficient [Pearson's R]
-of fields X and Y
-
-.TP
-.B  dotprod [X:Y]
-Scalar product (aka dot product or Euclidean inner product)
 of fields X and Y
 
 

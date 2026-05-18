@@ -214,7 +214,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       fputs ("  dirname, basename, barename, extname, getnum, cut\n", stdout);
 
       fputs (_("Numeric Grouping operations:\n"),stdout);
-      fputs ("  sum, min, max, absmin, absmax, range\n",stdout);
+      fputs ("  sum, min, max, absmin, absmax, range, dotprod\n",stdout);
 
       fputs (_("Textual/Numeric Grouping operations:\n"),stdout);
       fputs ("  count, first, last, rand, unique, collapse, countunique\n",
@@ -225,7 +225,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
   mean, geomean, harmmean, trimmean, median, q1, q3, iqr, perc,\n\
   mode, antimode, pstdev, sstdev, pvar, svar, ms, rms, mad, madraw,\n\
   pskew, sskew, pkurt, skurt, dpo, jarque,\n\
-  scov, pcov, spearson, ppearson, dotprod\n\
+  scov, pcov, spearson, ppearson\n\
 \n", stdout);
       fputs ("\n", stdout);
 

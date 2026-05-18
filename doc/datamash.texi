@@ -181,7 +181,8 @@ thousands separator.
 @code{getnum}, @code{cut}, @code{echo}
 
 @item Group-by Numeric operations:
-@code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax}, @code{range}
+@code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax},
+@code{range}, @code{dotprod}
 
 @item Group-by Textual/Numeric operations:
 @code{count}, @code{first}, @code{last}, @code{rand},
@@ -194,8 +195,7 @@ thousands separator.
 @code{antimode}, @code{pstdev}, @code{sstdev}, @code{pvar}, @code{svar},
 @code{ms}, @code{rms}, @code{mad}, @code{madraw}, @code{sskew},
 @code{pskew}, @code{skurt}, @code{pkurt}, @code{jarque}, @code{dpo},
-@code{scov}, @code{pcov}, @code{spearson}, @code{ppearson},
-@code{dotprod}
+@code{scov}, @code{pcov}, @code{spearson}, @code{ppearson}
 
 @end table
 
