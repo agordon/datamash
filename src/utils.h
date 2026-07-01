@@ -54,7 +54,7 @@ arithmetic_mean_value (const long double * const values, const size_t n);
     0.25 = First quartile
     0.50 = median
     0.75 = third quartile
-    0.99 = 99nt percentile
+    0.99 = 99th quantile
 */
 long double
 quantile_value (const long double * const values,
@@ -67,7 +67,7 @@ quantile_value (const long double * const values,
     25.0 = First quartile
     50.0 = median
     75.0 = third quartile
-    99.0 = 99nt percentile
+    99.0 = 99th percentile
 */
 long double
 percentile_value (const long double * const values,
