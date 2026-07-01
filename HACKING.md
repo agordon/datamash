@@ -124,6 +124,23 @@ password-less login.
 
 See `./build-aux/check-remote-make.sh -h` for many more options.
 
+## Locales
+
+Some of the tests assume specific locales are installed.
+If you're in a POSIX system where not all locales are installed by default,
+you can try a procedure like this to install locales to a dev environment:
+
+    export LOCPATH=$HOME/src/gnu/locales/datamash
+    mkdir -p $LOCPATH
+    localedef -i C     -f UTF-8 $LOCPATH/C.UTF-8
+    localedef -i en_US -f UTF-8 $LOCPATH/en_US.UTF-8
+    localedef -i en_DE -f UTF-8 $LOCPATH/de_DE.UTF-8
+
+You may also want to ensure the locale corresponding to your usual `LANG`
+variable is installed to the environment as well.
+
+After that, whenever you have the same `LOCPATH` exported to your environment,
+you can test any locales installed in that environment.
 
 ## Coverage
 
