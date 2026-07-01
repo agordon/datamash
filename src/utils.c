@@ -77,16 +77,16 @@ long double _GL_ATTRIBUTE_PURE
 quantile_value (const long double * const values,
                 const size_t n, const double quantile)
 {
-  const double h = ( (n-1) * quantile ) ;
-  const size_t fh = floor (h);
-
   /* Error in the calling parameters, should not happen */
   assert (n>0 && quantile>=0.0 && quantile<=1.0); /* LCOV_EXCL_LINE */
 
   if (n==1)
     return values[0];
 
-  return values[fh] + (h-fh) * ( values[fh+1] - values[fh] ) ;
+  const double h = ( (n-1) * quantile ) ;
+  const size_t h_floor = floor (h);
+  const size_t h_ceil = ceil (h);
+  return values[h_floor] + (h-h_floor) * ( values[h_ceil] - values[h_floor] ) ;
 }
 
 long double _GL_ATTRIBUTE_PURE
