@@ -201,6 +201,17 @@ set_op_params (struct fieldop *op)
       return;
     }
 
+  if (op->op==OP_SOFTMAX)
+    {
+      op->params.coldness = 1; /* default thermodynamic beta */
+      if (_params_used==1)
+        op->params.coldness = _params[0].f;
+      if (_params_used>1)
+        die (EXIT_FAILURE, 0, _("too many parameters for operation %s"),
+                                    quote (get_field_operation_name (op->op)));
+      return;
+    }
+
   if (op->op==OP_TRIMMED_MEAN)
     {
       op->params.trimmed_mean = 0; /* default trimmed mean = no trim */

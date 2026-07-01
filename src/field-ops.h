@@ -89,6 +89,7 @@ struct fieldop
     long double bin_bucket_size;
     size_t strbin_bucket_size;
     size_t percentile;
+    long double coldness;
     long double trimmed_mean;
     enum extract_number_type get_num_type;
   } params;

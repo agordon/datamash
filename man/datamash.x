@@ -138,6 +138,12 @@ the values range (max-min)
 Scalar product (aka dot product or Euclidean inner product)
 of fields X and Y
 
+.TP
+.B softmax[:coldness]
+scales a list of numbers into a stochastic vector.
+Coldness (defaults to 1) is a parameter that causes the resulting
+distribution to become more uniform as it decreases (gets hotter)
+or emphasizes differences as it increases.
 
 .SS "Textual/Numeric Grouping operations"
 

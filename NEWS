@@ -2,6 +2,11 @@
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** New Features
+
+  datamash(1): add operation softmax for converting a list of numbers into
+  a stochastic vector.
+
 ** Bug Fixes
 
   decorate(1): Fix buffer under-read (CWE-127) when undecorating an empty

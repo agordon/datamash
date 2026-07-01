@@ -170,6 +170,8 @@ struct operation_data operations[] =
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_FRACTION */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
+  /* OP_SOFTMAX */
+  {NUMERIC_VECTOR, IGNORE_FIRST, STRING_RESULT},
   /* OP_TRIMMED_MEAN */
   {NUMERIC_SCALAR, IGNORE_FIRST, NUMERIC_RESULT},
   /* OP_DIRNAME */
@@ -445,6 +447,11 @@ field_op_collect (struct fieldop *op,
         }
       break;
 
+    case OP_SOFTMAX:
+      field_op_add_value (op, num_value);
+      /* Implementing 'safe softmax', we want to store max,
+         so fall through to storing that in op->value */
+      /* FALLTHROUGH */
     case OP_MAX:
       if (num_value > op->value)
         {
@@ -640,6 +647,49 @@ field_op_collect (struct fieldop *op,
   return rc;
 }
 
+/* Creates the "softmax" values based on op->values.
+   Results are stored in op->out_buf.
+   We use the 'safe softmax' implementation defined at
+   https://en.wikipedia.org/wiki/Softmax_function#Numerical_algorithms
+   */
+static void
+softmax ( struct fieldop *op )
+{
+  long double _max = op->value;
+
+  long double denominator = 0;
+  for (size_t i=0; i< op->num_values; i++)
+    {
+      /* Shift values by max and exponentiate */
+      op->values[i] = expl (op->params.coldness * (op->values[i] - _max));
+
+      /* Keep track of the total */
+      denominator += op->values[i];
+    }
+
+  /* Add +1 size per value for newlines,
+     but don't worry about the final newline */
+  field_op_reserve_out_buf (op,
+                            (numeric_output_bufsize + 1)
+                            * op->num_values - 1);
+  memset (op->out_buf, 0,
+          (numeric_output_bufsize + 1)
+          * op->num_values - 1);
+
+  char _out_buf[numeric_output_bufsize];
+  for (size_t i=0; i< op->num_values; i++)
+    {
+      memset (_out_buf, 0, numeric_output_bufsize);
+      snprintf (_out_buf, numeric_output_bufsize,
+                numeric_output_format, op->values[i]/denominator);
+      strncat (op->out_buf, _out_buf, numeric_output_bufsize);
+      if (i != op->num_values - 1)
+      {
+        strncat (op->out_buf, "\n", 1);
+      }
+    }
+}
+
 /* creates a list of unique strings from op->str_buf .
    results are stored in op->out_buf. */
 static void
@@ -772,6 +822,7 @@ field_op_summarize_empty (struct fieldop *op)
     case OP_TRUNCATE:
     case OP_FRACTION:
     case OP_RANGE:
+    case OP_SOFTMAX:
     case OP_TRIMMED_MEAN:
     case OP_GETNUM:
       numeric_result = nanl ("");
@@ -920,6 +971,10 @@ field_op_summarize (struct fieldop *op)
       field_op_sort_values (op);
       numeric_result = percentile_value ( op->values, op->num_values,
                                           op->params.percentile / 100.0 );
+      break;
+
+    case OP_SOFTMAX:
+      softmax (op);
       break;
 
     case OP_TRIMMED_MEAN:

@@ -26,7 +26,7 @@ _datamash ()
   #NOTE: do not change the spaces (or indentation or backslashes)
   #      or the regex will fail.
   local groupby_ops="sum min max absmin absmax range \
-count first last rand \
+count first last rand softmax \
 unique uniq collapse countunique \
 mean geomean harmmean trimmean median q1 q3 iqr perc mode antimode \
 pstdev sstdev pvar svar mad madraw \

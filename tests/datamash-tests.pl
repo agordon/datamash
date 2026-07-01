@@ -372,6 +372,50 @@ e	c	b	bar,baz
 e	d	c	alice
 EOF
 
+# Use the same list of numbers as
+# https://en.wikipedia.org/wiki/Softmax_function#Example
+my $softmax_in=<<'EOF';
+1
+2
+3
+4
+1
+2
+3
+EOF
+
+# Use the same list of numbers as
+# https://en.wikipedia.org/wiki/Softmax_function#Example
+my $softmax_out_std=<<'EOF';
+0.023640543021591
+0.064261658510496
+0.17468129859572
+0.47483299974438
+0.023640543021591
+0.064261658510496
+0.17468129859572
+EOF
+
+my $softmax_out_hot=<<'EOF';
+0.10812478022457
+0.13206390479175
+0.16130321756604
+0.19701619483528
+0.10812478022457
+0.13206390479175
+0.16130321756604
+EOF
+
+my $softmax_out_cold=<<'EOF';
+0.0018889194268673
+0.013957331611482
+0.10313150626862
+0.76204448538606
+0.0018889194268673
+0.013957331611482
+0.10313150626862
+EOF
+
 =pod
   Example:
   my $data = "a 1\nb 2\n";
@@ -602,6 +646,11 @@ my @Tests =
   ['mm2', 'max 1', {IN_PIPE=>$in_minmax}, {OUT=>"200\n"}],
   ['mm3', 'absmin 1', {IN_PIPE=>$in_minmax}, {OUT=>"0.0001\n"}],
   ['mm4', 'absmax 1', {IN_PIPE=>$in_minmax}, {OUT=>"-700\n"}],
+
+  # Test softmax
+  ['sm1', 'softmax 1',     {IN_PIPE=>$softmax_in}, {OUT=>$softmax_out_std}],
+  ['sm2', 'softmax:0.2 1', {IN_PIPE=>$softmax_in}, {OUT=>$softmax_out_hot}],
+  ['sm3', 'softmax:2 1',   {IN_PIPE=>$softmax_in}, {OUT=>$softmax_out_cold}],
 
   #
   # Test Grouping

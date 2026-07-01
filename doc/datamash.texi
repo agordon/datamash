@@ -182,7 +182,7 @@ thousands separator.
 
 @item Group-by Numeric operations:
 @code{sum}, @code{min}, @code{max}, @code{absmin}, @code{absmax},
-@code{range}, @code{dotprod}
+@code{range}, @code{dotprod}, @code{softmax}
 
 @item Group-by Textual/Numeric operations:
 @code{count}, @code{first}, @code{last}, @code{rand},
@@ -480,6 +480,8 @@ maximum of the absolute values
 range of values (maximum - minimum)
 @item dotprod
 scalar product (aka dot product or Euclidean inner product) of two columns
+@item softmax
+converts a list of numbers into a stochastic vector, with optional coldness.
 @end table
 
 @item Group-By Textual/Numeric operations:
