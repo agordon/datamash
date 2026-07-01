@@ -2,6 +2,10 @@
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Changes in Behavior
+
+  datamash(1): the perc operation now accepts non-integer and 0% percentiles.
+
 ** New Features
 
   datamash(1): add operation softmax for converting a list of numbers into

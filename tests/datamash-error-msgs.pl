@@ -194,8 +194,6 @@ my @Tests =
     {ERR=>"$prog: strbin bucket size must not be zero\n"}],
 
    # values for percentile operation
-  ['e94','perc:0  1',    {IN_PIPE=>""}, {EXIT=>1},
-    {ERR=>"$prog: invalid percentile value 0\n"}],
   ['e95','perc:101  1',    {IN_PIPE=>""}, {EXIT=>1},
     {ERR=>"$prog: invalid percentile value 101\n"}],
   ['e96','perc:foo  1',    {IN_PIPE=>""}, {EXIT=>1},
