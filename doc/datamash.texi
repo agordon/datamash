@@ -190,7 +190,7 @@ thousands separator.
 @code{collapse}, @code{countunique}
 
 @item Group-by Statistical operations:
-@code{mean}, @code{geomean}, @code{harmmean}, @code{mode},
+@code{mean}, @code{geomean}, @code{harmmean}, @code{trimmean}, @code{mode},
 @code{median}, @code{q1}, @code{q3}, @code{iqr}, @code{perc},
 @code{antimode}, @code{pstdev}, @code{sstdev}, @code{pvar}, @code{svar},
 @code{ms}, @code{rms}, @code{mad}, @code{madraw}, @code{sskew},
