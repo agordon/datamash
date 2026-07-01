@@ -20,7 +20,6 @@
 #  sc_prohibit_strings_without_use: using memset/memmove requirs <string.h>
 local-checks-to-skip = \
   sc_copyright_check \
-  sc_indent \
   sc_prohibit_strings_without_use
 
 # Hash of the current/old NEWS file.
