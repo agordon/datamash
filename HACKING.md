@@ -332,3 +332,13 @@ Then configure and make like usual:
     $ ./configure --disable-werror
     $ gmake
     $ gmake check
+
+## Updating the webpage
+
+1. Ensure `cvs` is installed on your system.
+2. `ssh-add <savannah ssh key>`
+3. `cvs -z3 -d:ext:<username>@cvs.savannah.gnu.org:/web/datamash co datamash`
+4. `cvs update`
+5. edit files ...
+6. `cvs diff`
+7. `cvs commit -m <commit-message>`
