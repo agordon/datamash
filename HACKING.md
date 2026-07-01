@@ -72,6 +72,10 @@ To run a specific test:
 
     make check TESTS=./tests/datamash-tests.pl
 
+Using `MALLOC_PERTURB_` sometimes turns up more subtle bugs, eg try:
+
+    MALLOC_PERTURB_=141 make check
+
 ### Expensive tests
 
 Expensive tests use valgrind to find memory usage errors, and use specially
