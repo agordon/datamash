@@ -201,7 +201,7 @@ long double
 mode_value ( const long double * const values, size_t n, enum MODETYPE type);
 
 /*
- Given an array of doubles, return the mode/anti-mode values.
+ Given an array of doubles, return the trimmed mean values.
  */
 long double
 trimmed_mean_value ( const long double * const values, size_t n,
