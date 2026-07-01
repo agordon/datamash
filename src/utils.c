@@ -61,7 +61,7 @@ long double _GL_ATTRIBUTE_PURE
 median_value (const long double * const values, size_t n)
 {
 #if 0
-  return percentile_value (values, n, 2.0/4.0);
+  return quantile_value (values, n, 2.0/4.0);
 #else
   /* Equivalent to the above, but slightly faster */
   return (n&0x01)
@@ -74,19 +74,29 @@ median_value (const long double * const values, size_t n)
    See discussion here:
    http://tolstoy.newcastle.edu.au/R/e17/help/att-1067/Quartiles_in_R.pdf */
 long double _GL_ATTRIBUTE_PURE
-percentile_value (const long double * const values,
-                  const size_t n, const double percentile)
+quantile_value (const long double * const values,
+                const size_t n, const double quantile)
 {
-  const double h = ( (n-1) * percentile ) ;
+  const double h = ( (n-1) * quantile ) ;
   const size_t fh = floor (h);
 
   /* Error in the calling parameters, should not happen */
-  assert (n>0 && percentile>=0.0 && percentile<=100.0); /* LCOV_EXCL_LINE */
+  assert (n>0 && quantile>=0.0 && quantile<=1.0); /* LCOV_EXCL_LINE */
 
   if (n==1)
     return values[0];
 
   return values[fh] + (h-fh) * ( values[fh+1] - values[fh] ) ;
+}
+
+long double _GL_ATTRIBUTE_PURE
+percentile_value (const long double * const values,
+                  const size_t n, const double percentile)
+{
+  /* Error in the calling parameters, should not happen */
+  assert (n>0 && percentile>=0.0 && percentile<=100.0); /* LCOV_EXCL_LINE */
+
+  return quantile_value ( values, n, percentile / 100.0 );
 }
 
 

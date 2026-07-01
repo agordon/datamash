@@ -970,7 +970,7 @@ field_op_summarize (struct fieldop *op)
     case OP_PERCENTILE:
       field_op_sort_values (op);
       numeric_result = percentile_value ( op->values, op->num_values,
-                                          op->params.percentile / 100.0 );
+                                          op->params.percentile );
       break;
 
     case OP_SOFTMAX:

@@ -48,13 +48,26 @@ long double
 arithmetic_mean_value (const long double * const values, const size_t n);
 
 /*
- Given a sorted array of doubles, return the value of 'percentile'.
- Example of valid 'percentile':
+ Given a sorted array of doubles, return the value of 'quantile'.
+ Example of valid 'quantile':
     0.10 = First decile
     0.25 = First quartile
     0.50 = median
     0.75 = third quartile
     0.99 = 99nt percentile
+*/
+long double
+quantile_value (const long double * const values,
+                const size_t n, const double quantile);
+
+/*
+ Given a sorted array of doubles, return the value of 'percentile'.
+ Example of valid 'percentile':
+    10.0 = First decile
+    25.0 = First quartile
+    50.0 = median
+    75.0 = third quartile
+    99.0 = 99nt percentile
 */
 long double
 percentile_value (const long double * const values,
@@ -68,14 +81,14 @@ median_value (const long double * const values, size_t n);
 static inline long double
 quartile1_value (const long double * const values, size_t n)
 {
-  return percentile_value (values, n, 1.0/4.0);
+  return quantile_value (values, n, 1.0/4.0);
 }
 
 /* Given a sorted array of doubles, return the value of 3rd quartile */
 static inline long double
 quartile3_value (const long double * const values, size_t n)
 {
-  return percentile_value (values, n, 3.0/4.0);
+  return quantile_value (values, n, 3.0/4.0);
 }
 
 /* Given a sorted array of doubles, return the MAD value
