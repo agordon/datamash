@@ -523,7 +523,7 @@ print_column_headers ()
       }
 
       printf ("(%s", get_input_field_name (op->field));
-      while (dm->ops[i].slave)
+      while (dm->ops[i].subordinate)
         {
           /* print subsequent arguments to the same operation,
              e.g. 'pcov (x,y)' */
@@ -585,7 +585,7 @@ summarize_field_ops ()
   for (size_t i=0;i<dm->num_ops;++i)
     {
       struct fieldop *p = &dm->ops[i];
-      if (p->slave)
+      if (p->subordinate)
         continue;
 
       field_op_summarize (p);

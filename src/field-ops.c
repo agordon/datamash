@@ -329,8 +329,8 @@ field_op_init (struct fieldop* /*out*/ op,
   op->numeric = (op->acc_type == NUMERIC_SCALAR
                  || op->acc_type == NUMERIC_VECTOR);
   op->auto_first = operations[oper].auto_first;
-  op->slave = false;
-  op->slave_op = NULL;
+  op->subordinate = false;
+  op->subordinate_op = NULL;
 
   op->field = num;
   op->field_by_name = by_name;
@@ -343,18 +343,18 @@ field_op_init (struct fieldop* /*out*/ op,
     }
 }
 
-/* Ensure this (master) fieldop has the same number of values as
-   as it's slave fieldop. */
+/* Ensure this (primary) fieldop has the same number of values as
+   as it's subordinate fieldop. */
 static void
-verify_slave_num_values (const struct fieldop *op)
+verify_subordinate_num_values (const struct fieldop *op)
 {
-  assert (op && !op->slave && op->slave_op);     /* LCOV_EXCL_LINE */
+  assert (op && !op->subordinate && op->subordinate_op);    /* LCOV_EXCL_LINE */
 
-  if (op->num_values != op->slave_op->num_values)
+  if (op->num_values != op->subordinate_op->num_values)
     die (EXIT_FAILURE, 0, _("input error for operation %s: \
 fields %"PRIuMAX",%"PRIuMAX" have different number of items"),
                             quote (get_field_operation_name (op->op)),
-                            (uintmax_t)op->slave_op->field,
+                            (uintmax_t)op->subordinate_op->field,
                             (uintmax_t)op->field);
 }
 
@@ -991,10 +991,11 @@ field_op_summarize (struct fieldop *op)
 
     case OP_P_COVARIANCE:
     case OP_S_COVARIANCE:
-      assert (!op->slave);                       /* LCOV_EXCL_LINE */
-      assert (op->slave_op);                     /* LCOV_EXCL_LINE */
-      verify_slave_num_values (op);
-      numeric_result = covariance_value (op->values, op->slave_op->values,
+      assert (!op->subordinate);                       /* LCOV_EXCL_LINE */
+      assert (op->subordinate_op);                     /* LCOV_EXCL_LINE */
+      verify_subordinate_num_values (op);
+      numeric_result = covariance_value (op->values,
+                                         op->subordinate_op->values,
                                          op->num_values,
                                          (op->op==OP_P_COVARIANCE)?
                                                 DF_POPULATION:DF_SAMPLE );
@@ -1002,20 +1003,22 @@ field_op_summarize (struct fieldop *op)
 
     case OP_P_PEARSON_COR:
     case OP_S_PEARSON_COR:
-      assert (!op->slave);                       /* LCOV_EXCL_LINE */
-      assert (op->slave_op);                     /* LCOV_EXCL_LINE */
-      verify_slave_num_values (op);
-      numeric_result = pearson_corr_value (op->values, op->slave_op->values,
+      assert (!op->subordinate);                       /* LCOV_EXCL_LINE */
+      assert (op->subordinate_op);                     /* LCOV_EXCL_LINE */
+      verify_subordinate_num_values (op);
+      numeric_result = pearson_corr_value (op->values,
+                                           op->subordinate_op->values,
                                            op->num_values,
                                            (op->op==OP_P_PEARSON_COR)?
                                                 DF_POPULATION:DF_SAMPLE);
       break;
 
     case OP_DOT_PRODUCT:
-      assert (!op->slave);                       /* LCOV_EXCL_LINE */
-      assert (op->slave_op);                     /* LCOV_EXCL_LINE */
-      verify_slave_num_values (op);
-      numeric_result = dot_product_value (op->values, op->slave_op->values,
+      assert (!op->subordinate);                       /* LCOV_EXCL_LINE */
+      assert (op->subordinate_op);                     /* LCOV_EXCL_LINE */
+      verify_subordinate_num_values (op);
+      numeric_result = dot_product_value (op->values,
+                                          op->subordinate_op->values,
                                           op->num_values );
       break;
 

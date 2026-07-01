@@ -477,13 +477,15 @@ create_field_ops ()
 
       if (f->pair)
         {
-          op->slave = true;
+          op->subordinate = true;
 
           const struct parser_field_t *other_f = &_fields[++i];
           op = add_op (fop, other_f);
           set_op_params (op);
-          op->master = true;
-          op->slave_idx = dm->num_ops-2; /* index of the prev op = slave op */
+          op->primary = true;
+
+          /* index of the prev op = subordinate op */
+          op->subordinate_idx = dm->num_ops-2;
         }
     }
 }
@@ -531,15 +533,15 @@ parse_operations (enum processing_mode pm)
       tok = scanner_peek_token ();
     }
 
-  /* After adding all operations, see if there are master/slave ops
+  /* After adding all operations, see if there are primary/subordinate ops
    * that need resolving - caching their pointer instead of index */
   for (size_t i=0; i<dm->num_ops; ++i)
      {
-      if (!dm->ops[i].master)
+      if (!dm->ops[i].primary)
         continue;
-      const size_t si = dm->ops[i].slave_idx;
+      const size_t si = dm->ops[i].subordinate_idx;
       assert (si<=dm->num_ops);                  /* LCOV_EXCL_LINE */
-      dm->ops[i].slave_op = &dm->ops[si];
+      dm->ops[i].subordinate_op = &dm->ops[si];
     }
 }
 
@@ -890,10 +892,10 @@ datamash_ops_debug_print ( const struct datamash_ops* p )
       else
         printf ("  operation '%s' on numeric column %zu",
                         get_field_operation_name (o->op), o->field);
-      if (o->master)
-        printf (" (master)");
-      if (o->slave)
-        printf (" (slave)");
+      if (o->primary)
+        printf (" (primary)");
+      if (o->subordinate)
+        printf (" (subordinate)");
       printf ( "\n");
     }
 }
