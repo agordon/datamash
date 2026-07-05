@@ -175,6 +175,8 @@ my @Tests =
   ['rev4', '--no-strict reverse',   {IN_PIPE=>$in3}, {OUT=>$out3_rev}],
   ['tr4.1', '--no-strict --filler xxx transpose',
     {IN_PIPE=>$in3}, {OUT=>$out3_filler_tr}],
+  ['tr4.2', '--no-strict -F xxx transpose',
+    {IN_PIPE=>$in3}, {OUT=>$out3_filler_tr}],
 
 
   # Single column

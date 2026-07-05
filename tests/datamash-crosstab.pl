@@ -198,7 +198,8 @@ my @Tests =
 
   # Test missing values
   ['c30','ct 1,2 first 3',       {IN_PIPE=>$in3}, {OUT=>$out3_na}],
-  ['c31','--filler XX ct 1,2 first 3',       {IN_PIPE=>$in3}, {OUT=>$out3_xx}],
+  ['c31','--filler XX ct 1,2 first 3', {IN_PIPE=>$in3}, {OUT=>$out3_xx}],
+  ['c32','-F XX ct 1,2 first 3',       {IN_PIPE=>$in3}, {OUT=>$out3_xx}],
 
   # Test wrong usage
   ['e1',  'ct',  {IN_PIPE=>""}, {EXIT=>1},

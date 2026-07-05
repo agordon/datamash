@@ -283,7 +283,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
       --no-strict           allow lines with varying number of fields\n\
 "), stdout);
       printf (_("\
-      --filler=X            fill missing values with X (default %s)\n\
+  -F, --filler=X            fill missing values with X (default %s)\n\
 "), missing_field_filler);
 
       fputs ("\n", stdout);
