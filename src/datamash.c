@@ -259,7 +259,7 @@ which require a pair of fields (e.g. 'pcov 2:6').\n"), stdout);
   -H, --headers             same as '--header-in --header-out'\n\
 "), stdout);
       fputs (_("\
-  --vnlog                   Reads and writes data in the vnlog format.\n\
+      --vnlog               reads and writes data in the vnlog format.\n\
                               Implies -C -H -W\n\
 "), stdout);
       fputs (_("\
