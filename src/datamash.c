@@ -1283,27 +1283,33 @@ int main (int argc, char* argv[])
     {
       switch (optc)
         {
+        /* --skip-comments */
         case 'C':
           skip_comments = true;
           break;
 
+        /* --filler */
         case 'F':
           missing_field_filler = optarg;
           break;
 
+        /* --full */
         case 'f':
           print_full_line = true;
           break;
 
+        /* --group */
         case 'g':
           premode = MODE_GROUPBY;
           premode_group_spec = optarg;
           break;
 
+        /* --ignore-case */
         case 'i':
           case_sensitive = false;
           break;
 
+        /* --vnlog */
         case VNLOG_OPTION:
           skip_comments        = true;
           input_header         = output_header = true;
@@ -1313,30 +1319,37 @@ int main (int argc, char* argv[])
           vnlog                = true;
           break;
 
+        /* --zero-terminated */
         case 'z':
           eolchar = 0;
           break;
 
+        /* --header-in */
         case INPUT_HEADER_OPTION:
           input_header = true;
           break;
 
+        /* --header-out */
         case OUTPUT_HEADER_OPTION:
           output_header = true;
           break;
 
+        /* --headers */
         case 'H':
           input_header = output_header = true;
           break;
 
+        /* --round */
         case 'R':
           set_numeric_output_precision (optarg);
           break;
 
+        /* --sort */
         case 's':
           pipe_through_sort = true;
           break;
 
+        /* --seed */
         case 'S':
           force_seed = true;
           char *endptr;
@@ -1348,18 +1361,22 @@ int main (int argc, char* argv[])
           seed = proposed_seed;
           break;
 
+        /* --no-strict */
         case NO_STRICT_OPTION:
           strict = false;
           break;
 
+        /* --format */
         case CUSTOM_FORMAT_OPTION:
           set_numeric_printf_format (optarg);
           break;
 
+        /* --narm */
         case REMOVE_NA_VALUES_OPTION:
           remove_na_values = true;
           break;
 
+        /* --field-separator */
         case 't':
           if (optarg[0] == '\0' || optarg[1] != '\0')
             die (EXIT_FAILURE, 0,
@@ -1367,6 +1384,7 @@ int main (int argc, char* argv[])
           in_tab = out_tab = optarg[0];
           break;
 
+        /* --output-delimiter */
         case OUTPUT_DELIMITER_OPTION:
           if (optarg[0] == '\0' || optarg[1] != '\0')
             die (EXIT_FAILURE, 0,
@@ -1374,15 +1392,18 @@ int main (int argc, char* argv[])
           explicit_output_delimiter = (char)optarg[0];
           break;
 
+        /* --whitespace */
         case 'W':
           in_tab = TAB_WHITESPACE;
           out_tab = '\t';
           break;
 
+        /* --sort-cmd */
         case SORT_PROGRAM_OPTION:
           sort_cmd = xstrdup (optarg);
           break;
 
+        /* --collapse-delimiter */
         case'c':
           if (optarg[0] == '\0' || optarg[1] != '\0')
             die (EXIT_FAILURE, 0,
@@ -1390,24 +1411,30 @@ int main (int argc, char* argv[])
           collapse_separator = optarg[0];
           break;
 
+        /* ---print-inf */
         case UNDOC_PRINT_INF_OPTION:
+        /* ---print-nan */
         case UNDOC_PRINT_NAN_OPTION:
           field_op_print_empty_value ( (optc==UNDOC_PRINT_INF_OPTION)
                                        ?OP_MAX:OP_MEAN );
           exit (EXIT_SUCCESS);
           break;
 
+        /* ---print-progname */
         case UNDOC_PRINT_PROGNAME_OPTION:
           printf ("%s", program_name);
           exit (EXIT_SUCCESS);
           break;
 
+        /* ---rmdup-test */
         case UNDOC_RMDUP_TEST:
           rmdup_initial_size = 1024;
           break;
 
+        /* --help */
         case_GETOPT_HELP_CHAR;
 
+        /* --version */
         case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
         default:
