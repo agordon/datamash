@@ -409,7 +409,7 @@ $ datamash -H sum "FOO\\\\\-BAR" < input.txt
 
 .SS "Skipping comment lines"
 Use \fB\-C\fR \fB(\-\-skip\-comments)\fR to skip lines starting with '#'
-or '\;' characters (and optional whitespace before them):
+or ';' characters (and optional whitespace before them):
 .PP
 .nf
 .RS
@@ -744,5 +744,6 @@ $ echo zoom-123.45xyz | \fBdatamash\fR getnum:o 1
 
 [ADDITIONAL INFORMATION]
 See
-.UR https://www.gnu.org/software/datamash
-GNU Datamash Website (https://www.gnu.org/software/datamash)
+.UR https://\:www\:.gnu\:.org/\:software/\:datamash
+GNU Datamash Website
+.UE

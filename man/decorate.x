@@ -9,9 +9,10 @@ The \fBdecorate\fR program allows sorting input according to various
 ordering, e.g. IP addresses, roman numerals, etc.
 It works in tandem with sort(1) to perform the actual sorting.
 
-The idea was suggested by
-.UR https://lists.gnu.org/r/bug-coreutils/2015-06/msg00076.html
-Pádraig Brady in https://lists.gnu.org/r/bug-coreutils/2015-06/msg00076.html:
+The
+.UR https://\:lists\:.gnu\:.org/\:r/\:bug\-coreutils/\:2015\-06/\:msg00076\:.html
+idea was suggested by Pádraig Brady
+.UE :
 
 1. Decorate: convert the input to a sortable-format as additional fields
 .br
@@ -75,5 +76,6 @@ C
 
 [ADDITIONAL INFORMATION]
 See
-.UR https://www.gnu.org/software/datamash
-GNU Datamash Website (https://www.gnu.org/software/datamash)
+.UR https://\:www\:.gnu\:.org/\:software/\:datamash
+GNU Datamash Website
+.UE
