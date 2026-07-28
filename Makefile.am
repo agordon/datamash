@@ -189,7 +189,8 @@ TESTS = \
 	tests/decorate-tests.pl \
 	tests/decorate-errors.pl \
 	tests/decorate-sort-tests.pl \
-	tests/decorate-valgrind.sh
+	tests/decorate-valgrind.sh \
+	tests/doc-check.sh
 
 EXTRA_DIST += \
 	tests/no-perl \
